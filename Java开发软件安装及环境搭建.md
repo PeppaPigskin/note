@@ -70,7 +70,7 @@ NTVHT-YF2M4-J9FJG-BJD66-YG667
 	ZSH_THEME="agnoster" # 以agnoster为例，编辑【~/.zshrc】文件，修改【ZSH_THEME】配置
 5、设置字体
 	1)大部分主题用到的字体【Meslo for Powerline】
-	【Meslo for Powerline————https://link.zhihu.com/?target=https%3A//cdn.jsdelivr.net/gh/powerline/fonts/Meslo%2520Slashed/Meslo%2520LG%2520S%2520Regular%2520for%2520Powerline.ttf】
+	【Meslo for Powerline】
 	2)agnoster还需要额外安装字体【Powerline Fonts】
 	【https://github.com/powerline/fonts】  
 	3)选择字体
