@@ -1,5 +1,5 @@
 ---
-typora-root-url: ./image
+
 ---
 
 # 1、OS——终端常用命令
@@ -41,47 +41,47 @@ NTVHT-YF2M4-J9FJG-BJD66-YG667
 
 ​		`1、在自己想要备份数据的文件目录中创建三个空文件backup.sql,backup.xml,backuplog.log，分别用于存储备份的数据脚本、配置文件、日志信息:`
 
-<img src="/img2_2_1.png" style="zoom:50%;" />
+<img src="image/img2_2_1.png" style="zoom:50%;" />
 
 ​		`2、打开SQLyog，依次选择菜单项中的增强工具——>计划备份，将弹出如下窗:`
 
-<img src="/img2_2_2.png" style="zoom:50%;" />
+<img src="image/img2_2_2.png" style="zoom:50%;" />
 
 ​		`3、点击下一步,在弹出的如下窗口中选择需要备份的数据库，点击下一步:`
 
-<img src="/img2_2_3.png" style="zoom:50%;" />
+<img src="image/img2_2_3.png" style="zoom:50%;" />
 
 ​		`4、选择导出的对象，点击下一步:`
 
-<img src="/img2_2_4.png" style="zoom:50%;" />
+<img src="image/img2_2_4.png" style="zoom:50%;" />
 
 ​		`5、选择第一步创建的以.sql为后缀的文件，并设置脚本生成方式，点击下一步:`
 
-<img src="/img2_2_5.png" style="zoom:50%;" />
+<img src="image/img2_2_5.png" style="zoom:50%;" />
 
 ​		`6、选择要生成的选项，点击下一步:`
 
-<img src="/img2_2_6.png" style="zoom:50%;" />
+<img src="image/img2_2_6.png" style="zoom:50%;" />
 
 ​		`7、选择备份数据的文件字符集为utf-8,点击下一步:`
 
-<img src="/img2_2_7.png" style="zoom:50%;" />
+<img src="image/img2_2_7.png" style="zoom:50%;" />
 
 ​		`8、出现错误终止或者发邮件依个人需求而定，点击下一步:`
 
-<img src="/img2_2_8.png" style="zoom:50%;" />
+<img src="image/img2_2_8.png" style="zoom:50%;" />
 
 ​		`9、选择执行任务的方式和第一步创建的以.log为后缀的日志文件，点击下一步:`
 
-<img src="/img2_2_9.png" style="zoom:50%;" />
+<img src="image/img2_2_9.png" style="zoom:50%;" />
 
 ​		`10、选择工作文件地址（即为第一步创建的以.xml为后缀的配置文件）以及调度名称，然后点击完成:`
 
-<img src="/img2_2_10.png" style="zoom:50%;" />
+<img src="image/img2_2_10.png" style="zoom:50%;" />
 
 ​		`11、点击完成后会弹出对话框，点击计划，点击新建，选择需要执行的时间点，点击确定即可:`
 
-<img src="/img2_2_11.png" style="zoom:50%;" />
+<img src="image/img2_2_11.png" style="zoom:50%;" />
 
 
 
@@ -491,11 +491,11 @@ sh jmeter
 
 ​		1)第一个网卡为NAT Network
 
-​		<img src="/img5_2_1.png" alt="img" style="zoom: 50%;" />
+​		<img src="image/img5_2_1.png" alt="img" style="zoom: 50%;" />
 
 ​		2)在网络配置中，新建一个网卡2为桥接网卡。					
 
-​		<img src="/img5_2_2.png" alt="img" style="zoom:50%;" />
+​		<img src="image/img5_2_2.png" alt="img" style="zoom:50%;" />
 
 ### 3、Linux虚拟机安装
 
