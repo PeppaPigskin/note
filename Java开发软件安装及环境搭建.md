@@ -441,11 +441,11 @@ sh jmeter
 
 ​		1)第一个网卡为NAT Network
 
-​		<img src="/Users/pigskin/Desktop/img1.png" alt="img" style="zoom: 50%;" />
+​		<img src="image/img1.png" alt="img" style="zoom: 50%;" />
 
 ​		2)在网络配置中，新建一个网卡2为桥接网卡。					
 
-​		<img src="/Users/pigskin/Desktop/img2.png" alt="img" style="zoom:50%;" />
+​		<img src="image/img2.png" alt="img" style="zoom:50%;" />
 
 ### 3、Linux虚拟机安装
 
