@@ -183,13 +183,823 @@
 
 ## 3、阿里云视频播放器
 
+```java
+1、文档地址
+	https://help.aliyun.com/document_detail/61064.html
+2、基本使用流程
+	# 获取播放地址
+		/**
+     * 根据视频id获取视频播放地址（没有加密）     
+     *
+     * @param accessKeyId 
+     * @param accessKeySecret 
+     * @param id              上传到阿里云的视频ID     
+     */
+     public static void getVideoByID(String accessKeyId, String accessKeySecret, String id)
+     throws ClientException {     
+     	//创建初始化对象       
+      DefaultAcsClient defaultAcsClient = initVodClient(accessKeyId, accessKeySecret);    
+      //获取视频地址request和response对象     
+      GetPlayInfoRequest request = new GetPlayInfoRequest();    
+      GetPlayInfoResponse response;    
+      //向request对象中设置视频地址   
+      request.setVideoId("1165a086b3914d93b54951836a8ce5c4");     
+      //调用初始化对象中的方法传递request，获取视频相关数据        
+      response = defaultAcsClient.getAcsResponse(request);
+      //获取视频集合       
+      List<GetPlayInfoResponse.PlayInfo> infoList = response.getPlayInfoList();    
+      //获取视频播放地址        
+      for (GetPlayInfoResponse.PlayInfo info : infoList) {      
+      	String playURL = info.getPlayURL(); 
+        System.out.println("视频播放地址：" + playURL); 
+      } 
+      //获取视频名称   
+      String title = response.getVideoBase().getTitle();       
+      System.out.println("视频名称：" + title);    
+    }
+	# 获取播放凭证
+		@Override    
+		public String getPlayAuth(String videoId) {  
+    	try {            
+    		DefaultAcsClient client = InitVodClient.initVodClient(ConstantVodPropertiesUtils.ACCESS_KEY_ID, ConstantVodPropertiesUtils.ACCESS_KEY_SECRET);      
+        GetVideoPlayAuthRequest request = new GetVideoPlayAuthRequest();      
+        request.setVideoId(videoId);    
+        //设置播放凭证过期时间,默认为100秒,取值范围：[100,3000]。        
+        request.setAuthInfoTimeout(3000L);       
+        GetVideoPlayAuthResponse acsResponse = client.getAcsResponse(request); 
+        return acsResponse.getPlayAuth();       
+      } catch (Exception e) {            
+      	e.printStackTrace();  
+        throw new EduException(20001, "获取播放凭证异常！");  
+      }
+    }
+	# 创建视频播放器(前端)
+		<!-- 引入阿里云播放器需要的样式文件和js文件 -->
+		<link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.8.1/skins/default/aliplayer-min.css" />
+		<script charset="utf-8" type="text/javascript" src="https://g.alicdn.com/de/prismplayer/2.8.1/aliplayer-min.js"></script>
+    <!-- 初始化视频播放器 -->
+    <div class="prism-player" id="J_prismPlayer"></div>
+    <script>    
+      var player = new Aliplayer({    
+        id: 'J_prismPlayer',
+        width: '100%',
+        // 是否打开网页自动播放     
+        autoplay: false,   
+        cover: 'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png',    
+        //播放配置(设置播放方式)      
+        // 播放方式一：支持播放地址播放,此播放优先级最高，此种方式不能播放加密视频      
+        // source: 'https://outin-ca32ebbbe067aaaa11ebaaed800163e1aa3b4a.oss-cn-shanghai.aliyuncs.com/sv/3f6fe692-17acd974570/3f6fe692-17acd974570.mp4?Expires=1627010386&OSSAccessKeyId=LTAI4FfD63zoqnm6ckiBFfXZ&Signature=BE50sgQ%2BC0t57%2FH92v7Qmlfa%2Fuc%3D', 
+        // 播放方式二、阿里云播放器支持通过播放凭证自动换取播放地址进行播放，接入方式更为简单，且安全性更高。播放凭证默认时效为100秒（最大为3000秒），只能用于获取指定视频的播放地址，不能混用或重复使用。如果凭证过期则无法获取播放地址，需要重新获取凭证。  
+        encryptType: '1',//如果播放加密视频，则需设置encryptType=1，非加密视频无需设置此项（加上也可以）     
+        vid: '4c705cd5063546a895cc435sss4f292e1a9',//视频id      
+        playauth: 'ca32ebbbe067aaaa11ebaaed800163e1aa3b4a==',//凭证    
+      }, 
+      function (player) {
+        console.log('播放器创建好了。')  
+      });
+		</script>
+```
+
+```vue
+4、项目整合
+	# 创建布局页面
+		<template>
+			<div class="guli-player">  
+        <div class="head">   
+          <a href="#" title="Pigskin@Study">  
+            <img class="logo" src="~/assets/img/logo.png" lt="Pigskin@Study" />    
+      		</a>    
+      	</div>
+        <div class="body"> 
+          <div class="content"><nuxt /></div>
+      	</div>
+      </div>
+		</template>
+		<script>export default {};</script>
+		<style>
+      html,body {  height: 100%;}
+		</style>
+		<style scoped>
+      .head {  
+        height: 50px;
+        position: absolute;
+        top: 0;  
+        left: 0; 
+        width: 100%;
+      }
+      .head .logo {
+        height: 50px;  margin-left: 10px;
+      }
+      .body {
+        position: absolute;  
+        top: 50px;
+        left: 0;  
+        right: 0;
+        bottom: 0; 
+        overflow: hidden;
+      }
+		</style>
+	# 异步加载播放凭证 
+		layout: "video", //应用video布局  
+		asyncData({ params, error }) {    
+			if (params.vid)   
+				return vodApi.getPlayAuthByVideoId(params.vid).then((response) => { 
+					return {     
+						playAuth: response.data.playAuth,
+						vid: params.vid, 
+					};
+				});
+		},
+	# 页面加载完成执行视频播放请求
+		// 页面渲染之后执行  
+      mounted() {   
+        var player = new Aliplayer(  
+        {        
+          id: "J_prismPlayer", 
+          width: "100%",       
+          height: "500px",      
+          // 是否打开网页自动播放        
+          autoplay: false,       
+          cover: "http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png",  
+          //播放配置(设置播放方式)       
+          // 播放方式一：支持播放地址播放,此播放优先级最高，此种方式不能播放加密视频       
+          // source: 'https://outin-ca32ebbbe067aaaa11ebaaed800163e1aa3b4a.oss-cn-shanghai.aliyuncs.com/sv/3f6fe692-17acd974570/3f6fe692-17acd974570.mp4?Expires=1627010386&OSSAccessKeyId=LTAI4FfD63zoqnm6ckiBFfXZ&Signature=BE50sgQ%2BC0t57%2FH92v7Qmlfa%2Fuc%3D', 
+          // 播放方式二、阿里云播放器支持通过播放凭证自动换取播放地址进行播放，接入方式更为简单，且安全性更高。播放凭证默认时效为100秒（最大为3000秒），只能用于获取指定视频的播放地址，不能混用或重复使用。如果凭证过期则无法获取播放地址，需要重新获取凭证。 
+          encryptType: "1", //如果播放加密视频，则需设置encryptType=1，非加密视频无需设置此项（加上也可以）  
+          vid: this.vid, //视频id   
+          playauth: this.playAuth, //凭证    
+        }),      
+        function (player) {     
+          console.log("播放器创建成功");  
+        }   
+      ); 
+		},
+	# 其他可选配置
+		// 以下可选设置
+    cover: 'http://guli.shop/photo/banner/1525939573202.jpg', // 封面
+    qualitySort: 'asc', // 清晰度排序
+    mediaType: 'video', // 返回音频还是视频
+    autoplay: false, // 自动播放
+    isLive: false, // 直播
+    rePlay: false, // 循环播放
+    preload: true,controlBarVisibility: 'hover', // 控制条的显示方式：鼠标悬停
+    useH5Prism: true, // 播放器类型：html5
+	# 加入播放组件,详见如下链接
+		https://player.alicdn.com/aliplayer/presentation/index.html?type=cover
+```
+
+
+
 ## 4、阿里云短信服务
+
+```java
+1、说明
+	实现短信验证
+2、开通
+	# 登录阿里云
+	# 选择短信服务，免费开通
+	# 国内消息
+		-- 模板管理
+			用于显示内容设置
+		-- 签名管理
+3、项目整合
+	# 引入依赖
+		<!--json转换工具-->
+  	<dependency>
+  		<groupId>com.alibaba</groupId>
+  		<artifactId>fastjson</artifactId>
+  	</dependency>]
+  	<!--阿里云操作核心依赖-->
+  	<dependency>
+  		<groupId>com.aliyun</groupId>
+  		<artifactId>aliyun-java-sdk-core</artifactId>        
+  	</dependency>
+  # 服务端代码实现
+  	/**     
+  	 * 阿里云发送验证码
+     *
+     * @param hashMap   验证码哈希表
+     * @param phoneCode 手机号
+     * @return
+     */
+  	@Override
+  	public boolean sendPhoneCode(HashMap<String, Object> hashMap, String phoneCode) {
+  		if (StringUtils.isEmpty(phoneCode)) return false;
+  		DefaultProfile profile = DefaultProfile.getProfile("default", ConstantPropertiesUtils.ACCESS_KEY_ID, ConstantPropertiesUtils.ACCESS_KEY_SECRET);
+  		DefaultAcsClient client = new DefaultAcsClient(profile);
+  		//设置参数
+  		CommonRequest request = new CommonRequest();
+  		//request.setProtocol(ProtocolType.HTTPS);
+  		//（固定参数）
+  		request.setMethod(MethodType.POST);//提交方式
+  		request.setDomain("dysmsapi.aliyuncs.com");//请求地址
+  		request.setVersion("2017-05-25");//版本号
+  		request.setAction("SendSms");//请求方法
+  		//发送相关参数
+  		request.putQueryParameter("PhoneNumbers", phoneCode);//手机号
+  		request.putQueryParameter("SignName", "Pigskin教育网站");//申请的阿里云签名名称
+  		request.putQueryParameter("TemplateCode", "");//申请的阿里云模板CODE
+  		request.putQueryParameter("TemplateParam", JSONObject.toJSONString(hashMap));//验证码
+  		//最终发送        
+  		try {            
+        CommonResponse response = client.getCommonResponse(request);
+        return response.getHttpResponse().isSuccess();
+      } catch (ClientException e) {
+        e.printStackTrace();
+      }
+  		return false;
+		}
+	# Redis实现设定验证码有效时间
+    -- 注入实现对redis操作的对象
+    	/**
+       * 实现对redis操作
+       */
+    	@Autowired
+    	private RedisTemplate<String, String> redisTemplate;
+		-- 从Redis获取验证码（根据手机号），获取到直接返回
+      String code = redisTemplate.opsForValue().get(phoneCode);
+		-- 获取不到，就进行阿里云发送
+      String random = RandomUtil.getFourBitRandom();
+			HashMap<String, Object> hashMap = new HashMap<>();
+			hashMap.put("code", random);        
+			boolean b = msmService.sendPhoneCode(hashMap, phoneCode);
+		-- 发送成功，将发送成功的短信验证码放到redis中(并设定有效时间五分钟)
+      redisTemplate.opsForValue().set(phoneCode, random, 5, TimeUnit.MINUTES);
+```
+
+
 
 ## 5、腾讯云短信服务
 
+```java
+1、说明
+	实现短信验证
+2、Java SDK文档地址
+	https://cloud.tencent.com/document/product/382/43194
+3、开通过程
+	和阿里云类似
+4、项目整合
+	# 引入依赖
+  	<!--腾讯云操作依赖-->        
+  	<dependency>
+  		<groupId>com.tencentcloudapi</groupId>
+  		<artifactId>tencentcloud-sdk-java</artifactId>
+  		<version>3.1.270</version>
+  		<!-- 注：这里只是示例版本号（可直接使用），可获取并替换为 最新的版本号，注意不要使用4.0.x版本（非最新版本） -->
+  	</dependency>
+  # 服务端代码实现
+    import com.tencentcloudapi.common.Credential;
+    import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+    import com.tencentcloudapi.common.profile.ClientProfile;
+    import com.tencentcloudapi.common.profile.HttpProfile;
+    import com.tencentcloudapi.sms.v20210111.SmsClient;
+    import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
+    /**     
+     * 腾讯云发送验证码     
+     *     
+     * @param code   验证码
+     * @param mobile 手机号
+     * @return     
+     */    
+     @Override
+     public boolean sendPhoneCodeByTencentyun(String code, String mobile) {
+       if (StringUtils.isEmpty(mobile)) return false;
+       try {
+         //实例化认证对象
+         Credential cred = new Credential(ConstantPropertiesUtils.TX_ACCESS_KEY_ID, ConstantPropertiesUtils.TX_ACCESS_KEY_SECRET);
+         //实例化Http对象
+         HttpProfile httpProfile = new HttpProfile();
+         //设置站点域名
+         httpProfile.setEndpoint(ConstantPropertiesUtils.TX_END_POINT);
+         //实例化客户端配置对象
+         ClientProfile clientProfile = new ClientProfile();
+         clientProfile.setHttpProfile(httpProfile);
+         //实例化sms的client对象(第二个参数是地域信息) 
+         SmsClient client = new SmsClient(cred, "ap-guangzhou", clientProfile); 
+         SendSmsRequest req = new SendSmsRequest();
+         //设置下发手机号码  
+         String[] phoneNumberSet = {"+86" + mobile};
+         req.setPhoneNumberSet(phoneNumberSet);
+         //签名ID 
+         req.setSmsSdkAppId(ConstantPropertiesUtils.TX_SDK_APP_ID);
+         //签名
+         req.setSignName(ConstantPropertiesUtils.TX_SIGN_NAME); 
+         //模板ID
+         req.setTemplateId(ConstantPropertiesUtils.TX_TEMPLATE_ID); 
+         //模板参数(验证码，有效时间)
+         String[] templateParamSet = {code, "1"};
+         req.setTemplateParamSet(templateParamSet);
+         client.SendSms(req); 
+       } catch (TencentCloudSDKException e) {
+         throw new EduException(20001, e.getMessage());  
+       }
+       return true;
+     }
+	# 验证码接口防刷及再次校验[存到Redis]
+    -- 引入redis依赖
+    	<!--引入redis-->
+    	<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-data-redis</artifactId>
+    		<version>2.1.8.RELEASE</version>
+    	</dependency>
+    -- 配置redis
+    	#redis相关配置
+    	spring.redis.host=192.168.56.101
+    	spring.redis.port=6379
+    -- 注入对象
+    	@Autowired    
+    	private StringRedisTemplate redisTemplate;
+ 		-- 使用
+    	/*TODO:1、接口防刷*/
+      String redisCode = redisTemplate.opsForValue().get(AuthConstant.SMS_CODE_CACHE_PREFIX + phone);
+			if (!StringUtils.isEmpty(redisCode)) {
+        long parseLong = Long.parseLong(redisCode.split("_")[1]); 
+        /*根据当前系统时间减去上次该手机号记录的发送验证码的系统时间是否小于60秒，决定是否重新发送验证码*/   
+        if (System.currentTimeMillis() - parseLong < 60000) { 
+          //60秒内不能再发送 
+          return R.error(BizCodeEnum.SMS_CODE_EXCEPTION.getCode(), BizCodeEnum.SMS_CODE_EXCEPTION.getMsg());  
+        }
+      }
+			/*TODO:2、验证码再次校验，存，key:手机号，value：验证码*/ 
+			String code = String.valueOf((int) (Math.random() * 9 + 1) * 1000);        
+			String setRedisCode = code + "_" + System.currentTimeMillis();
+			/*redis缓存验证码*/   
+			redisTemplate.opsForValue().set(AuthConstant.SMS_CODE_CACHE_PREFIX + phone, setRedisCode, 10, TimeUnit.MINUTES);        
+			thirdPartFeignService.sendCode(phone, code);
+			return R.ok();
+    
+```
+
 ## 6、微信登录（注册）实现
 
+```
+1、准备工作
+	# 注册开发者资质(仅支持企业,注册后提供微信ID和密钥)
+		https://open.weixin.qq.com/
+	# 申请网站应用名称
+	# 需要域名地址
+2、开发过程
+	# https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html
+```
+
+<img src="image/img2_6_2_1.png" style="zoom:50%;" />
+
+```java
+3、后端功能实现
+	# 配置文件添加配置
+		# 微信开放平台 app_id    
+  	wx.open.app_id=wxed9954c01bb89b47    
+  	# 微信开放平台 app_secret    		
+  	wx.open.app_secret=a7482517235173ddb4083788de60b90e    
+  	# 微信开放平台 重定向url    
+  	wx.open.redirect_url=http://guli.shop/api/ucenter/wx/callback
+	# 创建用于读取配置文件内容的类
+    package com.pigskin.ucenter.utils;
+		import io.swagger.annotations.ApiModelProperty;
+		import org.springframework.beans.factory.InitializingBean;
+		import org.springframework.beans.factory.annotation.Value;
+		import org.springframework.stereotype.Component;
+		/**     
+		 * 用于获取微信登录相关配置信息
+     */
+		@Component
+    public class ConstantWxUtils implements InitializingBean {
+      @ApiModelProperty("appId")
+      @Value("${wx.open.app_id}")
+      private String appId;
+      @ApiModelProperty("appSecret")
+      @Value("${wx.open.app_secret}")
+      private String appSecret;
+      @ApiModelProperty("redirectUrl")
+      @Value("${wx.open.redirect_url}")
+      private String redirectUrl;
+      public static String WX_OPEN_APP_ID;
+      public static String WX_OPEN_APP_SECRET;
+      public static String WX_OPEN_REDIRECT_URL;
+      @Override
+      public void afterPropertiesSet() throws Exception {
+        WX_OPEN_APP_ID = this.appId;
+        WX_OPEN_APP_SECRET = this.appSecret;
+        WX_OPEN_REDIRECT_URL = this.redirectUrl;
+      }
+    }
+	# 生成微信扫描的二维码
+  	@Api(description = "微信登录相关操作接口")
+    @Controller
+    @RequestMapping("/uCenterService/weChartApi")
+    @CrossOrigin
+    public class WxApiController {
+      @ApiOperation(value = "生成微信登录二维码")  
+      @GetMapping("getWxCode")  
+      public String getWxCode() {
+        //https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect
+        //生成微信二维码的重定向基础地址字符串            
+        String baseUrl = "https://open.weixin.qq.com/connect/qrconnect" + 
+          "?appid=%s" +                    
+          "&redirect_uri=%s" +            
+          "&response_type=code" +     
+          "&scope=snsapi_login" +       
+          "&state=%s" +                 
+          "#wechat_redirect";        
+        //对redirect_url进行URLEncode编码   
+        String redirectUrl = ConstantWxUtils.WX_OPEN_REDIRECT_URL;       
+        try {               
+          redirectUrl = URLEncoder.encode(redirectUrl, "utf-8");     
+        } catch (UnsupportedEncodingException e) {     
+          throw new EduException(20001, "编码转换异常");        
+        }          
+        //占位符替换       
+        String url = String.format(    
+          baseUrl,                   
+          ConstantWxUtils.WX_OPEN_APP_ID,   
+          redirectUrl,                  
+          "atguigu"           
+        );           
+        //重定向到请求的微信地址     
+        return "redirect:" + url;      
+      }    
+    }
+	# 当扫描该二维码后,会重定向到设定的地址，并带出两个值（status,code）
+    -- 为测试准备
+    	// 将本地服务端口号改成8150
+    	// 回调接口地址和域名跳转地址写成一样
+   	-- 会执行本地的callback方法，在callback中获取两个值，在跳转的时候传递过来,代码示例如下
+    	/**
+       * 获取扫码人信息，添加数据  
+       *
+       * @param code  获取到的code值（临时票据），类似于验证码   
+       * @param state 原样传递值（作用不大）    
+       * @return
+       */
+      @ApiOperation(value = "获取扫码人信息，添加数据") 
+      @GetMapping("callback")
+      public String callback(String code, String state) { 
+        // 代码后续操作请查看下一步...
+      }
+		-- 拿着上一步的code,请求微信提供固定的地址，获取到两个值（access_token、openid）
+      // 代码实现
+      	//1、使用code创建微信固定请求地址   
+      		String baseAccessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token" +   
+          "?appid=%s" + 
+          "&secret=%s" +  
+          "&code=%s" +  
+          "&grant_type=authorization_code";
+          String accessTokenUrl = String.format(  
+            baseAccessTokenUrl,  
+            ConstantWxUtils.WX_OPEN_APP_ID,   
+            ConstantWxUtils.WX_OPEN_APP_SECRET,     
+            code 
+          );
+          //2、使用httpClient发送请求，获取到accessToken和openId  
+          String accessTokenInfo = HttpClientUtils.get(accessTokenUrl);     
+          //3、将从请求的到的Json字符串使用Gson转换成map集合，从中获取accessToken和openId 
+          String access_token = "";     
+          String openid = "";  
+          if (!StringUtils.isEmpty(accessTokenInfo)) {     
+            Gson gson = new Gson();       
+            HashMap mapAccessToken = gson.fromJson(accessTokenInfo, HashMap.class);      
+            access_token = mapAccessToken.get("access_token").toString();      
+            openid = mapAccessToken.get("openid").toString();    
+          }
+			// 响应结果示例
+			  accessTokenInfo:
+        {
+          /*访问凭证*/
+          "access_token":"31_asdaslgk566asdw84sdf656asdas",
+          /*凭证过期时间*/
+          "expires_in":7200,
+          /*刷新之后生成的新的凭证*/
+          "refresh_token":"31_adkldfjglASDFVLFK2545AD",
+          /*微信ID*/
+          "openid":"o3_asdfvgd65sdv",
+          /*作用范围*/
+          "scope":"snspi_login",
+          /*作用单元*/
+          "unionid":"asdg2asde2ad"
+        }
+		-- 根据openid查看表中是否已包含相同微信信息，没有的话进行第7步获取用户信息添加到数据库
+    -- 拿着上上一步获取到的两个值，再去请求微信提供固定地址，获取到微信扫码人信息（openid、nickName、sex、heardimgurl）
+      // 代码实现
+      	//4、使用获取到accessToken和openId，去请求另一个地址，获取到用户信息   
+          String baseUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo" +  
+          "?access_token=%s" +                    
+          "&openid=%s";              
+          String userInfoUrl = String.format(baseUserInfoUrl,  
+                                             access_token,            
+                                             openid);              
+          //4、发送请求(获取扫码人信息)            
+          String userInfo = HttpClientUtils.get(userInfoUrl);    
+					//todo:gson使用详见主流技术中Gson
+          HashMap userInfoMap = gson.fromJson(userInfo, HashMap.class);   
+          //昵称              
+          String nickName = userInfoMap.get("nickName").toString();     
+          //性别              
+          int sex = Integer.parseInt(userInfoMap.get("sex").toString());           
+          //头像              
+          String headimgurl = userInfoMap.get("headimgurl").toString();
+      // 响应结果示例
+      	userInfo:
+				{
+          /*微信ID*/
+          "openid":"o3_asdfvgd65sdv",
+          /*微信昵称*/         
+          "nickName":"哈哈",
+          /*性别*/
+          "sex":1,
+          /*语言*/
+          "language":"zh_CN",
+          /*城市*/
+          "city":"",
+          /*省份*/
+          "province":"",
+          /*国家*/
+          "country":"CN",
+          /*微信头像（路径中有转义）*/
+          "headimgurl":"http:\/\/thsdmkpokfpalds"
+          "privilege":[],
+          /*作用单元*/
+          "unionid":"asdg2asde2ad"
+			-- 将用户信息显示到主页面
+      	// 方式一:
+            将扫码之后的信息放到cookie中，跳转到首页进行显示
+            
+            存在问题：cookie无法实现跨域访问
+        // 方式二:
+            根据微信信息，使用jwt生成token字符串，将token字符串通过路径传递到首页面
+            
+            代码实现
+            	/*使用jwt根据member生成token字符串*/
+            	String token = JwtUtils.getJwtToken(member.getId(), member.getNickname());
+          		return "redirect:http://localhost:3000?token=" + token;
+```
+
+```vue
+4、前端代码实现
+	# 在首页路径中有token字符串
+		created() {    
+			//获取路径中的token值    
+			this.token = this.$route.query.token;
+			if (this.token) {   
+				this.wxLogin();
+			}
+		}
+	# 获取token值，放到cookie中
+		//微信登录显示的方法    
+		wxLogin() { 
+			// 将token值放到cookie中
+			cookie.set("edu_token", this.token, { domain: "localhost" }); 
+			//调用接口，根据token值获取用户信息     
+			loginApi.getLoginUserInfo().then((response) => {     
+				this.loginInfo = response.data.member;
+				//将用户信息记录到cookie   
+				cookie.set("edu_ucenter", this.loginInfo, { domain: "localhost" });   
+			});
+		},	
+	# 调用后端接口，根据token值获取用户信息
+		把获取出来的用户信息放到cookie中
+```
+
+
+
 ## 7、微信支付
+
+```java
+1、后端
+	# 准备工作
+  	微信支付id/商户号/商户key
+  # 引入相关依赖
+  	<!--微信支付依赖-->       
+  	<dependency>
+      <groupId>com.github.wxpay</groupId>    
+      <artifactId>wxpay-sdk</artifactId>     
+      <version>0.0.3</version>  
+    </dependency>  
+    <!--json转换-->    
+    <dependency>      
+      <groupId>com.alibaba</groupId>     
+      <artifactId>fastjson</artifactId> 
+    </dependency>
+  # 创建生成微信支付二维码接口
+  	@Override    
+  	public Map<String, Object> createNative(String orderNo) {     
+      try {
+        //1、获取订单信息     
+        QueryWrapper<Order> wrapper = new QueryWrapper<>();   
+        wrapper.eq("order_no", orderNo);      
+        Order orderInfo = orderService.getOne(wrapper);      
+        //2、设置支付所需参数        
+        Map m = new HashMap();        
+        m.put("appid", ConstantPropertiesUtils.APP_ID);//微信id          
+        m.put("mch_id", ConstantPropertiesUtils.PARTNER);//商户号        
+        m.put("nonce_str", WXPayUtil.generateNonceStr());//生成的随机字符串，确保生成的二维码每次都不相同    
+        m.put("body", orderInfo.getCourseTitle());//生成二维码显示的名称       
+        m.put("out_trade_no", orderNo);//二维码唯一标识（一般填写订单号）        
+        m.put("total_fee", orderInfo.getTotalFee().multiply(new BigDecimal("100")).longValue() + "");//二维码汇总订单的价格      
+        m.put("spbill_create_ip", "127.0.0.1");//进行支付的ip地址(域名)     
+        m.put("notify_url", ConstantPropertiesUtils.NOTIFY_URL + "\n");//支付成功后的回调地址  
+        m.put("trade_type", ConstantPropertiesUtils.TRADE_TYPE);//生成二维码的支付类型（NATIVE:根据价格生成二维码）
+        //3、发送HTTPClient请求，传递xml格式参数，微信支付提供的固定地址      
+        HttpClient client = new HttpClient(ConstantPropertiesUtils.CLIENT_URL);     
+        //client设置参数（map集合，商户key）    
+        client.setXmlParam(WXPayUtil.generateSignedXml(m, ConstantPropertiesUtils.PARTNER_KEY));      
+        //支持https访问  
+        client.setHttps(true);     
+        //发送post请求     
+        client.post();  
+        //4、返回第三方的数据（返回的内容是xml格式）     
+        String xml = client.getContent();
+        //将xml转换成map集合        
+        Map<String, String> resultMap = WXPayUtil.xmlToMap(xml);         
+        //5、封装返回结果集     
+        Map map = new HashMap<>();      
+        map.put("out_trade_no", orderNo);   
+        map.put("course_id", orderInfo.getCourseId());        
+        map.put("total_fee", orderInfo.getTotalFee());        
+        map.put("result_code", resultMap.get("result_code"));     
+        map.put("code_url", resultMap.get("code_url"));      
+        //微信支付二维码2小时过期，可采取2小时未支付取消订单       
+        //redisTemplate.opsForValue().set(orderNo, map, 120, TimeUnit.MINUTES);     
+        return map;   
+      } catch (Exception e) {
+        throw new EduException(20001, "获取支付信息失败！");        
+      }
+    }
+	# 创建查询订单支付状态接口
+    @Override   
+    public void updateOrdersStatus(Map<String, String> map) {     
+      //获取订单id  
+      String orderNo = map.get("out_trade_no");    
+      //根据订单编号查询订单信息   
+      QueryWrapper<Order> wrapper = new QueryWrapper<>();      
+      wrapper.eq("order_no", orderNo);   
+      Order order = orderService.getOne(wrapper);   
+      //更新订单表订单状态       
+      if (order.getStatus().intValue() == 1) {//已经支付    
+        return;     
+      }       
+      //修改支付状态为已修改   
+      order.setStatus(1);       
+      orderService.updateById(order);      
+      //向支付表中添加支付记录 
+      PayLog payLog = new PayLog();    
+      payLog.setOrderNo(order.getOrderNo());//支付订单号 
+      payLog.setPayTime(new Date());//订单完成时间    
+      payLog.setPayType(1);//支付类型        
+      payLog.setTotalFee(order.getTotalFee());//总金额(分)     
+      payLog.setTradeState(map.get("trade_state"));//支付状态      
+      payLog.setTransactionId(map.get("transaction_id"));//订单流水号      
+      payLog.setAttr(JSONObject.toJSONString(map));//其他属性     
+      baseMapper.insert(payLog);   
+    }
+  # 根据返回的查询状态进行后续操作
+    //获取订单的支付状态       
+    String trade_state = map.get("trade_state");    
+    if (trade_state.equals("SUCCESS")) {//支付成功    
+      //添加支付记录到支付表，更新订单表订单状态           
+      payLogService.updateOrdersStatus(map);     
+      return R.ok().message("支付成功");      
+    }       
+    return R.ok().code(25000).message("支付中");
+```
+
+```vue
+2、前端
+	# 安装插件
+		npm install vue-qriously
+	# 设置拦截器
+		// response 拦截器
+		service.interceptors.response.use(response => {    
+      /**     
+       * code为非20000是抛错 可结合自己业务进行修改     
+       */
+      const res = response.data    
+      if (res.code === 28004) {
+        // 返回 错误代码-1 清除 ticket信息并跳转到登录界面     
+        window.location.href = "/login"    
+        return
+      } else if (res.code !== 20000) {  
+        if (res.code != 25000) {//订单支付中不做任何提示   
+          Message({ 
+            message: res.message || 'error',     
+            type: 'error',  
+            duration: 5 * 1000    
+          })
+          // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了; 
+          if (res.code === 50008 || res.code === 50012 || res.code === 50014) {       
+            MessageBox.confirm(    
+              '你已被登出，可以取消继续留在该页面，或者重新登录',       
+              '确定登出',    
+              {
+                confirmButtonText: '重新登录',      
+                cancelButtonText: '取消',     
+                type: 'warning' 
+              }
+            ).then(() => { 
+              store.dispatch('FedLogOut').then(() => { 
+                location.reload() // 为了重新实例化vue-router对象 避免bug   
+              })          
+            })
+          }
+          return Promise.reject('error')
+        } else {  
+          return response.data      
+        } 
+      } else {   
+        return response.data
+      }
+		},  
+		error => {   
+      console.log('err' + error) // for debug  
+			Message({      
+        message: error.message,  
+        type: 'error',     
+        duration: 5 * 1000   
+      })   
+      return Promise.reject(error)  
+    })
+	# 展示付款码
+		<template> 
+      <div class="cart py-container">  
+        <!--主内容-->   
+        <div class="checkout py-container pay">  
+          <div class="checkout-tit">      
+            <h4 class="fl tit-txt">     
+              <span class="success-icon"></span>
+              <span class="success-info">
+                订单提交成功，请您及时付款！订单号：{{ payObj.out_trade_no }}
+              </span>     
+            </h4>    
+            <span class="fr">
+              <em class="sui-lead">应付金额：</em>
+              <em class="orange money">￥{{ payObj.total_fee }}</em>
+            </span>       
+          <div class="clearfix"></div>    
+        </div>     
+        <div class="checkout-steps">    
+          <div class="fl weixin">微信支付</div>  
+            <div class="fl sao">        
+              <p class="red">请使用微信扫一扫。</p> 
+              <div class="fl code">    
+                <!-- <img id="qrious" src="~/assets/img/erweima.png" alt=""> --> 
+                <!-- <qriously value="weixin://wxpay/bizpayurl?pr=R7tnDpZ" :size="338"/> -->  
+                <qriously :value="payObj.code_url" :size="338" />   
+                <div class="saosao">            
+                  <p>请使用微信扫一扫</p>            
+                  <p>扫描二维码支付</p>         
+                </div>         
+              </div>      
+            </div>      
+            <div class="clearfix"></div>   
+            <!-- <p><a href="pay.html" target="_blank">> 其他支付方式</a></p> -->   
+          </div>   
+        </div> 
+      </div>
+		</template>
+	# 进行定时器查询支付状态
+    <script>
+      import orderApi from "@/api/order";
+      export default {  
+        asyncData({ params, error }) {  
+          return orderApi.createNative(params.pid).then((response) => {  
+            return { payObj: response.data.map };  
+          }); 
+        }, 
+        data() { 
+          return {   
+            timer: "",   
+          };  
+        }, 
+        mounted() { 
+          //创建订单支付状态查询定时器，每三秒查一次    
+          this.timer = setInterval(() => {  
+            this.queryOrderStatus(this.payObj.out_trade_no); 
+          }, 3000);  
+        }, 
+        methods: {   
+          // 查询订单支付状态   
+          queryOrderStatus(orderNo) {  
+            orderApi.queryStatus(orderNo).then((response) => {  
+              console.log(response);      
+              if (response.success) {     
+                // 清除定时器      
+                clearInterval(this.timer);       
+                // 支付结果提示         
+                this.$message({       
+                  type: "success",          
+                  message: "支付成功！",     
+                });         
+                // 跳转到课程详情页面      
+                this.$router.push({ path: "/course/" + this.payObj.course_id });   
+              }   
+            });  
+          }, 
+        },
+      };
+    </script>
+```
+
+
 
 ## 8、HTTPClient
 
