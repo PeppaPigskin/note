@@ -1,6 +1,40 @@
 # 一、主流技术
 
-## 1、
+## 1、MybatisPlus
+
+## 2、Swagger
+
+## 3、Nginx
+
+## 4、Tomcat
+
+## 5、EasyExcel
+
+## 6、SpringBoot
+
+## 7、SpringCloud
+
+## 8、Nacos
+
+## 9、Redis
+
+## 10、JWT
+
+## 11、MD5加密
+
+## 12、OAuth2
+
+## 13、Canal数据同步工具
+
+## 14、Spring Security权限框架
+
+## 15、Git
+
+## 16、Jenkins
+
+## 17、Docker
+
+
 
 # 二、第三方服务技术
 
@@ -1369,7 +1403,7 @@
 
 
 
-# 二、开发经验
+# 三、开发经验
 
 ## 1、开发模式
 
@@ -1414,6 +1448,139 @@
 	# AP满足,C不能满足
 		机器数量多(P),也要正常的时间内响应(A),那么数据就不能及时同步到其他节点(C不满足)
 ```
+
+## 4、统一返回结果处理
+
+## 5、统一异常处理
+
+## 6、统一日志处理
+
+## 7、Json格式转换
+
+## 8、Cron实现定时任务
+
+# 四、相关注解说明
+
+## 1、基本注解
+
+```java
+@RestController
+	# 说明————本质是@Controller和@Response的结合体
+  # 使用————控制器类
+@Controller
+	# 说明————用于表示将该类交由Spring管理
+  # 使用————控制器类
+@Response
+	# 说明————用于表示控制器响应请求时需要返回json数据
+  # 使用————控制器类
+@RequestMapping("URI")
+	# 说明————用于表示当前控制器的被请求URI
+  # 使用————控制器类
+@GetMapping("URI")
+	# 说明————用于注解get请求的方法
+  # 使用————控制器类中的方法
+@DeleteMapping("{id}")
+	# 说明————用于注解delete的相关请求方法
+  # 使用————控制器类中的方法
+@PathVariable
+	# 说明————用户获取路径中的参数
+  # 使用————控制器方法形参
+  # 示例————如下:
+    @DeleteMapping("{id}")    
+		public boolean deleteById(@PathVariable String id) {        
+      return eduTeacherService.removeById(id);    
+    }
+@ComponentScan(basePackages = {"com.pigskin"})
+	# 说明————用于设置当前模块扫描规则（因为外部的组件配置类需要在本模块项目启动时使用）
+  # 使用————启动类
+@RequestBody(required = false)
+  # 说明————表示使用json传递数据，将json数据封装到对应对象中
+  # 使用————控制器类中方法形式参数
+  # 注意
+    -- 提交方式必须使用post方式，否则取不到值
+    -- required = false————表示参数值可以没有
+@ResponseBody
+	# 说明————表示返回数据，返回json数据
+  # 使用————控制器类
+@ControllerAdvice   
+  # 说明
+    -- 全局数据预处理
+    -- 使用 @ControllerAdvice 实现全局异常处理，只需要定义类，添加该注解即可
+    -- 全局数据绑定功能可以用来做一些初始化的数据操作，我们可以将一些公共的数据定义在添加了 @ControllerAdvice 注解的类中，这样，在每一个 Controller 的接口中，就都能够访问导致这些数据。
+  # 使用————类
+@AllArgsConstructor   
+  # 说明————用于生成有参构造
+  # 使用————类
+@NoArgsConstructor   
+  # 说明————用于生成无参构造
+  # 使用————类
+@CrossOrgin    
+  # 说明————用于解决跨域请求问题
+  # 使用————控制器类名上
+@EnableDiscoveryClient    
+  # 说明————用于让注册中心能够发现、扫描到该服务
+  # 使用————SpringBoot服务启动类
+@EnableFeignClients
+  # 说明————用于可以实现SpringCloud的服务远程调用
+  # 使用————调用端SpringBoot服务启动类
+@FeignClient(name="vod",fallback=对应实现类提供熔断机制.class)
+  # 说明————用于指定从哪个服务中调用功能 ，名称与被调用的服务名保持一致
+  # 使用————调用方创建的远端服务调用接口
+@RequestParam("videoIdList")
+  # 说明————将请求参数绑定到你控制器的方法参数上（是springmvc中接收普通参数的注解）
+  # 使用————控制器类中方法形式参数
+```
+
+## 2、Swagger相关注解
+
+```
+@EnableSwagger2
+  # 说明————用于表示启用Swagger
+  # 使用————Swagger配置类
+@Api(description = "讲师管理")
+	# 说明————对接口文档的类进行友好性提示
+	# 使用————类文件
+@ApiOperation(value = "根据id逻辑删除讲师")
+	# 说明————对接口文档的方法进行友好性提示
+	# 使用————方法
+@ApiParam(name = "id", value = "讲师id", required = true)
+	# 说明————对接口文档的方法参数进行友好性提示
+	# 使用————形式参数上
+	# 参数说明————required[标该参数识是否必须要有]
+@ApiModelProperty(value = "返回消息")
+	# 说明————对接口文档的方法参数进行友好性提示
+	# 使用————实体类属性
+```
+
+## 3、Redis相关注解
+
+```java
+@EnableCaching
+	# 说明————用于开启缓存注解
+	# 使用————缓存（Redis）配置类
+@Cacheable【一般用在查询方法上】
+	# 说明————根据方法对其返回结果进行缓存，下次请求时如果缓存还存在，则直接读取缓存数据；如果缓存不存在，则执行方法并把返回的结果存入缓存中
+	# 属性值
+		-- value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+		-- cacheNames【与value差不多，二选一即可】
+		-- key【可选属性，可以使用SpEL标签自定义缓存的key】
+@CachePut【一般用在新增方法上】
+	# 说明————使用该注解标志的方法，每次都会执行，并将结果存入指定的缓存中。其他方法可以直接从响应的缓存中读取缓存数据，而不需要再去查询数据库
+	# 属性值
+		-- value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+		-- cacheNames【与value差不多，二选一即可】
+		-- key【可选属性，可以使用SpEL标签自定义缓存的key】
+@CacheEvict【一般用在更新或者删除方法上】
+	# 说明————使用该注解标志的方法，会清空指定的缓存
+	# 属性值
+		-- value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+		-- cacheNames【与value差不多，二选一即可】
+		-- key【可选属性，可以使用SpEL标签自定义缓存的key】
+		-- allEntries【是否清空所有缓存，默认为false。如果指定为true，则方法调用后将立即清空所有的缓存】
+		-- beforeInvocation【是否在方法执行前就清空，默认为false。如果指定为true，则在方法执行前就会清空缓存】
+```
+
+
 
 
 
