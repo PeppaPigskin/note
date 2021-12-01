@@ -253,6 +253,25 @@ YF390-0HF8P-M81RQ-2DXQE-M2UT6
 ZF71R-DMX85-08DQY-8YMNC-PPHV8
 ```
 
+### 5、向日葵远程控制工具
+
+```bash
+1、说明
+	向日葵是一款阳光的远程控制软件。您可在任何可连入互联网的地方，轻松访问和控制安装了向日葵客户端的设备，且目前支持电脑、手机等多种控制端的方式进行远控。
+2、安装
+	brew install sunloginclient
+3、问题处理
+	# mac授权问题————
+		-- 进入终端su账户
+			sudo su
+		-- 执行命令
+			tccutil reset Accessibility
+		-- 重启电脑
+		-- 进行授权
+			系统偏好设置——>安全性与隐私——>隐私——>进行相应权限的授权
+			授权说明——https://service.oray.com/question/10558.html
+```
+
 
 
 # 4、Java——开发环境搭建
@@ -283,10 +302,23 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 		export JAVA_HOME=`/usr/libexec/java_home`
 ```
 
-### 2、IDE安装与配置
+### 2、IDEA安装与配置
 
-```
-
+```bash
+1、说明
+	IDEA 全称 IntelliJ IDEA，是java编程语言开发的集成环境。IntelliJ在业界被公认为最好的java开发工具，尤其在智能代码助手、代码自动提示、重构、JavaEE支持、各类版本工具(git、svn等)、JUnit、CVS整合、代码分析、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主。它的旗舰版本还支持HTML，CSS，PHP，MySQL，Python等。免费版只支持Java,Kotlin等少数语言。
+2、安装
+	brew install intellij-idea
+3、注册激活
+	# 插件激活(建议)
+		-- 下载安装IDE Eval Reset插件
+			IntelliJ IDEA——>Preferences——>Plugins——>Marketplace——>搜索[IDE Eval Reset]
+		-- 设置每次开启自动重置注册信息
+			Help——>Eval Reset——>勾选[Auto reset before per restart]项
+	# 注册码激活
+		-- 石墨文档————https://shimo.im/docs/XvW3WpHgHdRHVXgV/read
+		-- 文档获取————https://docs.qq.com/doc/DTVh3bkxWSEpvVm5N
+		-- 网址激活————http://www.lookdiv.com/————输入[7788]获取激活码
 ```
 
 ### 3、域名访问环境
