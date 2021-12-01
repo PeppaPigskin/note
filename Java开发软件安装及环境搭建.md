@@ -41,47 +41,47 @@ NTVHT-YF2M4-J9FJG-BJD66-YG667
 
 ​		`1、在自己想要备份数据的文件目录中创建三个空文件backup.sql,backup.xml,backuplog.log，分别用于存储备份的数据脚本、配置文件、日志信息:`
 
-<img src="image/img2_2_1.png" style="zoom:50%;" />
+<img src="image/img1_2_2_1.png" style="zoom:50%;" />
 
 ​		`2、打开SQLyog，依次选择菜单项中的增强工具——>计划备份，将弹出如下窗:`
 
-<img src="image/img2_2_2.png" style="zoom:50%;" />
+<img src="image/img1_2_2_2.png" style="zoom:50%;" />
 
 ​		`3、点击下一步,在弹出的如下窗口中选择需要备份的数据库，点击下一步:`
 
-<img src="image/img2_2_3.png" style="zoom:50%;" />
+<img src="image/img1_2_2_3.png" style="zoom:50%;" />
 
 ​		`4、选择导出的对象，点击下一步:`
 
-<img src="image/img2_2_4.png" style="zoom:50%;" />
+<img src="image/img1_2_2_4.png" style="zoom:50%;" />
 
 ​		`5、选择第一步创建的以.sql为后缀的文件，并设置脚本生成方式，点击下一步:`
 
-<img src="image/img2_2_5.png" style="zoom:50%;" />
+<img src="image/img1_2_2_5.png" style="zoom:50%;" />
 
 ​		`6、选择要生成的选项，点击下一步:`
 
-<img src="image/img2_2_6.png" style="zoom:50%;" />
+<img src="image/img1_2_2_6.png" style="zoom:50%;" />
 
 ​		`7、选择备份数据的文件字符集为utf-8,点击下一步:`
 
-<img src="image/img2_2_7.png" style="zoom:50%;" />
+<img src="image/img1_2_2_7.png" style="zoom:50%;" />
 
 ​		`8、出现错误终止或者发邮件依个人需求而定，点击下一步:`
 
-<img src="image/img2_2_8.png" style="zoom:50%;" />
+<img src="image/img1_2_2_8.png" style="zoom:50%;" />
 
 ​		`9、选择执行任务的方式和第一步创建的以.log为后缀的日志文件，点击下一步:`
 
-<img src="image/img2_2_9.png" style="zoom:50%;" />
+<img src="image/img1_2_2_9.png" style="zoom:50%;" />
 
 ​		`10、选择工作文件地址（即为第一步创建的以.xml为后缀的配置文件）以及调度名称，然后点击完成:`
 
-<img src="image/img2_2_10.png" style="zoom:50%;" />
+<img src="image/img1_2_2_10.png" style="zoom:50%;" />
 
 ​		`11、点击完成后会弹出对话框，点击计划，点击新建，选择需要执行的时间点，点击确定即可:`
 
-<img src="image/img2_2_11.png" style="zoom:50%;" />
+<img src="image/img1_2_2_11.png" style="zoom:50%;" />
 
 
 
@@ -98,35 +98,35 @@ Exit
 
 ​		`2、将设置好的文本文件保存关闭。并重新设置其扩展名为.bat，如图所示:`
 
-<img src="image/img2_3_1.png" style="zoom:50%;" />
+<img src="image/img1_2_3_1.png" style="zoom:50%;" />
 
 ​		`3、依次打开控制面板——>管理工具——>任务计划程序，打开后界面如图所示:`
 
-<img src="image/img2_3_2.png" style="zoom:50%;" />
+<img src="image/img1_2_3_2.png" style="zoom:50%;" />
 
 ​		`4、在弹出界面操作模块中，点击创建基本任务选项，如图红框所示:`
 
-<img src="image/img2_3_3.png" style="zoom:50%;" />
+<img src="image/img1_2_3_3.png" style="zoom:50%;" />
 
 ​		`5、在弹出的创建基本任务向导窗口中设置自己想要的名称和描述信息，点击下一步:`
 
-<img src="image/img2_3_4.png" style="zoom:50%;" />
+<img src="image/img1_2_3_4.png" style="zoom:50%;" />
 
 ​		`6、设置触发器内容，根据自身需求选择要备份的频次，点击下一步:`
 
-<img src="image/img2_3_5.png" style="zoom:50%;" />
+<img src="image/img1_2_3_5.png" style="zoom:50%;" />
 
 ​		`7、设置每次备份的开始时间以及间隔，点击下一步:`
 
-<img src="image/img2_3_6.png" style="zoom:50%;" />
+<img src="image/img1_2_3_6.png" style="zoom:50%;" />
 
 ​		`8、此处选择启动程序选项，点击下一步:`
 
-<img src="image/img2_3_7.png" style="zoom:50%;" />
+<img src="image/img1_2_3_7.png" style="zoom:50%;" />
 
 ​		`9、点击浏览,选择第二步创建的xxx.bat文件，点击下一步，然后点击完成即可:`
 
-<img src="image/img2_3_8.png" style="zoom:50%;" />
+<img src="image/img1_2_3_8.png" style="zoom:50%;" />
 
 # 3、Mac——常用软件环境搭建
 
@@ -562,11 +562,11 @@ sh jmeter
 
 ​		1)第一个网卡为NAT Network
 
-​		<img src="image/img5_2_1.png" alt="img" style="zoom: 50%;" />
+​		<img src="image/img1_5_2_1.png" alt="img" style="zoom: 50%;" />
 
 ​		2)在网络配置中，新建一个网卡2为桥接网卡。					
 
-​		<img src="image/img5_2_2.png" alt="img" style="zoom:50%;" />
+​		<img src="image/img1_5_2_2.png" alt="img" style="zoom:50%;" />
 
 ### 3、Linux虚拟机安装
 
