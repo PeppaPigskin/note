@@ -2,6 +2,270 @@
 
 ## 1、MybatisPlus
 
+```java
+1、说明
+	针对mybatis做的增强,简化开发
+```
+```java
+2、在线学习地址
+	http://mp.baomidou.com
+```
+```markdown
+3、整合过程
+
+	# 导入依赖
+  	<!-- mybatisplus依赖 -->
+		<dependency>            
+  		<groupId>com.baomidou</groupId>      
+  		<artifactId>mybatis-plus-boot-starter</artifactId>   
+  		<version>3.2.0</version>  
+  	</dependency>
+  	<!-- mysql驱动 -->
+  	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>    
+      <version>8.0.17</version>
+    </dependency>
+    
+ 	# 配置文件配置
+  	-- application.yml中配置数据源相关信息
+			#配置mysql数据源
+      spring:
+        datasource:
+          username: root
+          password: root
+          url: jdbc:mysql://192.168.56.106:3306/db_mall_sms
+          driver-class-name: com.mysql.jdbc.Driver
+    -- 配置mybatisplus相关配置
+			# 配置mybatis-plus查找sql映射文件
+      mybatis-plus.mapper-locations=classpath:/mapper/**/*.xml
+      # 配置主键自增
+      mybatis-plus.global-config.db-config.id-type=auto
+      # 全局逻辑删除的实体字段名[since 3.3.0,配置后可以忽略不配置步骤2
+      mybatis-plus.global-config.db-config.logic-delete-field=flag 
+      # 逻辑已删除值[默认为1]
+      mybatis-plus.global-config.db-config.logic-delete-value=1 
+      # 逻辑未删除值[默认为0]    
+      mybatis-plus.global-config.db-config.logic-not-delete-value=0                     
+```
+```markdown
+4、使用步骤
+
+	# 创建数据库，创建数据表，添加数据用于mp操作
+	
+	# 初始化工程
+		-- 使用Spring Initializr快速初始化一个SpringBoot工程
+		-- 当前使用版本：2.2.1.RELEASE
+		-- Artifact中安装mybatis-plus插件
+		
+	# 添加依赖                     
+    <dependencies>
+        <!--springboot启动器依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <!--springboot测试依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--mybatis-plus依赖-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+
+        <!--mysql依赖-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <!--lombok用来简化实体类的开发（通过注解形式就不需要写get和set方法）-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+    
+	# 安装lombok插件
+		Settings-->Plugins-->Marketplace-->搜索lombok进行安装  
+    
+	# 创建配置文件[application.properties或application.yml]
+    #mysql5
+    #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+    #spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus
+    #mysql8以上（springboot2.1以上）
+    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    ##【serverTimezone=GMT%2B8】表示时区;【&useUnicode=true&characterEncoding=utf8】用于设置编码格式，防止中文乱码
+    spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
+    spring.datasource.username=root
+    spring.datasource.password=root
+    #mybatis日志
+    ##查看更详细的内容
+    mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+    #设置逻辑删除默认值配置，可自动以配置
+    mybatis-plus.global-config.db-config.logic-delete-value=1
+    mybatis-plus.global-config.db-config.logic-not-delete-value=0
+    
+	# 编写代码
+		-- 创建对应实体类
+		-- 创建对应mapper接口文件继承自BaseMapper<对应实体类名>                     
+```
+
+```markdown
+5、主键生成策略
+
+	# 分类
+  	-- 自动增长
+  		AUTO_INCREMENT,缺点是进行分表操作时，下一张表需要知道上一张表的最后一个id
+  	-- UUID
+  		每次操作都会生成随机的一个唯一的值,缺点是无法通过生成的值进行排序
+  	-- redis实现
+  		依据redis的原子操作INCR和INCRBY来实现
+  	-- MP自带策略
+  		snowflake算法：使用41bit作为毫秒数，10bit作为机器的ID（5个bit是数据中心，5个bit的机器ID），12bit作为毫秒内的流水号（意味着每个节点在每毫秒可以产生 4096 个 ID），最后还有一个符号位，永远是0。	
+  
+  # 使用
+  	在要生成主键的属性上添加注解:@TableId（type=IdType.xxx）
+```
+
+```markdown
+6、自动填充实现步骤
+	
+	# 在实体类中进行自动填充的属性上添加注解：@TableField（fill=FieldFill.xxx）
+	
+	# 创建类（元对象处理类），实现接口MetaObjectHandler，并实现接口中的方法，同时将该类交由spring管理
+```
+
+```markdown
+7、乐观锁
+	
+	# 作用
+		主要解决丢失更新问题(并发修改同一条记录时，最后一次的提交会将之前的更新覆盖。)
+
+	# 解决方案
+		-- 悲观锁(串行)
+		
+		-- 乐观锁
+	
+	# 实现原理
+		-- 1、取出记录时，获取当前version
+		-- 2、更新时，带上这个version
+		-- 3、执行更新时，set version=newVersion where version=oldVersion
+		-- 4、如果version不对，就更新失败
+		
+	# 具体实现
+		-- 1、表添加字段，作为乐观锁的版本号
+		-- 2、对应实体添加版本号属性
+		-- 3、在实体类版本号属性添加注解@Version
+		-- 4、配置乐观锁插件（写到配置类中）
+			// Spring xml方式
+				<bean class="com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor" id="optimisticLockerInnerInterceptor"/>  
+        <bean id="mybatisPlusInterceptor" class="com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor">    
+          <property name="interceptors">        
+            <list>              
+            	<ref bean="optimisticLockerInnerInterceptor"/>    
+            </list>   
+          </property>
+        </bean>
+      // Springboot 注解方式
+      	@Bean
+      	public MybatisPlusInterceptor mybatisPlusInterceptor() {  
+        	MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();    
+        	interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());  
+        	return interceptor;
+        }
+```
+
+```java
+8、分页实现
+	# 说明
+		PageHelper类似
+	# 实现步骤
+		-- 1、配置分页插件
+  		/**    
+       * 分页插件
+       * 
+       * @return 
+       */ 
+      @Bean 
+      public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+      }
+		-- 2、编写分页代码
+			/**     
+			 * 分页查询    
+       */
+      @Test
+      void testPageSelect() {  
+        //1、创建page对象(分页当前页，每页条数)  
+        Page<User> page = new Page<>(2, 2);  
+        //2、调用mp分页查询方法(分页对象，条件)，会将分页所有的对象封装到page对象中 
+        userMapper.selectPage(page, null);  
+        //3、通过page对象获取分页数据  
+        System.out.println("当前页：" + page.getCurrent());  
+        System.out.println("每页数据list集合：" + page.getRecords()); 
+        System.out.println("每页显示记录数：" + page.getSize());  
+        System.out.println("总记录数：" + page.getTotal()); 
+        System.out.println("总页数：" + page.getPages());  
+        System.out.println("是否有下一页：" + page.hasNext()); 
+        System.out.println("是否有上一页：" + page.hasPrevious()); 
+      }
+```
+
+```java
+9、简单查询
+  # 根据ID查询————xxxMapper.selectById([id值])
+  	/**     
+  	 * 根据id查询
+     */
+  	@Test
+  	void selectById() {
+  		//根据id查询数据   
+  		User user = userMapper.selectById(1409337486740770818L);  
+  		System.out.println(user);    
+		}
+  # 通过多个id批量查询————xxxMapper.selectBatchIds([id集合])
+  	/**     
+  	 * 根据多个id批量查询    
+     */
+    @Test
+    void testSelectByIds(){
+    	List<User> users = userMapper.selectBatchIds(Arrays.asList(1409341740750704641L, 1409341829028179969L)); 
+  	  System.out.println(users);
+  	}
+  # 通过map封装查询条件————xxxMapper.selectByMap([map对象])
+  	/**
+     * 通过map封装查询条件    
+     */
+    @Test 
+    void testSelectByMap() {
+    	Map<String, Object> map = new HashMap<>();
+    	map.put("name", "mary"); 
+    	map.put("age", 16);
+    	List<User> users = userMapper.selectByMap(map);
+    	System.out.println(users);    
+  	}
+```
+
+```java
+10、复杂条件
+```
+
+
+
 ## 2、Swagger
 
 ## 3、Nginx
