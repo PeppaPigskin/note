@@ -272,6 +272,15 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 			授权说明——https://service.oray.com/question/10558.html
 ```
 
+### 6、终端工具Tabby
+
+```
+1、说明
+2、安装
+	brew install tabby
+4、
+```
+
 
 
 # 4、Java——开发环境搭建
