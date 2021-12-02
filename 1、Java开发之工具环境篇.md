@@ -409,7 +409,7 @@ sh jmeter
 
 
 
-### 7、Mysql 安装与配置
+### 8、Mysql 安装与配置
 
 #### 1、安装mysql@5.7
 
@@ -439,7 +439,7 @@ sh jmeter
 	FLUSH PRIVILEGES;
 ```
 
-### 8、Nacos环境搭建
+### 9、Nacos环境搭建
 
 ```bash
 1、下载
@@ -459,7 +459,7 @@ sh jmeter
 		kill -9 xxx 
 ```
 
-### 9、Vscode安装与配置
+### 10、Vscode安装与配置
 
 ```bash
 1、安装
@@ -484,7 +484,7 @@ sh jmeter
   Vetur
 ```
 
-### 9、Webpack安装
+### 11、Webpack安装
 
 ```bash
 1、安装
@@ -499,7 +499,7 @@ sh jmeter
 	npm uninstall webpack webpack-cli --save-dev
 ```
 
-### 10、Node环境搭建(npm同时也会安装好)
+### 12、Node环境搭建(npm同时也会安装好)
 
 ```bash
 1、安装nvm
@@ -526,6 +526,15 @@ sh jmeter
 	2)添加配置
 		export NODE_HOME="node安装路径(bin路径的父级路径)" 
 		export PATH=$PATH:$NODE_HOME/bin
+```
+
+### 13、Apifox安装与配置
+
+```bash
+1、说明
+	Apifox是 API 文档、API 调试、API Mock、API 自动化测试一体化协作平台，定位 Postman + Swagger + Mock + JMeter。通过一套系统、一份数据，解决多个系统之间的数据同步问题。只要定义好 API 文档，API 调试、API 数据 Mock、API 自动化测试就可以直接使用，无需再次定义；API 文档和 API 开发调试使用同一个工具，API 调试完成后即可保证和 API 文档定义完全一致。高效、及时、准确！
+2、使用文档
+	https://www.apifox.cn/help/
 ```
 
 
