@@ -381,8 +381,10 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ### 4、性能测试工具
 
-```
-
+```bash
+1、下载
+brew install VisualVM
+2、使用
 ```
 
 ### 5、压力测试工具
@@ -391,7 +393,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 1、下载
 https://archive.apache.org/dist/jmeter/binaries/
 2、启动
-cd /MyInstall/apache-jmeter-5.2.1/bin/
+cd MyInstall/apache-jmeter-5.2.1/bin/
 sh jmeter
 ```
 
