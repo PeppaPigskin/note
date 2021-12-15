@@ -16,6 +16,8 @@ ipconfig
 ```bash
 # 数据传输
 scp -r [本地文件路径] [远端主机账户]@[远端主机地址]:[远端文件路径]
+# 过滤查看所有进程
+ps aux | grep [过滤条件:svnserve]
 # 查看端口占用情况
 lsof -i:[端口号]
 # 强行终止进程
@@ -221,6 +223,15 @@ Exit
   man brew 
   # 显示包依赖
   brew deps
+4、安装指定版本的软件
+	# 1、brew官网搜索指定包名————https://brew.sh/
+	# 2、通过Cask code on GitHub,找到其在GitHub的仓库对应的xxx.rb文件————单击Cask code超链接
+	# 3、查看其历史提交记录————点击History按钮
+	# 4、找到对应版本的历史提交记录单机进入吃,查看详细————单击View at this point in the history按钮
+	# 5、终端输入以下命令创建指定文档————touch xxx.rb
+	# 6、终端输入以下命令打开并编辑文档————open -e goland.rb
+	# 7、将第4步的详细内容拷贝到创建的指定文档
+	# 8、执行如下命令进行安装————brew install xxx.rb
 ```
 
 ### 3、Mac OS 环境搭建
@@ -320,6 +331,8 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install intellij-idea
 3、注册激活
 	# 插件激活(建议)
+		-- 设置第三方插件仓库地址[https://plugins.zhile.io]
+			IntelliJ IDEA——>Preferences——>Plugins——>设置图标——>Manage Plugin Repositories...——>添加第三方插件仓库地址
 		-- 下载安装IDE Eval Reset插件
 			IntelliJ IDEA——>Preferences——>Plugins——>Marketplace——>搜索[IDE Eval Reset]
 		-- 设置每次开启自动重置注册信息
@@ -546,6 +559,98 @@ sh jmeter
 	Apifox是 API 文档、API 调试、API Mock、API 自动化测试一体化协作平台，定位 Postman + Swagger + Mock + JMeter。通过一套系统、一份数据，解决多个系统之间的数据同步问题。只要定义好 API 文档，API 调试、API 数据 Mock、API 自动化测试就可以直接使用，无需再次定义；API 文档和 API 开发调试使用同一个工具，API 调试完成后即可保证和 API 文档定义完全一致。高效、及时、准确！
 2、使用文档
 	https://www.apifox.cn/help/
+```
+
+### 14、SVN环境搭建
+
+```bash
+1、安装示例
+	https://www.jianshu.com/p/79116c6f8f72
+2、安装
+	brew install subversion
+3、配置
+	# 1、使用如下命令创建一个SVN的代码仓库（目录改成你想要创建的目录）
+		svnadmin create /Users/pigskin/Desktop/CTJ/Code/SVN
+	# 2、打开conf文件夹,备份[authz、password、svnserve.conf]三个文件
+	# 3、svnserve.conf文件的配置————去除如下四部分注释信息
+		anon-access = read————代表匿名访问可读，可以将其进行修改修改为anon-access = none代表不允许匿名访问。
+		auth-access = write————代表认证之后可写
+		passwd-db = passwd————代表密码数据库是passwd文件
+		authz-db = authz————代表授权数据库为authz文件
+	# 4、passwd文件的配置————[users]下添加用户名和密码,格式如下
+		username = password
+	# 5、authz文件的配置————[groups]下创建组,[路径]指定路径下的访问用户或组
+		[groups]
+		admin = wangwu # 将wangwu用户添加到admin组中
+		test = zhangsan,lisi # 将zhangsan,lisi用户添加到test组中
+		
+		[/] # 允许访问全部目录，也可以自己修改指定目录
+		@admin = rw # 给admin组的成员添加read、write权限,组前要加@
+		maliu = rw # 给maliu用户添加read、write权限,单个用户前不用添加@
+4、开启服务
+	svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/Code/SVN]
+5、关闭服务
+	打开[活动监视器]————>搜索[svnserve]————>选中对应服务————>删除
+6、使用
+	从本地导入代码到SVN服务器————svn import [本地文件路径] svn://localhost --username=[用户名] --password=[密码] -m "提交说明"
+	从SVN服务器下载到本地————svn checkout svn://localhost [本地路径]
+	提交更新过的代码到SVN服务器————svn commit -m "提交说明"
+	更新服务器端代码到客户端————svn update
+	删除在服务器上的文件————svn delete svn://xxx.xxx.xxx.xxx/文件的路径 -m "备注"
+	查看svn服务器的信息————svn info
+	版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
+```
+
+### 15、Go语言开发环境搭建
+
+```bash
+1、安装Golang的SDK
+	# SDK安装包方式
+		0)安装包下载地址:https://golang.org/dl/
+		1)双击 .tar 文件，就会自动解压成名字为“go”的文件夹;拖拽到你的用户名下,记住路径;
+我的路径为:/Users/pigskin/go
+		2)双击pkg包，顺着指引，即可安装成功。
+		3)在命令行输入 go version,验证SDK安装成功,获取到go的version，则代表安装成功。
+	# 使用brew
+		安装————brew install go
+2、配置环境变量
+	# 打开终端输入以下命令进入用户主目录————cd ~
+	# 输入以下命令查看是否存在.bash_profile————ls -all
+	# 存在即使用以下命令打开文件————vim .bash_profile
+	# 键入以下字符进入编辑模式,并添加如下内容————i
+		注意：= 前后没有空格。否则报错误(not a valid identifier)
+		1)SDK安装包方式
+			# 设置日常开发的根目录
+			export GOPATH=/Users/pigskin/go
+			# 设置GOPATH下的bin目录
+			export GOBIN=$GOPATH/bin
+			# 设置Path变量
+			export PATH=$PATH:$GOBIN
+		2)使用brew安装方式
+			# 设置日常开发的根目录
+			export GOPATH=/usr/local/Cellar/go/1.17.5
+			# 设置GOPATH下的bin目录
+			export GOBIN=$GOPATH/bin
+			# 设置Path变量
+			export PATH=$PATH:$GOBIN
+	# 点击ESC，并输入以下命令保存并退出编辑————:wq
+  # 可输入以下命令查看是否保存成功————vim .bash_profile
+  # 输入以下命令完成对golang环境变量的配置，配置成功没有提示————source ~/.bash_profile 
+	# 输入以下命令查看配置结果————go env
+3、使用命令行调试
+	# 创建工程在go的src目录下，比如我的go目录为/Users/pigskin/go，我创建文件夹 MSTest路径为/Users/pigskin/go/src/MSTest
+	# 创建文件 main.go ,输入如下代码,并保存。
+		package main
+
+		import "fmt"
+
+		func main() {
+			fmt.Println("hello")
+		}
+  # 在命令行输入如下命令生成exec文件————go build main.go 
+  # 点击这个exec 文件，会弹出命令行显示下面的运行结果————hello
+4、IDE安装
+	brew install goland
 ```
 
 
@@ -978,6 +1083,24 @@ sh jmeter
 	https://www.rabbitmq.com/networking.html
 5、镜像信息地址
 	https://hub.docker.com/_/rabbitmq?tab=tags
+```
+
+### 10、Docker中安装Oracle
+
+```bash
+1、安装
+	docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+2、启动镜像为容器
+	docker run --name oracle_11g \
+  -p 9090:8080 \
+  -p 1521:1521 \
+  -d registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+3、进入容器
+	docker exec -it 容器id  /bin/bash
+4、容器id可以通过一下命令查询
+	docker ps -a
+5、通过连接工具连接oracle
+    初始用户名密码：system/helowin；服务名：helowin
 ```
 
 
