@@ -1482,9 +1482,285 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ## 10、Redis
 
+```markdown
+# 说明
+	Redis（Remote Dictionary Server)，即远程字典服务，是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。
+
+# 作用
+	对数据进行缓存，能够提高查询效率（基于内存存储）
+
+# 特点
+	-- NoSQL系统之一
+	-- 基于Key-Value存储
+	-- 读写速度很高效
+	-- 支持多种数据结构————String（字符串）、List（列表）、Hash（哈希）、Set（无须集合）、ZSet（有序集合）
+	-- 支持持久化，集群部署————通过内存对数据进行存储，也可以存储到硬盘（即持久化）
+	-- 支持过期时间（存储的数据可以设定有效时间），支持事务、消息订阅
+
+# 与Memcache的区别
+	Redis和Memcache数据都是缓存在计算机内存中，不同的是，后者只能将数据缓存到内存中，无法自动定期写入硬盘，所以后者适用于缓存无需持久化的数据
+
+# 适用场景
+	一般将经常进行查询并且不经常修改的，不是特别重要的数据
+	
+# 安装
+	-- docker中安装,详见————1-5-6、Docker中安装redis
+	-- 虚拟机中安装,详见————1-5-11、Linux虚拟机中安装Redis
+```
+
+[ 1-5-6、Docker中安装redis](https://gitee.com/PeppaPigskin/note/blob/master/1%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%B7%A5%E5%85%B7%E7%8E%AF%E5%A2%83%E7%AF%87.md#6docker%E4%B8%AD%E5%AE%89%E8%A3%85redis)
+
+[1-5-11、Linux虚拟机中安装Redis](https://gitee.com/PeppaPigskin/note/blob/master/1%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%B7%A5%E5%85%B7%E7%8E%AF%E5%A2%83%E7%AF%87.md#11linux%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%AD%E5%AE%89%E8%A3%85redis)
+
+```markdown
+# key生成规则
+	value::key
+
+# SpringBoot整合Redis
+-- 1、添加依赖
+	<!--redis-->
+	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+	</dependency>
+	<!--spring2.X集成redis所需common-pool2-->
+	<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-pool2</artifactId>
+    <version>2.6.0</version>
+	</dependency>
+
+-- 2、添加Redis配置类【RedisConfig.java】
+    package com.pigskin.service_base;
+
+    import com.fasterxml.jackson.annotation.JsonAutoDetect;
+    import com.fasterxml.jackson.annotation.PropertyAccessor;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import org.springframework.cache.CacheManager;
+    import org.springframework.cache.annotation.CachingConfigurerSupport;
+    import org.springframework.cache.annotation.EnableCaching;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.data.redis.cache.RedisCacheConfiguration;
+    import org.springframework.data.redis.cache.RedisCacheManager;
+    import org.springframework.data.redis.connection.RedisConnectionFactory;
+    import org.springframework.data.redis.core.RedisTemplate;
+    import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+    import org.springframework.data.redis.serializer.RedisSerializationContext;
+    import org.springframework.data.redis.serializer.RedisSerializer;
+    import org.springframework.data.redis.serializer.StringRedisSerializer;
+    import java.time.Duration;
+
+    /**
+    * Redis缓存配置类
+    */
+    //开启缓存注解
+    @EnableCaching
+    //配置类
+    @Configuration
+    public class RedisConfigextendsCachingConfigurerSupport{
+      /**
+      * SpringBoot集成Redis模板
+      *
+      * @paramfactory
+      * @return
+      */
+      @Bean
+      public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactoryfactory){
+        RedisTemplate<String,Object> template = new RedisTemplate<>();
+        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL,JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+        template.setConnectionFactory(factory);
+        //key序列化方式
+        template.setKeySerializer(redisSerializer);
+        //value序列化
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        //valuehashMap序列化
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        return template;
+      }
+
+      /**
+      * 针对缓存的管理
+      *
+      * @paramfactory
+      * @return
+      */
+      @Bean
+      public CacheManager cacheManager(RedisConnectionFactoryfactory){
+        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+
+        //解决查询缓存转换异常的问题
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL,JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+
+        //配置序列化（解决乱码的问题）,过期时间600秒	
+        RedisCacheConfigurationconfig=RedisCacheConfiguration.defaultCacheConfig()
+        //设置数据缓存时间
+        .entryTtl(Duration.ofSeconds(600))
+        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
+	.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
+        .disableCachingNullValues();
+        RedisCacheManagercacheManager=RedisCacheManager.builder(factory).cacheDefaults(config).build();
+        return cacheManager;
+      }
+    }
+
+-- 3、配置文件添加Redis配置
+	spring.redis.host=192.168.44.132
+	spring.redis.port=6379
+	spring.redis.database=0
+	spring.redis.timeout=1800000
+	spring.redis.lettuce.pool.max-active=20
+	spring.redis.lettuce.pool.max-wait=-1
+	#最大阻塞等待时间(负数表示没限制)
+	spring.redis.lettuce.pool.max-idle=5
+	spring.redis.lettuce.pool.min-idle=0
+
+-- 4、方法添加Redis缓存注解（基于SpringBoot缓存注解）
+	1)@Cacheable【一般用在查询方法上】
+		-- 使用对象————一般使用到Service中的方法
+		-- 使用说明————根据方法对其返回结果进行缓存，下次请求时如果缓存还存在，则直接读取缓存数据；如果缓存不存在，则执行方法并把返回的结果存入缓存中
+		-- 属性值
+			value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+			cacheNames【与value差不多，二选一即可】
+			key【可选属性，可以使用SpEL标签自定义缓存的key】
+		-- 使用(注意key要是用“''”)————@Cacheable(key="'selectIndexList'",value="banner")
+
+	2)@CachePut【一般用在新增方法上】
+		-- 使用对象————一般使用到Service中的方法
+		-- 使用说明————使用该注解标志的方法，每次都会执行，并将结果存入指定的缓存中。其他方法可以直接从响应的缓存中读取缓存数据，而不需要再去查询数据库
+		-- 属性值
+			value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+			cacheNames【与value差不多，二选一即可】
+			key【可选属性，可以使用SpEL标签自定义缓存的key】
+
+	3)@CacheEvict【一般用在更新或者删除方法上】
+		-- 使用对象————一般使用到Service中的方法
+		-- 使用说明————使用该注解标志的方法，会清空指定的缓存
+		-- 属性值
+			value【缓存名，必填，它指定了你的缓存存放在哪块命名空间】
+			cacheNames【与value差不多，二选一即可】
+			key【可选属性，可以使用SpEL标签自定义缓存的key】
+			allEntries【是否清空所有缓存，默认为false。如果指定为true，则方法调用后将立即清空所有的缓存】
+			beforeInvocation【是否在方法执行前就清空，默认为false。如果指定为true，则在方法执行前就会清空缓存】
+
+-- 相关问题
+	1)两个系统间访问可能存在的问题————详见「开发经验2-3-11、Redis相关问题解决」
+```
+
+
+
 ## 11、MD5加密
 
+```markdown
+# 说明
+	只能加密，不能解密
+
+# 代码实现
+	package com.pigskin.common_utils;
+	
+	import java.security.MessageDigest;
+	import java.security.NoSuchAlgorithmException;
+	
+	/** 
+	* MD5加密 
+	*/
+	public final class MD5 {  
+  	/**    
+    * 获取MD5加密后的密码   
+    *    
+    * @param strSrc 密码明文 
+    * @return 加密密码   
+    */  
+    public static String encrypt(String strSrc) {   
+    	try {         
+    		char hexChars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8','9', 'a', 'b', 'c', 'd', 'e', 'f'};         
+    		byte[] bytes = strSrc.getBytes();       
+        MessageDigest md = MessageDigest.getInstance("MD5"); 
+        md.update(bytes);       
+        bytes = md.digest();     
+        int j = bytes.length;    
+        char[] chars = new char[j * 2];      
+        int k = 0;          
+        for (int i = 0; i < bytes.length; i++) {      
+        	byte b = bytes[i];         
+          chars[k++] = hexChars[b >>> 4 & 0xf];   
+          chars[k++] = hexChars[b & 0xf];         
+        }     
+        return new String(chars);  
+      } catch (NoSuchAlgorithmException e) {   
+      	e.printStackTrace();        
+        throw new RuntimeException("MD5加密出错！！+" + e);     
+      } 
+    }   
+    
+    public static void main(String[] args) {  
+    	System.out.println(MD5.encrypt("111111")); 
+    }
+  }
+```
+
+
+
 ## 12、OAuth2
+
+```markdown
+# 提出背景
+	照片拥有者想要在云冲服务上打印照片，云冲印服务需要访问云存储服务上的资源,之间存在权限的关系
+
+# 说明
+	针对特定问题一种解决方案
+
+# 主要解决问题
+-- 开放系统间的授权
+	1)说明————给对应需要访问某个服务授权访问权限
+	2)授权方式
+		-- 方式一：用户名密码复制
+			适用场景————适用于同一公司内部的多个系统，不适用于不受信的第三方应用
+			实现过程————如下图所示
+```
+
+<img src="image/img2_1_12_1_1.png" style="zoom:30%;" />
+
+```markdown
+		-- 方式二：通用开发者key（万能钥匙）
+			适用场景————适合用于合作商或者授信的不同业务部门之间（实力不对等的双方存在局限性）
+			实现过程————如下图所示,客户应用和受保护的资源双方约定好了，使用key能够打开双方
+```
+
+<img src="image/img2_1_12_1_2.png" style="zoom:50%;" />
+
+```markdown
+		-- 方式三：办法令牌（特殊令牌）
+			适用场景————接近OAuth2方式，需要考虑如何管理令牌、颁发令牌、吊销令牌，需要统一的协议，因此就有了OAuth2协议
+			实现过程————如下图所示,访问者使用受保护资源颁发的令牌（字符串），就能够访问
+```
+
+<img src="image/img2_1_12_1_3.png" style="zoom:50%;" />
+
+```markdown
+-- 分布式访问问题（即单点登录）
+	详见1-1-1-19、登陆方式——单点登录
+
+# 对OAuth2误解
+-- 并没有支持HTTP以外的协议
+-- 并不是一个认证协议
+-- 并没有定义授权处理机制
+-- 并没有定义token格式
+-- 并没有定义加密方法
+-- 并不是单个协议
+-- 仅是授权框架，仅用于授权代理
+```
+
+
 
 ## 13、Canal数据同步工具
 
@@ -1497,6 +1773,223 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 ## 17、Docker
 
 ## 18、JWT
+
+```markdown
+# 说明
+	给我们规定好的规则，使用其规则可以生成字符串，包含用户信息
+
+# 规则（包含三部分）
+-- 第一部分【jwt头信息】
+ 	{ 
+    “alg”:"HS256",
+    "type":"JWT"
+	}
+-- 第二部分【有效载荷】
+	{   
+		//主体信息
+	}
+-- 第三部分【签名Hash】
+	{    
+		//字符串的防伪标志
+	}
+
+# SpringBoot项目整合
+-- 引入依赖
+    <!--JWT依赖--> 
+    <dependency>  
+      <groupId>io.jsonwebtoken</groupId>     
+      <artifactId>jjwt</artifactId>   
+    </dependency>
+
+-- 创建工具类
+    package com.pigskin.common_utils;
+
+    import io.jsonwebtoken.Claims;
+    import io.jsonwebtoken.Jws;
+    import io.jsonwebtoken.Jwts;
+    import io.jsonwebtoken.SignatureAlgorithm;
+    import org.springframework.util.StringUtils;
+    import javax.servlet.http.HttpServletRequest;
+    import java.util.Date;
+
+    /**
+    * JWT工具类
+    */
+    public class JwtUtils {  
+      /**   
+      * 表示设置token过期时间    
+      */   
+      public static final long EXPIRE = 1000 * 60 * 60 * 24;   
+      /**    
+      * 秘钥，用于后期加密和编码（实际情况，按照公司的规则生成）    
+      */   
+      public static final String APP_SECRET = "ukc8BDbRigUDaY6pZNfWus2jZWLPHO";   
+      
+      /**     
+      * 生成token字符串（可以根据自己需求传多个值）    
+      *    
+      * @param id       用户ID    
+      * @param nickname 用户昵称   
+      * @return 生成的token字符串   
+      */   
+      public static String getJwtToken(String id, String nickname) {    
+        String JwtToken = Jwts.builder()//构建JWT字符串    
+        //设置JWT头信息（固定）      
+        .setHeaderParam("typ", "JWT")      
+        .setHeaderParam("alg", "HS256")     
+        //设置JWT过期时间            
+        .setSubject("pigskinEdu")//分类  
+        .setIssuedAt(new Date())     
+        .setExpiration(new Date(System.currentTimeMillis() + EXPIRE))    
+        //设置token主体部分（存储用户信息）         
+        .claim("id", id)              
+        .claim("nickname", nickname)       
+        //设置签名哈希（根据秘钥和方式进行编码）          
+        .signWith(SignatureAlgorithm.HS256, APP_SECRET)    
+        .compact();      
+        return JwtToken;  
+      } 
+      
+      /**    
+      * 判断token是否存在与有效    
+      *    
+      * @param jwtToken token字符串  
+      * @return    
+      */   
+      public static boolean checkToken(String jwtToken) {   
+        if (StringUtils.isEmpty(jwtToken)) return false;    
+        try {       
+          //根据秘钥进行验证token字符串      
+          Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(jwtToken);  
+        } catch (Exception e) {       
+          e.printStackTrace();    
+          return false;    
+        }      
+        return true; 
+      }   
+
+      /**    
+      * 判断token是否存在与有效    
+      *     
+      * @param request request请求    
+      * @return  
+      */   
+      public static boolean checkToken(HttpServletRequest request) { 
+        try {     
+          //通过request获取header中的token字符串，进行验证      
+          String jwtToken = request.getHeader("token");   
+          if (StringUtils.isEmpty(jwtToken)) return false;    
+          Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(jwtToken);   
+        } catch (Exception e) {     
+          e.printStackTrace();         
+          return false;   
+        }      
+        return true;  
+      }  
+
+      /**    
+      * 根据token获取用户信息  
+      *    
+      * @param request request请求  
+      * @param name    主体key     
+      * @return 获取主体信息, 得不到返回null 
+      */   
+      public static String getMemberIdByJwtToken(HttpServletRequest request, String name) {  
+        String jwtToken = request.getHeader("token");   
+        if (StringUtils.isEmpty(jwtToken)) return "";     
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(jwtToken);    
+        //获得token字符串的主体部分    
+        Claims claims = claimsJws.getBody();   
+        if (claims.containsKey(name)) {  
+        	return (String) claims.get(name);   
+        }     
+        return null;  
+      }
+    }
+```
+
+## 19、登录方式
+
+```markdown
+# 单一服务器模式
+-- 特点————没有集群，没有分布式
+-- 缺点————单点性能压力，无法扩展
+-- 实现方式————【Session对象实现】
+	1、实现过程：登录成功后将用户信息放到session中，判断是否登录，通过判断是否能够从session中取到数据
+	2、核心代码：
+		-- 向session中放数据————session.setAttribute("user",user);
+		-- 从session中获取数据————session.getAttribute("user");
+	3、实现原理：基于cookie实现
+
+# 服务器集群模式————SSO（Single sign on）模式【单点登录】
+-- 特点————集群部署（多台服务器，部署不同的服务，构成一个项目）
+-- 说明————一个项目有多个模块，每个模块独立运行，相互不产生影响，在一个模块登录了之后，其他模块都不需要进行二次登录
+-- 常见实现方式
+	1、session广播机制实现【session的复制】
+		-- 实现过程
+			1)一个模块登录后，通过session.setAttribute()将session保存起来
+			2)同时将session数据复制到其他各个模块
+		-- 缺点————模块太多的话。进行复制太消耗资源，同时浪费空间
+		-- 过期时间————session默认失效时间30分钟（可以自定义）
+
+	2、使用cookie+redis实现
+		-- 实现过程
+			1)在项目中任何一个模块进行登录，登录之后，将数据放到两个地方
+				redis————在key中放【生成唯一随机值】，ip\用户id\UUid等,在value中放【用户数据】
+				cookie————将redis中生成的key值放到cookie中
+			2)访问项目中其他模块，发送请求带着cookie进行发送，获取cookie值，拿着cookie,把cookie获取值，到redis进行查询，根据key进行查询，如果查到数据就代表已经登录
+		-- 过期时间————通过配置redis的过期时间来实现
+		-- cookie————客户端技术:每次发送请求，都会带着cookie值进行发送
+		-- redis————基于key-value存储
+ 
+	3、使用token实现【自包含令牌】
+		-- 实现过程
+			1)在项目中某个模块登录，登录之后，按照骨子生成字符串，将登陆之后的用户信息包含到生成的字符串中，将字符串返回（1、放到cookie中；2、把字符串通过地址栏返回）
+			2)再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。能获取到就是已经登录
+		-- 过期时间————可以进行设置，详见1-1-18、JWT
+		-- token————即按照一定规则（可以自己指定一定的规则）生成的字符串，生成的字符串可以包含用户信息.通用（官方）规则【JWT】，详见JWT
+
+	4、使用OAuth2方式
+		-- 实现过程
+			1)登录成功之后，【按照一定规则生成字符串】，字符串包含用户信息
+			2)将生成的字符串通过路径传递，或者放入cookie中
+			3)再发送请求时，每次带着字符串发送（从字符串中能获取到用户信息就是已经登录，否则未登录）
+	
+```
+
+
+
+## 20、Json格式转换
+
+```markdown
+# fastjson
+	-- 引入依赖
+		<!--json转换工具-->       
+    <dependency>     
+      <groupId>com.alibaba</groupId>   
+      <artifactId>fastjson</artifactId>     
+    </dependency>
+	-- 具体使用
+		//将map转换成Json对象
+		JSONObject.toJSONString(hashMap)
+
+# gson
+	-- 引入依赖
+    <!--gson-->    
+    <dependency>  
+      <groupId>com.google.code.gson</groupId>     
+      <artifactId>gson</artifactId>      
+    </dependency>
+	-- 具体使用
+		//将json对象转换成map集合
+		Gson gson = new Gson();
+		gson.fromJson(accessTokenInfo, HashMap.class);
+
+# jackson
+	@RestController注解，返回json数据。其底层使用的就是这种方式
+```
+
+
 
 # 二、第三方服务技术
 
@@ -3588,6 +4081,41 @@ spring.servlet.multipart.max-request-size:10MB #最大总上传的数据大小�
 ```markdown
 #nginx配置文件【nginx.conf】的【http{}】中创建配置如下内容
 client_max_body_size 1021m;#根据实际需求设置大小
+```
+
+## 11、Redis相关问题解决
+
+```markdown
+# 两个系统间远程访问不通
+-- 可能redis所在系统防火墙没关
+	查看防火墙状态————systemctl status firewalld——>service iptables status
+	暂时关闭防火墙————systemctl stop firewalld——>service iptables stop
+	永久关闭防火墙————systemctl disable firewalld——>chkconfig iptables off
+	重启防火墙————systemctl enable firewalld——>service iptables restart
+	永久关闭后重启————chkconfig iptables on
+-- 只允许本地访问
+	【vi 配置文件所在地址】,注释掉配置文件中的【# bind 127.0.0.1】
+-- 出错【Causedby:io.lettuce.core.RedisconnectionException:
+DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
+	因为是保护模式，不允许远程访问。修改配置文件的【protected-mode yes】改为【protected-mode no】
+
+# WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+-- 解决方式
+	进入【cd /etc】目录
+	打开【vim sysctl.conf】文件
+	添加【net.core.somaxconn = 1024】，并报存退出
+	执行【sysctl -p】
+
+# WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+-- 解决方式
+	进入【cd /etc】目录
+	执行【echo 1 > /proc/sys/vm/overcommit_memory】
+
+# WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+-- 解决方式
+	进入【cd /etc】目录
+	执行【echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled】
+
 ```
 
 
