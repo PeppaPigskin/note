@@ -858,7 +858,627 @@ PageHelper类似
 
 ## 8、SpringCloud
 
+### 1、微服务简介
+
+```markdown
+# 特点
+-- 一个项目中有多个端口的服务端口进行启动的
+-- 一个项目拆分成独立的多个服务，每个服务能够独立运行
+
+# 常用微服务开发框架
+-- Spring Cloud(现在比较流行的)————https://spring.io/projects/spring-cloud
+
+-- Dubbo(出现的早，有些公司也在用)————https://dubbo.apache.org/zh/
+
+-- DropWizard（关注单个微服务的开发）————https://www.dropwizard.io/en/latest/
+
+-- Consul、etcd&etc(微服务的模块)
+
+```
+
+
+
+### 2、分布式简介
+
+```markdown
+# 说明
+ 一个项目不同服务单独部署到不同的服务器
+```
+
+
+
+### 3、SpringCloud说明
+
+```markdown
+-- 不是一种技术，而是多种技术的集合
+-- 包含多种框架（技术），使用这些技术实现微服务操作
+-- 依赖于springboot技术
+```
+
+
+
+### 4、SpringCloud相关基础服务组件（框架）
+
+```markdown
+# 服务发现【Netflix Eureka（Nacos）】——注册中心
+-- 作用
+	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
+
+-- 常见的注册中心
+  Eureka(原生，2.0遇到性能瓶颈，停止维护)
+  Zookeeper(支持，专业的独立产品。例如：dubbo)
+  Consul(原生，Go语言开发)
+  Nacos内容详见【1.9————Nacos】
+
+-- 服务注册实现步骤
+  1、相关模块引入依赖
+    <!--服务注册-->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+  2、在要注册服务的配置文件中进行Nacos地址配置
+    #nacos服务地址
+    spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
+  3、在启动类添加注解，进行nacos注册
+  	@EnableDiscoveryClient
+  4、启动测试
+  	在nacos的服务列表中就会列举出来
+
+# 服务调用【Netflix Feign】
+-- Feign说明
+  1、Feign是Netflix开发的声明式、模板化的HTTP客户端， Feign可以帮助我们更快捷、优雅地调用HTTP API。
+  2、Feign支持多种注解，例如Feign自带的注解或者JAX-RS注解等。
+  3、Spring Cloud对Feign进行了增强，使Feign支持了Spring MVC注解，并整合了Ribbon和Eureka，从而让Feign的使用更加方便。
+  4、Spring Cloud Feign是基于Netflix feign实现，整合了Spring Cloud Ribbon和Spring Cloud Hystrix，除了提供这两者的强大功能外，还提供了一种声明式的Web服务客户端定义的方式。
+  5、Spring Cloud Feign帮助我们定义和实现依赖服务接口的定义。在Spring Cloud feign的实现下，只需要创建一个接口并用注解方式配置它，即可完成服务提供方的接口绑定，简化了在使用Spring Cloud Ribbon时自行封装服务调用客户端的开发量。
+
+-- 服务调用实现步骤
+  1、引入相关依赖
+    <!--服务调用-->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>
+  2、调用端启动类添加注解
+  	@EnableFeignClients
+  3、创建调用服务接口【@FeignClient("被调用的服务名")】，并设置被调用的方法【要设置完全路径、PathVariable一定要指定名称】
+    packagecom.pigskin.eduservice.client;
+
+    importcom.pigskin.common_utils.R;
+    importorg.springframework.cloud.openfeign.FeignClient;
+    importorg.springframework.stereotype.Component;
+    importorg.springframework.web.bind.annotation.DeleteMapping;
+    importorg.springframework.web.bind.annotation.PathVariable;
+
+    /**
+    * 定义服务调用接口
+    */
+    @Component
+    @FeignClient("vod-service")//设置要调用的服务名
+    public interface VodClient{
+      /**
+      * @param videoId
+      * @return
+      */
+      @PathVariable("videoId")//定义要调用方法的路径,PathVariable一定要指定名称
+      @DeleteMapping("/vod_service/video/removeVideoSourceById/{videoId}")
+      R removeVideoSource(@PathVariable("videoId")StringvideoId);
+    }
+  4、将创建的服务接口注入到要使用的服务类中，进行调用即可
+    //远端服务接口注入
+    @Autowired private VodClient vodClient;
+
+    @Override    
+    public void deleteVideoById(String videoId) {  
+      //获取视频ID      
+      EduVideo eduVideo = baseMapper.selectById(videoId);    
+      if (eduVideo != null && StringUtils.isEmpty(eduVideo.getVideoSourceId())) {   
+      //TODO:根据视频ID,进行远程调用，实现对应阿里云视频删除         
+      vodClient.removeVideoSource(eduVideo.getVideoSourceId()); 
+      }      
+      //删除小节      
+      baseMapper.deleteById(videoId);  
+    }
+
+# 熔断器【Netflix Hystrix】
+-- Hystrix说明
+  1、查看被调用服务是否宕机（挂掉了），如果宕机，则进行熔断，否则继续执行
+  2、一个供分布式系统使用，提供延迟和容错功能，保证复杂的分布系统在面临不可避免的失败时，仍能有其弹性。
+
+-- Feign结合Hystrix使用步骤
+  1、添加依赖
+    <!--提供负载均衡-->  
+    <dependency>
+      <groupId>org.springframework.cloud</groupId> 
+      <artifactId>spring-cloud-starter-netflix-ribbon</artifactId> 
+    </dependency>
+    <!--hystrix依赖，主要是用  @HystrixCommand -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>   
+    </dependency>
+  2、调用端配置文件中添加hystrix配置
+    #开启熔断机制
+    feign.hystrix.enabled=true
+    #设置hystrix超时时间，默认1000ms
+    hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=6000
+  3、设置的服务调用接口添加实现类，用于当发生熔断时，进行的处理操作
+    /** 
+    * vod服务远端接口实现类(用于实现熔断机制) 
+    */
+    @Component
+    public class VodFileDegradeFeignClient implements VodClient { 
+      @Override   
+      public R removeVideoSource(String videoId) {     
+      	return R.error().message("删除视频出错！");  
+      }   
+
+      @Override   
+      public R removeVideoSources(List<String> videoIdList) {   
+      	return R.error().message("删除多个视频出错！");  
+      }
+    }
+  4、服务调用接口注解添加属性【fallback】,值为其实现类
+  	@FeignClient(name="vod",fallback=VodFileDegradeFeignClient.class)
+
+# 服务网关【Spring Cloud GateWay】
+-- 说明
+	什么是网关?————在客户端和服务端中间存在的一堵墙，可以起到【请求转发】【负载均衡】【权限控制】等,替代nginx
+
+-- Gateway图示,如下:
+```
+
+<img src="image/img2_1_8_4_1.png" style="zoom:50%;" />
+
+```markdown
+-- 核心概念
+	1、路由————路由是网关最基础的部分，路由信息有一个ID、一个目的URL、一组断言和一组Filter组成。如果断言路由为真，则说明请求的URL和配置匹配
+	2、断言————Java8中的断言函数。Spring Cloud Gateway中的断言函数输入类型是Spring5.0框架中的ServerWebExchange。Spring Cloud Gateway中的断言函数允许开发者去定义匹配来自于http request中的任何信息，比如请求头和参数等。
+	3、过滤器————一个标准的Spring webFilter。Spring cloud gateway中的filter分为两种类型的Filter，分别是Gateway Filter和Global Filter。过滤器Filter将会对请求和响应进行修改处理
+
+-- 执行过程
+	Spring cloud Gateway发出请求。然后再由Gateway Handler Mapping中找到与请求相匹配的路由，将其发送到Gateway web handler。Handler再通过指定的过滤器链将请求发送到我们实际的服务执行业务逻辑，然后返回。如下图所示:
+```
+
+<img src="image/img2_1_8_4_2.png" style="zoom:50%;" />
+
+```markdown
+-- 代码实现
+	1、创建对应微服务模块————api_gateway
+	2、引入相关依赖
+		<dependencies>      
+      <dependency>      
+        <groupId>com.pigskin</groupId>      
+        <artifactId>common_utils</artifactId>      
+        <version>0.0.1-SNAPSHOT</version>   
+      </dependency>   
+      <dependency>          
+        <groupId>org.springframework.cloud</groupId> 
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>    
+      </dependency>   
+      <dependency>        
+        <groupId>org.springframework.cloud</groupId> 
+        <artifactId>spring-cloud-starter-gateway</artifactId>  
+        <version>2.1.2.RELEASE</version>    
+      </dependency>      
+      <!--gson-->   
+      <dependency>  
+        <groupId>com.google.code.gson</groupId> 
+        <artifactId>gson</artifactId>        
+      </dependency>      
+      <!--服务调用-->       
+      <dependency>     
+        <groupId>org.springframework.cloud</groupId>    
+        <artifactId>spring-cloud-starter-openfeign</artifactId>     
+      </dependency>  
+    </dependencies>
+	3、编写application.properties配置文件
+    # 服务端口
+    server.port=8222
+    # 服务名
+    spring.application.name=service-gateway
+
+    # nacos服务地址
+    spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
+
+    #使用服务发现路由
+    spring.cloud.gateway.discovery.locator.enabled=true
+    #服务路由名小写
+    #spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+
+    #设置路由id(建议服务名)
+    spring.cloud.gateway.routes[0].id=service-acl
+    #设置路由的uri（lb://nacos中注册的服务名称）
+    spring.cloud.gateway.routes[0].uri=lb://service-acl
+    #设置路由断言,代理servicerId为auth-service的/auth/路径（匹配规则）
+    spring.cloud.gateway.routes[0].predicates= Path=/*/acl/**
+
+    #配置service-edu服务
+    spring.cloud.gateway.routes[1].id=eduService
+    spring.cloud.gateway.routes[1].uri=lb://eduService
+    spring.cloud.gateway.routes[1].predicates= Path=/eduService/**
+	4、创建启动类
+		package com.pigskin.gateway;
+		
+		import org.springframework.boot.SpringApplication;
+		import org.springframework.boot.autoconfigure.SpringBootApplication;
+		import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+		
+		@SpringBootApplication
+		@EnableDiscoveryClient
+		public class ApiGatewayApplication {   
+    	public static void main(String[] args) {    
+      	SpringApplication.run(ApiGatewayApplication.class, args); 
+      }
+    }
+
+-- Gateway网关负载均衡
+	1、负载均衡————将请求平均分摊到多台服务器
+	2、实现负载均衡的几种方式
+		轮询————
+		权重————
+		请求时间————
+	3、实现原理
+		如下图所示,默认不需要额外配置，只要多个服务名字一样，Gateway自动实现负载均衡
+
+-- 相关工具类
+	1、Gateway网关跨域【就不需要给每个控制器添加@CrossOrigin】
+		package com.pigskin.gateway.config;
+		
+		import org.springframework.context.annotation.Bean;
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.web.cors.CorsConfiguration;
+		import org.springframework.web.cors.reactive.CorsWebFilter;
+		import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+		import org.springframework.web.util.pattern.PathPatternParser;
+		
+		/** * 统一处理跨域 */
+		@Configuration
+		public class CorsConfig {  
+    	@Bean  
+    	public CorsWebFilter corsFilter() {  
+    		CorsConfiguration config = new CorsConfiguration();  
+    		config.addAllowedMethod("*");     
+    		config.addAllowedOrigin("*");   
+        config.addAllowedHeader("*");    
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser()); 
+        source.registerCorsConfiguration("/**", config);  
+        return new CorsWebFilter(source); 
+    	}
+    }
+	2、Gateway访问控制过滤器
+    package com.pigskin.gateway.filter;
+
+    import com.google.gson.JsonObject;
+    import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+    import org.springframework.cloud.gateway.filter.GlobalFilter;
+    import org.springframework.core.Ordered;
+    import org.springframework.core.io.buffer.DataBuffer;
+    import org.springframework.http.server.reactive.ServerHttpRequest;
+    import org.springframework.http.server.reactive.ServerHttpResponse;
+    import org.springframework.stereotype.Component;
+    import org.springframework.util.AntPathMatcher;
+    import org.springframework.web.server.ServerWebExchange;
+    import reactor.core.publisher.Mono;
+    import java.nio.charset.StandardCharsets;
+    import java.util.List;
+
+    /**
+    * 全局Filter，统一处理会员登录与外部不允许访问的服务 
+    */
+    @Component
+    public class AuthGlobalFilter implements GlobalFilter, Ordered {  
+      private AntPathMatcher antPathMatcher = new AntPathMatcher();  
+      @Override   
+      public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {  
+        ServerHttpRequest request = exchange.getRequest();  
+        String path = request.getURI().getPath();   
+        //api接口，校验用户必须登录     
+        if (antPathMatcher.match("/api/**/auth/**", path)) {  
+          List<String> tokenList = request.getHeaders().get("token");
+          if (null == tokenList) {       
+            ServerHttpResponse response = exchange.getResponse();      
+            return out(response);      
+          } else {
+            //Boolean isCheck = JwtUtils.checkToken(tokenList.get(0));
+            //if(!isCheck) {  
+            ServerHttpResponse response = exchange.getResponse();  
+            return out(response);
+            //}       
+          }      
+        }      
+        //内部服务接口，不允许外部访问      
+        if (antPathMatcher.match("/**/inner/**", path)) {        
+          ServerHttpResponse response = exchange.getResponse();   
+          return out(response);     
+        }        
+        return chain.filter(exchange);  
+      }   
+
+      @Override   
+      public int getOrder() { 
+        return 0;  
+      }    
+
+      private Mono<Void> out(ServerHttpResponse response) {   
+        JsonObject message = new JsonObject();   
+        message.addProperty("success", false);    
+        message.addProperty("code", 28004);      
+        message.addProperty("data", "鉴权失败");    
+        byte[] bits = message.toString().getBytes(StandardCharsets.UTF_8);  
+        DataBuffer buffer = response.bufferFactory().wrap(bits);  
+        //response.setStatusCode(HttpStatus.UNAUTHORIZED);     
+        //指定编码，否则在浏览器中会中文乱码      
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");  
+        return response.writeWith(Mono.just(buffer));  
+      }
+    }
+	3、Gateway异常处理
+    package com.pigskin.gateway.handler;
+
+    import org.springframework.beans.factory.ObjectProvider;
+    import org.springframework.boot.autoconfigure.web.ResourceProperties;
+    import org.springframework.boot.autoconfigure.web.ServerProperties;
+    import org.springframework.boot.context.properties.EnableConfigurationProperties;
+    import org.springframework.boot.web.reactive.error.ErrorAttributes;
+    import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
+    import org.springframework.context.ApplicationContext;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.core.Ordered;
+    import org.springframework.core.annotation.Order;
+    import org.springframework.http.codec.ServerCodecConfigurer;
+    import org.springframework.web.reactive.result.view.ViewResolver;
+    import java.util.Collections;import java.util.List;
+
+    /**
+    * 覆盖默认的异常处理 
+    * 
+    * @author yinjihuan 
+    *
+    */
+    @Configuration
+    @EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class})
+    public class ErrorHandlerConfig {  
+      private final ServerProperties serverProperties; 
+      private final ApplicationContext applicationContext; 
+      private final ResourceProperties resourceProperties;  
+      private final List<ViewResolver> viewResolvers;  
+      private final ServerCodecConfigurer serverCodecConfigurer; 
+
+      public ErrorHandlerConfig(ServerProperties serverProperties, 
+        ResourceProperties resourceProperties,      
+        ObjectProvider<List<ViewResolver>> viewResolversProvider,    
+        ServerCodecConfigurer serverCodecConfigurer,          
+        ApplicationContext applicationContext) {      
+        this.serverProperties = serverProperties;   
+        this.applicationContext = applicationContext;   
+        this.resourceProperties = resourceProperties;   
+        this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);   
+        this.serverCodecConfigurer = serverCodecConfigurer;    
+      }   
+
+      @Bean  
+      @Order(Ordered.HIGHEST_PRECEDENCE) 
+      public ErrorWebExceptionHandler errorWebExceptionHandler(ErrorAttributes errorAttributes) { 
+        JsonExceptionHandler exceptionHandler = new JsonExceptionHandler(   
+        errorAttributes,              
+        this.resourceProperties,      
+        this.serverProperties.getError(),    
+        this.applicationContext);      
+        exceptionHandler.setViewResolvers(this.viewResolvers);        
+        exceptionHandler.setMessageWriters(this.serverCodecConfigurer.getWriters());  
+        exceptionHandler.setMessageReaders(this.serverCodecConfigurer.getReaders());  
+        return exceptionHandler;  
+      }
+    }
+
+    package com.pigskin.gateway.handler;
+
+    import org.springframework.boot.autoconfigure.web.ErrorProperties;
+    import org.springframework.boot.autoconfigure.web.ResourceProperties;
+    import org.springframework.boot.autoconfigure.web.reactive.error.DefaultErrorWebExceptionHandler;
+    import org.springframework.boot.web.reactive.error.ErrorAttributes;
+    import org.springframework.context.ApplicationContext;
+    import org.springframework.web.reactive.function.server.*;
+    import java.util.HashMap;import java.util.Map;
+
+    /**
+    * 自定义异常处理(异常时用JSON代替HTML异常信息) 
+    */
+    public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {   
+      public JsonExceptionHandler(ErrorAttributes errorAttributes, 
+        ResourceProperties resourceProperties,           
+        ErrorProperties errorProperties,
+        ApplicationContext applicationContext) {  
+        super(errorAttributes, resourceProperties, errorProperties, applicationContext);   
+      }   
+
+      /**   
+      * 获取异常属性  
+      */    
+      @Override 
+      protected Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {  
+        Map<String, Object> map = new HashMap<>(); 
+        map.put("success", false);  
+        map.put("code", 20005);    
+        map.put("message", "网关失败");     
+        map.put("data", null);       
+        return map;  
+      }  
+
+      /**  
+      * 指定响应处理方法为JSON处理的方法 
+      *  
+      * @param errorAttributes  
+      */
+      @Override   
+      protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {      
+        return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse); 
+      }  
+
+      /**    
+      * 根据code获取对应的HttpStatus    
+      *    
+      * @param errorAttributes 
+      */  
+      @Override   
+      protected int getHttpStatus(Map<String, Object> errorAttributes) {
+        return 200;    
+      }
+    }
+```
+
+<img src="image/img2_1_8_4_3.png" style="zoom:50%;" />
+
+```markdown
+# 分布式配置【Spring Cloud Config（Nacos）】
+	Nacos内容详见【1.9————Nacos————Nacos配置中心】
+
+# 消息总线【Spring Cloud Bus（Nacos）】
+	
+```
+
+
+
+### 5、调用接口过程
+
+```markdown
+# 名词解释
+-- 消费者（调用者）
+	1、接口化请求调用（创建服务接口）
+	2、Feign（根据定义的服务名，找到服务接口进行调用）
+	3、Hystrix（查看被调用服务是否正常启动，如果没有正常启动，则进行熔断）
+	4、Ribbon
+	5、HttpClient/OkHttp
+
+-- 生产者（被调用者）
+
+# 调用过程
+	Feign-->Hystrix-->Ribbon-->Http Client(apache http components/Okhttp),详细过程如图:
+```
+
+<img src="image/img2_1_8_4_4.png" style="zoom:50%;" />
+
+### 6、小版本划分
+
+```markdown
+SNAPSHOT————快照版本，随时可能修改
+
+M(MileStone)————表示里程碑版本，一般同时标注PRE,表示预览版本
+
+SR(Service Relese )————表示正式版本，一般同时标注GA
+```
+
+
+
 ## 9、Nacos
+
+```markdown
+# 说明
+	阿里巴巴推出的一个开源项目。Nacos=Spring Cloud Eureka + Spring Cloud Config。可与Spring、Spring Boot、Spring Cloud集成.并能替代它们两者，通过Nacos Server和spring-cloud-starter-alibaba-nacos-discovery实现服务的注册和发现.以服务为主要服务对象的中间件，支持所有主流的服务发现、配置和管理
+
+# 主要提供功能
+-- 服务发现和服务健检测
+-- 动态配置服务
+-- 动态DNS服务
+-- 服务及其元数据管理
+
+# 结构图
+	如下所示:
+```
+
+<img src="image/img2_1_8_4_5.png" style="zoom:50%;" />
+
+```markdown
+# 下载安装
+-- 下载
+	地址:https://github.com/alibaba/nacos/releases(建议先进入github,再去搜索nacos下载)
+	下载版本：nacos-server-1.1.4.tar.gz或nacos-server-1.1.4.zip,解压到任意目录即可
+-- 启动
+	windows————运行解压的【startup.cmd】
+	mac————终端进入nacos的bin目录下,执行命令【./startup.sh -m standalone】
+-- 终端测试是否启动成功
+	终端执行命令————curl 127.0.0.1:8848/nacos
+-- 访问
+	浏览器访问地址————http://localhost:8848/nacos/#/login
+	默认用户名和密码————【nacos/nacos】
+-- 启动问题
+	nacos单机模式报错
+		错误内容————server is DOWN now, please try again later!
+    解决方式————如下:
+      #删除nacos目录下data/protocol目录
+      cd nacos/data
+      rm -rf protocol/
+      #重新启动nacos服务
+      sh startup.sh -m standalone &
+
+# Nacos配置中心
+-- 作用
+	基于配置中心进行配置文件的统一管理
+
+-- 相关依赖
+	<!--nacos配置中心依赖-->       
+  <dependency>      
+    <groupId>org.springframework.cloud</groupId>  
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>    
+  </dependency>
+  
+-- Spring Boot配置文件加载顺序
+	1、先加载[bootstrap.yml(.properties)]
+	2、后加载[application.yml(.properties)]
+	3、如果application.yml中存在[spring.profiles.active=dev],就会接着去加载[application-dev.yml]
+	
+-- 实现过程
+	1、调用服务中添加依赖[spring-cloud-starter-alibaba-nacos-config]
+	2、在nacos配置管理的配置列表中添加配置
+		-- Data ID:读取的配置文件名称
+			1)名称规则
+				第一部分:服务名
+				第二部分:配置文件所使用的环境(不指定可省略)
+				第三部分:文件类型扩展名
+			2)完整格式
+				${spring.application.name}-${spring.profiles.active}.${file.exetension}
+		-- Group:默认组
+		-- 配置格式:配置文件格式
+		-- 配置内容:配置文件内容
+	3、添加配置到配置文件[bootstrap.yml]
+		#配置中心地址
+		spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+		#通过这个环境去配置中心找对应配置
+		#spring.profiles.active=dev
+		#通过这个名字去配置中心找对应配置
+		spring.application.name=staService
+
+-- 名称空间切换环境
+	1、实际开发包含的开发环境
+		-- dev:开发环境
+		-- test:测试环境
+		-- prod:生产环境
+	2、使用
+    -- 在nacos中创建不同的名称空间
+      public:默认名称空间
+      dev:开发名称空间
+      test:测试名称空间
+      prod:生产名称空间
+    -- 不同名称空间创建不同的配置文件
+    -- 配置文件[bootstrap.yml]中追加内容
+      #通过此设置去nacos配置中心找对应配置命名空间(值为创建出的不同名称空间对应的)
+      spring.cloud.nacos.config.namespace=aa10b21c-9642-46c2-8422-7ea095ffe3c0
+
+-- 多配置文件加载
+ 	1、创建不同的配置文件,用于设置不同的配置
+ 	2、修改配置文件[bootstrap.yml],加载nacos中的多个配置文件
+ 		#加载nacos配置中心的多个配置文件
+ 		##设置加载的配置文件名称
+ 		spring.cloud.nacos.config.ext-config[0].data-id=port.properties
+ 		##开启动态刷新配置，否则配置文件修改，工程无法感知
+ 		spring.cloud.nacos.config.ext-config[0].refresh=true
+ 		...
+```
+
+
 
 ## 10、Redis
 
