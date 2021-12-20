@@ -1113,6 +1113,35 @@ sh jmeter
     初始用户名密码：system/helowin；服务名：helowin
 ```
 
+### 11、Linux虚拟机中安装Redis
+
+```markdown
+# 安装
+1、下载安装包
+	进入到Xshell控制台(默认当前是root根目录)，输入【wget http://download.redis.io/releases/redis-5.0.7.tar.gz】
+2、解压缩文件
+	下载完成后需要将压缩文件解压，输入【tar -zvxf redis-5.0.7.tar.gz】解压到当前目录
+3、移动redis目录
+	一般都会将redis目录放置到/usr/local/redis目录，所以这里输入下面命令将目前在/root目录下的redis-5.0.7文件夹更改目录，同时更改文件夹名称为redis【mv /root/redis-5.0.7 /usr/local/redis】
+4、编译
+	cd到/usr/local/redis目录，输入命令【make】执行编译命令，接下来控制台会输出各种编译过程中输出的内容
+5、安装
+	执行命令【make PREFIX=/usr/local/redis/bin install】进行安装
+6、redis配置文件路径修改
+	通过命令【mv /usr/local/redis/redis.conf /etc】将redis.conf文件移动到【/etc】目录下
+7、卸载
+	直接【rm -rf /usr/local/redis】即可删除redis
+
+# 启动
+1、使用xshell连接上redis所在服务地址
+2、找到redis配置文件【redis.conf】---【我在/etc下放着】
+3、【服务端启动】进入redis安装位置【cd /usr/local/redis/bin/bin】使用命令同时指定配置文件启动【./redis-server /etc/redis.conf】
+4、【客户端启动】使用命令检验是否启动【./redis-cli】，输出Ip地址就成功了
+5、使用【keys *】查看有哪些key
+6、使用命令【get XX-key名】查看指定key对应的值
+7、重启redis【ps aux | grep redis】-查看redis进程、【kill -9 xxxx】-杀掉指定进程
+```
+
 
 
 ​		
