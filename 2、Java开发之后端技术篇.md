@@ -1072,20 +1072,30 @@ PageHelper类似
 -- 依赖于springboot技术
 ```
 
-
-
-### 4、SpringCloud相关基础服务组件（框架）
+### 4、SpringCloudAlibaba相关服务组件
 
 ```markdown
-# 服务发现【Netflix Eureka（Nacos）】——注册中心
+# 地址
+	https://github.com/alibaba/spring-cloud-alibaba/blob/master/spring-cloud-alibaba-examples/nacos-example/nacos-discovery-example/readme-zh.md
+
+# SpringCloudAlibaba整体依赖
+-- 导入依赖
+	<dependencyManagement>   
+    <dependencies>          
+      <dependency>           
+        <groupId>com.alibaba.cloud</groupId>    
+        <artifactId>spring-cloud-alibaba-dependencies</artifactId>        
+        <version>2.1.0.RELEASE</version>     
+        <type>pom</type>             
+        <scope>import</scope>         
+      </dependency>      
+    </dependencies> 
+  </dependencyManagement>
+
+
+# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】——注册中心
 -- 作用
 	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
-
--- 常见的注册中心
-  Eureka(原生，2.0遇到性能瓶颈，停止维护)
-  Zookeeper(支持，专业的独立产品。例如：dubbo)
-  Consul(原生，Go语言开发)
-  Nacos内容详见【1.9————Nacos】
 
 -- 服务注册实现步骤
   1、相关模块引入依赖
@@ -1102,16 +1112,142 @@ PageHelper类似
   4、启动测试
   	在nacos的服务列表中就会列举出来
 
+# 分布式配置【SpringCloudAlibaba-Nacos作为配置中心】————Nacos配置中心
+-- 作用
+	基于配置中心进行配置文件的统一动态配置管理
+
+-- 相关依赖
+	<!--nacos配置中心依赖-->       
+  <dependency>      
+    <groupId>org.springframework.cloud</groupId>  
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>    
+  </dependency>
+ 
+-- Spring Boot配置文件加载顺序
+	1、先加载[bootstrap.yml(.properties)]
+	2、后加载[application.yml(.properties)]
+	3、如果application.yml中存在[spring.profiles.active=dev],就会接着去加载[application-dev.yml]
+
+-- 实现过程
+	1、调用服务中添加依赖[spring-cloud-starter-alibaba-nacos-config]
+	2、在nacos配置管理的配置列表中添加配置————如果配置文件和本地都有对应属性,优先采用配置中心的配置
+		-- Data ID:读取的配置文件名称
+			1)名称规则
+				第一部分:服务名
+				第二部分:配置文件所使用的环境(不指定可省略)
+				第三部分:文件类型扩展名
+			2)完整格式
+				${spring.application.name}-${spring.profiles.active}.${file.exetension}
+		-- Group:默认组
+		-- 配置格式:配置文件格式
+		-- 配置内容:配置文件内容
+	3、添加配置到配置文件[bootstrap.yml]
+		#配置中心地址
+		spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+		#通过这个环境去配置中心找对应配置
+		#spring.profiles.active=dev
+		#通过这个名字去配置中心找对应配置
+		spring.application.name=staService
+	4、说明
+		-- 使用@RefreshScope注解标识控制器每次自动刷新配置,并使用@Value("${配置属性名}")
+		-- @ConfigurationProperties("${配置属性名}")获取配置属性
+
+-- 名称空间切换环境
+	1、实际开发包含的开发环境
+		-- dev:开发环境
+		-- test:测试环境
+		-- prod:生产环境
+	2、使用
+    -- 在nacos中创建不同的名称空间
+      public:默认名称空间
+      dev:开发名称空间
+      test:测试名称空间
+      prod:生产名称空间
+    -- 不同名称空间创建不同的配置文件
+    -- 配置文件[bootstrap.yml]中追加内容
+      #通过此设置去nacos配置中心找对应配置命名空间(值为创建出的不同名称空间对应的)
+      spring.cloud.nacos.config.namespace=aa10b21c-9642-46c2-8422-7ea095ffe3c0
+
+-- 多配置文件加载
+ 	1、创建不同的配置文件,用于设置不同的配置
+ 	2、修改配置文件[bootstrap.yml],加载nacos中的多个配置文件
+ 		#加载nacos配置中心的多个配置文件
+ 		##设置加载的配置文件名称
+ 		spring.cloud.nacos.config.ext-config[0].data-id=port.properties
+ 		##开启动态刷新配置，否则配置文件修改，工程无法感知
+ 		spring.cloud.nacos.config.ext-config[0].refresh=true
+ 		...
+-- 细节
+	1、命名空间__默认public,用于配置隔离
+		1)开发、测试、生产:利用命名空间来做环境隔离
+			#bootstrap.properties设置使用的命名空间
+			spring.cloud.nacos.config.namespace=2c67d4xc-217e-4e82-95f5-66d05b01c5b9
+			#设置使用的配置分组
+			spring.cloud.nacos.config.group=dev
+		2)每个微服务之间互相隔离配置,每个微服务创建自己的命名空间,只加载自己命名空间下的配置
+	2、配置集__一组相关或不相关的配置项的集合
+		1)加载多个
+			#加载多个配置文件
+			##配置加载的属性文件ID
+			spring.cloud.nacos.config.ext-config[0].data-id=datasource.yml
+			##配置对应组
+			spring.cloud.nacos.config.ext-config[0].group=dev
+			##配置是否动态刷新
+			spring.cloud.nacos.config.ext-config[0].refresh=true
+	3、配置集ID————类似于配置文件名
+	4、配置分组————默认所有的配置文件都属于DEFAULT_GROUP
+		1)通过在bootstrap.properties文件中如下配置设定使用的配置
+			#设置使用的配置分组
+			spring.cloud.nacos.config.group=DEFAULT_GROUP
+
+# 服务容错【SpringCloudAlibaba-Sentinel】————限流、降级、熔断
+
+# 分布式事务解决方案【SpringCloudAlibaba-Seata】————原Fescar
+
+```
+
+
+
+### 5、SpringCloud相关基础服务组件（框架）
+
+```markdown
+# 地址
+	https://spring.io/projects/spring-cloud
+
+# 服务发现【Netflix Eureka（现多用Nacos）】——注册中心
+-- 作用
+	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
+
+-- 常见的注册中心
+  Eureka(原生，2.0遇到性能瓶颈，停止维护)
+  Zookeeper(支持，专业的独立产品。例如：dubbo)
+  Consul(原生，Go语言开发)
+  Nacos内容详见【1.9————Nacos】
+
+-- SpringCloudAlibaba使用Nacos作为注册中心————详见1-1-8-4、SpringCloudAlibaba相关服务组件
+
+# 分布式配置【Spring Cloud Config（现多用Nacos）】
+	Nacos内容详见【1-1-8-4、SpringCloudAlibaba相关服务组件】
+
+# 负载均衡[SpringCloud-Ribbon]
+
 # 服务调用【Netflix Feign】
--- Feign说明
+-- Feign说明————声明式Http客户端(调用远程服务)
   1、Feign是Netflix开发的声明式、模板化的HTTP客户端， Feign可以帮助我们更快捷、优雅地调用HTTP API。
   2、Feign支持多种注解，例如Feign自带的注解或者JAX-RS注解等。
   3、Spring Cloud对Feign进行了增强，使Feign支持了Spring MVC注解，并整合了Ribbon和Eureka，从而让Feign的使用更加方便。
   4、Spring Cloud Feign是基于Netflix feign实现，整合了Spring Cloud Ribbon和Spring Cloud Hystrix，除了提供这两者的强大功能外，还提供了一种声明式的Web服务客户端定义的方式。
   5、Spring Cloud Feign帮助我们定义和实现依赖服务接口的定义。在Spring Cloud feign的实现下，只需要创建一个接口并用注解方式配置它，即可完成服务提供方的接口绑定，简化了在使用Spring Cloud Ribbon时自行封装服务调用客户端的开发量。
 
+-- 远程调用逻辑————只要json数据模型兼容,双方服务无需同一个TO
+	1、本地服务调用编写的Feign服务,并传入一个对象参数
+	2、SpringCloud根据@RequestBody注解,将该对象转为json对象
+	3、SpringCloud从注册中心找到该Feign服务,并根据Mapping路径给指定路径发送请求,同时将上一步转换的json对象放入请求体中,发送请求
+	4、远端服务接收到该请求.并根据@RequestBody注解,将请求体中的json对象转换成对应的对象
+-- 
+
 -- 服务调用实现步骤
-  1、引入相关依赖
+  1、调用方引入相关依赖
     <!--服务调用-->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
@@ -1158,7 +1294,7 @@ PageHelper类似
       baseMapper.deleteById(videoId);  
     }
 
-# 熔断器【Netflix Hystrix】
+# 熔断器【Netflix Hystrix————可以使用SpringCloudAlibaba的Sentinel】
 -- Hystrix说明
   1、查看被调用服务是否宕机（挂掉了），如果宕机，则进行熔断，否则继续执行
   2、一个供分布式系统使用，提供延迟和容错功能，保证复杂的分布系统在面临不可避免的失败时，仍能有其弹性。
@@ -1200,8 +1336,13 @@ PageHelper类似
   	@FeignClient(name="vod",fallback=VodFileDegradeFeignClient.class)
 
 # 服务网关【Spring Cloud GateWay】
+-- 地址
+	https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#glossary
+
 -- 说明
-	什么是网关?————在客户端和服务端中间存在的一堵墙，可以起到【请求转发】【负载均衡】【权限控制】等,替代nginx
+	1、什么是网关?
+		API网关(webflux编程模式),在客户端和服务端中间存在的一堵墙，可以起到【请求转发】【负载均衡】【权限控制】等,替代nginx
+	2、常用功能————路由转发、权限校验,限流控制,用来替换zuul网关
 
 -- Gateway图示,如下:
 ```
@@ -1510,16 +1651,15 @@ PageHelper类似
 <img src="image/img2_1_8_4_3.png" style="zoom:50%;" />
 
 ```markdown
-# 分布式配置【Spring Cloud Config（Nacos）】
-	Nacos内容详见【1.9————Nacos————Nacos配置中心】
-
 # 消息总线【Spring Cloud Bus（Nacos）】
-	
+
+# 调用链监控【SpringCloud-Sleuth】
+
 ```
 
 
 
-### 5、调用接口过程
+### 6、调用接口过程
 
 ```markdown
 # 名词解释
@@ -1538,7 +1678,7 @@ PageHelper类似
 
 <img src="image/img2_1_8_4_4.png" style="zoom:50%;" />
 
-### 6、小版本划分
+### 7、小版本划分
 
 ```markdown
 SNAPSHOT————快照版本，随时可能修改
@@ -1590,69 +1730,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       rm -rf protocol/
       #重新启动nacos服务
       sh startup.sh -m standalone &
-
-# Nacos配置中心
--- 作用
-	基于配置中心进行配置文件的统一管理
-
--- 相关依赖
-	<!--nacos配置中心依赖-->       
-  <dependency>      
-    <groupId>org.springframework.cloud</groupId>  
-    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>    
-  </dependency>
-  
--- Spring Boot配置文件加载顺序
-	1、先加载[bootstrap.yml(.properties)]
-	2、后加载[application.yml(.properties)]
-	3、如果application.yml中存在[spring.profiles.active=dev],就会接着去加载[application-dev.yml]
-	
--- 实现过程
-	1、调用服务中添加依赖[spring-cloud-starter-alibaba-nacos-config]
-	2、在nacos配置管理的配置列表中添加配置
-		-- Data ID:读取的配置文件名称
-			1)名称规则
-				第一部分:服务名
-				第二部分:配置文件所使用的环境(不指定可省略)
-				第三部分:文件类型扩展名
-			2)完整格式
-				${spring.application.name}-${spring.profiles.active}.${file.exetension}
-		-- Group:默认组
-		-- 配置格式:配置文件格式
-		-- 配置内容:配置文件内容
-	3、添加配置到配置文件[bootstrap.yml]
-		#配置中心地址
-		spring.cloud.nacos.config.server-addr=127.0.0.1:8848
-		#通过这个环境去配置中心找对应配置
-		#spring.profiles.active=dev
-		#通过这个名字去配置中心找对应配置
-		spring.application.name=staService
-
--- 名称空间切换环境
-	1、实际开发包含的开发环境
-		-- dev:开发环境
-		-- test:测试环境
-		-- prod:生产环境
-	2、使用
-    -- 在nacos中创建不同的名称空间
-      public:默认名称空间
-      dev:开发名称空间
-      test:测试名称空间
-      prod:生产名称空间
-    -- 不同名称空间创建不同的配置文件
-    -- 配置文件[bootstrap.yml]中追加内容
-      #通过此设置去nacos配置中心找对应配置命名空间(值为创建出的不同名称空间对应的)
-      spring.cloud.nacos.config.namespace=aa10b21c-9642-46c2-8422-7ea095ffe3c0
-
--- 多配置文件加载
- 	1、创建不同的配置文件,用于设置不同的配置
- 	2、修改配置文件[bootstrap.yml],加载nacos中的多个配置文件
- 		#加载nacos配置中心的多个配置文件
- 		##设置加载的配置文件名称
- 		spring.cloud.nacos.config.ext-config[0].data-id=port.properties
- 		##开启动态刷新配置，否则配置文件修改，工程无法感知
- 		spring.cloud.nacos.config.ext-config[0].refresh=true
- 		...
 ```
 
 
