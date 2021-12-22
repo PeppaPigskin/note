@@ -306,28 +306,32 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ### 1、jdk安装与配置
 
-```bash
-1、安装
-	1)获取 Homebrew 历史版本库
+```markdown
+# 安装
+-- 获取 Homebrew 历史版本库
 		brew tap homebrew/cask-versions
-	2)使用 brew install xxx 命令安装对应版本jdk
-		# 安装 jdk6，执行如下命令，其将安装到【/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home】下
+-- 使用 brew install xxx 命令安装对应版本jdk
+	1、安装 jdk6，执行如下命令，其将安装到【/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home】下
 		brew install java6
-		# 安装 jdk8，执行如下命令，其将安装到【/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home】下
+	2、安装 jdk8，执行如下命令，其将安装到【/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home】下
 		brew install adoptopenjdk8
-2、环境配置
-	1)如果安装了zsh,会导致【~/.bash_profile】不会被执行
-		执行命令【vim ~/.zshrc】打开【zshrc】文件,并添加【source ~/.bash_profile】,此时【~/.bash_profile】配置的环境变量将有效
-	2)执行命令【vim ~/.bash_profile】改【bash_profile】文件,添加如下内容:
-		# 配置 jdk 环境
-		export JAVA_6_HOME=/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
-		export JAVA_8_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
-		# 编辑一个命令 jdk6，输入则转至 jdk1.6
-		alias jdk6="export JAVA_HOME=$JAVA_6_HOME"
-		# 编辑一个命令 jdk8，输入则转至 jdk1.8
-		alias jdk8="export JAVA_HOME=$JAVA_8_HOME"
-		# 最后安装的版本，这样当自动更新时，始终指向最新版本
-		export JAVA_HOME=`/usr/libexec/java_home`
+
+# 环境配置
+-- 如果安装了zsh,会导致【~/.bash_profile】不会被执行
+	解决方式————执行命令【vim ~/.zshrc】打开【zshrc】文件,并添加【source ~/.bash_profile】,此时【~/.bash_profile】配置的环境变量将有效
+-- 执行命令【vim ~/.bash_profile】改【bash_profile】文件,添加如下内容:
+  #配置 jdk 环境
+  export JAVA_6_HOME=/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+  export JAVA_8_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
+  #编辑一个命令 jdk6，输入则转至 jdk1.6
+  alias jdk6="export JAVA_HOME=$JAVA_6_HOME"
+  #编辑一个命令 jdk8，输入则转至 jdk1.8
+  alias jdk8="export JAVA_HOME=$JAVA_8_HOME"
+  #最后安装的版本，这样当自动更新时，始终指向最新版本
+  export JAVA_HOME=`/usr/libexec/java_home`
+
+# 查看JDK版本
+	java -version
 ```
 
 ### 2、IDEA安装与配置
@@ -420,12 +424,19 @@ sh jmeter
 
 ### 6、Git 环境配置
 
-```bash
-1、设置 username 和 email
-	git config --global user.name "PeppaPigskin"
-	git config --global user.email "1789484932@qq.com"
-2)通过终端命令创建 ssh key
-	ssh-keygen -t rsa -C "1789484932@qq.com"
+```markdown
+# 注册码云账号————https://gitee.com/
+
+# 下载安装git————https://git-scm.com/
+	brew install git
+# 进入git控制台,配置用户名和邮箱
+-- 配置用户名————git config --global user.name "PeppaPigskin"
+-- 配置邮箱————git config --global user.email "178xxxx932@qq.com"
+
+# 配置ssh免密登录————https://gitee.com/help/articles/4181#article-header0
+
+# 测试是否配置成功————ssh -T git@gitee.com
+
 ```
 
 ### 7、Tomcat 安装与配置
@@ -493,27 +504,26 @@ sh jmeter
 
 ### 10、Vscode安装与配置
 
-```bash
-1、安装
-	brew install vscode
-2、相关插件
-	# 汉化插件
-  Chinese (Simplified) Language Pack for Visual Studio Code
-  # 彩色括号
-  Bracket Pair Colorizer
-  # 标签自动补全
-  Auto Close Tag
-  # 修改标签名自动同步闭合标签
-  Auto Rename Tag 
-  # 画流程图
-  Draw.io Integration
-  # Git版本控制
-  Git Graph # 可以查看git提交历史 现在所处分支 提交内容明细 以及回滚删除分支等操作
-  Git Lens # 可在代码行中查看谁提交的 清晰追溯 目前我只用到这个工具中的这个功能
-  # 力扣刷算法题的插件
-  LeetCode
-  # 可以高亮Vue代码 格式化代码等
-  Vetur
+```markdown
+# 安装
+	mac使用brew方式安装vscode————brew install vscode
+# 相关插件
+-- Chinese (Simplified) Language Pack for Visual Studio Code————汉化插件
+-- Bracket Pair Colorizer————彩色括号
+-- Auto Close Tag————标签自动补全
+-- Auto Rename Tag————修改标签名自动同步闭合标签
+-- Draw.io Integration————画流程图
+-- Git版本控制
+	1、Git Graph————可以查看git提交历史 现在所处分支 提交内容明细 以及回滚删除分支等操作
+	2、Git Lens————可在代码行中查看谁提交的 清晰追溯 目前我只用到这个工具中的这个功能
+-- LeetCode————力扣刷算法题的插件
+-- Vetur————可以高亮Vue代码 格式化代码等
+-- Chinese————简体中文包
+-- EsLint————ES语法检查工具
+-- HTML CSS Support————Html Css支持
+-- JavaScript (ES6) code snippets————JavaScript语法提示
+-- Live Server————实时服务器
+-- open in browser————在浏览器打开页面插件
 ```
 
 ### 11、Webpack安装
@@ -659,6 +669,69 @@ sh jmeter
   # 点击这个exec 文件，会弹出命令行显示下面的运行结果————hello
 4、IDE安装
 	brew install goland
+```
+
+### 16、Maven环境搭建
+
+```markdown
+# 说明
+	Maven 是最流行的 Java 项目构建系统，Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。
+
+# Maven仓库地址
+	https://mvnrepository.com/
+
+# 前提条件
+	配置好JDK开发环境————详见1-4-1、jdk安装与配置
+
+# 下载安装maven
+-- maven安装包apache-maven-3.6.3.zip
+	下载位置————https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/
+
+-- 解压下载的安装包到自己想要配置的目录
+	我的位置————/Users/pigskin/MyInstall/Maven/
+
+# 环境配置
+-- 编辑maven安装位置下的settings.xml文件
+	cd  /Users/pigskin/MyInstall/Maven/apache-maven-3.6.3/conf/
+-- 配置maven使用阿里云镜像
+	<mirrors>   
+    <mirror>    
+      <id>nexus-aliyun</id>   
+      <mirrorOf>central</mirrorOf> 
+      <name>Nexus aliyun</name>     
+      <url>http://maven.aliyun.com/nexus/content/groups/public</url>  
+    </mirror>
+  </mirrors>
+-- 配置maven使用jdk1.8编译项目
+	<profiles>
+    <!--自行配置maven使用jdk1.8编译项目-->  
+    <profile>        
+      <id>jdk-1.8</id>             
+      <activation>             
+        <activeByDefault>true</activeByDefault>          
+        <jdk>1.8</jdk>            
+      </activation>              
+      <properties>                     
+        <maven.compiler.source>1.8</maven.compiler.source>   
+        <maven.compiler.target>1.8</maven.compiler.target>  
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>   
+      </properties>       
+    </profile>
+  </profiles>
+
+# 查看Maven版本
+	mvn -v
+
+# Idea整合maven
+-- 配置idea为本地仓库————Idea——>Preferences——>Build...——>Build Tools——>Maven,如下图所示:
+```
+
+<img src="image/img1_4_16_1.png" style="zoom:50%;" />
+
+```markdown
+-- 安装插件
+	1、lombok————简化JavaBean的开发
+	2、mybatisx————从一个mapper的方法快速定位到其对应xml文件
 ```
 
 
