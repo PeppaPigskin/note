@@ -856,6 +856,178 @@ PageHelper类似
 
 
 
+### 3、SpringBoot定时任务
+
+([玩转SpringBoot之定时任务详解](https://www.cnblogs.com/mmzs/p/10161936.html#_labelTop))
+
+```markdown
+# 说明
+	在固定时间自动执行程序
+
+# Cron表达式（七子/域表达式）
+-- 在线生成地址————https://cron.qqe2.com/|https://www.pppet.net/
+
+-- 每一位分别代表的意义————秒 分钟 小时 日 月 星期 年
+	1、秒（0~59） 例如0/5表示每5秒
+	2、分（0~59）
+	2、时（0~23）
+	4、日（0~31）的某天，需计算
+	5、月（0~11）
+	6、周几（可填1~7 或 SUN/MON/TUE/WED/THU/FRI/SAT）
+
+-- springboot默认当年，只能指定六位，指定第七位会报错
+
+-- Cron表达式示例
+	1)每隔5秒执行一次————*/5 * * * * ?
+	2)每隔1分钟执行一次————0 */1 * * * ?
+	3)每天23点执行一次————0 0 23 * * ?
+	4)每天凌晨1点执行一次————0 0 1 * * ?
+	5)每月1号凌晨1点执行一次————0 0 1 1 * ?
+	6)每月最后一天23点执行一次————0 0 23 L * ?
+	7)每周星期天凌晨1点实行一次————0 0 1 ? * L
+	8)在26分、29分、33分执行一次————0 26,29,33 * * * ?
+	9)每天的0点、13点、18点、21点都执行一次————0 0 0,13,18,21 * * ?
+
+# 使用SpringBoot创建定时任务非常简单，目前主要有以下三种创建方式:
+-- 静态————基于注解(@Scheduled)
+	1、说明
+		1)基于注解@Scheduled默认为单线程，开启多个任务时，任务的执行时机会受上一个任务执行时间的影响。
+		2)除了支持灵活的参数表达式cron之外，还支持简单的延时操作，例如 fixedDelay ，fixedRate 填写相应的毫秒数即可.
+	2、缺点————当我们调整了执行周期的时候，需要重启应用才能生效，这多少有些不方便。为了达到实时生效的效果，可以使用接口来完成定时任务。
+	3、使用步骤————如下:
+		1)创建定时器
+			@Configuration      //1.主要用于标记配置类，兼备Component的效果。
+			@EnableScheduling   //2.开启定时任务
+      public class SaticScheduleTask {
+          //3.添加定时任务
+          @Scheduled(cron = "0/5 * * * * ?")
+          //或直接指定时间间隔，例如：5秒
+          //@Scheduled(fixedRate=5000)
+          private void configureTasks() {
+              System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
+          }
+      }
+    2)启动测试————启动应用，可以看到控制台打印对应内容.
+
+-- 动态————基于接口(SchedulingConfigurer)————用于从数据库库中读取指定时间来动态执行定时任务
+	1、说明————基于接口（SchedulingConfigurer）,能够达到实时生效的效果.
+	2、注意————如果在数据库修改时格式出现错误，则定时任务会停止，即使重新修改正确,此时只能重新启动项目才能恢复。
+	3、使用步骤————如下:
+		1)导入依赖包
+			<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>2.0.4.RELEASE</version>
+      </parent>
+
+      <dependencies>
+        <dependency><!--添加Web依赖 -->
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency><!--添加MySql依赖 -->
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency><!--添加Mybatis依赖 配置mybatis的一些初始化的东西-->
+          <groupId>org.mybatis.spring.boot</groupId>
+          <artifactId>mybatis-spring-boot-starter</artifactId>
+          <version>1.3.1</version>
+        </dependency>
+        <dependency><!-- 添加mybatis依赖 -->
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+          <version>3.4.5</version>
+          <scope>compile</scope>
+        </dependency>
+      </dependencies>
+    2)添加数据库记录————开启本地数据库mysql，随便打开查询窗口，然后执行脚本内容
+    	DROP DATABASE IF EXISTS `socks`;
+      CREATE DATABASE `socks`;
+      USE `SOCKS`;
+      DROP TABLE IF EXISTS `cron`;
+      CREATE TABLE `cron`  (
+        `cron_id` varchar(30) NOT NULL PRIMARY KEY,
+        `cron` varchar(30) NOT NULL  
+      );
+      INSERT INTO `cron` VALUES ('1', '0/5 * * * * ?');
+    3)配置文件application.yml配置数据源信息
+    	spring:
+        datasource:
+          url: jdbc:mysql://localhost:3306/socks
+          username: root
+          password: 123456
+    4)创建定时器————注意这里添加的是TriggerTask，目的是循环读取我们在数据库设置好的执行周期，以及执行相关定时任务的内容。
+    	@Configuration      //1.主要用于标记配置类，兼备Component的效果。
+      @EnableScheduling   //2.开启定时任务
+      public class DynamicScheduleTask implements SchedulingConfigurer {
+        @Mapper
+        public interface CronMapper {
+          @Select("select cron from cron limit 1")
+          public String getCron();
+        }
+
+        @Autowired      //注入mapper
+        @SuppressWarnings("all")
+        CronMapper cronMapper;
+
+        /**
+        * 执行定时任务.
+        */
+        @Override
+        public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+          taskRegistrar.addTriggerTask(
+            //1.添加任务内容(Runnable)
+            () -> System.out.println("执行动态定时任务: " + LocalDateTime.now().toLocalTime()),
+            //2.设置执行周期(Trigger)
+            triggerContext -> {
+              //2.1 从数据库获取执行周期
+              String cron = cronMapper.getCron();
+              //2.2 合法性校验.
+              if (StringUtils.isEmpty(cron)) {
+              	// Omitted Code ..
+              }
+              //2.3 返回执行周期(Date)
+              return new CronTrigger(cron).nextExecutionTime(triggerContext);
+            }
+          );
+        }
+      }
+		5)启动测试
+			-- 启动应用后，查看控制台，打印时间是我们预期的每10秒一次
+			-- 然后打开Navicat ，将执行周期修改为每6秒执行一次
+			-- 查看控制台，发现执行周期已经改变，并且不需要我们重启应用，十分方便。
+-- 多线程定时任务
+	1、说明————基于注解设定多线程定时任务
+	2、注意————第一个定时任务和第二个定时任务互不影响；并且，由于开启了多线程，第一个任务的执行时间也不受其本身执行时间的限制，所以需要注意可能会出现重复操作导致数据异常。
+	3、使用步骤————如下
+		1)创建多线程定时任务
+			//@Component注解用于对那些比较中立的类进行注释；
+      //相对与在持久层、业务层和控制层分别采用 @Repository、@Service 和 @Controller 对分层中的类进行注释
+      @Component
+      @EnableScheduling   // 1.开启定时任务
+      @EnableAsync        // 2.开启多线程
+      public class MultithreadScheduleTask {
+        @Async //这里的@Async注解很关键
+        @Scheduled(fixedDelay = 1000)  //间隔1秒
+        public void first() throws InterruptedException {
+          System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
+          System.out.println();
+          Thread.sleep(1000 * 10);
+        }
+
+        @Async //这里的@Async注解很关键
+        @Scheduled(fixedDelay = 2000)
+        public void second() {
+          System.out.println("第二个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
+          System.out.println();
+        }
+      }
+    2)启动测试————启动应用后，查看控制台
+```
+
+
+
 ## 8、SpringCloud
 
 ### 1、微服务简介
@@ -1764,13 +1936,1152 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ## 13、Canal数据同步工具
 
+```markdown
+# 说明
+	阿里巴巴旗下开发的一款开源项目，纯Java开发。目前支持Mysql数据库
+	
+# 应用场景
+	解决采取服务调用获取数据，耦合度高，效率相对低
+
+# 应用原理
+	通过实时同步数据库表的方式，解决服务调用获取数据的缺点（将远程库中的数据同步到本地库中）
+	例如：我们要统计每天注册与登录人数，只需要把会员表同步到统计库中，实现本地统计就可以了，此方式，效率高，耦合度低
+
+# Linux中Canal环境搭建
+	详见————1-5-14、Linux中Canal环境搭建
+	
+# 使用步骤
+-- 准备工作
+	1、虚拟机Linux和本地windows系统都装上mysql数据库，并创建同样的数据库和表
+		1)创建数据库
+			CREATE DATABASE `db_online_canal` CHARACTER SET utf8 COLLATE utf8_general_ci;
+		2)创建表
+			use db_online_canal;
+			create Table  members(
+      	id   int  primary key,    
+      	username varchar(100),
+        age int
+      );
+
+-- canal代码编写
+	1、创建模块————canal_client
+	2、引入依赖
+		<dependencies>     
+      <!--web工程-->    
+      <dependency>      
+        <groupId>org.springframework.boot</groupId>     
+        <artifactId>spring-boot-starter-web</artifactId>    
+      </dependency>    
+      <!--mysql-->  
+      <dependency>     
+        <groupId>mysql</groupId>        
+        <artifactId>mysql-connector-java</artifactId>      
+      </dependency>    
+      <!--数据库操作工具-->    
+      <dependency>        
+        <groupId>commons-dbutils</groupId>  
+        <artifactId>commons-dbutils</artifactId>  
+      </dependency>       
+      <!--数据库操作工具-->   
+      <dependency>         
+        <groupId>org.springframework.boot</groupId>  
+        <artifactId>spring-boot-starter-jdbc</artifactId>  
+      </dependency>    
+      <!--canal客户端同步工具依赖-->     
+      <dependency>         
+        <groupId>com.alibaba.otter</groupId> 
+        <artifactId>canal.client</artifactId>   
+      </dependency>   
+    </dependencies>
+	3、配置文件application.properties添加配置信息
+		# 服务端口
+		server.port=10000
+		# 服务名
+		spring.application.name=canal-client
+		# 环境设置
+		spring.profiles.active=dev
+
+		# mysql数据库连接
+		spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+		spring.datasource.url=dbc:mysql://localhost:3308/db_online_education?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
+		spring.datasource.username=root
+		spring.datasource.password=root123456
+	4、创建canal客户端同步类，在启动类中执行
+		package com.pigskin.canal.clienet;
+
+		import com.alibaba.otter.canal.client.CanalConnector;
+		import com.alibaba.otter.canal.client.CanalConnectors;
+		import com.alibaba.otter.canal.protocol.CanalEntry.*;
+		import com.alibaba.otter.canal.protocol.Message;
+		import com.google.protobuf.InvalidProtocolBufferException;
+		import org.apache.commons.dbutils.DbUtils;
+		import org.apache.commons.dbutils.QueryRunner;
+		import org.springframework.stereotype.Component;
+		import javax.annotation.Resource;
+		import javax.sql.DataSource;
+		import java.net.InetSocketAddress;
+		import java.sql.Connection;
+		import java.sql.SQLException;
+		import java.util.List;
+		import java.util.Queue;
+		import java.util.concurrent.ConcurrentLinkedQueue;
+
+		@Component
+		public class CanalClient {   
+    	/**   
+      * sql队列  
+      */   
+      private Queue<String> SQL_QUEUE = new ConcurrentLinkedQueue<>();   
+
+      @Resource   
+      private DataSource dataSource;  
+      /**    
+      * canal入库方法  
+      */   
+      public void run() { 
+      	CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress("192.168.44.132",11111), "example", "", "");  
+        int batchSize = 1000;    
+        try {        
+        	connector.connect();   
+          connector.subscribe(".*\\..*"); 
+          connector.rollback();      
+          try {             
+          	while (true) {       
+              //尝试从master那边拉去数据batchSize条记录，有多少取多少      
+              Message message = connector.getWithoutAck(batchSize);    
+              long batchId = message.getId();        
+              int size = message.getEntries().size();    
+              if (batchId == -1 || size == 0) {       
+                Thread.sleep(1000);          
+              } else {            
+                dataHandle(message.getEntries());  
+              }                 
+              connector.ack(batchId);    
+              //当队列里面堆积的sql大于一定数值的时候就模拟执行    
+              if (SQL_QUEUE.size() >= 1) {    
+                executeQueueSql();            
+              }          
+            }          
+          } catch (InterruptedException e) {   
+          	e.printStackTrace();     
+          } catch (InvalidProtocolBufferException e) {  
+          	e.printStackTrace();         
+          }
+        } finally {
+        	connector.disconnect();   
+        }
+      }
+
+      /**
+      * 模拟执行队列里面的sql语句  
+      */   
+      public void executeQueueSql() {  
+      	int size = SQL_QUEUE.size();   
+        for (int i = 0; i < size; i++) {    
+        	String sql = SQL_QUEUE.poll();      
+          System.out.println("[sql]----> " + sql);    
+          this.execute(sql.toString());    
+        }  
+      }     
+
+      /**   
+      * 数据处理      
+      *       
+      * @param entrys 
+      */   
+      private void dataHandle(List<Entry> entrys) throws InvalidProtocolBufferException { 
+      	for (Entry entry : entrys) {    
+        	if (EntryType.ROWDATA == entry.getEntryType()) {   
+          	RowChange rowChange = RowChange.parseFrom(entry.getStoreValue());  
+            EventType eventType = rowChange.getEventType();    
+            if (eventType == EventType.DELETE) {    
+            	saveDeleteSql(entry);           
+            } else if (eventType == EventType.UPDATE) {   
+            	saveUpdateSql(entry);        
+            } else if (eventType == EventType.INSERT) {  
+            	saveInsertSql(entry);               
+            }           
+          }     
+        }   
+      }     
+
+      /**  
+      * 保存更新语句       
+      *      
+      * @param entry   
+      */   
+      private void saveUpdateSql(Entry entry) {        
+      	try {       
+          RowChange rowChange = RowChange.parseFrom(entry.getStoreValue());     
+          List<RowData> rowDatasList = rowChange.getRowDatasList(); 
+          for (RowData rowData : rowDatasList) {     
+            List<Column> newColumnList = rowData.getAfterColumnsList();    
+            StringBuffer sql = new StringBuffer("update " + entry.getHeader().getTableName() + " set ");          
+            for (int i = 0; i < newColumnList.size(); i++) {        
+              sql.append(" " + newColumnList.get(i).getName()+ " = '" + newColumnList.get(i).getValue() + "'");    
+              if (i != newColumnList.size() - 1) {     
+                sql.append(",");              
+              }              
+            }          
+            sql.append(" where ");    
+            List<Column> oldColumnList = rowData.getBeforeColumnsList();   
+            for (Column column : oldColumnList) {     
+              if (column.getIsKey()) {                  
+                //暂时只支持单一主键              
+                sql.append(column.getName() + "=" + column.getValue());    
+                break;                 
+              }              
+            }            
+            SQL_QUEUE.add(sql.toString());     
+          }      
+        } catch (InvalidProtocolBufferException e) {    
+        	e.printStackTrace();     
+        }   
+      }      
+
+      /**  
+      * 保存删除语句   
+      *        
+      * @param entry      
+      */  
+      private void saveDeleteSql(Entry entry) {    
+      	try {    
+        	RowChange rowChange = RowChange.parseFrom(entry.getStoreValue());
+          List<RowData> rowDatasList = rowChange.getRowDatasList();         
+          for (RowData rowData : rowDatasList) {          
+          	List<Column> columnList = rowData.getBeforeColumnsList(); 
+            StringBuffer sql = new StringBuffer("delete from " + entry.getHeader().getTableName() + " where ");
+            for (Column column : columnList) {             
+              if (column.getIsKey()) {               
+                //暂时只支持单一主键               
+                sql.append(column.getName() + "=" + column.getValue());  
+                break;              
+              }    
+            }     
+            SQL_QUEUE.add(sql.toString());        
+          }       
+      	} catch (InvalidProtocolBufferException e) { 
+      		e.printStackTrace();      
+      	}   
+      }       
+
+      /**       
+      * 保存插入语句     
+      *        
+      * @param entry  
+      */   
+      private void saveInsertSql(Entry entry) { 
+      	try {    
+      		RowChange rowChange = RowChange.parseFrom(entry.getStoreValue());    
+          List<RowData> rowDatasList = rowChange.getRowDatasList();       
+          for (RowData rowData : rowDatasList) {   
+          	List<Column> columnList = rowData.getAfterColumnsList();     
+            StringBuffer sql = new StringBuffer("insert into " + entry.getHeader().getTableName() + " ("); 
+            for (int i = 0; i < columnList.size(); i++) {   
+            	sql.append(columnList.get(i).getName());        
+              if (i != columnList.size() - 1) {  
+              	sql.append(","); 
+              }
+            }
+            sql.append(") VALUES (");
+            for (int i = 0; i < columnList.size(); i++) {                 
+            	sql.append("'" + columnList.get(i).getValue() + "'");        
+              if (i != columnList.size() - 1) {        
+              	sql.append(",");             
+              }               
+            }             
+            sql.append(")");     
+            SQL_QUEUE.add(sql.toString()); 
+          }     
+        } catch (InvalidProtocolBufferException e) {   
+        	e.printStackTrace();     
+        }   
+      }      
+
+      /**        
+      * 入库   
+      * @param sql   
+      */  
+      public void execute(String sql) {  
+        Connection con = null;      
+        try {         
+          if(null == sql) return;     
+          con = dataSource.getConnection();   
+          QueryRunner qr = new QueryRunner();        
+          int row = qr.execute(con, sql);       
+          System.out.println("update: "+ row);     
+        } catch (SQLException e) {   
+          e.printStackTrace();    
+        } finally {        
+          DbUtils.closeQuietly(con);   
+        }   
+      }
+    }
+  5、创建启动类，并实现监控
+    package com.pigskin.canal;
+
+    import com.pigskin.canal.clienet.CanalClient;
+    import org.springframework.boot.CommandLineRunner;
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+    import javax.annotation.Resource;
+
+    @SpringBootApplication
+    public class CanalApplication implements CommandLineRunner {  
+    	@Resource   
+      private CanalClient canalClient;  
+
+      public static void main(String[] args) {    
+      	SpringApplication.run(CanalApplication.class, args);  
+      }   
+
+      @Override  
+      public void run(String... args) throws Exception {   
+      	//项目启动执行canal客户端监控
+        canalClient.run(); 
+      }
+    }
+
+-- 测试使用
+	1、启动canal
+	2、启动项目
+	3、在远程库中添加一条数据
+	3、结果————本地库中也将会同步到远程库中的数据
+```
+
+
+
 ## 14、Spring Security权限框架
+
+```markdown
+# 说明
+	Spring 是一个非常流行和成功的 Java 应用开发框架。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。一般来说，Web 应用的安全性包括用户认证（Authentication）和用户授权（Authorization）两个部分。
+	
+# 主要部分
+-- 用户认证【Authentication】
+	验证某个用户是否为系统中的合法主体，也就是说用户能否访问该系统。用户认证一般要求用户提供用户名和密码。系统通过校验用户名和密码来完成认证过程。
+
+-- 用户授权【Authorization】
+	验证某个用户是否有权限执行某个操作。在一个系统中，不同用户所具有的权限是不同的。比如对一个文件来说，有的用户只能进行读取，而有的用户可以进行修改。一般来说，系统会为不同的用户分配不同的角色，而每个角色则对应一系列的权限。
+
+# 本质
+	Spring Security其实就是用filter，对请求的路径进行过滤。
+	-- 如果是基于Session，那么Spring-security会对cookie里的sessionid进行解析，找到服务器存储的sesion信息，然后判断当前用户是否符合请求的要求。
+	-- 如果是token，则是解析出token，然后将当前请求加入到Spring-security管理的权限信息中去
+
+# 实现过程
+-- 说明
+	-- 如果系统的模块众多，每个模块都需要就行授权与认证，所以我们选择基于token的形式进行授权与认证
+	-- 用户根据用户名密码认证成功，然后获取当前用户角色的一系列权限值，并以用户名为key，权限列表为value的形式存入redis缓存中
+	-- 根据用户名相关信息生成token返回，浏览器将token记录到cookie中
+	-- 每次调用api接口都默认将token携带到header请求头中
+	-- Spring-security解析header头获取token信息
+	-- 解析token获取当前用户名，根据用户名就可以从redis中获取权限列表，这样Spring-security就能够判断当前请求是否有权限访问
+
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_14_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 代码整合
+-- 创建对应模块
+	权限管理模块目录结构,如下图所示:
+```
+
+<img src="image/img2_1_14_1_2.png" style="zoom:50%;" />
+
+```markdown
+-- 引入依赖
+	<dependencies>   
+  	<!--自定义公共组件-->      
+    <dependency>   
+      <groupId>com.pigskin</groupId>    
+      <artifactId>common_utils</artifactId>    
+      <version>0.0.1-SNAPSHOT</version>     
+    </dependency>     
+    <!-- Spring Security权限控制依赖 -->     
+    <dependency>      
+      <groupId>org.springframework.boot</groupId>   
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>       
+    <!--jwt依赖用于生成token-->       
+    <dependency>     
+      <groupId>io.jsonwebtoken</groupId>  
+      <artifactId>jjwt</artifactId>     
+    </dependency>   
+  </dependencies>
+
+-- 编写核心代码
+	1、核心配置类代码
+		package com.pigskin.serurity.config;
+		
+		import com.pigskin.serurity.filter.TokenAuthenticationFilter;
+		import com.pigskin.serurity.filter.TokenLoginFilter;
+		import com.pigskin.serurity.security.DefaultPasswordEncoder;
+		import com.pigskin.serurity.security.TokenLogoutHandler;
+		import com.pigskin.serurity.security.TokenManager;
+		import com.pigskin.serurity.security.UnauthorizedEntryPoint;
+		import org.springframework.beans.factory.annotation.Autowired;
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.data.redis.core.RedisTemplate;
+		import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+		import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+		import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+		import org.springframework.security.config.annotation.web.builders.WebSecurity;
+		import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+		import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+		import org.springframework.security.core.userdetails.UserDetailsService;
+		
+		/**
+    * Security配置类 
+    */
+    @Configuration
+    @EnableWebSecurity
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
+    public class TokenWebSecurityConfig extends WebSecurityConfigurerAdapter {  
+    	/**   
+      * 自定义查询数据库类     
+      */   
+      private UserDetailsService userDetailsService;   
+      /**   
+      * Token操作工具类   
+      */  
+      private TokenManager tokenManager; 
+      /**    
+      * 密码处理工具类  
+      */   
+      private DefaultPasswordEncoder defaultPasswordEncoder;  
+      /**     
+      * redis操作类  
+      */   
+      private RedisTemplate redisTemplate; 
+      
+      @Autowired  
+      public TokenWebSecurityConfig(UserDetailsService userDetailsService, 
+      		DefaultPasswordEncoder defaultPasswordEncoder,                            
+      		TokenManager tokenManager, RedisTemplate redisTemplate) {    
+        this.userDetailsService = userDetailsService;  
+        this.defaultPasswordEncoder = defaultPasswordEncoder; 
+        this.tokenManager = tokenManager;      
+        this.redisTemplate = redisTemplate;  
+      }   
+      
+      /** 
+      * 配置设置    
+      *    
+      * @param http   
+      * @throws Exception  
+      */   
+      @Override  
+      protected void configure(HttpSecurity http) throws Exception {  
+      	http.exceptionHandling()          
+        .authenticationEntryPoint(new UnauthorizedEntryPoint())     
+        .and().csrf().disable()   
+        .authorizeRequests()    
+        .anyRequest().authenticated()      
+        //设置退出请求地址（可以不用改）          
+        .and().logout().logoutUrl("/admin/acl/index/logout")   
+        .addLogoutHandler(new TokenLogoutHandler(tokenManager, redisTemplate)).and()   
+        .addFilter(new TokenLoginFilter(authenticationManager(), tokenManager, redisTemplate))    
+        .addFilter(new TokenAuthenticationFilter(authenticationManager(), tokenManager, redisTemplate))
+        .httpBasic();  
+      }   
+      
+      /**   
+      * 密码处理   
+      *    
+      * @param auth   
+      * @throws Exception     
+      */   
+      @Override   
+      public void configure(AuthenticationManagerBuilder auth) throws Exception {   
+      	auth.userDetailsService(userDetailsService).passwordEncoder(defaultPasswordEncoder);   
+      }   
+      
+      /**   
+      * 配置哪些请求不拦截  
+      *   
+      * @param web   
+      * @throws Exception     
+      */  
+      @Override  
+      public void configure(WebSecurity web) throws Exception {    
+      	web.ignoring()
+      	.antMatchers("/api/**", "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");       
+        //web.ignoring().antMatchers("/*/**");   
+      }
+    }
+	2、相关实体类
+		-- 安全认证用户详情信息类
+			package com.pigskin.serurity.entity;
+			
+			import lombok.Data;
+			import lombok.extern.slf4j.Slf4j;
+			import org.springframework.security.core.GrantedAuthority;
+			import org.springframework.security.core.authority.SimpleGrantedAuthority;
+			import org.springframework.security.core.userdetails.UserDetails;
+			import org.springframework.util.StringUtils;
+			import java.util.ArrayList;
+			import java.util.Collection;
+			import java.util.List;
+			
+			/**
+      * 安全认证用户详情信息,需实现SpringSecurity提供的UserDetails接口 
+      */
+      @Data
+      @Slf4j
+      public class SecurityUser implements UserDetails { 
+      	/**    
+        * 当前登录用户   
+        */   
+        private transient User currentUserInfo;  
+        /**    
+        * 当前权限  
+        */   
+        private List<String> permissionValueList;
+        
+        public SecurityUser(User user) {   
+        	if (user != null) {    
+          	this.currentUserInfo = user;      
+          }  
+        }    
+        
+        @Override   
+        public Collection<? extends GrantedAuthority> getAuthorities() {  
+        	Collection<GrantedAuthority> authorities = new ArrayList<>();  
+          permissionValueList.stream().forEach(permissionValue -> {   
+          	if (!StringUtils.isEmpty(permissionValue)) {    
+            	SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue); 
+              authorities.add(authority);          
+            }     
+          });   
+          return authorities; 
+        }   
+        
+        @Override  
+        public String getPassword() {  
+        	return currentUserInfo.getPassword();    
+        }
+        
+        @Override
+        public String getUsername() {
+        	return currentUserInfo.getUsername();
+        }
+        
+        @Override  
+        public boolean isAccountNonExpired() {
+        	return true;
+        }  
+        
+        @Override  
+        public boolean isAccountNonLocked() {   
+        	return true;  
+        }   
+        
+        @Override   
+        public boolean isCredentialsNonExpired() {    
+        	return true; 
+        }   
+        
+        @Override   
+        public boolean isEnabled() {  
+      	  return true;  
+        }
+      }
+		-- 用户实体类
+			package com.pigskin.serurity.entity;
+			
+			import io.swagger.annotations.ApiModel;
+			import io.swagger.annotations.ApiModelProperty;
+			import lombok.Data;import java.io.Serializable;
+			
+			/** 
+			* 用户实体类
+      */
+      @Data
+      @ApiModel(description = "用户实体类")
+      public class User implements Serializable { 
+      	private static final long serialVersionUID = 1L; 
+        
+        @ApiModelProperty(value = "微信openid")  
+        private String username;   
+        
+        @ApiModelProperty(value = "密码")  
+        private String password;   
+        
+        @ApiModelProperty(value = "昵称") 
+        private String nickName;   
+        
+        @ApiModelProperty(value = "用户头像")  
+        private String salt;   
+        
+        @ApiModelProperty(value = "用户签名")  
+        private String token;
+      }
+	3、核心过滤器
+		-- 授权过滤器
+			package com.pigskin.serurity.filter;
+			
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import com.pigskin.serurity.security.TokenManager;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.authentication.AuthenticationManager;
+			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+			import org.springframework.security.core.GrantedAuthority;
+			import org.springframework.security.core.authority.SimpleGrantedAuthority;
+			import org.springframework.security.core.context.SecurityContextHolder;
+			import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+			import org.springframework.util.StringUtils;
+			import javax.servlet.FilterChain;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+			import java.util.ArrayList;
+			import java.util.Collection;
+			import java.util.List;
+			
+			/**
+      * 访问(授权)过滤器 
+      */
+      public class TokenAuthenticationFilter extends BasicAuthenticationFilter { 
+      	private TokenManager tokenManager;   
+        private RedisTemplate redisTemplate;    
+        public TokenAuthenticationFilter(AuthenticationManager authManager,
+        		TokenManager tokenManager, RedisTemplate redisTemplate) {    
+        	super(authManager);     
+          this.tokenManager = tokenManager;  
+          this.redisTemplate = redisTemplate;  
+        }    
+        
+        @Override  
+        protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)  
+        		throws IOException, ServletException {     
+        	logger.info("=================" + req.getRequestURI());    
+          if (req.getRequestURI().indexOf("admin") == -1) {   
+          	chain.doFilter(req, res);           
+            return;      
+          }    
+          UsernamePasswordAuthenticationToken authentication = null;      
+          try {       
+          	authentication = getAuthentication(req); 
+          } catch (Exception e) {          
+          	ResponseUtil.out(res, R.error());      
+          }
+          if (authentication != null) {            
+          	SecurityContextHolder.getContext().setAuthentication(authentication);  
+          } else {          
+            ResponseUtil.out(res, R.error());   
+          }       
+          chain.doFilter(req, res);   
+        } 
+        
+        private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {   
+        	// token置于header里    
+          String token = request.getHeader("token");   
+          if (token != null && !"".equals(token.trim())) {    
+          	String userName = tokenManager.getUserFromToken(token); 
+            List<String> permissionValueList = (List<String>) redisTemplate.opsForValue().get(userName);  
+            Collection<GrantedAuthority> authorities = new ArrayList<>();         
+            for (String permissionValue : permissionValueList) {              
+            	if (StringUtils.isEmpty(permissionValue)) continue;           
+              SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue);  
+              authorities.add(authority);         
+            }       
+            if (!StringUtils.isEmpty(userName)) {   
+            	return new UsernamePasswordAuthenticationToken(userName, token, authorities);      
+            }          
+            return null; 
+          }     
+          return null;
+        }
+      }
+		-- 认证过滤器
+			package com.pigskin.serurity.filter;
+			
+			import com.fasterxml.jackson.databind.ObjectMapper;
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import com.pigskin.serurity.entity.SecurityUser;
+			import com.pigskin.serurity.entity.User;
+			import com.pigskin.serurity.security.TokenManager;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.authentication.AuthenticationManager;
+			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+			import org.springframework.security.core.Authentication;
+			import org.springframework.security.core.AuthenticationException;
+			import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+			import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+			import javax.servlet.FilterChain;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;import java.util.ArrayList;
+			
+			/**
+      * 登录过滤器，继承UsernamePasswordAuthenticationFilter，对用户名密码进行登录校验 
+      */
+      public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter { 
+      	private AuthenticationManager authenticationManager; 
+        private TokenManager tokenManager;   
+        private RedisTemplate redisTemplate; 
+        
+        /**   
+        * 构造，传递参数  
+        *   
+        * @param authenticationManager  
+        * @param tokenManager    
+        * @param redisTemplate    
+        */   
+        public TokenLoginFilter(AuthenticationManager authenticationManager, TokenManager tokenManager, 
+        		RedisTemplate redisTemplate) {     
+        	this.authenticationManager = authenticationManager;     
+          this.tokenManager = tokenManager;      
+          this.redisTemplate = redisTemplate;     
+          this.setPostOnly(false);      
+          //设置登录请求地址      
+          this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/acl/login", "POST")); 
+        }   
+        
+        /**   
+        * 得到用户名和密码  
+        *    
+        * @param req  
+        * @param res  
+        * @return  
+        * @throws AuthenticationException   
+        */  
+        @Override  
+        public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)  
+        		throws AuthenticationException {     
+        	try {        
+          	User user = new ObjectMapper().readValue(req.getInputStream(), User.class);      
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+            	user.getUsername(), user.getPassword(), new ArrayList<>()));    
+          } catch (IOException e) {      
+          	throw new RuntimeException(e);    
+          }  
+        }   
+        
+        /**  
+        * 登录认证成功  
+        *   
+        * @param req   
+        * @param res   
+        * @param chain    
+        * @param auth    
+        * @throws IOException   
+        * @throws ServletException   
+        */   
+        @Override  
+        protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, 
+        		FilterChain chain,  Authentication auth) throws IOException, ServletException {    
+          SecurityUser user = (SecurityUser) auth.getPrincipal();        
+          //采用jwt方式生成token字符串        
+          String token = tokenManager.createToken(user.getCurrentUserInfo().getUsername());  
+          //将数据存到redis中   
+          redisTemplate.opsForValue().set(
+          	user.getCurrentUserInfo().getUsername(), user.getPermissionValueList());     
+          ResponseUtil.out(res, R.ok().data("token", token)); 
+        }    
+        
+        /**  
+        * 登录失败  
+        *    
+        * @param request 
+        * @param response  
+        * @param e     
+        * @throws IOException    
+        * @throws ServletException  
+        */   
+        @Override   
+        protected void unsuccessfulAuthentication(HttpServletRequest request, 
+        		HttpServletResponse response,AuthenticationException e) throws IOException, ServletException {     
+        	ResponseUtil.out(response, R.error());    
+        }
+      }
+	4、相关工具类
+		-- 密码处理工具类
+			package com.pigskin.serurity.security;
+			
+			import com.pigskin.common_utils.MD5;
+			import org.springframework.security.crypto.password.PasswordEncoder;
+			import org.springframework.stereotype.Component;
+			
+			/**
+      * 密码的处理方法类型
+      */
+      @Component
+      public class DefaultPasswordEncoder implements PasswordEncoder {  
+      	public DefaultPasswordEncoder() {    
+        	this(-1);   
+        }   
+        
+        /**   
+        * @param strength 要使用的位数介于4和31之间  
+        */    
+        public DefaultPasswordEncoder(int strength) {
+        
+        }  
+        
+        /**   
+        * MD5加密   
+        *   
+        * @param rawPassword 要加密的密码    
+        * @return   
+        */   
+        public String encode(CharSequence rawPassword) {   
+        	return MD5.encrypt(rawPassword.toString());  
+        }   
+        
+        /**   
+        * 密码匹配验证  
+        *    
+        * @param rawPassword     要验证的密码     
+        * @param encodedPassword 已加密密码   
+        * @return   
+        */   
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {    
+        	return encodedPassword.equals(MD5.encrypt(rawPassword.toString())); 
+        }
+      }
+		-- token操作工具类
+			package com.pigskin.serurity.security;
+			
+			import io.jsonwebtoken.CompressionCodecs;
+			import io.jsonwebtoken.Jwts;
+			import io.jsonwebtoken.SignatureAlgorithm;
+			import org.springframework.stereotype.Component;
+			import java.util.Date;
+			
+			/**
+      * token管理 
+      */
+      @Component
+      public class TokenManager {  
+      	private long tokenExpiration = 24 * 60 * 60 * 1000;  
+        private String tokenSignKey = "123456";   
+        
+        /**    
+        * 根据用户名创建token字符串    
+        *    
+        * @param username 用户名   
+        * @return 
+        */    
+        public String createToken(String username) {  
+        	return Jwts.builder().setSubject(username)    
+          	.setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))         
+            .signWith(SignatureAlgorithm.HS512, tokenSignKey).compressWith(CompressionCodecs.GZIP).compact();  
+        }  
+        
+        /**  
+        * 从token中获取用户信息   
+        *    
+        * @param token   
+        * @return   
+        */   
+        public String getUserFromToken(String token) {     
+        	return Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token).getBody().getSubject();  
+        }  
+        
+        /**    
+        * 移除token  
+        *     
+        * @param token
+        */   
+        public void removeToken(String token) {    
+        	//jwttoken无需删除，客户端扔掉即可。  
+        }
+      }
+		-- 退出工具类
+			package com.pigskin.serurity.security;
+			
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.core.Authentication;
+			import org.springframework.security.web.authentication.logout.LogoutHandler;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			
+			/**
+      * 登出业务逻辑类 
+      */
+      public class TokenLogoutHandler implements LogoutHandler {   
+      		private TokenManager tokenManager;  
+          private RedisTemplate redisTemplate;  
+          
+          public TokenLogoutHandler(TokenManager tokenManager, RedisTemplate redisTemplate) {   
+            this.tokenManager = tokenManager;  
+            this.redisTemplate = redisTemplate;   
+          }    
+          
+          @Override  
+          public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {    
+          	String token = request.getHeader("token");     
+            if (token != null) {   
+              tokenManager.removeToken(token);     
+              //清空当前用户缓存中的权限数据          
+              String userName = tokenManager.getUserFromToken(token);  
+              redisTemplate.delete(userName);   
+            }     
+            ResponseUtil.out(response, R.ok());  
+          }
+        }
+		-- 未授权统一处理类
+			package com.pigskin.serurity.security;
+			
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import org.springframework.security.core.AuthenticationException;
+			import org.springframework.security.web.AuthenticationEntryPoint;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+			
+			/** 
+			* 未授权的统一处理方式 
+			*/
+			public class UnauthorizedEntryPoint implements AuthenticationEntryPoint { 
+      	@Override    
+      	public void commence(HttpServletRequest request, HttpServletResponse response,                         AuthenticationException authException) throws IOException, ServletException {   
+        	ResponseUtil.out(response, R.error());   
+        }
+      }
+	5、公共工具类添加
+		-- 响应工具类
+			package com.pigskin.common_utils;
+			
+			import com.fasterxml.jackson.databind.ObjectMapper;
+			import org.springframework.http.HttpStatus;
+			import org.springframework.http.MediaType;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+			
+			/**
+			* 响应工具类
+      */
+      public class ResponseUtil {  
+      	public static void out(HttpServletResponse response, R r) {   
+        	ObjectMapper mapper = new ObjectMapper();   
+          response.setStatus(HttpStatus.OK.value());    
+          response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);  
+          try {          
+          	mapper.writeValue(response.getWriter(), r);   
+          } catch (IOException e) { 
+          	e.printStackTrace();    
+          }   
+        }
+      }
+		
+		-- MD5加密工具类————详见2-1-11、MD5加密
+
+-- 对应的需要认证服务的模块中引入该模块依赖
+
+# 代码执行过程
+-- 1、模块登录后，进入认证过滤器，获取输入的登录用户名和密码
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res){
+		...
+	}
+
+-- 2、调用自己写的类，根据用户名查询用户信息和用户具有的权限，并通过security对象返回
+	@Service("userDetailsService")
+	public class UserDetailsServiceImpl implements UserDetailsService {
+		...
+	}
+
+-- 3、认证成功后，执行认证过滤器中的认证成功后的方法，得到用户信息，并根据用户名生成token值，同时将用户名和权限信息放到redis中。返回token值
+	@Override    
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,Authentication auth) throws IOException, ServletException {
+		...
+	}
+
+-- 4、进入授权过滤器，从header中根据token信息获取用户名称，根据用户名称从redis查询数据，给用户授权
+	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {       
+		// token置于header里 
+  	String token = request.getHeader("token");
+	}
+
+# 前端代码整合
+-- 替换element-ui
+-- 替换代码
+-- 安装依赖————npm install --save vuex-persistedstate
+-- 修改
+```
+
+
 
 ## 15、Git
 
+```markdown
+```
+
+
+
 ## 16、Jenkins
 
+```markdown
+# 说明
+	持续化部署工具
+
+# 手动打包运行过程
+-- 微服务项目打包说明————https://www.freesion.com/article/12741168370/
+
+-- 手动打包运行过程
+	1、创建普通SpringBoot项目
+	2、将工程进行打包.运行————前提条件:安装好maven,配置好maven环境变量/因为SpringBoot项目通过main方法执行,打包变成jar包形式,使用Maven进行打包操作[mvn clean package]
+	3、在项目中会创建target目录,里边有打包好的jar
+	4、运行打包好的jar————java -jar jar包名称
+
+# 使用Jenkins实现完整过程
+-- 准备工作
+	1、安装JDK环境————详见1-5-12、Linux中JDK环境搭建
+	2、安装maven环境————详见1-5-15、Linux中Maven环境搭建
+	3、安装git环境————详见1-5-16、Linux中Git环境搭建
+	4、安装docker————详见1-5-4、Linux中Docker环境搭建
+	5、安装jenkins————详见1-5-17、Linux中Jenkins搭建
+-- Jekins自动化过程
+	1、项目根目录下添加DockerFile文件,内容如下:
+		#拉取JDK环境
+		FROM openjdk:8-jdk-alpine
+		#缓存处理
+		VOLUME /tmp
+		#复制指定位置的jar包，并设置新的名字
+		COPY ./target/edu_parent.jar edu_parent.jar
+		#执行拷贝的jar包
+		ENTRYPOINT ["java","-jar","/edu_parent.jar","&"]
+	2、项目的pom文件中添加打包类型以及Maven打包插件
+  	添加打包类型————<packaging>jar</packaging>
+  	设置打包插件————如下:
+      <build>       
+        <plugins>    
+          <plugin>      
+            <groupId>org.springframework.boot</groupId>       
+            <artifactId>spring-boot-maven-plugin</artifactId>   
+          </plugin>     
+        </plugins>  
+      </build>
+	3、jenkins管理界面,创建自动化任务
+		-- 依次点击[新建任务]————>添加任务名————>选择任务类型,一般选择第一项————>点击确定
+		-- 设置源码管理————>提交代码到码云————>添加git代码存储仓库地址
+		-- 配置构建选项————>选择[执行shell]————>添加脚本,如下:
+			#!/bin/bash
+			# maven打包
+			mvn clean install -pl ./infrastructure/api_gateway -am -DskipTests
+			echo 'package ok!'
+			
+			# docker构建
+			echo 'build start!'
+			
+			# 进入构建目录
+			cd ./infrastructure/api_gateway
+			
+			# 设置服务名和端口
+			service_name="api_gateway"
+			service_port=8222
+			
+			# 查看镜像id
+			IID=$(docker images | grep "$service_name" | awk '{print $3}')
+			echo "IID $IID"
+			if [ -n "$IID" ]
+			then  
+      	echo "exist $service_name image,IID=$IID"   
+        # 删除镜像   
+        docker rmi -f $service_name   
+        echo "delete $service_name image"  
+        # 构建   
+        docker build -t $service_name .  
+        echo "build $service_name image"
+      else
+      	echo "no exist $service_name image,build docker" 
+        # 构建   
+        docker build -t $service_name .  
+        echo "build $service_name image"
+      fi
+      # 查看容器id
+      CID=$(docker ps | grep "$service_name" | awk '{print $1}')
+      echo "CID $CID"
+      if [ -n "$CID" ]
+      then  
+      	echo "exist $service_name container,CID=$CID" 
+        # 停止   
+        docker stop $service_name   
+        # 删除容器  
+        docker rm $service_nameelse  
+        echo "no exist $service_name container"
+      fi
+      # 启动
+      docker run -d --name $service_name --network=bridge -p $service_port:$service_port $service_name
+      # 查看启动日志
+      #docker logs -f  $service_name
+		-- 执行作业
+			1、在对应任务展开下拉菜单
+				1)需要启动docker
+				2)选择立即构建————拉取代码——>下载依赖——>BUILD SUCCESS之后,执行添加的Dockfile文件
+				3)可以右键构建任务,点击[控制台输出]查看执行过程
+			2、图标代表含义
+				1)蓝色——代表上次一个构建成功
+				2)黄色——代表上次一个构建可能成功,但有错误
+				3)红色——代表上一次构建失败
+				4)灰色——代表项目从未被构建,或者被禁用
+
+# Jenkins复制和导出导入job
+-- 复制全部job
+	cd .jenkins
+	# 在源Jenkins上压缩jobs目录
+	tar -czvf jobs.tar.gz jobs
+	# 在目标Jenkins上解压jobs目录
+	tar -zxvf jobs.tar.gz
+
+-- 复制单个job
+	cd .jenkins/jobs
+	# 在源Jenkins上压缩指定的job目录
+	tar -czvf myjob.tar.gz myjob
+	# 在目标Jenkins上解压指定的job目录
+	tar -zxvf myjob.tar.gz
+```
+
+
+
 ## 17、Docker
+
+```markdown
+# 说明
+	Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中，然后发布到任何流行的Linux或Windows操作系统的机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口.
+# 特点
+	容器化虚拟技术[一次封装,到处运行]
+
+# Docker安装
+	详见1-5-4、Linux中Docker环境搭建
+	
+# Docker常用命令
+	docker images————查看所有镜像包
+	docker ps————查看正在启动的实例
+	docker start 实例名————启动指定实例
+	docker restart 实例名————重新启动指定实例
+	docker stop 实例名————停止运行指定实例
+	docker logs 实例名————查看指定实例的运行日志
+
+# Dockerfile体系结构（保留字指令）
+	-- FROM————基础镜像，当前镜像是基于那个镜像的
+	-- MAINTAINER————镜像维护者的姓名、邮箱地址
+	-- RUN————容器构建时需要运行的命令
+	-- EXPOSE————当前容器对外暴露的端口号
+	-- WORKDIR————指定在创建容器后，终端默认登录进来的工作目录，一个落脚点
+	-- ENV————用来在构建镜像过程中设置环境变量
+	-- ADD————将宿主机目录下的文件拷贝进镜像，且ADD命令会自动处理url和解压tar压缩包
+	-- COPY————类似ADD，拷贝文件到镜像
+	-- VOLUME————容器数据卷，用于数据保存和持久化
+	-- CMD————指定一个容器启动时需要执行的命令。（dockerfile中可以有多个CMD指令，但只有最后一个生效。CMD会被docker run之后的参数替换）
+	-- ENTRYPOINT————指定一个容器启动时需要执行的命令。（ENTRYPOINT的目的和CMD一样，但是CMD会被最后一条替换，ENTRYPOINT则是追加执行）
+	-- ONBUILD————当构建一个被继承的Dockerfile时运行命令。父镜像在被子镜像继承后，父镜像的ONBUILD触发
+```
+
+
 
 ## 18、JWT
 
@@ -4064,7 +5375,7 @@ error => {   
 
 
 
-## 8、Cron实现定时任务
+## 8、SpringBoot定时任务
 
 
 
@@ -4116,6 +5427,284 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	进入【cd /etc】目录
 	执行【echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled】
 
+```
+
+
+
+## 12、Mysql递归查询实现方式
+
+```markdown
+# 方式一————创建自定义函数实现递归查询
+-- 说明
+	这种方式实现之后，调用简单，但是效率较慢，而且由于字段 、函数、 长度的的限制，数据量大的时候可能查询不全。适合小数据量下使用。
+
+-- 准备工作
+	1、创建函数的时候，可能会报错。This function has none of DETERMINISTIC
+		在MySQL安装根目录个人配置文件my.ini中添加一行————log_bin_trust_function_creators=1,然后重启MySQL服务。
+	2、创建函数的时候用到了系统函数GROUP_CONCAT()，该函数默认长度是1024
+		在配置文件my.ini 中修改默认长度，添加一行语句————group_concat_max_len=102400
+		保存后重启MySQL服务。查询sql————SELECT @@global.group_concat_max_len;
+
+-- 创建函数
+	1、查询子节点的函数,查询时包含自身
+    CREATE 
+      DEFINER=`root`@`localhost` 
+      FUNCTION `queryChildren_1_sys_region`(areaId VARCHAR(15)) RETURNS varchar(20000) CHARSET utf8
+    BEGIN
+      DECLARE sTemp VARCHAR(20000);
+      DECLARE sTempChd VARCHAR(20000);
+
+      SET sTemp='$';
+      SET sTempChd = areaId;
+
+      WHILE sTempChd IS NOT NULL DO
+        SET sTemp= CONCAT(sTemp,',',sTempChd);
+        SELECT GROUP_CONCAT(code) INTO sTempChd FROM sys_region WHERE FIND_IN_SET(parent_code,sTempChd)>0;
+      END WHILE;
+
+      RETURN sTemp;
+    END
+	2、查询子节点的函数 查询时  不包含自身
+    CREATE 
+      DEFINER=`root`@`localhost` 
+      FUNCTION `queryChildren_sys_region`(areaId VARCHAR(15)) RETURNS varchar(21840) CHARSET utf8
+    BEGIN
+      DECLARE sTemp VARCHAR(21840);
+      DECLARE sTempChd VARCHAR(21840);
+
+      SET sTemp='$';
+      SET sTempChd = areaId;
+
+      WHILE sTempChd IS NOT NULL DO
+
+        if sTempChd != areaId then 
+          SET sTemp= CONCAT(sTemp,',',sTempChd);
+        end if;
+
+        SELECT GROUP_CONCAT(code) INTO sTempChd FROM sys_region WHERE FIND_IN_SET(parent_code,sTempChd)>0;
+
+      END WHILE;
+      RETURN sTemp;
+    END
+	3、查询父节点  查询的时候 包含自身
+    CREATE 
+    	DEFINER=`root`@`localhost` 
+    	FUNCTION `queryParent_1_sys_region`(areaId VARCHAR(15)) RETURNS varchar(21840) CHARSET utf8
+    BEGIN
+      DECLARE sTemp VARCHAR(21840);
+      DECLARE sTempChd VARCHAR(21840);
+
+      SET sTemp='$';
+      SET sTempChd = areaId;
+
+      -- SET sTemp = CONCAT(sTemp,',',sTempChd);
+      -- SELECT IFNULL(parent_code,'') INTO sTempChd FROM tgyi.sys_region  WHERE code = sTempChd;
+
+      WHILE (sTempChd <> '' ) DO
+
+        SET sTemp = CONCAT(sTemp,',',sTempChd);
+        select ifnull((SELECT parent_code FROM tgyi.sys_region  WHERE code = sTempChd),'')  INTO sTempChd ;
+
+      END WHILE;
+      RETURN sTemp;
+    END
+	4、查询父节点   查询的时候  不包含自身
+    CREATE 
+    	DEFINER=`root`@`localhost` 
+    	FUNCTION `queryParent_sys_region`(areaId VARCHAR(15)) RETURNS varchar(21840) CHARSET utf8
+    BEGIN
+      DECLARE sTemp VARCHAR(21840);
+      DECLARE sTempChd VARCHAR(21840);
+
+      SET sTemp='$';
+      SET sTempChd = areaId;
+
+      -- SET sTemp = CONCAT(sTemp,',',sTempChd);
+      -- SELECT IFNULL(parent_code,'') INTO sTempChd FROM tgyi.sys_region  WHERE code = sTempChd;
+
+      WHILE (sTempChd <> '' ) DO
+
+        if sTempChd != areaId then 
+          SET sTemp = CONCAT(sTemp,',',sTempChd);
+        end if;
+
+        select ifnull((SELECT parent_code FROM tgyi.sys_region  WHERE code = sTempChd),'')  INTO sTempChd ;
+
+      END WHILE;
+      RETURN sTemp;
+    END
+
+-- 查询示例
+	1、子节点,包含自己
+		SELECT * from sys_region where FIND_IN_SET(code,queryChildren_1_sys_region('370000000000'));
+	2、子节点,不含自己
+		SELECT * from  sys_region where FIND_IN_SET(code,queryChildren_sys_region('370000000000'));
+	3、父节点,包含自己
+		SELECT * from  sys_region where FIND_IN_SET(code,queryParent_1_sys_region('370171401000'));
+	4、父节点,不含自己
+		SELECT * from  sys_region where FIND_IN_SET(code,queryParent_sys_region('370171401000'));
+
+# 方式二————单纯使用sql不创建函数实现递归
+-- 说明
+	写法比较复杂，但是适合MySQL各版本，比较灵活。
+
+-- 查询脚本
+	1、单纯使用SQL递归 查询子节点  含自己
+    SELECT 
+    	T2.level_, T3.* 
+    FROM( 
+      SELECT 
+      	@codes as _ids, 
+        (SELECT @codes := GROUP_CONCAT(code) FROM sys_region WHERE FIND_IN_SET(parent_code, @codes)) as T1, 
+        @l := @l+1 as level_ 
+      FROM sys_region,(SELECT @codes :='370000000000', @l := 0 ) T4
+      WHERE @codes IS NOT NULL 
+    ) T2, sys_region T3 
+    WHERE FIND_IN_SET(T3.code, T2._ids) 
+    ORDER BY level_, code;
+	2、单纯使用SQL递归 查询子节点  不含自己
+    SELECT 
+    	T2.level_, T3.* 
+    FROM( 
+      SELECT 
+      	@codes as _ids, 
+        (SELECT @codes := GROUP_CONCAT(code) FROM sys_region WHERE FIND_IN_SET(parent_code, @codes)) as T1, 
+      	@l := @l+1 as level_ 
+      FROM sys_region,(SELECT @codes :='370000000000', @l := -1 ) T4 
+    	WHERE @codes IS NOT NULL 
+    ) T2, sys_region T3 
+    WHERE FIND_IN_SET(T3.code, T2._ids) and code !='370000000000'
+    ORDER BY level_, code;
+	3、单纯使用SQL递归 查询父节点  含自己
+    SELECT 
+    	T2.level_, T3.* 
+    FROM( 
+      SELECT 
+      	@code as _code, 
+        (SELECT @code := parent_code FROM sys_region WHERE code = @code) as T1, 
+        @l := @l+1 as level_ 
+      FROM sys_region,(SELECT @code := '370171401000', @l := 0 ) T4 
+      WHERE @code is not null
+    ) T2, sys_region T3
+    WHERE T2._code = T3.code 
+    ORDER BY level_;
+	4、单纯使用SQL递归 查询父节点  不含自己
+    SELECT 
+    	T2.level_, T3.* 
+    FROM( 
+      SELECT 
+      	@code as _code, 
+        (SELECT @code := parent_code FROM sys_region WHERE code = @code) as T1, 
+        @l := @l+1 as level_ 
+      FROM sys_region,(SELECT @code := '370171401000', @l := -1 ) T4 
+      WHERE @code is not null
+    ) T2, sys_region T3
+    WHERE T2._code = T3.code and T2._code != '370171401000' 
+   	ORDER BY level_;
+
+# 方式三————MySQL 8.0 版本以上 使用 WITH RECURSIVE 实现递归
+-- 说明
+	写法比较简单，也比较灵活，但是只适用于MySQL8.0及以上版本，这种写法其实和 PostgreSQL 的写法是一样的。
+
+-- 查询脚本
+	1、查询子节点  含自己
+ 		WITH RECURSIVE recursion (id, name, short_name, code, parent_code, level, flag) AS
+		(
+  		SELECT 
+  			T1.id, T1.name, T1.short_name,
+        T1.code, T1.parent_code, 
+        T1.level, T1.flag  
+	  	from sys_region T1
+	 		where T1.code='370000000000'
+  		
+  		UNION ALL
+	
+  		SELECT 
+  			T2.id, T2.name, T2.short_name, 
+  			T2.code, T2.parent_code,
+  			T2.level, T2.flag 
+    	from sys_region T2, recursion T3
+	 		WHERE T2.parent_code=T3.code
+		)
+		SELECT 
+			T.id, T.name, T.short_name,
+      T.code, T.parent_code, 
+      T.level, T.flag  
+  	FROM recursion T;
+	2、查询子节点  不含自己
+ 		WITH RECURSIVE recursion (id, name, short_name, code, parent_code, level, flag) AS
+		(
+  		SELECT 
+  			T1.id, T1.name, T1.short_name, 
+  			T1.code, T1.parent_code, 
+  			T1.level, T1.flag  
+	  	from sys_region T1
+	 		where T1.code='370000000000'
+  		
+  		UNION ALL
+	
+  		SELECT 
+  			T2.id, T2.name, T2.short_name, 
+  			T2.code, T2.parent_code, 
+  			T2.level, T2.flag 
+    	from sys_region T2, recursion T3
+     	WHERE T2.parent_code=T3.code
+		)
+		SELECT 
+			T.id, T.name, T.short_name, 
+			T.code, T.parent_code,
+      T.level, T.flag  
+  	FROM recursion T
+ 		where T.code!='370000000000';
+	3、查询父节点  含自己
+ 		WITH RECURSIVE recursion (id, name, short_name, code, parent_code, level, flag) AS
+		(
+  		SELECT 
+  			T1.id, T1.name, T1.short_name, 
+  			T1.code, T1.parent_code, 
+  			T1.level, T1.flag  
+	  	from sys_region T1
+     	where T1.code='370171401000'
+    	
+    	UNION ALL
+	
+  		SELECT 
+  			T2.id, T2.name, T2.short_name, 
+  			T2.code, T2.parent_code, 
+  			T2.level, T2.flag 
+    	from sys_region T2, recursion T3
+	 		WHERE T2.code=T3.parent_code
+		)
+		SELECT 
+			T.id, T.name, T.short_name,
+      T.code, T.parent_code,
+      T.level, T.flag  
+  	FROM recursion T;
+	4、查询父节点  不含自己
+		WITH RECURSIVE recursion (id, name, short_name, code, parent_code, level, flag) AS
+		(
+  		SELECT 
+  			T1.id, T1.name, T1.short_name,
+        T1.code, T1.parent_code,
+        T1.level, T1.flag  
+	  	from sys_region T1
+	 		where T1.code='370171401000'
+  		
+  		UNION ALL
+	
+  		SELECT 
+  			T2.id, T2.name, T2.short_name, 
+  			T2.code, T2.parent_code,
+        T2.level, T2.flag 
+    	from sys_region T2, recursion T3
+	 		WHERE T2.code=T3.parent_code
+		)
+		SELECT 
+			T.id, T.name, T.short_name,
+      T.code, T.parent_code, 
+      T.level, T.flag  
+  	FROM recursion T
+		where T.code!='370171401000';	
 ```
 
 
