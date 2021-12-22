@@ -4,7 +4,7 @@
 
 # 1、OS——终端常用命令
 
-### 1、mac常用命令
+## 1、mac常用命令
 
 ```bash
 # 查看IP
@@ -13,9 +13,11 @@
  	ssh [账户名]@[服务地址]
 ```
 
-### 2、linux常用命令(https://mp.weixin.qq.com/s/64m8VxQxTNvSLyoO13ccVA)
+## 2、linux常用命令
 
 ```bash
+# 参考链接
+	https://mp.weixin.qq.com/s/64m8VxQxTNvSLyoO13ccVA
 # 数据传输
 -- 上传本地文件到服务器指定目录————scp [本地文件所在路径]/[文件名]  [账户名]@[服务地址]:[服务端指定目录]
 -- 从服务器下载到本地目录————scp [账户名]@[服务地址]:[服务端文件所在路径]/[文件名]  [本地目录]
@@ -780,9 +782,7 @@ sh jmeter
 	3)接下来可以使用【passwd】命令修改root账户密码
 ```
 
-### 4、Docker安装		
-
-​		Docker 是一个**开源**的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的**镜像**中，然后发布到任何流行的 **Linux**或**Windows**操作系统的机器上，也可以实现**虚拟化**。容器是完全使用**沙箱**机制，相互之间不会有任何接口.具体安装步骤如下:
+### 4、Linux中Docker环境搭建		
 
 ```bash
 1、卸载旧的docker
@@ -794,17 +794,32 @@ sh jmeter
   docker-latest-logrotate \
   docker-logrotate \
   docker-engine
-2、安装依赖包
-	sudo yum install -y yum-utils \
-	device-mapper-persistent-data \
-	lvm2
-3、设置docker地址
-	sudo yum-config-manager \
-	--add-repo \
-  https://download.docker.com/linux/centos/docker-ce.repo
-4、安装docker相关[docker引擎社区版、操作docker的客户端、docker容器]
-	sudo yum install docker-ce docker-ce-cli containerd.io
-5、配置镜像加速(https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors)
+2、如果是Linux6,需要升级内核
+	1)yum update
+	2)安装ssl————yum -y install curl nss openssl
+	3)查看当前内核版本————more /etc/issue————uname -a
+	4)导入public key————rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+	5)安装ELRepo到CentOS-6.x中————yum install https://www.elrepo.org/elrepo-release-6.el6.elrepo.noarch.rpm
+	6)安装kernel-lt（lt=long-term）/安装kernel-ml（ml=mainline）
+		#长期有效————yum --enablerepo=elrepo-kernel install kernel-lt -y
+		#主流版本————yum --enablerepo=elrepo-kernel install kernel-ml -y
+	7)编辑grub.conf文件，修改Grub引导顺序
+		————vim /etc/grub.conf
+		————按 i 把 default=1修改为 default=0,按esc 键，输入 ：wq保存退出。
+	8)重启系统，这时候你的内核就成功升级了。
+		#重启————reboot
+		#查看内核版本————uname -r
+3、安装必要的系统工具————yum install -y yum-utils device-mapper-persistent-data lvm2
+4、添加软件源信息(二者选其一)
+	1)阿里云安装镜像————yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	2)本身镜像————yum-config-manager --add-repo   https://download.docker.com/linux/centos/docker-ce.repo
+5、安装docker相关[docker引擎社区版、操作docker的客户端、docker容器]
+	1)制作缓存
+		# 针对Linux6————yum makecache fast
+		# 针对Linux8————yum makecache  
+	2)执行安装
+		sudo yum install docker-ce docker-ce-cli containerd.io	
+6、第四步采用了对应镜像就不用了,配置镜像加速(https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors)
 	1)创建目录
 		sudo mkdir -p /etc/docker
 	2)配置镜像加速器地址
@@ -817,14 +832,13 @@ sh jmeter
 		sudo systemctl daemon-reload
 	4)重启docker服务
 		sudo systemctl restart docker
-6、docker常用命令
-	docker images————查看所有镜像包
-	docker ps————查看正在启动的实例
-	docker start 实例名————启动指定实例
-	docker restart 实例名————重新启动指定实例
-	docker stop 实例名————停止运行指定实例
-	docker logs 实例名————查看指定实例的运行日志
+7、测试是否安装成功————docker -v
+8、删除————https://blog.csdn.net/qq_18948359/article/details/102715729
+	1)切换到 /etc/yum.repos.d 目录下，将所有 docker 相关的 repo全部删掉
+	2)sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
+
+
 
 ### 5、Docker中安装mysql
 
@@ -1141,6 +1155,312 @@ sh jmeter
 6、使用命令【get XX-key名】查看指定key对应的值
 7、重启redis【ps aux | grep redis】-查看redis进程、【kill -9 xxxx】-杀掉指定进程
 ```
+
+### 12、Linux中JDK环境搭建
+
+```markdown
+-- 1、下载jdk————http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+-- 2、创建文件夹————mkdir /usr/local/java
+
+-- 3、解压文件————tar -zxvf jdk-8u181-linux-x64.tar.gz -C /usr/local/java/
+
+-- 4、修改环境变量————vim /etc/profile 添加如下内容：
+	export JAVA_HOME=/usr/lib/java/jdk1.8.0_261
+	export PATH=$JAVA_HOME/bin:$PATH
+	export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+
+-- 5、重启机器或执行命令————source /etc/profile
+
+-- 6、测试是否安装成功————java -version
+```
+
+### 13、Linux中MySQL环境搭建【LNMP】
+
+```markdown
+# 准备工作
+-- 关闭selinux
+	0、查看selinux状态————getenforce
+	1、临时关闭，即时生效，重启失效————setenforce 0
+	2、永久关闭，重启生效，永不失效
+		1)修改Selinux配置文件————vim /etc/selinux/config
+		2)修改此处为disabled————SELINUX=disabled
+
+-- 关闭防火墙
+	1、Linux6
+		1)临时关闭，即时生效，重启失效————service iptables stop
+		2)永久关闭，重启生效，永不失效————chkconfig iptables off
+	2、Linux8
+		1)查看运行状态————systemctl status firewalld
+		2)禁止开机启动————systemctl disable firewalld
+		3)停止运行————systemctl stop firewalld
+
+-- 或不关闭防火墙，只开发部分端口：如80,3306
+	1、开放80端口————/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+	2、保存配置————/etc/rc.d/init.d/iptables save
+	3、重启防火墙服务————/etc/rc.d/init.d/iptables restart
+	4、查看已开放的端口————netstat -anp
+
+-- 问题解决
+	1、yum修复————https://blog.csdn.net/weixin_42104211/article/details/112228242
+		1)问题————当yum运行出错时【Error: Cannot find a valid baseurl for repo: base】
+	  2)解决————执行以下命令一键修复yum
+      sed -i “s|enabled=1|enabled=0|g” /etc/yum/pluginconf.d/fastestmirror.conf
+      mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+      curl -o /etc/yum.repos.d/CentOS-Base.repo https://www.xmpan.com/Centos-6-Vault-Aliyun.repo
+      yum clean all
+      yum makecache
+	2、CentOS 8中执行命令，出现报错：Failed to set locale, defaulting to C.UTF-8
+		1)问题原因1
+			原因————没有安装相应的语言包。
+			解决————安装对应语言包
+				-- 查看目前系统已安装的语言包————locale -a
+				-- 安装中文语言包————yum install glibc-langpack-zh
+				-- 安装英文语言包————dnf install glibc-langpack-en 或 dnf install langpacks-en glibc-all-langpacks -y
+		2)问题原因2
+			原因————没有设置正确的语言环境
+			解决————设置正确的语言环境
+        echo "export LC_ALL=en_US.UTF-8" >> /etc/profile
+        source /etc/profile
+        或
+        locale -gen en_US.UTF-8
+-- 重启虚拟机————reboot
+
+# 安装
+-- 检查是否已安装 mysql————yum list installed | grep mysql
+
+-- 卸载
+	1、移除mysql相关内容————yum -y remove xxxx
+	2、卸载依赖
+		1)rpm -qa | grep -i mysql
+		2)yum remove xxx
+	3、删除文件夹
+		1)find / -name mysql
+		2)rm -rf xxx
+-- 下载mysql的yum源
+	1、安装wget————yum install wget -y
+	2、mysql5.6,针对CenstOS 6————wget http://repo.mysql.com/mysql-community-release-e16-5.noarch.rpm
+	3、mysql8.0.26,针对CenstOS 6————wget --no-check-certificate https://dev.mysql.com/get/mysql80-community-release-el6-3.noarch.rpm
+	4、mysql8.0.21,针对CenstOS 8————wget https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm
+
+-- 安装源
+	rpm -ivh mysql80-community-release-el6-3.noarch.rpm
+	或
+	rpm -ivh mysql80-community-release-el8-1.noarch.rpm
+
+-- 更新源————yum makecache
+
+-- 查看源可安装mysql————yum list | grep mysql
+
+-- yum安装mysql
+	yum install mysql-community-server.x86_64
+	或
+	yum install mysql-server.x86_64
+
+-- 启动mysql服务————service mysqld start
+
+-- 设置开机自启————chkconfig mysqld on
+
+# 配置
+-- 查看初始化后的密码
+	1、进入mysql安装目录————cd /var/lib/mysql
+	2、查看文件————ll
+	3、过滤文件，查看密码————grep 'password' /var/log/mysqld.log
+
+-- 登录mysql————mysql -uroot -p
+
+-- 修改密码
+	1、启用可设置简单密码
+		1)字段含义
+      # validate_password.length————密码长度的最小值(这个值最小要是4)
+      # validate_password.number_count————密码中数字的最小个数。	
+      # validate_password.mixed_case_count————大小写的最小个数。
+      # validate_password.special_char_count————特殊字符的最小个数。
+      # validate_password.dictionary_file ————字典文件
+    2)设定脚本
+      set global validate_password.check_user_name=0;
+      set global validate_password.length=0;
+      set global validate_password.mixed_case_count=0;
+      set global validate_password.number_count=0;
+      set global validate_password.policy=0;
+      set global validate_password.special_char_count=0;
+      show variables like 'validate_password%';
+	2、查看密码验证插件信息————show variables like 'validate_password%';
+	3、安装密码验证插件————INSTALL COMPONENT 'file://component_validate_password';
+	4、密码修改————ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
+
+-- 修改mysql默认编码
+	1、查看mysql默认编码————SHOW VARIABLES LIKE 'character%';
+	2、修改配置文件————vi /etc/my.cnf————添加如下配置
+		[client]
+		default-character-set=utf8
+		
+		[mysqld]
+		character-set-server=utf8
+	3、重启mysql服务————service mysqld restart
+
+-- mysql开启远程连接
+	1、查看已存在的连接————select host, user, authentication_string, plugin from user;
+	2、针对mysql5.6
+		mysql>GRANT ALL PRIVILEGES ON *.* TO `root`@`%` IDENTIFIED BY `` WITH GRANT OPTION;
+		mysql>flush privileges;
+		mysql>select host,user from user;
+	3、针对mysql8
+		mysql>CREATE USER 'root'@'%' IDENTIFIED BY '你的密码'; 
+		mysql>GRANT ALL ON *.* TO 'root'@'%'; 
+		mysql>ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '你的密码';
+		mysql>FLUSH PRIVILEGES;
+
+-- 修改默认端口
+	1、查看当前端口————show global variables like 'port';
+	2、修改配置文件————vi /etc/my.cnf————# 添加/修改，如下配置
+		[client]
+		port=3308
+		
+		[mysqld]
+		port=3308
+	3、 重启服务————service mysqld restart
+
+# Windows安装mysql
+	https://blog.csdn.net/weixin_42109012/article/details/94443391
+```
+
+### 14、Linux中Canal环境搭建
+
+```markdown
+# 前提条件
+-- 搭建好JDK环境————详见1-5-12、Linux中JDK环境搭建
+-- 搭建好Mysql环境————详见1-5-13、Linux中MySQL环境搭建【LNMP】
+
+# 准本工作
+-- 开启mysql服务————service mysqld start
+
+-- 开启binlog写入功能
+	1、canal基于mysql binlog技术。所以需要开启mysql的binlog写入功能
+	2、检查binlog功能是否开启————show variables like 'log_bin'————OFF(未开启)/ON(已开启)
+	3、开启binlog
+		1)修改mysql配置文件my.cnf————vi /etc/my.cnf
+		2)追加内容
+			#binlog文件名
+			log-bin=mysql-bin
+			#选择row模式
+			binlog_format=ROW
+			#mysql实例id,不能和canal的slaveId重复
+			server_id=1
+		3)重启mysql————service mysqld restart
+
+-- mysql中添加以下的相关用户和权限
+	create user `canal`@`%` identified by 'xxx';
+	grant show view,select,replication slave,replication client on *.* to 'canal'@'%';
+	flush privileges;
+
+-- 下载安装Canal服务
+	1、下载地址————https://github.com/alibaba/canal/releases
+	2、将canal压缩文件上传到linux系统中————https://blog.csdn.net/shenjianxz/article/details/56686449
+		linux中安装lrzsz————yum  install lrzsz————接下来就可以将文件拖拽进当前文件夹
+	3、解压缩————tar zxvf 压缩文件名
+	4、修改canal配置文件
+		1)进入配置文件目录————cd /usr/local/canal/conf/example
+		2)打开配置文件————vi instance.properties
+		3)修改配置
+			# 改成自己的数据库信息（当前linux中的数据库地址）
+			canal.instance.master.address=127.0.0.1:3306
+			# 改成自己的数据库用户名和密码（当前linux中的数据库）
+			canal.instance.dbUsername=canalcanal.instance.dbPassword=canal
+			# 改成同步的数据库表规则，例如只是同步一下表
+			## 所有表
+			canal.instance.filter.regex=.*\\..*
+			##指定表
+			canal.instance.filter.regex=指定库.指定表
+		4)配置说明————mysql数据解析关注的表，Perl正则表达式（多个正则之间以【,】分割，转义符需要双斜杠【\\】）
+			-- 常见示例
+				# 所有表————【.*】【.*\\..*】
+				# canal schema下所有表————【canal\\..*】
+				# canal下的以canal打头的表————【canal\\.canal.*】
+				# canal下的具体某张表————【canal.test1】
+				# 多个规则组合使用(逗号分割)————【canal\\..*,mysql.test1,mysql.test2】
+			-- 注意————此过滤条件只针对row模式的数据有效（ps:mixed/statement因为不解析sql,所以无法准确提取tableName进行过滤）
+
+-- 启动Canal
+	1、进入目录————cd /usr/local/canal/bin
+	2、启动————./startup.sh
+	3、查看是否已启动————ps -ef | grep canal
+```
+
+### 15、Linux中Maven环境搭建
+
+```markdown
+-- 上传或下载安装介质
+	下载地址————https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/
+-- 存放安装介质apache-maven-3.6.1-bin.tar.gz到指定目录————cd /usr/local
+-- 解压安装包————tar -zxvf  apache-maven-3.6.1-bin.tar.gz
+-- 建立软连接————ln -s /usr/local/apache-maven-3.6.1/ /usr/local/maven
+-- 修改环境变量
+	1、打开环境变量配置文件
+		vim /etc/profile
+	2、追加如下配置
+		export MAVEM_HOME=/usr/local/maven
+		export PATH=$PATH:$MAVEM_HOME/bin
+	3、应用配置
+		source /etc/profile
+-- 测试是否成功————mvn -v
+```
+
+### 16、Linux中Git环境搭建
+
+```markdown
+-- 执行安装命令————yum -y install git
+-- 测试是否成功————git --version
+```
+
+### 17、Linux中Jenkins搭建
+
+```markdown
+-- 上传或下载安装介质
+	下载地址————http://updates.jenkins-ci.org/download/war/
+-- 存放安装介质jenkins.war到指定目录————cd /usr/local
+-- 启动
+	1、#前缀nohup,代表后台静默启动 启动war包命令>日志输出文件路径 后缀
+		nohup java -jar /usr/local/jenkins/jenkins.war >/usr/local/jenkins/jenkins.out &
+	2、提示[nohup: ignoring input and redirecting stderr to stdout]继续按下回车键
+	3、查看进程
+		ps -ef | grep jenkins
+-- 重装
+	1、只需要删除安装jenkins用户的主目录（~）下的（.jenkins）文件夹，一般在/root/.jenkins
+	2、可以用 ls -a 查看隐藏的文件。然后 rm -rf .jenkins就可以删除了
+-- 访问————http://当前虚拟机ip:8080
+-- 安装配置
+	1、解锁jenkins
+		1)获取管理员密码————默认初始密码文件所在路径————/root/.jenkins/secrets/initialAdminPassword
+		2)复制以上目录,并执行以下命令,获取默认密码————cat /root/.jenkins/secrets/initialAdminPassword
+	2、配置国内镜像
+		1)关闭浏览器,配置镜像
+		2)cd {jenkins工作目录,从解锁密码处可看到}/updates,并执行以下命令
+			sed -i 's/http:\/\/updates.jenkins-ci.org\/download/https:\/\/mirrors.tuna.tsinghua.edu.cn\/jenkins/g' default.json && sed -i 's/http:\/\/www.google.com/https:\/\/www.baidu.com/g' default.json
+	3、重启jenkins,运行管理界面,安装插件
+		1)选择[安装推荐的插件]
+		2)创建管理员用户名和密码
+	4、实例配置,采用默认,可以知道Jenkins URL————http://当前虚拟机ip:8080
+-- 使用配置
+	1、使用[which 软件名]查找
+	2、配置自动化部署所需环境
+		1)依次进入Manage Jenkins>Global Tool Configuration
+		2)配置jdk,如下图所示:
+```
+
+<img src="image/img1_5_18_1.png" style="zoom:50%;" />
+
+```markdown
+		3)配置maven,如下图所示:
+```
+
+<img src="image/img1_5_18_2.png" style="zoom:50%;" />
+
+```markdown
+		4)配置git,如下图所示:
+```
+
+<img src="image/img1_5_18_3.png" style="zoom:50%;" />
 
 
 
