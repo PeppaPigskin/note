@@ -502,31 +502,7 @@ sh jmeter
 		kill -9 xxx 
 ```
 
-### 10、Vscode安装与配置
-
-```markdown
-# 安装
-	mac使用brew方式安装vscode————brew install vscode
-# 相关插件
--- Chinese (Simplified) Language Pack for Visual Studio Code————汉化插件
--- Bracket Pair Colorizer————彩色括号
--- Auto Close Tag————标签自动补全
--- Auto Rename Tag————修改标签名自动同步闭合标签
--- Draw.io Integration————画流程图
--- Git版本控制
-	1、Git Graph————可以查看git提交历史 现在所处分支 提交内容明细 以及回滚删除分支等操作
-	2、Git Lens————可在代码行中查看谁提交的 清晰追溯 目前我只用到这个工具中的这个功能
--- LeetCode————力扣刷算法题的插件
--- Vetur————可以高亮Vue代码 格式化代码等
--- Chinese————简体中文包
--- EsLint————ES语法检查工具
--- HTML CSS Support————Html Css支持
--- JavaScript (ES6) code snippets————JavaScript语法提示
--- Live Server————实时服务器
--- open in browser————在浏览器打开页面插件
-```
-
-### 11、Webpack安装
+### 10、Webpack安装
 
 ```bash
 1、安装
@@ -541,7 +517,7 @@ sh jmeter
 	npm uninstall webpack webpack-cli --save-dev
 ```
 
-### 12、Node环境搭建(npm同时也会安装好)
+### 11、Node环境搭建(npm同时也会安装好)
 
 ```bash
 1、安装nvm
@@ -570,7 +546,7 @@ sh jmeter
 		export PATH=$PATH:$NODE_HOME/bin
 ```
 
-### 13、Apifox安装与配置
+### 12、Apifox安装与配置
 
 ```bash
 1、说明
@@ -579,7 +555,7 @@ sh jmeter
 	https://www.apifox.cn/help/
 ```
 
-### 14、SVN环境搭建
+### 13、SVN环境搭建
 
 ```bash
 1、安装示例
@@ -619,7 +595,7 @@ sh jmeter
 	版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
 ```
 
-### 15、Go语言开发环境搭建
+### 14、Go语言开发环境搭建
 
 ```bash
 1、安装Golang的SDK
@@ -671,7 +647,7 @@ sh jmeter
 	brew install goland
 ```
 
-### 16、Maven环境搭建
+### 15、Maven环境搭建
 
 ```markdown
 # 说明
@@ -1009,13 +985,14 @@ sh jmeter
 
 ### 7、Docker中安装elasticSearch及kibana
 
-```bash
-1、下载镜像文件
+```markdown
+# 下载镜像文件
 	1)存储和检索数据
 		docker pull elasticsearch:7.4.2
 	2)可视化检索数据
 		docker pull kibana:7.4.2
-2、创建elasticSearch实例
+
+# 创建elasticSearch实例
 	1)创建文件夹
 		#用于挂载es的配置文件
 		mkdir -p /mydata/elasticsearch/config
@@ -1048,8 +1025,11 @@ sh jmeter
 		sudo docker update elasticsearch --restart=always
 	6)访问测试
 		http://虚拟机IP:9200/
-	7)
-3、创建kibana实例
+	7)重新设置es容器大小————停止服务移除镜像实例,重新启动
+		停止es服务————sudo docker stop bd4105
+		移除旧的————sudo docker rm bd4105
+
+# 创建kibana实例
 	1)创建并启动kibana实例
 		docker run --name kibana \
 		-e ELASTICSEARCH_HOSTS=http://192.168.56.106:9200 \
@@ -1064,7 +1044,8 @@ sh jmeter
 		sudo docker update kibana --restart=always
 	3)访问路径
 		http://虚拟机IP:5601/
-4、安装ik分词器(需要和es版本同步)
+
+# 安装ik分词器(需要和es版本同步)
 	1)github地址
 		https://github.com/medcl/elasticsearch-analysis-ik
 	2)下载指定版本ik分词器,复制要下载的版本链接地址,使用wget命令进行下载
@@ -1088,7 +1069,8 @@ sh jmeter
       "analyzer":"ik_smart",
       "text":"北京人在紫禁城吃着炸酱面,喝着北冰洋"
     }
-5、自定义扩展词库——修改ik分词器的配置
+
+# 自定义扩展词库——修改ik分词器的配置
 	1)进入ik配置目录
 		cd /mydata/elasticsearch/plugins/ik/config
 	2)修改配置文件IKAnalyzer.cfg.xml
@@ -1534,7 +1516,5 @@ sh jmeter
 ```
 
 <img src="image/img1_5_18_3.png" style="zoom:50%;" />
-
-
 
 ​		
