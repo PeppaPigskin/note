@@ -1051,6 +1051,10 @@ PageHelper类似
 
 -- Consul、etcd&etc(微服务的模块)
 
+# 动静分离
+-- 静————图片,JS,CSS等静态资源(以实际文件存在的方式)
+
+-- 动————服务器需要处理的请求
 ```
 
 
@@ -3183,28 +3187,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- git合并相关的辅助命令,如下表:
 ```
 
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-
 | 命令                | 简要说明                                                     |
 | ------------------- | ------------------------------------------------------------ |
 | git merge-base      | 供其他脚本调用，找到两个或多个提交最近的共同祖先             |
@@ -3629,6 +3611,839 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # jackson
 	@RestController注解，返回json数据。其底层使用的就是这种方式
+```
+
+## 21、ElasticSearch全文检索引擎
+
+```markdown
+# 说明————底层是开源库Lucene,是Lucene的封装,提供了REST API(天然跨平台)的操作接口.开箱即用
+-- 官方文档————https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+-- 中文官方文档————https://www.elastic.co/guide/cn/elasticsearch/guide/current/foreword_id.html
+-- 社区中文文档————https://doc.codingdict.com/elasticsearch/0/
+
+# 基本概念
+-- 概念
+	1、Index(索引)————相当于Mysql的Insert/相当于Mysql的Database
+	2、Type(类型)————在索引(Index)中可以定义一个或多个类型,类似于Mysql中的Table,每种类型的数据放在一起
+	3、Document(文档)————类似于Mysql中某个表中的内容,保存在某个索引(Index)下,某种类型(Type)的一个数据(Document),文档是Json格式
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_21_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 倒排索引机制
+-- 概念
+	1、分词————将整句拆分为单词,并维护那些单词在那些记录中存在
+	2、检索————将检索的内容拆分成单词,在单词维护表中得到包含检索内容单词的记录
+	3、相关性得分————通过单词维护表,选择命中率最高的记录
+--图示,如下图所示:
+```
+
+<img src="image/img2_1_21_1_2.png" style="zoom:50%;" />
+
+```markdown
+#	安装
+-- 详见1-5-7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
+
+# 初步检索
+-- 查看相关信息
+	1、GET /_cat/nodes————查看所有节点
+	2、GET /_cat/health————查看ES健康状况
+	3、GET /_cat/master————查看主节点
+	4、GET /_cat/indices————查看所有索引
+
+-- 索引一个文档————保存在那个索引的那个类型下,指定那个唯一标识
+	1、PUT————PUT保存(必须携带ID)
+		1)新增————带ID,之前没数据
+		2)修改————带ID,之前有数据
+		3)示例
+			[put]
+			http://192.168.xx.xxx:9200/customer/external/1[body-raw-json]{  
+      	"name":"zhangsan"
+      }
+    4)结果说明
+    	#返回结果说明,带[_]称为元数据
+    	{
+    		#该条数据在那个索引下   
+        "_index": "customer",
+        #在那个类型下   
+        "_type": "external",
+        #唯一标识   
+        "_id": "1",
+        #数据版本   
+        "_version": 1,
+        #最终结果   
+        "result": "created",
+        #分片   
+        "_shards": {   
+        	"total": 2,   
+          "successful": 1,   
+          "failed": 0  
+        },   
+        "_seq_no": 0,  
+        "_primary_term": 1
+      }
+	2、POST————POST保存(可以不携带ID)
+		1)新增————不带ID(会自定生成唯一ID)/带ID但之前没数据
+		2)修改————带ID,并且之前有数据
+
+-- 查询文档
+	1、GET
+		1)示例————[get]http://192.168.xx.xxx:9200/customer/external/1
+		2)结果说明
+			{   
+      	"_index": "customer",   
+        "_type": "external",  
+        "_id": "1",   
+        "_version": 1,
+        #乐观锁操作(并发控制字段,每次更新就会+1)  
+        "_seq_no": 0,
+        #乐观锁操作(主分片重新分配,例如重启)   
+        "_primary_term": 1,
+        #代表找到了
+        "found": true,
+        #查找到的结果   
+        "_source": {    
+        	"name": "zhangsan" 
+        }
+      }
+		3)更新携带模拟————同时修改当其中一个修改成功后,seq_no会发生变化,另外一个修改会被报409异常
+			-- 第一遍请求————[post]http://192.168.56.101:9200/customer/external/1?if_seq_no=2&if_primary_term=1
+			-- 第二遍请求————[post]http://192.168.56.101:9200/customer/external/1?if_seq_no=2&if_primary_term=1
+			-- 结果————第二遍请求会报409异常
+
+-- 更新文档
+	1、POST
+		1)带_update————会对更新的数据做对比,相同不进行任何操作,同时要添加doc,示例如下:
+			[post]
+			http://192.168.xx.xxx:9200/customer/external/1/_update
+			[body-raw-json]
+			{ 
+      	"doc":{  
+        	"name":"zhangsan" 
+        }
+      }
+		2)不带_update————不会对更新数据进行对比,示例如下:
+			[post]
+			http://192.168.xx.xxx:9200/customer/external/1
+			[body-raw-json]
+			{   
+      	"name":"zhangsan"
+      }
+	2、PUT————和POST更新不带_update效果相同,示例如下:
+    [put]
+    http://192.168.xx.xxx:9200/customer/external/1
+    [body-raw-json]
+    { 
+    	"name":"zhangsan"
+    }
+
+-- 删除文档&索引
+	1、DELETE
+		1)删除文档————[delete]http://192.168.56.101:9200/customer/external/1
+		2)删除索引————[delete]http://192.168.56.101:9200/customer
+
+-- bulk批量导入API
+	1、语法格式
+		{action:{metadata}}
+		{request body}
+		
+		{action:{metadata}}
+		{request body}
+	2、示例1
+		-- 简单示例
+      POST /customer/external/_bulk
+      {"index":{"_id":"1"}}
+      {"name":"zhangsan"}
+      {"index":{"_id":"2"}}
+      {"name":"lisi"}
+    -- 结果说明
+    	#! Deprecation: [types removal] Specifying types in bulk requests is deprecated.
+    	{  
+    		"took" : 139,#花费毫秒数  
+    		"errors" : false,#是否有异常 
+        "items" : [#每一项的结果    
+        {   
+        	"index" : {   
+          	"_index" : "customer",   
+            "_type" : "external",    
+            "_id" : "1",     
+            "_version" : 1,  
+            "result" : "created", 
+            "_shards" : {    
+            	"total" : 2,      
+              "successful" : 1,   
+              "failed" : 0     
+            },     
+            "_seq_no" : 0,  
+            "_primary_term" : 1, 
+            "status" : 201     
+          }   
+        },  
+        {    
+        	"index" : {    
+          	"_index" : "customer",  
+            "_type" : "external",   
+            "_id" : "2",       
+            "_version" : 1,    
+            "result" : "created", 
+            "_shards" : {      
+              "total" : 2,     
+              "successful" : 1,   
+              "failed" : 0       
+            },   
+            "_seq_no" : 1,   
+            "_primary_term" : 1,
+            "status" : 201 
+          }    
+        }]
+      }
+	3、示例2
+		-- 复杂示例
+			POST /_bulk
+			#删除操作
+			{"delete":{"_index":"website","_type":"blog","_id":"123"}}
+			#创建操作
+			{"create":{"_index":"website","_type":"blog","_id":"123"}}
+			#创建操作的内容
+			{"title":"My first blog post"}
+			#保存记录
+			{"index":{"_index":"website","_type":"blog"}}
+			#保存的内容
+			{"title":"My seacond blog post"}
+			#更新操作(更新失败,重试三次)
+			{"update":{"_index":"website","_type":"blog","_id":"123"}}
+			#更新内容
+			{"doc":{"title":"My updated blog post"}}
+		-- 结果说明
+			#! Deprecation: [types removal] Specifying types in bulk requests is deprecated.
+			{  
+				"took" : 165,  
+				"errors" : false,  
+				"items" : [ 
+        	{    
+          	"delete" : {   
+            	"_index" : "website",   
+            	"_type" : "blog",   
+              "_id" : "123",   
+              "_version" : 1,  
+              "result" : "not_found",   
+              "_shards" : {      
+              	"total" : 2,   
+                "successful" : 1,      
+                "failed" : 0    
+              },      
+              "_seq_no" : 0,   
+              "_primary_term" : 1,  
+              "status" : 404     
+            }    
+          },  
+          {   
+          		"create" : {    
+              	"_index" : "website",  
+              	"_type" : "blog",   
+                "_id" : "123",    
+                "_version" : 2,      
+                "result" : "created", 
+                "_shards" : {     
+                	"total" : 2,    
+                  "successful" : 1,    
+                  "failed" : 0      
+                },       
+                "_seq_no" : 1,   
+                "_primary_term" : 1,  
+                "status" : 201   
+              }  
+            },   
+            {   
+            		"index" : {  
+                "_index" : "website",   
+                "_type" : "blog",   
+                "_id" : "NMt38nsBG_KdaabAasAK",  
+                "_version" : 1,      
+                "result" : "created", 
+                "_shards" : {          
+                	"total" : 2,       
+                  "successful" : 1,      
+                  "failed" : 0    
+                },        
+                "_seq_no" : 2,   
+                "_primary_term" : 1,     
+                "status" : 201   
+              }   
+            },  
+            {    
+            	"update" : {  
+              	"_index" : "website",  
+                "_type" : "blog",    
+                "_id" : "123",     
+                "_version" : 3,      
+                "result" : "updated",   
+                "_shards" : {       
+                	"total" : 2,  
+                  "successful" : 1,     
+                  "failed" : 0     
+                },      
+                "_seq_no" : 3,  
+                "_primary_term" : 1,  
+                "status" : 200    
+              }   
+            }]
+          }
+-- 样本测试数据
+	1、数据地址————https://github.com/elastic/elasticsearch/blob/v7.4.2/docs/src/test/resources/accounts.json
+	2、查询数据————POST /bank/account/_bulk
+
+# 进阶检索
+-- SearchAPI(支持两种基本方式检索)
+	1、方式一————通过REST request URL发送搜索参数(url+搜索参数)
+		#测试查询(q=*:查询所有)
+		GET /bank/_search?q=*&sort=account_number:asc
+	2、方式二————通过REST request body发送请求体(url+请求体)
+		GET /bank/_search
+		{ 
+   	 	#查询条件  
+   	 	"query": {   
+      	"match_all": {}  
+     	},  
+     	#排序规则 
+      "sort": [    
+      	{      "account_number": "asc"    } 
+      ]
+    }
+-- Query DSL(查询领域对象语言)
+	1、基本语法格式
+  	1)典型结构
+  		{ 
+      	#要做什么  
+      	QUERY_NAME:{  
+        	#操作详细信息  
+          ARGUMENT:VALUE,  
+          ARGUMENT:VALUE, 
+          ... 
+        }
+      }
+    2)针对某个字段
+    	{  
+    		QUERY_NAME:{
+        	FIELD_NAME:{   
+          	ARGUMENT:VALUE, 
+          	ARGUMENT:VALUE,
+          	...   
+          } 
+        }
+      }
+    2、返回部分字段
+    	#返回部分字段
+    	GET /bank/_search
+    	{ 
+      	"query": { 
+        	"match_all": {} 
+        }, 
+        "sort": [ 
+        	{    
+            "balance": { 
+              "order": "desc"  
+            }  
+          } 
+        ], 
+        "from": 0, 
+        "size": 5, 
+        #指定返回的字段  
+        "_source": [    "balance",    "account_number"  ]
+      }
+    3、match匹配查询————数字类型精确查找,字符串类型模糊查询(分词+全文检索)
+    	GET /bank/_search{ 
+      	"query": {  
+        	"match": {      "address": "mill lane"    } 
+        }
+      }
+    4、match_phrase短语匹配————将需要的值当作一个整体进行检索,不进行分词
+    	GET /bank/_search{ 
+      	"query": {  
+      		"match_phrase": {      "address": "mill Road",    }  
+      	}
+     	}
+    5、Field.keyword精确匹配
+    	GET /bank/_search
+    	{
+      	"query": {   
+        	"match_phrase": {      "address.keyword": "mill Road"    }  
+        }
+      }
+    6、multi_match多字段匹配————获取多个字段中,任意一个字段包含了检索条件的(会分词)
+    	GET /bank/_search
+    	{ 
+      	"query": {  
+        	"multi_match": {    
+          	"query": "mill",    
+            "fields": ["state","address"]  
+          } 
+        }
+      }
+		7、bool复合查询————bool复合查询(must:必须满足,must_not:必须不满足,should:应该满足)
+			GET /bank/_search
+			{  
+				"query": 
+				{   
+        	"bool": {  
+          	"must": [       
+            	{
+            		"match": {       
+                	"gender": "M"       
+                }
+              },
+              {
+              	"match": {    
+                	"address": "mill"     
+                }
+              }   
+            ],    
+            "must_not": [    
+            	{
+            		"match": {   
+                	"age": "38"      
+                }
+              }   
+            ],   
+            "should": [   
+            	{
+            		"match": {   
+              		"lastname": "Wallace"    
+                }
+              }  
+            ]  
+          }  
+        }
+      }
+    8、filter结果过滤————filter过滤查询,不会计算相关性得分
+    	GET /bank/_search
+    	{  
+    		"query": {    
+    			"bool": {     
+          	"filter": {   
+            	"range": {  
+              	"age": {   
+                	"gte": 10,   
+                  "lte": 20   
+                }       
+              }    
+            }    
+          }  
+        }
+      }
+    9、term————term建议针对非文本使用,文本类型建议使用match
+    	GET /bank/_search
+    	{ 
+      	"query": 
+      	{   
+        	"term": {  
+          	"age": "28"  
+          } 
+        }
+      }
+-- aggregations(执行聚合)
+	1、搜索address中包含mill的所有人的平局年龄分布以及平均年龄
+		GET /bank/_search
+		{ 
+      "query": {  
+        "match": {   
+        	"address": "mill"  
+        } 
+      }, 
+      "aggs": {  
+        "age_agg": {   
+        	"terms": {       
+        		"field": "age",   
+        		"size": 10     
+        	}   
+        },   
+        "age_avg":{  
+        	"avg": {    
+        		"field": "age"   
+        	}   
+        },   
+        "balance_avg":{   
+        	"avg": {   
+        		"field": "balance"   
+        	}  
+        } 
+      }
+    }
+	2、按照年龄聚合,并且按照年龄获取平均薪资(使用size:0,可以只看聚合结果)
+		GET /bank/_search
+		{  
+			"query": {   
+      	"match_all": {}  
+      }, 
+      "aggs": {  
+        "age_agg": {  
+          "terms": {    
+            "field": "age",  
+            "size": 100    
+          },    
+          "aggs": {    
+            "age_avg": {      
+              "avg": {     
+              	"field": "balance"  
+              }       
+            }   
+          }  
+        }  
+      },
+      "size": 0
+      }
+	3、获取所有年龄分布,并且这些年龄中M的平均薪资和F的平均薪资,以及这个年龄的总体平均薪资,以及总薪资
+		GET /bank/_search
+		{  
+      "query": {    
+      	"match_all": {}  
+      },  
+      "aggs": {   
+      	"age_agg": {   
+      		"terms": {      
+      			"field": "age",   
+      			"size": 100  
+      		},    
+      		"aggs": {      
+      			"gender_agg": {     
+      				"terms": {     
+      					"field": "gender.keyword",   
+      					"size": 2      
+      				},       
+      				"aggs": {     
+      					"blance_avg": {      
+      						"avg": {          
+      							"field": "balance"    
+      						}        
+      					}         
+      				}    
+      			},      
+            "all_blance_avg":{   
+            	"avg": {       
+      					"field": "balance"   
+      				}      
+      			},      
+      			"all_blance_sum":{  
+      				"sum": {       
+      					"field": "balance"    
+      				}     
+      			}    
+      		}  
+      	}  
+      }, 
+      "size": 0
+    }
+
+-- Mapping(映射)
+	1、字段类型
+		1)说明
+			-- 从ES8开始为了提高ES效率,不再支持定义类型.
+		2)地址————https://www.elastic.co/guide/en/elasticsearch/reference/6.0/mapping-types.html
+		3)详细,如下图所示:
+```
+
+<img src="image/img2_1_21_1_3.png" style="zoom:50%;" />
+
+<img src="image/img2_1_21_1_4.png" style="zoom:50%;" />
+
+```markdown
+	2、映射————用来定义一个文档,以及它包含的属性是如何存储和索引的
+		1)比如使用mapping来定义
+			-- 那些字符串属性应该被看作全文属性(full text fields)
+			-- 那些属性包含数字,日期或地理位置
+			-- 文档中所有的属性是否能都被索引(_all配置)
+			-- 日期的格式
+			-- 自定义映射规则,来执行动态添加属性
+		2)查看mapping信息————GET /bank/_mapping
+		3)创建mapping信息
+			PUT /my_index
+			{  
+				"mappings": {   
+        	"properties": {   
+          	"age": {    
+            	"type": "integer"  
+            },  
+            "email":{   
+            	"type": "keyword" 
+            },   
+            "name":{   
+            	"type": "text"   
+            }  
+          }
+        }
+      }
+		4)修改mapping信息,如下图所示:
+```
+
+<img src="image/img2_1_21_1_5.png" style="zoom:50%;" />
+
+```markdown
+-- 新版本改变
+	1、创建索引并映射
+		PUT /my_index
+		{ 
+    	"mappings": {  
+      	"properties": {   
+          "age": {     
+          	"type": "integer"  
+          },     
+          "email":{  
+          	"type": "keyword"   
+          },    
+          "name":{   
+          	"type": "text"   
+          }   
+        } 
+      }
+    }
+
+	2、添加新的字段映射
+		PUT /my_index/_mapping
+		{  
+			"properties": {    
+				"employee_id": {   
+        	"type": "keyword",   
+          #不需要被索引    
+          "index": false  
+        } 
+      }
+    }
+
+	3、更新字段映射————需要创建新的索引,然后进行数据迁移
+		#创建新索引
+		PUT /new——bank
+		{ 
+    	"mappings": {  
+      	"properties": {    
+        	"account_number": {   
+          	"type": "long"  
+          },     
+          "address": {   
+          	"type": "text",    
+            "fields": {  
+            	"keyword": {     
+              	"type": "keyword",    
+                "ignore_above": 256  
+              }      
+            }   
+          },   
+          "age": {    
+          	"type": "integer"   
+          },    
+          "balance": {   
+          	"type": "long"   
+          },    
+          "city": {   
+          	"type": "keyword"    
+          },    
+          "email": {  
+          	"type": "keyword"  
+          },     
+          "employer": { 
+          	"type": "keyword"   
+          },     
+          "firstname": {  
+          	"type": "text"   
+          },    
+          "gender": {  
+          	"type": "keyword"  
+          },     
+          "lastname": {
+            "type": "text",   
+            "fields": {     
+              "keyword": {     
+                "type": "keyword",     
+                "ignore_above": 256     
+              }     
+            }    
+          },  
+          "state": {  
+          	"type": "keyword"  
+          }   
+        } 
+      }
+    }
+
+	4、数据迁移
+		1)不用类型迁移
+			POST _reindex
+			{
+      	#迁移源
+        "source": {    "index": ""  },
+        #迁移目标 
+        "dest": {    "index": ""  }
+      }
+		2)使用了类型时迁移
+			POST _reindex
+			{  
+				#迁移源  
+				"source": {    
+					#老索引   
+          "index": "",   
+          #老类型  
+          "type": ""  
+        }, 
+        #迁移目标 
+        "dest": { 
+        	#新索引  
+          "index": "" 
+        }
+      }
+
+# 分词
+	-- 详见1-5-7、Docker中安装elasticSearch及kibana中的分词器部分
+
+# 代码整合————ElasticSearch-Rest-Client
+-- 说明
+
+-- SpringBoot整合
+	1、创建ElasticSearch检索服务模块————search
+	2、引入依赖
+		<!--elasticsearch依赖-->    
+    <dependency>         
+      <groupId>org.elasticsearch.client</groupId>  
+      <artifactId>elasticsearch-rest-high-level-client</artifactId> 
+      <version>7.4.2</version>      
+    </dependency>
+    <!--        导入公共依赖模块-->      
+    <dependency>         
+      <groupId>com.pigskin.mall</groupId>   
+      <artifactId>mall-common</artifactId>  
+      <version>0.0.1-SNAPSHOT</version>      
+    </dependency>
+	3、修改基带版本
+		<properties>   
+    	<java.version>1.8</java.version>   
+      <elasticsearch.version>7.4.2</elasticsearch.version>   
+    </properties>
+	4、添加配置类,给容器中注入一个RestHighLevelClient
+		package com.pigskin.search.config;
+		
+		import org.apache.http.HttpHost;
+		import org.elasticsearch.client.RestClient;
+		import org.elasticsearch.client.RestHighLevelClient;
+		import org.springframework.context.annotation.Bean;
+		import org.springframework.context.annotation.Configuration;
+		
+		/** 
+		* ElasticSearch配置类
+    */
+    @Configuration
+    public class MallElasticSearchConfig {   
+    	@Bean   
+      public RestHighLevelClient restClient() {
+      	RestHighLevelClient client = new RestHighLevelClient(  
+        	/*多个es创建多个HttpHost*/         
+          RestClient.builder(             
+            /*主机地址，端口号，协议名*/  
+            new HttpHost("192.168.56.101", 9200, "http")
+          )
+        );   
+        return client;  
+      }
+    }
+	5、使用Spring测试类测试
+		1)添加注解————@RunWith(SpringRunner.class)
+		2)注入对象
+			@Autowired
+			private RestHighLevelClient restHighLevelClient;
+		3)测试实例是否可以创建成功
+			@Test    
+			public void contextLoads() {    
+      	System.out.println(restHighLevelClient);  
+      }
+
+-- 配置
+	1、配置类中添加通用配置————
+		/**    
+    * 创建通用设置项   
+    */   
+    public static final RequestOptions COMMON_OPTIONS;  
+    static {      
+    	RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+    	//        builder.addHeader("Authorization", "Bearer " + TOKEN);
+    	//        builder.setHttpAsyncResponseConsumerFactory(
+    	//                new HttpAsyncResponseConsumerFactory
+    	//                        .HeapBufferedResponseConsumerFactory(30 * 1024 * 1024 * 1024));  
+      COMMON_OPTIONS = builder.build();  
+    }
+
+-- 使用
+	1、测试存储数据到ES
+		/**   
+    * 测试存储数据到es(更新也可以)   
+    */   
+    @Test   
+    public void indexData() throws IOException {     
+    	/*设置索引参数*/       
+      IndexRequest request = new IndexRequest("users");      
+      /*设置ID*/    
+      request.id("1");   
+      /*设置数据-方式一*/
+      //  request.source("userName", "张三", "age", 18, "gender", "男");      
+      /*设置数据-方式二(常用)*/    
+      User user = new User();   
+      user.setUserName("张三");     
+      user.setAge(18);       
+      user.setGender("男");     
+      request.source(JSON.toJSONString(user), XContentType.JSON);    
+      /*执行操作同步保存*/       
+      IndexResponse response = client.index(request, MallElasticSearchConfig.COMMON_OPTIONS);  
+      /*提取响应数据*/       
+      System.out.println(response);  
+    }
+	2、测试复杂检索
+		/**    
+    * 测试复杂检索   
+    *   
+    * @throws IOException   
+    */  
+    @Test   
+    public void searchData() throws IOException {    
+    	/*1、创建检索请求*/     
+      SearchRequest request = new SearchRequest();     
+      /*2、指定检索的索引（可以指定多个索引一起检索）*/   
+      request.indices("bank");     
+      /*3、指定DSL(检索条件)*/     
+      SearchSourceBuilder builder = new SearchSourceBuilder();    
+      /*1）构造检索条件*/     
+      builder.query(QueryBuilders.matchQuery("address", "mill"));   
+      System.out.println(builder.toString());      
+      /*2）构造聚合条件*/    
+      /*3.2.1、按照年龄的值分布聚合*/    
+      builder.aggregation(AggregationBuilders.terms("ageAgg").field("age").size(10));    
+      /*3.2.2、计算平均薪资*/    
+      builder.aggregation(AggregationBuilders.avg("balanceAvg").field("balance"));  
+      System.out.println(builder.toString());    
+      request.source(builder);    
+      /*4、执同步检索请求*/      
+      SearchResponse response = client.search(request, RequestOptions.DEFAULT);   
+      /*5、获取检索结果并分析结果*/ 
+      System.out.println(response.toString());     
+      /*1）获取命中记录*/   
+      SearchHits hits = response.getHits();   
+      SearchHit[] searchHits = hits.getHits(); 
+      for (SearchHit searchHit : searchHits) {        
+        String string = searchHit.getSourceAsString();   
+        Account account = JSON.parseObject(string, Account.class);   
+        System.out.println("account" + account);    
+      }      
+      /*2）获取聚合分析信息*/     
+      Aggregations aggregations = response.getAggregations();     
+      /*5.2.1、获取指定名称的聚合数据*/    
+      Terms ageAgg = aggregations.get("ageAgg");    
+      for (Terms.Bucket bucket : ageAgg.getBuckets()) {  
+        String key = bucket.getKeyAsString();      
+        System.out.println("年龄：" + key + ".人数：" + bucket.getDocCount());     
+      }     
+      Avg balanceAvg = aggregations.get("balanceAvg");  
+      System.out.println("平均薪资：" + balanceAvg.getValue());  
+    }
+	3、数组扁平化
+
+# 注意说明————如果是嵌入式属性(nested),查询,聚合,分析都应该使用嵌入式
 ```
 
 
@@ -5117,6 +5932,337 @@ error => {   
 
 
 # 三、开发经验
+
+## 0、开发规范
+
+### 1、数据校验JSR303
+
+```markdown
+# JSR303数据校验标准
+		1、作用————对后台数据进行校验
+		2、使用步骤
+			1)给bean添加校验注解(java.validation.constraints包中)————可以通过message属性设置自定义提示内容
+				@NotNull————不为空
+				@NotBlank————不为空,且至少包含一个非空格字符
+				@URL————必须是一个地址
+				@Pattern(regexp = "/^[a-zA-Z]$/", message = "检索首字母必须是一个a-z或A-Z的字母")————自定义正则验证
+			2)给控制器参数添加校验注解@Valid
+				@RequestMapping("/save")  
+        //@RequiresPermissions("product:brand:save")  
+        public R save(@Valid @RequestBody BrandEntity brand, BindingResult result) {    
+        	if (result.hasErrors()) {         
+          	Map<String, String> map = new HashMap<>();    
+            //获取校验的错误结果         
+            result.getFieldErrors().forEach(item -> {   
+            	//获取到错误提示             
+              String message = item.getDefaultMessage();             
+              //获取错误属性名              
+              String field = item.getField();    
+              map.put(field, message);         
+            });    
+            return R.error(400, "提交的数据不合法").put("data", map);   
+          } else {   
+          	brandService.save(brand);     
+            return R.ok();     
+          }    
+        }
+      3)结果说明
+      	-- 校验不成功会返回400异常
+      	-- 校验的Bean后,紧跟一个BindingResult,就可以获取到校验的结果
+
+# 分组校验(新增和修改的校验规则不同)
+		1、创建校验类型接口
+		2、给注解标注何时进行校验
+			@NotBlank(message = "品牌名必须设置", groups = {AddGroup.class, UpdateGroup.class})
+		3、在控制器中采用可设置校验分组的注解
+			public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand) {
+				...
+			}
+		4、默认没有指定的分组的校验注解在指定校验分组@Validated(UpdateGroup.class)的情况下不生效,只会在未指定分组@Validated的情况下生效
+
+# 自定义校验
+		1、引入依赖
+			<!--        自定义校验器相关依赖-->    
+      <dependency>          
+        <groupId>javax.validation</groupId>     
+        <artifactId>validation-api</artifactId>    
+        <version>2.0.1.Final</version>     
+      </dependency>
+    2、编写自定义校验注解
+    	package com.pigskin.common.valid;
+    	
+    	import jdk.nashorn.internal.objects.annotations.Constructor;
+    	import javax.validation.Constraint;
+    	import javax.validation.Payload;
+    	import java.lang.annotation.*;
+    	import static java.lang.annotation.RetentionPolicy.RUNTIME;
+    	
+    	/** 
+    	* 自定义注解 
+    	*/
+    	@Documented
+    	//关联自定义校验器和自定义校验注解
+    	@Constraint(validatedBy = {ListValueConstraintValidator.class})
+    	//设置注解可应用的场景（方法、属性）
+    	@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
+    	//校验注解的获取时机(运行时获取)
+    	@Retention(RUNTIME)
+    	public @interface ListValue {  
+      	/**   
+        * 设置校验出错时，去何处取错误信息   
+        *   
+        * @return  
+        */   
+        String message() default "{com.pigskin.common.valid.ListValue.message}";    
+        
+        /**  
+        * 设置其支持分组校验   
+        *   
+        * @return   
+        */  
+        Class<?>[] groups() default {}; 
+        
+        /**   
+        * 设置自定义注解可以自定义负载信息     
+        *    
+        * @return  
+        */   
+        Class<? extends Payload>[] payload() default {}; 
+        
+        /**    
+        * 设定的值范围  
+        *  
+        * @return   
+        */   
+        int[] vals() default {};
+      }
+    3、编写自定义的校验器
+    	package com.pigskin.common.valid;
+    	
+    	import javax.validation.ConstraintValidator;
+    	import javax.validation.ConstraintValidatorContext;
+    	import java.util.HashSet;import java.util.Set;
+    	
+    	/** 
+    	* 自定义校验器，继承自ConstraintValidator<被校验的注解类，校验值类型> 
+    	*/
+    	public class ListValueConstraintValidator implements ConstraintValidator<ListValue, Integer> {  
+      	/**    
+     	 	* 存放用于校验的值   
+       	*/   
+        private Set<Integer> set = new HashSet<>(); 
+        
+        /**  
+        * 初始化方法     
+        *    
+        * @param constraintAnnotation  
+        */   
+        @Override    
+        public void initialize(ListValue constraintAnnotation) {   
+        	int[] values = constraintAnnotation.vals();    
+          if (values != null) {         
+          	for (int val : values) {          
+            	set.add(val);     
+            }       
+          }  
+        } 
+        
+        /** 
+        * 判断是否校验成功  
+        *     
+        * @param integer                    被标注属性当前值 
+        * @param constraintValidatorContext    
+        * @return   
+        */   
+        @Override  
+        public boolean isValid(Integer integer, ConstraintValidatorContext constraintValidatorContext) {     
+       		//校验被标注数据是否被包含在设置的集合中    
+          return set.contains(integer); 
+        }
+      }
+    4、关联自定义校验器和自定义校验注解,可以设置多个不同校验器
+    	//关联自定义校验器和自定义校验注解@
+    	Constraint(validatedBy = {ListValueConstraintValidator.class})
+    5、添加提示消息属性文件[ValidationMessages.properties],并设置属性
+    	com.pigskin.common.valid.ListValue.message=The specified value must be used
+   	6、使用自定义注解
+   		/**   
+      * 显示状态[0-不显示；1-显示]     
+      */    
+      //自定义校验注解使用   
+      @ListValue(vals = {0, 1}, groups = {AddGroup.class})   
+      private Integer showStatus;
+```
+
+### 2、统一异常处理@ControllerAdvice
+
+```markdown
+		package com.pigskin.mall.product.exception;
+		
+		import com.pigskin.common.utils.R;
+		import lombok.extern.slf4j.Slf4j;
+		import org.springframework.validation.BindingResult;
+		import org.springframework.web.bind.MethodArgumentNotValidException;
+		import org.springframework.web.bind.annotation.ExceptionHandler;
+		import org.springframework.web.bind.annotation.RestControllerAdvice;
+		import java.util.HashMap;
+		import java.util.Map;
+		
+		/**
+    * 集中处理所有异常 
+    */
+    @Slf4j
+    //@ResponseBody
+    //@ControllerAdvice(basePackages = "com.pigskin.mall.product.controller")
+    @RestControllerAdvice(basePackages = "com.pigskin.mall.product.controller")
+    public class MallExceptionControllerAdvice {    
+    	/**   
+      * 统一处理数据校验异常  
+      *   
+      * @param e 数据校验异常信息 
+      * @return 统一返回异常处理结果   
+      */    
+      @ExceptionHandler(value = MethodArgumentNotValidException.class) 
+      public R handleValidException(MethodArgumentNotValidException e) {  
+      	log.error("数据校验出现问题：{}.异常类型：{}", e.getMessage(), e.getClass());  
+        BindingResult bindingResult = e.getBindingResult(); 
+        Map<String, String> errorMap = new HashMap<>();  
+        bindingResult.getFieldErrors().forEach((fieldError) -> {  
+        	errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());   
+        });       
+        return R.error(400, "数据校验出现问题").put("data", errorMap);   
+      }
+    }
+```
+
+### 3、全局异常处理
+
+```markdown
+	详见————2-3-5、统一异常处理
+```
+
+### 4、全局统一返回
+
+```markdown
+	详见————2-3-4、统一返回结果处理
+```
+
+### 5、全局跨域处理
+
+```markdown
+# HTTP访问控制（CORS）解决跨域请求
+	1、方式一————使用Nginx部署为同一域
+		1)中心思想
+			-- 将前后端项目同时部署到nginx服务器,前后端统一访问nginx服务
+			-- 浏览器发送静态请求,直接转给前端项目
+			-- 浏览器发送动态请求,nginx将请求转给后台网关,网关再转给真实的服务器
+	
+	2、方式二————配置当次请求允许跨域
+		1)实现方式————添加响应头,可配置内容如图所示:
+```
+
+<img src="image/img2_3_5_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 微服务跨域解决方案
+	1、方式一————在网关中统一配置跨域
+		package com.pigskin.mall.mallgateway.config;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.cors.CorsConfiguration;
+    import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+    import org.springframework.web.cors.reactive.CorsWebFilter;
+
+    @Configuration
+    public class MallCorsConfiguraion {
+        @Bean
+        public CorsWebFilter corsWebFilter(){
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+            CorsConfiguration corsConfiguraion = new CorsConfiguration();
+
+            //1.配置跨域
+            corsConfiguraion.addAllowedHeader("*");
+            corsConfiguraion.addAllowedMethod("*");//允许的请求方式
+            corsConfiguraion.addAllowedOrigin("*");//允许的请求来源
+            corsConfiguraion.setAllowCredentials(true);//是否允许携带cook'ie
+
+            source.registerCorsConfiguration("/**",corsConfiguraion);//任意路径都要跨域
+            return new CorsWebFilter(source);
+        }
+    }
+```
+
+### 6、枚举响应状态
+
+```markdown
+-- 说明————针对系统中可能出现的响应状态码,进行统一枚举类创建整理
+```
+
+### 7、枚举业务状态码
+
+```markdown
+-- 说明————针对系统中可能出现的业务状态码,进行统一枚举类创建整理
+```
+
+### 8、领域模型中的实体类划分
+
+```markdown
+# 领域模型中的实体类
+	-- 分为四种类型————VO、DTO、DO、PO，各种实体类用于不同业务层次间的交互，并会在层次内实现实体类之间的转化。具体说明如下:
+		1、VO（View Object）————视图对象，用于展示层，它的作用是把某个指定页面（或组件）的所有数据封装起来。
+		2、DTO（Data Transfer Object）————数据传输对象，这个概念来源于J2EE的设计模式，原来的目的是为了EJB的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，从而提高分布式调用的性能和降低网络负载，但在这里，我泛指用于展示层与服务层之间的数据传输对象。
+		3、DO（Domain Object）————领域对象，就是从现实世界中抽象出来的有形或无形的业务实体。
+		4、PO（Persistent Object）————持久化对象，它跟持久层（通常是关系型数据库）的数据结构形成一一对应的映射关系，如果持久层是关系型数据库，那么，数据表中的每个字段（或若干个）就对应PO的一个（或若干个）属性。
+
+# Object划分
+	-- PO(Persistant Object)————持久化对象,即Entity对象,实体类
+		1、说明————对应数据库中某张表中的一条记录,多个记录可以用PO的集合,PO中应该不包含任何对数据库的操作
+
+	-- DO(Domain Object)————领域数据
+		1、说明————从现实世界中抽象出来的有型或无形的业务实体
+
+	-- TO(Transfer Object)————数据传输对象
+		1、说明————不同应用程序间传输的对象
+		2、举例————微服务之间通讯的数据
+
+	-- DTO(Data Transfer Object)————数据传输对象
+		1、说明————泛指用于服务层与展示层间的数据传输对象
+
+	-- VO(Value Object)————值对象
+		1、说明————用于业务层之间的数据.也可以认为是View Object(视图对象):接收页面传递来的数据,封装对象,以及将业务处理完的对象,封装成页面使用的数据
+
+	-- BO(Business Object)————业务对象
+		1、说明————多个PO的组合
+
+	-- POJO(Plain Ordinary java object)————简单无规则Java对象————DO/DTO/VO的统称
+		1、说明————只有属性字段及getter/setter方法的对象
+
+	-- DAO(Data Access Object)————数据访问对象
+		1、说明————用于访问数据库的对象
+
+# 业务分层
+	业务分层为————视图层（VIEW+ACTION），服务层（SERVICE），持久层（DAO）
+
+# 相应各层间实体的传递
+	项目中我们并没有严格遵循这种传递关系，但这种和业务层次的关联对我们理解各实体类的作用是有帮助的。（我们没有接触到PO的原因，我理解为ORM对PO进行了封装）如下图:
+```
+
+<img src="image/img2_3_0_1_1.png" style="zoom:50%;" />
+
+```markdown
+-- 模型
+    1、用户发出请求（可能是填写表单），表单的数据在展示层被匹配为VO。
+    2、展示层把VO转换为服务层对应方法所要求的DTO，传送给服务层。
+    3、服务层首先根据DTO的数据构造（或重建）一个DO，调用DO的业务方法完成具体业务。
+    4、服务层把DO转换为持久层对应的PO（可以使用ORM工具，也可以不用），调用持久层的持久化方法，把PO传递给它，完成持久化操作。
+    5、对于一个逆向操作，如读取数据，也是用类似的方式转换和传递，略。
+
+-- 从项目代码中抽象出的理解————VO对应于页面上需要显示的数据，DO对应于数据库中存储的数据，DTO对应于除二者之外需要进行传递的数据。
+```
+
+
 
 ## 1、开发模式
 
