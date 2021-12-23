@@ -41,16 +41,16 @@ spring:
 		driver-class-name: com.mysql.jdbc.Driver
 		
 -- 配置mybatisplus相关配置
-#配置mybatis-plus查找sql映射文件
-mybatis-plus.mapper-locations=classpath:/mapper/**/*.xml
-#配置主键自增
-mybatis-plus.global-config.db-config.id-type=auto
-#全局逻辑删除的实体字段名[since 3.3.0,配置后可以忽略不配置步骤2
-mybatis-plus.global-config.db-config.logic-delete-field=flag 
-#逻辑已删除值[默认为1]
-mybatis-plus.global-config.db-config.logic-delete-value=1 
-#逻辑未删除值[默认为0]    
-mybatis-plus.global-config.db-config.logic-not-delete-value=0                     
+    #配置mybatis-plus查找sql映射文件
+    mybatis-plus.mapper-locations=classpath:/mapper/**/*.xml
+    #配置主键自增
+    mybatis-plus.global-config.db-config.id-type=auto
+    #全局逻辑删除的实体字段名[since 3.3.0,配置后可以忽略不配置步骤2
+    mybatis-plus.global-config.db-config.logic-delete-field=flag 
+    #逻辑已删除值[默认为1]
+    mybatis-plus.global-config.db-config.logic-delete-value=1 
+    #逻辑未删除值[默认为0]    
+    mybatis-plus.global-config.db-config.logic-not-delete-value=0                     
 ```
 ### 4、使用步骤
 
@@ -621,8 +621,35 @@ PageHelper类似
 ## 3、Nginx
 
 ```markdown
-# 说明
-	反向代理服务器
+# 说明————反向代理服务器
+-- 正向代理与反向代理
+	1、正向代理————帮助隐藏客户端信息
+	2、反向代理————帮助屏蔽内网服务器信息,负载均衡访问
+	3、图示:
+```
+
+<img src="image/img2_1_3_1_1.png" style="zoom:50%;" />
+
+```markdown
+# Nginx配置文件说明
+	-- 如图所示:
+```
+
+<img src="image/img2_1_3_1_2.png" style="zoom:50%;" />
+
+```markdown
+# 设置本地域名配置,配置本地hosts文件
+	-- 安装switchhosts————brew install switchhosts
+
+	-- 添加本地本配置[mac的hosts文件所在位置/etc/hosts]
+		#pigskin_mall
+		192.168.56.xxx pigskin.com
+# 域名映射效果
+-- 请求接口和请求页面都同时访问域名
+
+-- nginx直接将请求代理给网关,网关进行判断
+	1、如果/api/***,负载均衡给对应服务器
+	2、如果满足域名规则,转交给对应的服务
 
 # 功能
   -- 请求转发
@@ -634,7 +661,7 @@ PageHelper类似
   	-- 实现步骤————如下:
   		1、找到nginx配置文件【nginx.conf】
   		2、修改nginx配置文件【nginx.conf】的【server{}】中的默认端口【80】，改为【81】————listen 81;
-  		3、配置nginx转发规则,在【http{}】中创建如下配置:
+  		3、配置nginx转发规则,图示如下.在【http{}】中创建如下配置:
   			 server {		
   			 	# 对外监听端口		
   			 	listen 9001;
@@ -650,22 +677,69 @@ PageHelper类似
           	proxy_pass http://localhost:8002;
           }	
         }
+```
+
+<img src="image/img2_1_3_1_3.png" style="zoom:50%;" />
+
+```markdown
 			4、重启nginx
 				#先停掉
 				nginx.exe -s stop
 				#再重启
 				nginx.exe
-  -- 负载均衡
-  	-- 说明————多台服务器中放相同的内容（集群效果），多台服务器平均分摊压力
-  	-- 分摊规则
-  		1、轮询
-  		2、根据请求时间
-  	-- 示例
-  		1、客户端浏览器发起请求
-  		2、nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
+
+-- 负载均衡
+  	1、说明————多台服务器中放相同的内容（集群效果），多台服务器平均分摊压力
+  		1)分摊规则
+  			-- 轮询
+  			-- 根据请求时间
+  	2、示例
+  		1)客户端浏览器发起请求
+  		2)nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
+  	3、具体实现配置过程
+  		1)配置server,如下图所示
+```
+
+<img src="image/img2_1_3_1_4.png" style="zoom:50%;" />
+
+```markdown
+  		2)配置http,如下图所示
+```
+
+<img src="image/img2_1_3_1_5.png" style="zoom:50%;" />
+
+```markdown
+  		3)网关配置(放到配置最后),如下图所示
+```
+
+<img src="image/img2_1_3_1_6.png" style="zoom:50%;" />
+
+```markdown
+  		4)解决nginx代理给网关时,会丢失请求的host信息————配置文件中添加如下配置
+  			#设置代理时加上Header中加上Host(解决nginx反向代理时丢失相关请求头数据问题)     
+        #proxy_set_header Host $host;
 
   -- 动静分离
-  	-- 说明————将java代码和普通页面分开进行部署，每个请求分开访问
+  	1、说明————将java代码和普通页面分开进行部署，每个请求分开访问————如图所示
+```
+
+<img src="image/img2_1_3_1_7.png" style="zoom:50%;" />
+
+```markdown
+  	2、使用示例
+  		1)将所有项目静态资源,放在nginx中————/mydata/nginx/html/下
+  		2)指定规则:/static/**所有请求都由ngixn直接返回————将html静态资源请求路径进行如下规则设定
+  			-- href="替换成href="/static/
+  			-- <script src="替换成<script src="/static/
+  			-- <img src="替换成<img src="/static/
+  			-- src="index替换成src="/static/index
+			3)修改nginx配置文件,针对server的配置
+				server{
+					#设置静态请求去nginx中的静态资源文件中找    
+					location /static/ {   
+          	root   /usr/share/nginx/html;   
+          }
+        }
 
 # 安装/启动
 	-- 1、官网下载————http://nginx.org/en/download.html
@@ -4444,6 +4518,70 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	3、数组扁平化
 
 # 注意说明————如果是嵌入式属性(nested),查询,聚合,分析都应该使用嵌入式
+```
+
+## 22、Thymeleaf
+
+```markdown
+# 说明
+	Thymeleaf是一个XML/XHTML/HTML5模板引擎，可用于Web与非Web环境中的应用开发。
+
+# 语法
+-- th:echo
+
+-- th:attr
+
+# 使用
+-- 引入依赖
+	<!--thymeleaf依赖(模板引擎)-->     
+  <dependency>      
+    <groupId>org.springframework.boot</groupId> 
+    <artifactId>spring-boot-starter-thymeleaf</artifactId> 
+  </dependency>
+
+-- resource/static目录,引入静态资源————可以直接访问
+
+-- resource/tempatles目录,引入html页面资源————可以直接访问,springboot访问该项目默认会找index
+
+-- 配置文件添加配置
+	#关闭缓存，这样开发期间就能看到实时效果
+	spring.thymeleaf.cache=false
+	#前缀（用于我们去找页面文件所在位置,默认classpath:/templates/）
+	spring.thymeleaf.prefix=classpath:/templates/
+	#后缀（用于配置我们去找那种后缀名的文件，默认.html）
+	spring.thymeleaf.suffix=.html
+
+-- 添加web包————用于添加页面跳转的Controller
+	package com.pigskin.mall.product.web;
+	import org.springframework.stereotype.Controller;
+	import org.springframework.web.bind.annotation.GetMapping;
+
+	/**
+	* 页面跳转Controller 
+	*/
+	@Controller
+	public class IndexController {  
+  	@GetMapping({"/", "/index.html"})   
+    public String index() {   
+    	/*视图解析器进行拼串：配置的前缀+"返回值"+后缀*/     
+      return "index"; 
+    }
+  }
+
+# 增强使用
+-- 智能提示————修改html页面名称空间
+	<!DOCTYPE html>
+	<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+-- 不重启服务器,页面修改实时刷新
+	1、引入springboot提供的devtooles
+		<!-- spring boot devtools 依赖包. -->  
+    <dependency>         
+      <groupId>org.springframework.boot</groupId> 
+      <artifactId>spring-boot-devtools</artifactId>     
+      <optional>true</optional>   
+    </dependency>
+	2、修改完页面,control+shift+f9重新自编译页面,如果是代码配置,建议重启服务
 ```
 
 
