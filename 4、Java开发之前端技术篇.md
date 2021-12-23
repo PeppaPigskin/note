@@ -18,50 +18,69 @@
 		文件->首选项->用户代码片段->新建全局代码片段/文件夹代码片段
 	# 使用
 		根据设置的快捷键快速插入
+3、 相关插件
+-- Chinese (Simplified) Language Pack for Visual Studio Code————汉化插件
+-- Bracket Pair Colorizer————彩色括号
+-- Auto Close Tag————标签自动补全
+-- Auto Rename Tag————修改标签名自动同步闭合标签
+-- Draw.io Integration————画流程图
+-- Git版本控制
+	1、Git Graph————可以查看git提交历史 现在所处分支 提交内容明细 以及回滚删除分支等操作
+	2、Git Lens————可在代码行中查看谁提交的 清晰追溯 目前我只用到这个工具中的这个功能
+-- LeetCode————力扣刷算法题的插件
+-- Vetur————可以高亮Vue代码 格式化代码等
+-- Chinese————简体中文包
+-- EsLint————ES语法检查工具
+-- HTML CSS Support————Html Css支持
+-- JavaScript (ES6) code snippets————JavaScript语法提示
+-- Live Server————实时服务器
+-- open in browser————在浏览器打开页面插件
 ```
 
 ## 2、ES6
 
-```javascript
-1、说明
+```markdown
+# 说明
 	一套JS标准
-2、ES6和ES5区别
+
+# ES6和ES5区别
 	ES6简洁,但兼容差
-3、基本语法
-	# let
-		-- var定义变量没有作用范围
-		-- let定义变量有作用范围	
-		-- var 可以声明多次，let只能声明一次
-	# const
-		-- const用于声明常量
-		-- 常量值一旦定义就不能更改
-		-- 常量定义必须初始化
-	# 数组解构
-  	-- 传统写法
+
+# 基本语法
+	-- let
+		1、var定义变量没有作用范围
+		2、let定义变量有作用范围	
+		3、var 可以声明多次，let只能声明一次
+	-- const
+		1、const用于声明常量
+		2、常量值一旦定义就不能更改
+		3、常量定义必须初始化
+	-- 数组解构
+  	1、传统写法
     	let a=1,b=2,c=3
       console.log(a,b,c)
-		-- es6写法
+		2、es6写法
     	let [x,y,z]=[1,2,3]
       console.log(x,y,z)
-	# 对象解构
-  	-- 传统写法
+	-- 对象解构
+  	1、传统写法
     	let name=user.name
       let age=user.age
       console.log(name,age)
-		-- es6写法
+		2、es6写法
     	let {nage,age}=user
       console.log(name,age)
-	# [``]模板字符串
-  	-- 可实现换行效果
-    -- 包含的字符串可插入表达式和变量，使用${变量名}
-		-- 包含的字符串中可调用方法，使用${方法调用}
-  # 声明对象
-  	-- 传统方式
+	-- [``]模板字符串
+  	1、可实现换行效果
+    2、包含的字符串可插入表达式和变量，使用${变量名}
+		3、包含的字符串中可调用方法，使用${方法调用}
+	-- 声明对象
+  	1、传统方式
     	const user1={name:name,age:age}
-    -- es6写法
+    2、es6写法
     	const user2={name,age}
-  # 定义方法
-  	-- 传统方式
+	-- 定义方法
+  	1、传统方式
     	//定义
     	const p={    
         sayHi:function(){
@@ -70,7 +89,7 @@
       }
       //调用
       p.sayHi()
-		-- es6方式
+		2、es6方式
     	//定义
     	const p={
         sayHi(){
@@ -79,26 +98,26 @@
       }
       //调用
       p.sayHi()
-	# 对象扩展运算符
-  	-- 拷贝对象
+	-- 对象扩展运算符
+  	1、拷贝对象
     	let p={name:"A",age=10}
       let cp={...p}
       console.log(cp)//{name:"A",age=10}
-		-- 合并对象
+		2、合并对象
     	let p={name:"A"}
       let a={age=10}
       let cp={...p,...a}
       console.log(cp)//{name:"A",age=10}
-	# 箭头函数
-  	-- 传统定义函数
+	-- 箭头函数
+  	1、传统定义函数
     	var f1=function(a){    
         return a
       }
       console.log(f1(1))
-		-- ES6
+		2、ES6
     	var f2=a=>a
       console.log(f2(1))
-		--说明
+		3、说明
     	// 当箭头函数没有参数时，需要用（）括起来
     	// 函数体中包含多条 执行语句时需要用{}括起来
       // 函数体只有一行语句，可以省略{}，结果会自动返回
@@ -109,16 +128,17 @@
 
 ## 3、Vue
 
-```vue
-1、说明
+```markdown
+# 说明
 	一套用于构建用户界面的渐进式框架
-2、基本使用
-	# 创建html
-	# 引入vue的js文件
+
+# 基本使用
+	1、创建html
+	2、引入vue的js文件
 		<script src="vue.min.js"></script>
-	# 创建div标签，并添加id属性
+	2、创建div标签，并添加id属性
 		<div id="app "></div>
-	# 编写vue代码，固定格式
+	4、编写vue代码，固定格式
 		<script>
       //创建一个vue对象
       new Vue({
@@ -131,13 +151,14 @@
         }
       })
 		</script>
-	# 使用插值表达式，绑定vue中的data数据
+	5、使用插值表达式，绑定vue中的data数据
 		{{message}}
-3、基本数据渲染和语法指令
-	# v-bind
-		-- 作用：单项数据绑定
-		-- 使用对象：标签属性中，获取值
-		-- 示例： 
+
+# 基本数据渲染和语法指令
+	-- v-bind
+		1、作用：单项数据绑定
+		2、使用对象：标签属性中，获取值
+		3、示例： 
 			<h1 v-bind:title="message">            
         {{content}}
 			</h1>
@@ -145,43 +166,43 @@
 			<h1 :title="message">
         {{content}}
 			</h1>
-	# v-model
-		-- 作用：双向数据绑定
-		-- 使用对象：内容绑定
-		-- 示例：
+	-- v-model
+		1、作用：双向数据绑定
+		2、使用对象：内容绑定
+		3、示例：
 			<!-- v-model使用 -->
 			<!-- 单向绑：此处变，其他地方不变定 -->
 			<input type="text" :value="searchMap.keyWord">        
 			<!-- 双向绑定：一个地方变，其他跟着变 -->
 			<input type="text" v-model="searchMap.keyWord">
 			<p>{{searchMap.keyWord}}</p>
-	# v-on:事件名称
-		-- 作用：用于事件绑定
-		-- 使用对象：事件的响应
-		-- 示例：
+  -- v-on:事件名称
+		1、作用：用于事件绑定
+		2、使用对象：事件的响应
+		3、示例：
 			<!-- v-on:事件名 - 进行事件绑定-->
 			<button v-on:click="search()">查询</button>
 			<!-- 简写形式 -->
 			<button @click="search()">查询</button>
-	# .prevent
-		-- 作用：用于指出一个指令应该以特殊的方式绑定
-		-- 示例：
+	-- .prevent
+		1、作用：用于指出一个指令应该以特殊的方式绑定
+		2、示例：
 			.prevent告诉v-on指令对于触发的时事件调用js的preventDefault()
 			<!-- 修饰符 -->
 			<form action="save" @submit.prevent="onSubmitForm()">            
         <input type="text" name="name" v-model="user.name"/>
         <button type="submit">保存</button>
 			</form>
-	# v-if
-		-- 作用：条件渲染
-		-- 示例：
+	-- v-if
+		1、作用：条件渲染
+		2、示例：
 			<!-- 条件渲染 -->
 			<input type="checkbox" v-model="ok"/>是否同意
 			<h1 v-if="ok">阿达</h1>
 			<h1 v-else>好的</h1>
-	# v-for
-		-- 作用：循环输出
-		-- 示例： 
+	-- v-for
+		1、作用：循环输出
+		2、示例： 
       <!-- 循环遍历 -->
       <!-- 简单的列表渲染 -->
       <ul>
@@ -191,9 +212,10 @@
       <ul>
         <li v-for="(n,index) in 5">{{n}}={{index}}</li>
       </ul>
-4、组件
-	# 局部组件
-		-- 定义
+
+# 组件
+	-- 局部组件
+		1、定义
 			new Vue({
 				el: '#app',
 				data: {
@@ -206,10 +228,10 @@
 					}
 				}
 			})
-		-- 使用
+		2、使用
 			标签使用：<Navbar></Navbar>
-	# 定义全局组件
-		-- 定义
+	-- 定义全局组件
+		1、定义
 			//创建单独的js文件，在其中定义全局组件
 			Vue.component(
 				// 组件名字
@@ -218,14 +240,34 @@
 					template:'<ul><li>首页</li><li>学员管理</li></ul>'
 				}
 			)
-		-- 使用
+		2、使用
 			//引入该全局组件js
 			<script src="components/Navbar.js"></script>
 			//标签使用：<Navbar></Navbar>
-5、生命周期	
-	# created（）:在页面渲染之前执行
-	# mounted（）：在页面渲染之后执行
-	# 示例：
+	-- 父子组件数据传递
+		1、说明————子组件给父组件传递数据
+			使用事件机制:子组件给父组件发送一个事件,携带上数据
+		2、实现步骤
+			1)子组件创建事件,并在事件中向父组件发送数据
+				// 节点单击事件(节点数据对象,当前节点,节点组件本身)  
+        nodeClick(data, node, component) {   
+        	console.log(data, node, component);     
+          // 子组件向父组件发送数据(事件名,任何数据...) 
+          this.$emit("tree-node-click", data, node, component);  
+        },
+      2)父组件使用子组件的地方注册发送过来的事件名的事件,用来感知到子组件的事件
+      	<category @tree-node-click="treeNodeClick"></category>
+      	
+      	// 感知子组件(树节点)被点击事件    
+      	treeNodeClick(data, node, component) {   
+        	console.log("感知子组件(树节点)被点击事件", data, node, component);    
+          console.log(data.catId)  
+        },
+
+# 生命周期	
+	-- created（）————在页面渲染之前执行
+	-- mounted（）————在页面渲染之后执行
+	-- 示例：
 		new Vue({
 			el: '#app',
 			data: {
@@ -241,10 +283,11 @@
 				console.log("mounted...")
 			}
 		})
-6、路由使用
-	# 引入js，在vue.js之后
+
+# 路由使用
+	-- 引入js，在vue.js之后
 		<script src="vue-router.min.js"></script>
-	# 编写Html
+	-- 编写Html
 		<div id="app">
       <h1>Hello App!</h1>
       <p>
@@ -258,7 +301,7 @@
       <!-- 使用router-view定义路由出口，路由匹配到的组件将渲染在这里 -->
       <router-view></router-view>
 		</div>
-	# 编写JS
+	-- 编写JS
 		<script>
       // 1、定义路由组件，可以从其他文件import进来
       const Welcome={template:'<div>欢迎访问首页</div>'}
@@ -283,13 +326,13 @@
         router
       })
 		</script>
-	# 实现数据回显
-		-- 回显处使用router-link组件来导航，通过传入`to`属性指定链接
+	-- 实现数据回显
+		1、回显处使用router-link组件来导航，通过传入`to`属性指定链接
 			<!-- TODO:传值跳转 -->
 			<router-link :to="`/teacher/edit/${scope.row.id}`">
         <el-button size="mini" icon="el-icon-edit" type="primary">编辑</el-button>
 			</router-link>
-		-- 路由index页面中添加隐藏路由
+		2、路由index页面中添加隐藏路由
 			// 用于数据回显的编辑讲师路由
 			{
 				path: 'edit/:id',
@@ -298,7 +341,7 @@
 				meta: { title: '编辑讲师', noCache: true },        		
 				hidden: true
 			}
-		-- 在api接口中创建获取回显数据的接口
+		3、在api接口中创建获取回显数据的接口
 			// 获取讲师信息
 			getTeacherInfoById(id) {
 				return request({
@@ -306,7 +349,7 @@
 					method: 'get'
 				})
 			},
-		-- 在需要回显的页面调用接口，进行数据的回显
+		4、在需要回显的页面调用接口，进行数据的回显
 			 // 根据讲师id获取讲师信息    
 			getEditTeacherInfoById(id) {
 				teacher.getTeacherInfoById(id)
@@ -320,14 +363,15 @@
 					})        
 				})
 			}
-		-- 如何判断是修改还是添加操作（两个页面公共时）
+		5、如何判断是修改还是添加操作（两个页面公共时）
 			// 根据路由参数重是否传入id参数,来判断是否为修改界面    
 			if (this.$router.params && this.$router.params.id) {      
 				const id = this.$$router.params.id
 				this.getEditTeacherInfoById(id)
 			}
-7、使用问题解决
-	# 使用vue的监听解决数据回显问题
+
+# 使用问题解决
+	-- 使用vue的监听解决数据回显问题
 		//vue监听  
 		watch: {
 			//表示路由变化的方式 ：当路由发生变化，方法就会执行
