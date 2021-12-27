@@ -195,51 +195,48 @@ Exit
 
 ### 2、Brew 安装和卸载
 
-```bash
-1、安装命令
-/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
-2、卸载命令
-/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)"
-3、brew常用命令
-  # 安装软件
-  brew install formulae
-  # 卸载软件
-  brew uninstall formulae
-  # 查看软件信息
-  brew info／home formulae
-  # 升级 brew 自身和包(formulae),建议安装前输入
-  brew update 
-  # 查找本机版本已经落后的包
-  brew outdated 
-  # 升级所有版本落后的包
-  brew upgrade 
-  # 单独升级指定包
-  brew upgrade formulae 
-  # 锁定指定包的版本,不允许升级
-  brew pin formulae
-  # 解锁指定包,允许升级
-  brew unpin formulae 
-  # 清理全部版本过期的包
-  brew cleanup 
-  # 当你的 brew 运行不正常,试试这个
-  brew doctor 
-  # 搜索和 ruby 相关的包
-  brew search ruby 
-  # 显示本机已经安装的包
-  brew list 
-  # 显示更多brew命令帮助
-  man brew 
-  # 显示包依赖
-  brew deps
-4、安装指定版本的软件
-	# 1、brew官网搜索指定包名————https://brew.sh/
-	# 2、通过Cask code on GitHub,找到其在GitHub的仓库对应的xxx.rb文件————单击Cask code超链接
-	# 3、查看其历史提交记录————点击History按钮
-	# 4、找到对应版本的历史提交记录单机进入吃,查看详细————单击View at this point in the history按钮
-	# 5、终端输入以下命令创建指定文档————touch xxx.rb
-	# 6、终端输入以下命令打开并编辑文档————open -e goland.rb
-	# 7、将第4步的详细内容拷贝到创建的指定文档
-	# 8、执行如下命令进行安装————brew install xxx.rb
+```markdown
+# 安装命令
+	/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
+
+# 卸载命令
+	/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)"
+
+# brew常用命令
+  -- brew install formulae————安装软件
+  -- brew uninstall formulae————卸载软件
+  -- brew info／home formulae————查看软件信息
+  -- brew update————升级 brew 自身和包(formulae),建议安装前输入
+  -- brew outdated————查找本机版本已经落后的包
+  -- brew upgrade————升级所有版本落后的包
+  -- brew upgrade formulae————单独升级指定包
+  -- brew pin formulae————锁定指定包的版本,不允许升级
+  -- brew unpin formulae————解锁指定包,允许升级
+  -- brew cleanup————清理全部版本过期的包
+  -- brew doctor————当你的 brew 运行不正常,试试这个
+  -- brew search ruby————搜索和 ruby 相关的包
+  -- brew list————显示本机已经安装的包
+  -- man brew————显示更多brew命令帮助
+  -- brew deps————显示包依赖
+  
+# 安装指定版本的软件
+	1、brew官网搜索指定包名————https://brew.sh/
+	2、通过Cask code on GitHub,找到其在GitHub的仓库对应的xxx.rb文件————单击Cask code超链接
+	3、查看其历史提交记录————点击History按钮
+	4、找到对应版本的历史提交记录单机进入吃,查看详细————单击View at this point in the history按钮
+	5、终端输入以下命令创建指定文档————touch xxx.rb
+	6、终端输入以下命令打开并编辑文档————open -e goland.rb
+	7、将第4步的详细内容拷贝到创建的指定文档
+	8、执行如下命令进行安装————brew install xxx.rb
+
+# 完全清除安装包相关文件
+	1、卸载指定软件————brew方式采用[brew uninstall 包名]进行卸载,[.app]安装包通过图标进行卸载,并删除.app文件
+	2、删除如下目录下的App名称目录
+		1)~/Library/Preferences/
+		2)~/Library/Caches/
+		3)~/Library/Application Support/
+		4)~/Library/Logs/
+	3、同理，如果想要初始化配置啥的，也可以删除对应的目录，重启即可
 ```
 
 ### 3、Mac OS 环境搭建
@@ -297,7 +294,6 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 1、说明
 2、安装
 	brew install tabby
-4、
 ```
 
 
