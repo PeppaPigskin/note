@@ -6111,6 +6111,92 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   }
 ```
 
+## 24、重定向与请求转发
+
+### 1、请求转发
+
+```markdown
+# 说明
+	1、服务器行为
+	2、使用forward
+	3、服务器内部把对一个request/response的处理权，移交给另外一个.对于客户端而言，它只知道自己最早请求的那个A，而不知道中间的B，甚至C、D。传输的信息不会丢失。
+
+# 工作流程
+	1、客户浏览器发送http请求
+	2、web服务器接受此请求
+	3、调用内部的一个方法在容器内部完成请求处理和转发动作
+	4、将目标资源发送给客户
+	注————在这里，转发的路径必须是同一个web容器下的url，其不能转向到其他的web路径上去，中间传递的是自己的容器内的request。在客户浏览器路径栏显示的仍然是其第一次访问的路径，也就是说客户是感觉不到服务器做了转发的。转发行为是浏览器只做了一次访问请求。
+
+# 调用方式————转发到new.jsp
+-- servlet中
+	request.getRequestDispatcher("new.jsp").forward(request, response);
+-- jsp页面
+	<jsp:forward page="new.jsp" />
+
+# 携带数据方式
+-- Model————通过model参数获取和设置参数,来进行数据的传递
+```
+
+
+
+### 2、重定向
+
+```markdown
+# 说明
+	1、客户端行为
+	2、使用redirect
+	3、其实是两次request.第一次，客户端request   A,服务器响应，并response回来，告诉浏览器，你应该去B。这个时候IE可以看到地址变了，而且历史的回退按钮也亮了。重定向可以访问自己web应用以外的资源。在重定向的过程中，传输的信息会被丢失。
+
+# 工作流程
+	1、客户浏览器发送http请求
+	2、web服务器接受后发送302状态码响应及对应新的location给客户浏览器
+	3、客户浏览器发现是302响应，则自动再发送一个新的http请求，请求url是新的location地址
+	4、服务器根据此请求寻找资源并发送给客户
+	注————在这里location可以重定向到任意URL，既然是浏览器重新发出了请求，则就没有什么request传递的概念了。在客户浏览器路径栏显示的是其重定向的路径，客户可以观察到地址的变化的。重定向行为是浏览器做了至少两次的访问请求的。
+
+# 调用方式————重定向到new.jsp
+-- servlet中
+	response.sendRedirect("new.jsp");   
+-- jsp页面
+	<%response.sendRedirect("new.jsp"); %> 
+
+# 携带数据方式
+-- redirectAttributes.addAttributie("prama",value); 
+	1、说明————这种方法相当于在重定向链接地址上追加传递的参数
+	2、使用————attributes.addAttribute("errors", errors);
+	3、示例
+		@RequestMapping("/test")
+    private String shopList(RedirectAttributes ra) {
+      ra.addAttribute("param", 1);
+      return "redirect:/shopadmin/shoplist";
+    }
+		注————相当于请求 http://localhost:8080/o2o/shopadmin/shoplist?param=1
+
+-- redirectAttributes.addFlashAttributie("prama",value); ，
+	1、说明————这种方法是隐藏了参数，链接地址上不直接暴露
+	2、原理————利用session原理——将数据放到session中,只要跳到下一个页面,取出数据以后,session中的数据就会删掉
+	3、特点————添加一闪而过的数据，只能被使用一次
+	4、使用————attributes.addFlashAttribute("errors", errors);
+	5、获取参数————用(@ModelAttribute(value = "prama")String prama)的方式获取参数
+	6、示例
+		@RequestMapping("/test")
+    private String shopList(RedirectAttributes ra) {
+      ra.addFlashAttribute("param", 1);
+      return "redirect:/shopadmin/shoplist";
+    }
+    //接收参数
+    @RequestMapping("/shoplist")
+    private String shopList(@ModelAttribute("param") String param) {
+      System.out.println(param);//输出1
+      return "shop/shoplist";
+    }
+
+
+# 分布式下session问题
+	详见————2-1-25、Session共享问题
+```
+
 
 
 # 二、第三方服务技术
