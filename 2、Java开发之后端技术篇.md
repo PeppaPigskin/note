@@ -1993,10 +1993,25 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 ## 11、MD5加密
 
 ```markdown
-# 说明
-	只能加密，不能解密
+# MD5(Message Digest algorithm 5)
+	-- 说明————信息摘要算法,	只能加密，不能解密
 
-# 代码实现
+# 特性
+	-- 压缩性————任意长度的数据,计算出来的MD5值长度都是固定的
+	-- 容易计算————从原数据计算MD5值很容易
+	-- 抗修改性————对原数据进行任何改动,哪怕只修改一个字节,所得到的MD5值都有很大的区别(彩虹表————暴力破解算法)
+	-- 强抗碰撞————想找到两个不相同的数据,使他们具有相同的MD5值,是非常困难的
+	-- 不可逆
+
+# 加密分类
+	-- 可逆————加密后,可根据加密算法得到明文
+	-- 不可逆————加密后,不可获取到明文
+
+# MD5盐值加密
+	-- 加盐————通过生成随机数与MD5生成字符串进行组合
+		1、数据库沟通是存储MD5值与盐salt值,验证正确性时使用salt进行MD5即可
+
+# 代码实现MD5加密
 	package com.pigskin.common_utils;
 	
 	import java.security.MessageDigest;
@@ -3652,8 +3667,11 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			1)登录成功之后，【按照一定规则生成字符串】，字符串包含用户信息
 			2)将生成的字符串通过路径传递，或者放入cookie中
 			3)再发送请求时，每次带着字符串发送（从字符串中能获取到用户信息就是已经登录，否则未登录）
-	
+
+-- 单点登陆流程图如下:
 ```
+
+<img src="image/img2_1_19_1_1.png" style="zoom:50%;" />
 
 
 
@@ -4582,6 +4600,1456 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       <optional>true</optional>   
     </dependency>
 	2、修改完页面,control+shift+f9重新自编译页面,如果是代码配置,建议重启服务
+```
+
+
+
+## 23、缓存与分布式锁
+
+### 1、缓存
+
+```markdown
+# 缓存使用————为提高系统性能的提升,一般会将部分数据放入缓存中,加速访问.而DB承担数据落盘工作
+-- 那些数据适合放入缓存?
+	1、即时性,数据一致性要求不高的
+	2、访问量大且更新频率不高的数据(读多写少)
+
+-- 读模式缓存使用流程,如下图所示:
+```
+
+<img src="image/img2_1_23_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 缓存说明
+-- 本地缓存————将缓存内容放在本地
+
+-- 分布式缓存的本地模式
+	1、存在问题————因为分布式会负载到不同的服务,缓存在本地各顾各的,修改数据时,会导致数据一致性问题
+	2、解决方案————所有服务的缓存都在统一的一个缓存中间件中
+
+# 缓存中间件
+-- 整合redis作为缓存中间件
+	1、引入redis依赖
+		<!--redis作为缓存依赖-->     
+    <dependency>         
+      <groupId>org.springframework.boot</groupId>     
+      <artifactId>spring-boot-starter-data-redis</artifactId>     
+    </dependency>
+	2、创建Redis配置信息
+		#指定redis主机地址
+		spring.redis.host=192.168.56.101
+		#指定redis端口（默认6379）
+		spring.redis.port=6379
+	3、使用springboot自动配置好的SpringRedisTemplate来操作Redis
+	4、lettuce和jedisd都是操作redis最底层的客户端.redisTemplate是spring对其再次封装的结果
+
+-- 内存泄漏及解决
+	1、内存泄漏问题————会产生堆外内存溢出异常：OutOfDirectMemoryError。
+	2、原因————没有得到内存的及时释放
+		1)springboot2.0以后默认使用lettuce作为操作redis的客户端。它使用netty进行网络通信
+		2)lettuce的BUG导致netty堆外内存溢出，我们在VM Options中设置了最大内存-Xmx300m，netty如果没有指定堆外内存，他就默认使用VM Options中设置的最大内存-Xmx300m
+		3)可以通过(PlatformDependent类进行读取)-Dio.netty.maxDirectMemory虚拟机参数进行设置
+	3、解决方案————不能使用虚拟机参数直接调大最大堆外内存(-Xmx300m),因为只是调大内存,一定时间后,还是会出现
+		1)方案一————升级lettuce客户端————还没有现成的方式,只能修改源码
+		2)方案二————切换使用jedis————pom依赖排除
+			<!--redis作为缓存依赖-->   
+      <dependency>          
+        <groupId>org.springframework.boot</groupId>     
+        <artifactId>spring-boot-starter-data-redis</artifactId>   
+        <exclusions>       
+          <!--排除使用lettuce，因为其没有好的方案解决堆外内存溢出问题-->       
+          <exclusion>              
+            <groupId>io.lettuce</groupId>        
+            <artifactId>lettuce-core</artifactId>     
+          </exclusion>        
+        </exclusions>     
+      </dependency>    
+      <!--引入jedis解决lettuce导致的堆外内存溢出问题-->    
+      <dependency>         
+        <groupId>redis.clients</groupId>  
+        <artifactId>jedis</artifactId>      
+      </dependency>
+
+# 高并发下缓存失效问题
+-- 缓存穿透————如下图
+```
+
+<img src="image/img2_1_23_1_2.png" style="zoom:50%;" />
+
+```markdown
+	1、说明————指查询一个一定不存在的数据,由于缓存是不命中,将去查询数据库,但是数据库也无此记录,我们没有将此次查询的null写入缓存,这将导致这个不存在的数据每次请求都要去存储层去查询,失去了缓存的意义
+	2、存在风险————利用不存在的数据进行攻击,数据库瞬时压力增大,最终导致崩溃
+	3、解决方案————null结果缓存,并加入短暂过期时间
+
+-- 缓存雪崩————如下图
+```
+
+<img src="image/img2_1_23_1_3.png" style="zoom:50%;" />
+
+```markdown
+	1、说明————指我们设置缓存时key采用了相同的过期时间,导致缓存在某一时刻同时失效,请求全部转发到DB,DB瞬间压力过重雪崩
+	2、解决方案————原有的失效时间基础上增加一个随机值,这样每一个缓存的过期时间的重复率就会降低,就很难引发集体失效的事件
+
+-- 缓存击穿————如下图
+```
+
+<img src="image/img2_1_23_1_4.png" style="zoom:50%;" />
+
+```markdown
+	1、说明————对于一些设置了过期时间的key,如果这些key可能在某些时间点被超高并发的访问,是一种非常“热点”的数据,如果这个key在大量请求同时进来前正好失效,那么所有对这个key的数据查询都落到DB
+	2、解决方式————加锁,大并发只让一个人去查,其他人等待查到以后释放锁,其他人获取到锁,先查缓存,就会有数据,就不用去DB查
+		1)同步代码块————将要同步的代码放到 synchronized (this) {...}中,如下示例:
+			//synchronized (this):当前对象————springboot所有组件在容器中都是单例的
+			synchronized (this){        
+				//只要是同一把锁,就能锁住需要这个锁的线程                
+				/*TODO:得到锁之后再去缓存中确定下*/      
+        String jsonString = stringRedisTemplate.opsForValue().get("catalogJson"); 
+        if (!StringUtils.isEmpty(jsonString)) {      
+        	/*将redis缓存中的json字符串数据进行转换*/            
+          Map<String, List<Catalog2Vo>> catalogJson = JSON.parseObject(jsonString,
+          	new TypeReference<Map<String, List<Catalog2Vo>>>() {}); 
+          return catalogJson;
+        }
+        //TODO:进行查询操作
+
+        //TODO:将查出的对象转换为json放入缓存中(也在锁中进行，防止出现时序行问题)
+        String s = JSON.toJSONString(listMap);
+        stringRedisTemplate.opsForValue().set("catalogJson", s, 1, TimeUnit.DAYS);
+      }
+    2)同步方法
+    	public synchronized Map<String, List<Catalog2Vo>> getCatalogJsonFromDB()
+    	{
+    		...
+    	}
+	3、锁的时序问题————redis交互存储数据时可能比较慢,导致会查多遍数据,所以将放数据也加进锁内
+
+# 缓存数据一致性
+-- 双写模式————修改数据库数据,同时修改缓存,还是会产生脏数据,如图:
+```
+
+<img src="image/img2_1_23_1_5.png" style="zoom:50%;" />
+
+```markdown
+-- 失效模式————修改数据库后,删除对应缓存,让下一次查询再重新缓存,还是会产生脏数据,如图:
+```
+
+<img src="image/img2_1_23_1_6.png" style="zoom:50%;" />
+
+```markdown
+-- 解决方案————都会产生暂时性脏数据问题,可以加上读写锁,如图:
+```
+
+<img src="image/img2_1_23_1_7.png" style="zoom:50%;" />
+
+```markdown
+-- 解决-Canal————canal订阅binlog方式,进行数据的同步,如图:
+```
+
+<img src="image/img2_1_23_1_8.png" style="zoom:50%;" />
+
+```markdown
+# SpringCache
+-- 链接————https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache
+
+-- 简介
+	1、Spring从3.1开始定义了org.springframework.cache.Cache和org.srpingframework.cache.CacheManger接口来统一不同的缓存技术,并支持使用JCache(JSR-107)注解简化我们的开发
+	2、Cache接口为缓存的组件规范定义,包含缓存的各种操作集合;Cache接口下,Spring提供了各种xxxCache的实现:如RedisCache、EhCacheCache、ConcurrentMapCache等
+	3、每次调用需要缓存功能的方法时,Spring会检查指定参数的指定目标方法是否已经被调用过.如果有就直接从缓存中获取方法调用后的结果,如果没有就调用方法并缓存结果后返回给用户
+	4、Spring缓存抽象时,需要关注以下两点:
+		1)确定方法需要被缓存,以及他们的缓存策略
+		2)从缓存中读取之前缓存存储的数据
+
+-- 原理
+	1、缓存自动配置类CacheAutoConfiguration帮我们导入redis缓存自动配置类RedisCacheConfiguration,
+	2、redis缓存自动配置类帮我们自动配置了缓存管理器RedisCacheManger,
+	3、缓存管理器初始化所有缓存,决定使用那种缓存到的配置(如果RedisCacheConfiguration有,就用已有的配置,否则创建一个默认的).
+	4、所有想改缓存的配置,只需要给容器中加入一个RedisCacheConfiguration,就会应用到当前缓存管理器管理的所有缓存分区中
+
+-- 图示
+```
+
+<img src="image/img2_1_23_1_9.png" style="zoom:50%;" />
+
+```markdown
+# SpringBoot整合SpringCache简化缓存开发
+-- 引入依赖
+	<!--引入spring缓存场景，和spring-boot-starter-data-redis依赖-->       
+  <dependency>   
+    <groupId>org.springframework.boot</groupId>    
+    <artifactId>spring-boot-starter-cache</artifactId>  
+  </dependency><!--redis作为缓存依赖-->       
+  <dependency>  
+    <groupId>org.springframework.boot</groupId> 
+    <artifactId>spring-boot-starter-data-redis</artifactId>        
+    <exclusions>            
+      <!--排除使用lettuce，因为其没有好的方案解决堆外内存溢出问题-->      
+      <exclusion>    
+        <groupId>io.lettuce</groupId>    
+        <artifactId>lettuce-core</artifactId>       
+      </exclusion>         
+    </exclusions>     
+  </dependency>     
+  <!--引入jedis解决lettuce导致的堆外内存溢出问题-->   
+  <dependency>           
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>     
+  </dependency>
+
+-- 添加配置
+	1、自动配置了那些[CacheAutoConfiguration]————会导入redisCacheConfiguration————自动配好了缓存管理器RedisCacheManger
+	2、需要手动配置那些
+		#配置缓存类型
+		spring.cache.type=redis
+		#缓存名（配置了之后，就会按照配置的写，而不在创建）
+		#spring.cache.cache-names=productCache
+		#指定混存数据存活时间(毫秒为单位)
+		spring.cache.redis.time-to-live=600000
+		#添加前缀(指定了使用该前缀，没指定默认使用缓存名作为前缀)
+		#spring.cache.redis.key-prefix=CACHE_
+		#设置是否启用前缀
+		spring.cache.redis.use-key-prefix=true
+		#是否缓存空值（解决缓存穿透问题）
+		spring.cache.redis.cache-null-values=true
+	3、测试使用————启动类使用注解@EnableCaching开启缓存功能————使用对应注解,详见注解说明
+
+-- 注解说明
+	1、@Cacheable: Triggers cache population.(触发将数据保存到缓存的操作)
+		1)说明————代表当前方法的结果需要缓存,如果缓存中有,方法不用调用,如果缓存中没有,调用方法,将最后的结果放入缓存.
+		2)注意————每一个需要缓存的数据都来指定要放入那个名字的缓存@Cacheable({缓存名}),建议缓存的分区按照业务类型区分
+		3)默认行为
+			-- 如果缓存中有,方法不用调用
+			-- key默认自动生成:缓存名::自主生产的key值
+			-- value默认使用jdk序列化机制,将序列化后的数据存入redis
+			-- 默认过期时间[-1]
+		4)需要自定义操作
+			-- 指定生成的缓存使用的key————key属性指定,接收一个spEL表达式,字符串需要使用''再次包裹
+				SPEL表达式详见————
+			-- 指定过期时间
+				#指定混存数据存活时间(毫秒为单位)
+				spring.cache.redis.time-to-live=60000
+			-- 指定JSON序列化机制
+				#添加配置类,从而修改缓存管理器
+					package com.pigskin.mall.product.config;
+					
+					import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+					import org.springframework.boot.autoconfigure.cache.CacheProperties;
+					import org.springframework.boot.context.properties.EnableConfigurationProperties;
+					import org.springframework.cache.annotation.EnableCaching;
+					import org.springframework.context.annotation.Bean;
+					import org.springframework.context.annotation.Configuration;
+					import org.springframework.data.redis.cache.RedisCacheConfiguration;
+					import org.springframework.data.redis.serializer.RedisSerializationContext;
+					import org.springframework.data.redis.serializer.StringRedisSerializer;
+					
+					/**
+          * 自定义缓存配置类 
+          */
+          @EnableConfigurationProperties(CacheProperties.class)
+          @Configuration
+          @EnableCaching
+          public class MyCacheConfig {  
+          /**  
+          * @param cacheProperties 自动从容器中获取  
+          * @return   
+          */   
+          @Bean    
+          RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) { 
+          /*1、获取默认配置*/   
+          RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig(); 
+          /*2、设置自定义的要求*/       
+          /*设置主键序列机制*/   
+          config = config.serializeKeysWith(
+            RedisSerializationContext
+            .SerializationPair
+            .fromSerializer(new StringRedisSerializer())
+          );   
+          /*设置值序列化机制*/   
+          config = config.serializeValuesWith(
+          	RedisSerializationContext
+          	.SerializationPair
+          	.fromSerializer(new GenericFastJsonRedisSerializer())
+          );    
+          /*3、将配置文件中的配置生效*/      
+          /*获取所有redis配置*/   
+          CacheProperties.Redis redisProperties = cacheProperties.getRedis();  
+          /*进行配置生效*/       
+          if (redisProperties.getTimeToLive() != null) {   
+          config = config.entryTtl(redisProperties.getTimeToLive());      
+          }       
+          if (redisProperties.getKeyPrefix() != null) {  
+          config = config.prefixKeysWith(redisProperties.getKeyPrefix());    
+          }    
+          if (!redisProperties.isCacheNullValues()) {        
+          config = config.disableCachingNullValues();      
+          }    
+          if (!redisProperties.isUseKeyPrefix()) {          
+          config = config.disableKeyPrefix();   
+          }     
+          return config;  
+          }}
+				#自定义配置类后,配置文件未生效
+					//原始配置文件绑定为
+					@ConfigurationProperties(prefix = "spring.cache")public class CacheProperties {
+					//要让他生效之需要在自定义的配置类上添加注解
+					@EnableConfigurationProperties(CacheProperties.class)————用来使指定类绑定生效
+	2、@CacheEvict: Triggers cache eviction.(触发将数据从缓存移除的操作)
+		1)使用
+			-- @CacheEvict(value = "category", key = "'getLevelOneCategorys'")//失效模式
+			-- @CacheEvict(value = "category", allEntries = true),//失效模式,删除某个分区下的所有数据
+	3、@CachePut: Updates the cache without interfering with the method execution.(不影响方法执行去更新缓存)
+		1)说明————双写模式使用,如果返回的结果是最新的结果,使用该注解可以讲结果重新写入缓存
+	4、@Caching: Regroups multiple cache operations to be applied on a method.(组合以上多个操作)
+		1)使用
+			@Caching(evict = {//同时进行多种缓存操作          
+      	@CacheEvict(value = "category", key = "'getLevelOneCategorys'"),//失效模式        
+      	@CacheEvict(value = "category", key = "'getCatalogJson'")//失效模式  
+      })
+	5、@CacheConfig: Shares some common cache-related settings at class-level.(在类级别共享缓存的相同配置)
+
+-- 不足之处————
+	1、读模式
+		1)缓存穿透:查询一个null数据.解决:缓存null.spring.cache.redis.cache-null-values=true
+		2)缓存雪崩:大量key同时过期.解决:加随机时间.spring.cache.redis.time-to-live=600000
+		3)缓存击穿:大量并发进来同时查询一个正好过期数据.解决方案:加锁.默认无加锁,Cacheable使用sync属性启用
+	2、写模式(缓存数据一致性)
+		1)读写加锁.适用于读多写少
+		2)引入中间件,Canal,感知到mysql数据库的更新去更新数据库
+	3、读多写多————直接去数据库
+
+-- 使用总结
+	常规数据(读多写少,及时性、一致性不高的):完全可以使用SpringCache,写模式,只要缓存的数据有过期时间就足够了特殊数据——特殊设计
+```
+
+
+
+### 2、分布式锁
+
+```markdown
+# 说明
+	-- 本地锁(synchronized/JUC(lock))————只锁当前进程
+	-- 分布式如何加锁?————本地锁只能锁住当前进程,所以我们需要分布式锁
+
+# 基本原理
+	1、我们可以同时去公共的一个地方“占坑”,如果占到,就执行逻辑.否则就必须等待,知道释放锁
+	2、占坑可以去redis,可以去数据库,可以去任何大家都能访问到的地方
+	3、等待可以自旋的方式(递归调用)
+
+# 分布式锁演进
+	-- 分布式锁演进——阶段一
+```
+
+<img src="image/img2_1_23_2_1.png" style="zoom:50%;" />
+
+```markdown
+	-- 分布式锁演进——阶段二
+```
+
+<img src="image/img2_1_23_2_2.png" style="zoom:50%;" />
+
+```markdown
+	-- 分布式锁演进——阶段三
+```
+
+<img src="image/img2_1_23_2_3.png" style="zoom:50%;" />
+
+```markdown
+	-- 分布式锁演进——阶段四
+```
+
+<img src="image/img2_1_23_2_4.png" style="zoom:50%;" />
+
+```markdown
+	-- 分布式锁演进——最终形态
+```
+
+<img src="image/img2_1_23_2_5.png" style="zoom:50%;" />
+
+```markdown
+# redis分布式锁(自旋锁)使用
+  /**    
+  * 将多次查询数据库变为一次查询(从数据库查询，并封装分类数据，分布式锁方式)    
+  *   
+  * @return  
+  */   
+  public Map<String, List<Catalog2Vo>> getCatalogJsonFromDBWithRedisLock() {   
+    String uuid = UUID.randomUUID().toString();      
+    /*1、占分布式锁,和设置过期时间必须是一个原子操作，去redis占坑(设置不存在情况下)*/   
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid, 300,TimeUnit.SECONDS);     
+    if (lock) {        
+      System.out.println("获取分布式锁成功...");    
+      /*加锁成功...执行业务*/      
+      /*设置过期时间(30秒后自定删除)*/
+      //            stringRedisTemplate.expire("lock", 30, TimeUnit.SECONDS);  
+      /*执行业务*/    
+      Map<String, List<Catalog2Vo>> dataFromDb = null;    
+      try {           
+      	dataFromDb = getDataFromDb();        
+      } finally {
+        //解决锁的自动续期，需要让设置的锁时间稍长一些，不管业务是否执行完成，在次进行原子删锁操作       String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";           
+        /*原子删锁*/       
+        stringRedisTemplate.execute(new DefaultRedisScript<Integer>(script, Integer.class),Arrays.asList("lock"), uuid);       
+      }       
+      /*执行业务成功，删除锁，让别人也可以使用*/     
+      /*删锁和获取锁也要成为原子操作（lua脚本解锁）*/
+      //            String lockValue = stringRedisTemplate.opsForValue().get("lock");/
+      /            if (uuid.equals(lockValue)) {
+      //                /*删除自己的锁*/
+      //                stringRedisTemplate.delete("lock");
+      //            }  
+      return dataFromDb;    
+    } else {     
+      /*加锁失败...重试...*/      
+      System.out.println("获取分布式锁失败...等待重试");         
+      try {              
+        /*休眠100ms后重试*/       
+        Thread.sleep(200);        
+      } catch (Exception e) {          
+      }        
+    return getCatalogJsonFromDBWithRedisLock();//自旋方式   
+    }   
+  }
+```
+
+```markdown
+# 分布式锁框架—Redisson
+	-- 官方地址————https://github.com/redisson/redisson/wiki
+	
+	-- 说明
+		Redisson是一个在Redis的基础上实现的Java驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的Java常用对象，还提供了许多分布式服务。其中包括(BitSet, Set, Multimap, SortedSet, Map, List, Queue, BlockingQueue, Deque, BlockingDeque, Semaphore, Lock, AtomicLong, CountDownLatch, Publish / Subscribe, Bloom filter, Remote service, Spring cache, Executor service, Live Object service, Scheduler service) Redisson提供了使用Redis的最简单和最便捷的方法。Redisson的宗旨是促进使用者对Redis的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。
+
+	-- 使用
+		1、引入依赖
+      <!--redisson依赖（以后使用redisson作为所有分布式锁，分布式对象等功能框架）-->   
+      <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->      
+      <dependency>      
+        <groupId>org.redisson</groupId>   
+        <artifactId>redisson</artifactId>      
+        <version>3.12.0</version>       
+      </dependency>
+    2、配置redisson
+      package com.pigskin.mall.product.config;
+
+      import org.redisson.Redisson;
+      import org.redisson.api.RedissonClient;
+      import org.redisson.config.Config;
+      import org.springframework.context.annotation.Bean;
+      import org.springframework.context.annotation.Configuration;
+      import java.io.IOException;
+
+      /** 
+      * Redisson配置类 
+      */
+      @Configuration
+      public class MyRedissonConfig {   
+        /**    
+        * 所有对Redisson的使用都是通过RedissonClient对象   
+        *     
+        * @return    
+        */   
+        @Bean(destroyMethod = "shutdown")//指定了销毁方法，服务停止后会调用shutdown进行销毁  
+        public RedissonClient redisson() throws IOException {     
+          /*1、查创建配置*/     
+          Config config = new Config();     
+          /*使用redis集群模式*/
+          //        config.useClusterServers().addNodeAddress("127.1.0.1:7004", "127.1.0.1:7005");     
+          /*单节点模式*/    
+          config.useSingleServer().setAddress("redis://192.168.56.101:6379");    
+          /*2、根据Config对象创建出RedissonClient实例*/  
+          return Redisson.create(config);  
+        }
+      }
+    3、异常问题
+      1)问题————Caused by: java.lang.IllegalArgumentException: Redis url should start with redis:// or rediss:// (for SSL connection)
+      	解决————因为地址需要加上redis://前缀.如果连接redis是受保护的ssl，则应该使用rediss://代替redis:	
+
+# 分布式锁和同步器————https://github.com/redisson/redisson/wiki/8.-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8
+	-- 可重入锁
+		1、说明
+			基于Redis的Redisson分布式可重入锁RLock Java对象实现了java.util.concurrent.locks.Lock接口。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
+		2、功能特性
+			1)可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉
+			2)加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
+		3、使用示例
+			@ResponseBody   
+      @GetMapping("/hello")   
+      public String hello() {   
+        /*1、获取一把锁，只要名字一样，就是同一把锁*/     
+        RLock rLock = redisson.getLock("mylock");     
+        /*2、加锁*/      
+        //2.1、阻塞式等待（默认加的锁都是30s时间）   
+        //  1、可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉      
+        //  2、加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
+        //        rLock.lock();      
+        //2.2、阻塞式等待（指定锁到期时间后，在锁时间到了之后，不会自动续期），因此，自动解锁时间一定要大于业务的执行时间      
+        //  1、如若我们传递了锁的超时时间，就发送给redis执行脚本,进行占锁，默认超时时间就是指定的时间       
+        //  2、如若我们未传递锁的超时时间，就使用30*1000【lockWatchdogTimeout看门狗的默认时间】，只要占锁成功，   
+        //  就会启动一个定时任务【重新给锁设定过期时间，新的过期时间，就是看门狗的过期时间，lockWatchdogTimeout/3后进行续期】
+        //        rLock.lock(10, TimeUnit.SECONDS);     
+        //2.3、尝试加锁（最多100m）
+        //        try {
+        //            boolean b = rLock.tryLock(100, 10, TimeUnit.SECONDS);
+        //            if(b){
+        //                try {
+        //                    System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());
+        //                    Thread.sleep(30000);
+        //                } catch (Exception e) {
+        //                    e.printStackTrace();
+        //                } finally {
+        //                    /*3、解锁*/
+        //                    /*假设解锁代码没有执行，redisson会不会死锁*/
+        //                    System.out.println("释放锁。。。" + Thread.currentThread().getId());
+        //                    rLock.unlock();
+        //                }
+        //            }
+        //        } catch (InterruptedException e) {
+        //            e.printStackTrace();
+        //        }      
+        try {        
+          System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());     
+          Thread.sleep(30000);      
+        } catch (Exception e) {       
+        	e.printStackTrace();     
+        } finally {        
+        /*3、解锁*/     
+          /*假设解锁代码没有执行，redisson会不会死锁*/       
+          System.out.println("释放锁。。。" + Thread.currentThread().getId());    
+          rLock.unlock();     
+        }      
+        return "hello";  
+      }
+
+	-- 公平锁
+		1、说明
+			基于Redis的Redisson分布式可重入公平锁也是实现了java.util.concurrent.locks.Lock接口的一种RLock对象。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。它保证了当多个Redisson客户端线程同时请求加锁时，优先分配给先发出请求的线程。所有请求线程会在一个队列中排队，当某个线程出现宕机时，Redisson会等待5秒后继续下一个线程，也就是说如果前面有5个线程都处于等待状态，那么后面的线程会等待至少25秒。
+		2、使用示例
+			RLock fairLock = redisson.getFairLock("anyLock");
+			// 最常见的使用方法
+			fairLock.lock();
+
+	-- 可读写锁
+		1、说明
+			基于Redis的Redisson分布式可重入读写锁RReadWriteLock Java对象实现了java.util.concurrent.locks.ReadWriteLock接口。其中读锁和写锁都继承了RLock接口。
+		2、功能特征
+			1)分布式可重入读写锁允许同时有多个读锁和一个写锁处于加锁状态。
+			2)可以保证读取的数据是最新的,修改期间,写锁是一个排它锁(互斥锁、独享锁).读锁是一个共享锁
+			3)写锁未释放读锁就必须等待只要有写锁,都需要等待
+				-- 读+读————相当于无锁(并发读,只会在redis中记录好所有当前的读锁.他们都会同时加锁成功)
+				-- 写+读————等待写锁匙放
+				-- 写+写————阻塞方式
+				-- 读+写————有读锁,写也要等待
+		3、使用示例
+			/**    
+      * 测试写锁  
+      *     
+      * @return    
+      */   
+      @ResponseBody   
+      @GetMapping("/write")    
+      public String write() {   
+        /*获取读写锁*/       
+        RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock");   
+        String s = "";     
+        RLock rLock = rReadWriteLock.writeLock();     
+        try {        
+          /*改数据加写锁，读数据加读锁*/    
+          rLock.lock();    
+          s = UUID.randomUUID().toString();  
+          Thread.sleep(30000);        
+          template.opsForValue().set("writeValue", s);   
+        } catch (Exception e) {   
+        	e.printStackTrace();     
+        } finally {      
+        	rLock.unlock();      
+        }       
+        return s; 
+      }   
+
+      /**    
+      * 测试读锁  
+      *     
+      * @return    
+      */ 
+      @ResponseBody   
+      @GetMapping("/read")   
+      public String read() {   
+        String s = "";       
+        RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock"); 
+        RLock rLock = rReadWriteLock.readLock();       
+        rLock.lock();       
+        try {      
+        	s = template.opsForValue().get("writeValue");    
+        } catch (Exception e) {   
+        	e.printStackTrace();       
+        } finally {      
+        	rLock.unlock();     
+        }      
+        return s;  
+      }
+
+	-- 闭锁
+		1、说明
+			基于Redisson的Redisson分布式闭锁（CountDownLatch）Java对象RCountDownLatch采用了与java.util.concurrent.CountDownLatch相似的接口和用法。
+		2、使用示例
+			/**   
+      * 测试闭锁   
+      */    
+      @ResponseBody   
+      @GetMapping("/lockDoor")   
+      public String lockDoor() throws InterruptedException {   
+        RCountDownLatch door = redisson.getCountDownLatch("door"); 
+        door.trySetCount(5L);    
+        door.await();//等待闭锁都完成    
+        return "放假了";   
+      } 
+      
+      @ResponseBody   
+      @GetMapping("/gogogo/{id}")  
+        public String gogogo(@PathVariable("id") Long id) { 
+        // 在其他线程或其他JVM里
+        RCountDownLatch door = redisson.getCountDownLatch("door");     
+        door.countDown();//计数减一    
+        return id + "班的人都走了。。。"; 
+      }
+
+	-- 信号量
+		1、说明
+			基于Redis的Redisson的分布式信号量（Semaphore）Java对象RSemaphore采用了与java.util.concurrent.Semaphore相似的接口和用法。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
+		2、使用示例
+			/**   
+      * 测试信号量    
+      * 模拟车库有车来了   
+      *   
+      * @return  
+      */   
+      @ResponseBody  
+      @GetMapping("/park")   
+      public String park() throws InterruptedException {     
+        RSemaphore park = redisson.getSemaphore("park");  
+        park.acquire();
+        /*获取一个信号，获取一个值,占一个车位*/   
+        park.tryAcquire();
+        /*看一下是否有(可以做限流)*/ 
+        return "ok"; 
+      }  
+      /**    
+      * 测试信号量   
+      * 模拟车库车开走了 
+      *  
+      * @return  
+      */   
+      @ResponseBody  
+      @GetMapping("/go")  
+      public String go() throws InterruptedException {     
+        RSemaphore park = redisson.getSemaphore("park");     
+        park.release();
+        /*释放一个信号，获取一个值，释放一个车位*/ 
+        return "ok";
+      }
+```
+
+
+
+## 23、异步和线程池
+
+### 1、线程和线程池
+
+```markdown
+# 初始化线程的四种方式
+	-- 继承Thread
+		1、特征————主进程无法获取到线程的运算结果
+		2、创建
+      /**     
+      * 初始化线程方式一   
+      */  
+      public static class Thread01 extends Thread {   
+        @Override     
+        public void run() {      
+        System.out.println("当前线程：" + Thread.currentThread().getId());   
+        int i = 10 / 2;         
+        System.out.println("运行结果：" + i);   
+        }  
+      }
+		3、使用  
+      Thread01 thread01 = new Thread01();    
+      thread01.start();
+
+	-- 实现Runnable接口
+		1、特征————主进程无法获取到线程的运算结果
+		2、创建
+			/**   
+      * 初始化线程方式二   
+      */  
+      public static class Runnable01 implements Runnable {    
+        @Override      
+        public void run() {     
+          System.out.println("当前线程：" + Thread.currentThread().getId());   
+          int i = 10 / 2;        
+          System.out.println("运行结果：" + i);     
+        }  
+      }
+		3、使用
+			Runnable01 runnable01 = new Runnable01();      
+      new Thread(runnable01).start();
+
+	-- 实现Callable接口+FutureTask(jdk1.5以后)
+		1、特征————主线程可以获取线程的运算结果,但是不利于控制服务器中的线程资源.可以导致服务器资源耗尽
+		2、创建
+			/**     
+			* 初始化线程方式三    
+      */    
+      public static class Callable01 implements Callable<Integer> { 
+        @Override     
+        public Integer call() throws Exception {    
+          System.out.println("当前线程：" + Thread.currentThread().getId());  
+          int i = 10 / 2;         
+          System.out.println("运行结果：" + i);      
+          return i;    
+        } 
+      }
+		3、使用
+			FutureTask<Integer> futureTask = new FutureTask<>(new Callable01());    
+      new Thread(futureTask).start();       
+      /*阻塞等待整个线程执行完成，获取返回结果*/      
+      Integer integer = futureTask.get();      
+      System.out.println("main__________end____" + integer);
+
+	-- 线程池
+		1、特征
+			性能稳定,可以获取执行结果,并捕获异常,达到控制资源的效果.但是在复杂业务下,一个异步调用可能依赖于另一个异步调用的执行结果
+		2、初始化线程方式
+			1)工具类创建————Executors.newFiexedThreadPool(3);
+				/*4）线程池。给线程池直接提交任务*/     
+        //原生写法，存在问题：会耗费掉资源（所以在业务代码中不能使用前三种，应该将所有的多线程异步任务交给线程池执行）
+        //        new Thread(() -> System.out.println("hello")).start();     
+        /*需要整个系统只有一两个，每个异步任务直接提交给线程池*/
+        //        包含10个线程的线程池
+        public static ExecutorService service = Executors.newFixedThreadPool(10);   
+        service.execute(new Runnable01());
+			2)原生方式创建————参数详见[线程池的七大参数]
+        new ThreadPoolExecutor(
+          corePollSize,maximumPoolSize,keepAliveTime,
+          timeUnit,wortQueue,threadFactory,handler
+        )
+
+# 线程池的七大参数
+	-- 参数说明
+		1、int corePoolSize————the number of threads to keep in the pool, even if they are idle, unless allowCoreThreadTimeOut is set(核心线程数,线程池创建好之后就准备好的线程数量,就等待接收异步任务来执行.即当于指定new Thread()的个数.)
+    2、int maximumPoolSize————the maximum number of threads to allow in the pool(最大线程数量,控制资源)
+    3、long keepAliveTime————when the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before terminating.(存活时间.如果当前的线程数量,大于核心数量,只要线程的空闲时间大于设定的存活时间,就释放空闲的线程(最大大小-核心大小).)
+    4、TimeUnit unit————the time unit for the keepAliveTime argument(时间单位)
+    5、BlockingQueue<Runnable> workQueue————the queue to use for holding tasks before they are executed. This queue will hold only the Runnable tasks submitted by the execute method.(阻塞队列.如果任务有很多,就会将多的任务放到队列中,只要有线程空闲,就会去队列中取出新的任务继续执行.默认integer最大值)
+    6、ThreadFactory threadFactory————the factory to use when the executor creates a new thread(线程的创建工厂,可自己创建)
+    7、RejectedExecutionHandler handler————the handler to use when execution is blocked because the thread bounds and queue capacities are reached(如果队列满了,按照指定的拒绝策略拒绝执行任务)
+			1)DiscardOldestPolicy
+				-- 说明————丢弃最老的,也就是说如果队列满了，会将最早进入队列的任务删掉腾出空间，再尝试加入队列。因为队列是队尾进，队头出，所以队头元素是最老的，因此每次都是移除对头元素后再尝试入队。
+				-- 源码
+          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            if (!e.isShutdown()) {
+              //移除队头元素
+              e.getQueue().poll();
+              //再尝试入队
+              e.execute(r);
+            }
+          }
+			2)AbortPolicy
+				-- 说明————线程池的默认策略。使用该策略时，如果线程池队列满了丢掉这个任务并且抛出RejectedExecutionException异常。
+				-- 源码
+          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            //不做任何处理，直接抛出异常
+            throw new RejectedExecutionException("Task " + r.toString() +" rejected from " +e.toString());
+          }
+			3)CallerRunsPolicy
+				-- 说明————直接调用run方法的任务.此方式不抛弃,以同步方式执行.使用此策略，如果添加到线程池失败，那么主线程会自己去执行该任务，不会等待线程池中的线程去执行。
+				-- 源码
+          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            if (!e.isShutdown()) {
+              //直接执行run方法
+              r.run();
+            }
+          }
+			4)DiscardPolicy
+				-- 说明————这个策略和AbortPolicy的slient版本，如果线程池队列满了，会直接丢掉这个任务并且不会有任何异常。
+				-- 源码
+          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+          	//就是一个空的方法
+          }	
+			5)RejectedExecutionHandler(自定义)
+				-- 说明————如果以上策略都不符合业务场景，那么可以自己定义一个拒绝策略，只要实现RejectedExecutionHandler接口，并且实现rejectedExecution方法就可以了。具体的逻辑就在rejectedExecution方法里去定义就OK了。
+				-- 自定义示例————例如：我定义了我的一个拒绝策略，叫做MyRejectPolicy，里面的逻辑就是打印处理被拒绝的任务内容
+					public class MyRejectPolicy implements RejectedExecutionHandler{
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+              //Sender是我的Runnable类，里面有message字段
+              if (r instanceof Sender) {
+                Sender sender = (Sender) r;
+                //直接打印
+                System.out.println(sender.getMessage());
+              }
+            }
+        }
+
+	-- 工作顺序
+  	1、线程池创建,准备好core数量的核心线程,准备接收任务
+  	2、新的任务进来了.用准备好的空闲线程执行
+  		1)core满了,就将进来的任务放到阻塞队列中.有了空闲的线程就会自己去阻塞队列获取任务执行
+  		2)阻塞队列满了,就直接开新线程执行,最大只能开到max指定的数量
+  		3)max都执行好了.max-core数量空闲的线程就会在keepAliveTime指定的时间后自动销毁,最终保持到core大小
+  		4)如果线程数开到max数量后,还有新的任务进来,就会使用handler指定的拒绝策略进行处理
+  	3、所有的线程创建都由factory创建的
+
+ 	-- 示例
+ 		问题————一个线程池,core 7,max 20,queue 50,100个并发进来怎么分配.
+ 		说明————7个立即执行,50个进入队列,再开13个进行执行,剩余30个使用拒绝策略处理
+
+# 常见的四种线程池
+	-- Executors.newCachedThreadPool();————带缓存的线程池：核心是0，所有都可回收
+
+	-- Executors.newFixedThreadPool(10);————固定线程池大小：核心等于最大的，都不可回收
+
+	-- Executors.newScheduledThreadPool(10);————用于定时任务的线程池
+
+	-- Executors.newSingleThreadExecutor();————单线程线程池：后台从队列中获取任务，顺序执行
+
+# 开发中为什么使用线程池
+	-- 降低资源的消耗————通过重复利用已创建好的线程,降低创建和销毁线程带来的损耗
+	-- 提高响应速度————因为线程池中的线程数没有冲超过线程池的最大限度时,有的线程处于待分配任务的状态,当任务来时,无需创建新的线程就能执行
+	-- 提高线程的可管理性————线程池会根据当前系统特点对池内的线程进行优化处理,减少创建和销毁线程带来的系统开销.无限的创建和销毁线程不仅消耗系统资源,还降低系统的稳定性,使用线程池统一分配
+```
+
+
+
+### 2、CompletableFuture异步编排
+
+```markdown
+# 创建异步对象(CompletableFuture提供了四个静态方法来创建一个异步操作)
+	-- 无返回结果的，可自定义线程池
+		1、相关方法
+    	1)不可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable)
+    	2)可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable, Executor executor)
+    2、代码示例：       
+      CompletableFuture.runAsync(() -> {    
+        System.out.println("当前线程：" + Thread.currentThread().getId());   
+        int i = 10 / 2;         
+        System.out.println("运行结果：" + i);      
+      }, service); //service为自定义线程池,不指定采用默认
+    3、结果：
+      //        main方法开始。。。。。
+      //        main方法结束。。。。。
+      //        当前线程：11
+      //        运行结果：5
+
+	-- 有返回结果的，可自定义线程池
+   	1、相关方法
+   		1)不可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier)
+   		2)可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier,
+      	Executor executor)
+   	2、代码示例 
+    	CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {      
+        System.out.println("当前线程：" + Thread.currentThread().getId());      
+        int i = 10 / 2;         
+        System.out.println("运行结果：" + i);   
+        return i;   
+      }, service);   
+      System.out.println("main方法结束。。。。。" + supplyAsync.get());
+    3、结果
+    	//        main方法开始。。。。。
+    	//        当前线程：11
+    	//        运行结果：5
+    	//        main方法结束。。。。。5
+
+# 计算完成时回调方法(方法完成之后的感知)
+	-- 相关方法————处理正常和异常的计算结果
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+  		public CompletableFuture<T> whenComplete (BiConsumer < ? super T, ?super Throwable > action)  
+		2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, ?super Throwable > action)   
+		3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, 
+    		?super Throwable > action, Executor executor)       
+  	4、处理异常结果
+  		public CompletableFuture<T> exceptionally (Function < Throwable, ? extends T > fn)
+
+	-- 代码示例    
+  	CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {       
+      System.out.println("当前线程：" + Thread.currentThread().getId());     
+      int i = 10 / 0;          
+      System.out.println("运行结果：" + i);     
+      return i;     
+    }, service).whenComplete((result, exception) -> {    
+      /*虽然能得到异常信息，但是没法修改返回数据*/       
+      System.out.println("异步任务成功完成了。。。,结果是：" + result + "；异常是：" + exception);    
+    }).exceptionally(throwable -> {   
+      /*可以感知异常，同时返回默认值*/      
+      return 10;      
+    });
+
+	-- 结果
+		//        main方法开始。。。。。
+		//        当前线程：11
+		//        异步任务成功完成了。。。,结果是：null；异常是：java.util.concurrent.CompletionException: 
+		// java.lang.ArithmeticException: / by zero
+		//        main方法结束。。。。。10
+
+# handle方法(方法完成之后的处理)
+	-- 相关方法————处理正常和异常的计算结果，并返回新的结果
+    1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public <U > CompletableFuture < U > handle(BiFunction < ? super T, Throwable, ? extends U > fn)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+      public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, ? extends U > fn)      
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+      public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, 
+      	? extends U > fn, Executor executor)
+
+	-- 代码示例
+  	CompletableFuture<Integer> handle = CompletableFuture.supplyAsync(() -> {     
+      System.out.println("当前线程：" + Thread.currentThread().getId());       
+      int i = 10 / 4;         
+      System.out.println("运行结果：" + i);   
+      return i;    
+    }, service).handle((result, exception) -> {    
+      if (result != null && exception == null) {
+        //返回有结果，并且异常为空，则继续执行并返回执行后的新结果    
+        return result * 2;       
+      }          
+      /*否则证明有异常或者返回结果为空*/   
+      return 0;   
+    });
+
+	-- 结果
+  	// main方法开始。。。。。    
+    // 当前线程：11       
+    // main方法结束。。。。。
+    // 0
+
+# 线程串行化方法
+	-- 相关方法————不能获取到上一步的执行结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+			public CompletableFuture<Void> thenRun(Runnable action)      
+    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    	public CompletableFuture<Void> thenRunAsync (Runnable action)      
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> thenRunAsync (Runnable action, Executor executor)
+		4、代码示例  
+      CompletableFuture.supplyAsync(() -> {         
+        System.out.println("当前线程：" + Thread.currentThread().getId());   
+        int i = 10 / 4;        
+        System.out.println("运行结果：" + i);      
+        return i;      
+      }, service).thenRunAsync(() -> {   
+        System.out.println("任务二启动了。。。");   
+      }, service);
+		5、运行结果
+		//        当前线程：11
+		//        运行结果：2
+		//        main方法结束。。。。。
+		//        任务二启动了。。。
+
+	-- 相关方法————能接收到上一步的执行结果,但是不能改变返回值，继续执行
+    1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public CompletableFuture<Void> thenAccept(Consumer<? super T> action)    
+    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action)    
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action, Executor executor)
+		4、代码示例 
+		  CompletableFuture.supplyAsync(() -> {     
+        System.out.println("当前线程：" + Thread.currentThread().getId());    
+        int i = 10 / 4;         
+        System.out.println("运行结果：" + i);  
+        return i;     
+      }, service).thenAcceptAsync((result) -> {  
+      	System.out.println("任务二启动了。。。上一次结果为：" + result);     
+      }, service);
+		5、运行结果
+		   //        当前线程：11
+		   //        运行结果：2
+		   //        main方法结束。。。。。
+		   //        任务二启动了。。。上一次结果为：2
+
+	-- 相关方法————能接收到上一步的执行结果,并且能改变返回值，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public <U > CompletableFuture < U > thenApply(Function < ? super T, ? extends U > fn)       
+    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    	public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, ? extends U > fn)       
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    	public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, 
+    		? extends U > fn, Executor executor)
+    4、代码示例
+    	CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {  
+        System.out.println("当前线程：" + Thread.currentThread().getId());      
+        int i = 10 / 4;          
+        System.out.println("运行结果：" + i);        
+        return i;      
+      }, service).thenApplyAsync((result) -> {   
+        System.out.println("任务二启动了。。。上一次结果为：" + result);  
+        return "我是返回结果" + result;  
+      }, service);    
+      System.out.println("main方法结束。。。。。最终返回结果：" + future.get());
+    5、执行结果
+    	//        当前线程：11
+    	//        运行结果：2
+    	//        任务二启动了。。。上一次结果为：2
+    	//        main方法结束。。。。。最终返回结果：我是返回结果2
+
+# 两个任务组合——都要完成(两个任务都完成后触发)
+	-- 相关方法————不能获取到任务一和任务二的执行结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public CompletableFuture<Void> runAfterBoth (CompletionStage < ? > other, Runnable action)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action)        
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+ 			public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, 
+ 				Runnable action, Executor executor)
+		4、代码示例：       
+      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> { 
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());      
+        int i = 10 / 4;     
+        System.out.println("任务一线程结束：" + i);  
+        return i;      
+      }, service);  
+      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {        
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
+        System.out.println("任务二线程结束：");     
+        return "Hello";     
+      }, service);    
+      future01.runAfterBothAsync(future02, () -> {   
+        System.out.println("任务三开始。。。");      
+      }, service);     
+		5、运行结果：
+      //        main方法开始。。。。。
+      //        任务一线程启动：11
+      //        任务一线程结束：2
+      //        任务二线程启动：12
+      //        任务二线程结束：
+      //        main方法结束。。。。。最终返回结果：
+      //        任务三开始。。。
+
+	-- 相关方法————能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
+  	1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, 
+    		BiConsumer < ? super T, ?super U > action)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,
+    		BiConsumer < ? super T, ?super U > action)       
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
+    		BiConsumer < ? super T, ?super U > action, Executor executor)
+    4、代码示例：      
+      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {   
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
+        int i = 10 / 4;        
+        System.out.println("任务一线程结束：" + i);     
+        return i;    
+      }, service);    
+      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {    
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
+        System.out.println("任务二线程结束：");     
+        return "Hello";
+      }, service);     
+      future01.thenAcceptBothAsync(future02, (f1, f2) -> {         
+        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);   
+      }, service);
+    5、运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务二线程结束：
+    	//        main方法结束。。。。。最终返回结果：
+    	//        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+
+	-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public <U, V > CompletableFuture < V > thenCombine(CompletionStage < ? extends U > other,
+    		BiFunction < ? super T,? super U,? extends V > fn)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other, 
+    		BiFunction < ? super T,?super U,? extends V > fn)        
+    3、自定义线程池（将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other,
+      	BiFunction < ? super T,?super U,? extends V > fn, Executor executor)
+    4、代码示例：
+    	CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
+        int i = 10 / 4;         
+        System.out.println("任务一线程结束：" + i);   
+        return i;     
+      }, service);  
+      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {   
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());  
+        System.out.println("任务二线程结束：");      
+        return "Hello";    
+      }, service);  
+      CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {   
+        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);      
+        return "任务三返回结果：" + "任务一的结果：" + f1 + ";任务二的结果：" + f2;    
+      }, service);
+    5、运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务二线程结束：
+    	//        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+    	//        main方法结束。。。。。最终返回结果：任务三返回结果：任务一的结果：2;任务二的结果：Hello
+
+# 两个任务组合——一个完成
+	-- 相关方法————不能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public CompletableFuture<Void> runAfterEither (CompletionStage < ? > other, Runnable action) 
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action)  
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行	
+    	public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action, 
+    		Executor executor)
+    4、代码示例
+    	CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {  
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());         
+        int i = 10 / 4;       
+        System.out.println("任务一线程结束：" + i);    
+        return i;     
+      }, service);      
+      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {     
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());          
+        try {              
+          Thread.sleep(3000);     
+          System.out.println("任务二线程结束：任务二的线程睡了三秒");    
+        } catch (InterruptedException e) {      
+        	e.printStackTrace();          
+        }         
+        return "Hello";     
+      }, service);  
+      future01.runAfterEitherAsync(future02, () -> {         
+      	System.out.println("任务三开始执行。。。");      
+      }, service);
+    5、运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务三开始执行。。。
+    	//        任务二线程结束：任务二的线程睡了三秒
+
+	-- 相关方法————能获取到任务一或任务二的执行结果，任务三无返回结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+      public CompletableFuture<Void> acceptEither (CompletionStage < ? extends T > other, 
+        Consumer < ? super T > action)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,
+      	Consumer < ? super T > action)        
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,
+      	Consumer < ? super T > action, Executor executor)
+    4、代码示例：
+    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {       
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());  
+        int i = 10 / 4;       
+        System.out.println("任务一线程结束：" + i);    
+        return i;      
+      }, service);   
+      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
+        System.out.println("任务二线程结束：");      
+        try {               
+          Thread.sleep(3000);    
+          System.out.println("任务二线程结束：任务二的线程睡了三秒");   
+        } catch (InterruptedException e) {            
+        	e.printStackTrace();          
+        }          
+        return "Hello";    
+      }, service);     
+      future01.acceptEitherAsync(future02, (result) -> {   
+      	System.out.println("任务三开始执行。。。任务一或任务二的结果为：" + result);   
+      }, service);
+    5、运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务二线程结束：
+    	//        任务三开始执行。。。任务一或任务二的结果为：2
+    	//        任务二线程结束：任务二的线程睡了三秒
+
+	-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
+		1、执行当前任务的线程继续执行任务————相同的线程执行
+    	public <U > CompletableFuture < U > applyToEither(CompletionStage < ? extends T > other, 
+    		Function < ? super T, U > fn)       
+    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, 
+    		Function < ? super T, U > fn)      
+    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    	public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, 
+    		Function < ? super T, U > fn, Executor executor)
+    4、代码示例：    
+    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {         
+      	System.out.println("任务一线程启动：" + Thread.currentThread().getId());        
+        int i = 10 / 4;        
+        System.out.println("任务一线程结束：" + i);     
+        return i;     
+      }, service); 
+      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());      
+        try {            
+          Thread.sleep(3000);      
+          System.out.println("任务二线程结束：");    
+        } catch (InterruptedException e) {   
+        	e.printStackTrace();        
+        }          
+        return "Hello";    
+      }, service);     
+      CompletableFuture<String> stringCompletableFuture = future01.applyToEitherAsync(future02, (result) -> {  
+        System.out.println("任务三开始执行。。。");    
+        return "任务三执行完成，任务一或任务二的结果为：result:" + result;       
+      }, service);     
+      System.out.println("main方法结束。。。。。最终返回结果：" + stringCompletableFuture.get());
+   	5、运行结果：
+   		//        main方法开始。。。。。
+   		//        任务一线程启动：11
+   		//        任务一线程结束：2
+   		//        任务二线程启动：12
+   		//        任务二线程结束：
+   		//        任务三开始执行。。。
+   		//        main方法结束。。。。。最终返回结果：任务三执行完成，任务一或任务二的结果为：result:2
+
+# 多任务组合
+	-- 相关方法 
+  	1、等待所有任务完成
+    	public static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs)     
+    2、只要有一个任务完成
+    	public static CompletableFuture<Object> anyOf(CompletableFuture<?>... cfs)
+    3、代码示例：     
+    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {  
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
+        int i = 10 / 4;        
+        System.out.println("任务一线程结束：" + i);     
+        return i;     
+      }, service);   
+      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {     
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
+        try {           
+          Thread.sleep(3000);     
+          System.out.println("任务二线程结束：");       
+        } catch (InterruptedException e) {            
+        	e.printStackTrace();      
+        }          
+        return "Hello";    
+      }, service);     
+      CompletableFuture<Object> future03 = CompletableFuture.supplyAsync(() -> {   
+        System.out.println("任务三线程启动：" + Thread.currentThread().getId());  
+        try {          
+          Thread.sleep(5000);    
+          System.out.println("任务三线程结束：");   
+        } catch (InterruptedException e) { 
+        	e.printStackTrace();         
+        }           
+        return "Hello";      
+      }, service);      
+      CompletableFuture<Object> future04 = CompletableFuture.supplyAsync(() -> {     
+        System.out.println("任务四线程启动：" + Thread.currentThread().getId());    
+        try {             
+          Thread.sleep(6000);  
+          System.out.println("任务四线程结束：");   
+        } catch (InterruptedException e) {       
+        	e.printStackTrace();           
+        }           
+        return "Hello";     
+      }, service);   
+      //等待所有结果完成
+      CompletableFuture.allOf(future01, future02, future03, future04).get();
+      System.out.println("main...end..." + future01.get() + "=>" 
+      	+ future02.get() + "=>" + future03.get() + "=>" + future04.get());
+
+      //只要其中一个执行完成
+      CompletableFuture<Object> f = CompletableFuture.anyOf(future01, future02, future03, future04);      
+    	System.out.println("main...end..." + f.get());
+    4、等待所有结果完成————运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务三线程启动：13
+    	//        任务四线程启动：14
+    	//        任务二线程结束：
+    	//        任务三线程结束：
+    	//        任务四线程结束：
+    	//        main...end...2=>Hello=>Hello=>Hello       
+
+    5、只要其中一个执行完成————运行结果：
+    	//        main方法开始。。。。。
+    	//        任务一线程启动：11
+    	//        任务一线程结束：2
+    	//        任务二线程启动：12
+    	//        任务三线程启动：13
+    	//        任务四线程启动：14
+    	//        main...end...2
+    	//        任务二线程结束：
+    	//        任务三线程结束：
+    	//        任务四线程结束：
+
+# 业务场景示例
+	-- 场景————假如商品详情页的每个查询,需要入校标注的时间才能完成,那么用户5.5s才能看到结果.但是使用多线程,1.5s就能看到
+	-- 说明
+		1、方法说明：  
+      /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行（执行当前任务的线程继续执行任务——相同的线程执行）*/
+      public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, 
+      	BiConsumer < ? super T, ?super U > action)     
+      /*能获取到任务一和任务二的执行结果,任务三无返回结果,继续执行（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
+      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
+      	BiConsumer < ? super T, ?super U > action)    
+      /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行，自定义线程池（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
+      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
+      	BiConsumer < ? super T, ?super U > action, Executor executor)
+    2、代码示例：    
+      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
+        System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
+        int i = 10 / 4;         
+        System.out.println("任务一线程结束：" + i);    
+        return i;      
+      }, service);    
+      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> { 
+        System.out.println("任务二线程启动：" + Thread.currentThread().getId()); 
+        System.out.println("任务二线程结束：");       
+        return "Hello";      
+      }, service);  
+      future01.thenAcceptBothAsync(future02, (f1, f2) -> {    
+      	System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);        
+      }, service);
+    3、结果展示
+      //      运行结果：
+      //        main方法开始。。。。。
+      //        任务一线程启动：11
+      //        任务一线程结束：2
+      //        任务二线程启动：12
+      //        任务二线程结束：
+      //        main方法结束。。。。。最终返回结果：
+      //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+```
+
+
+
+### 3、CompletableFuture异步编排使用步骤
+
+```markdown
+# 引入依赖(可以不引用),提供提示功能
+	<!--线程池配置依赖元数据处理器，可以提示（可以不加）-->   
+  <dependency>         
+    <groupId>org.springframework.boot</groupId>        
+    <artifactId>spring-boot-configuration-processor</artifactId>  
+    <optional>true</optional>     
+  </dependency>
+
+# 创建线程池配置类
+    package com.pigskin.mall.product.config;
+
+    import lombok.Data;
+    import org.springframework.boot.context.properties.ConfigurationProperties;
+    import org.springframework.stereotype.Component;
+    import java.util.concurrent.TimeUnit;
+
+    /**
+    * 线程池属性文件配置 
+    */
+    @ConfigurationProperties(prefix = "pigskinmall.thread")
+    @Component
+    @Data
+    public class ThreadPoolConfigProperties {   
+      /**  
+      * 核心线程大小(默认20) 
+      */   
+      private Integer coreSize = 20;  
+      /**   
+      * 最大大小(默认100)   
+      */   
+      private Integer maxSize = 100;  
+      /**   
+      * 休眠时长(默认10)    
+      */  
+      private Integer keepAliveTime = 10;  
+      /**   
+      * 休眠时长单位(默认TimeUnit.SECONDS)    
+      */   
+      private TimeUnit timeUnit; 
+      /**   
+      * 队列大小(默认100000)  
+      */  
+      private Integer capacity = 100000;
+    }
+
+# 配置文件添加配置
+	#配置线程池相关配置
+	pigskinmall.thread.core-size=20
+	pigskinmall.thread.keep-alive-time=10
+	pigskinmall.thread.max-size=200
+	pigskinmall.thread.capacity=100000
+	pigskinmall.thread.time-unit=seconds
+
+# 创建线程池异步编排配置类文件
+    package com.pigskin.mall.product.config;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import java.util.concurrent.Executors;
+    import java.util.concurrent.LinkedBlockingDeque;
+    import java.util.concurrent.ThreadPoolExecutor;
+
+    /**
+    * 创建线程池配置 
+    */
+    /*开启指定类文件的属性配置，这样在对应类中就可以不写@Component注解*/
+    //@EnableConfigurationProperties(ThreadPoolConfigProperties.class)
+    @Configuration
+    public class MyThreadConfig {  
+      /**    
+      * @return  
+      */   
+      @Bean  
+      public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfigProperties pool) {    
+        return new ThreadPoolExecutor(pool.getCoreSize(),         
+        pool.getMaxSize(),          
+        pool.getKeepAliveTime(),            
+        pool.getTimeUnit(),         
+        new LinkedBlockingDeque<>(pool.getCapacity()),    
+        Executors.defaultThreadFactory(),      
+        new ThreadPoolExecutor.AbortPolicy());  
+      }
+    }
+
+# 业务代码使用异步编排
+  @Override 
+  public SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException {  
+    SkuItemVo skuItemVo = new SkuItemVo();      
+    /*TODO:进行异步编排*/   
+    CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {   
+      //1、sku基本信息获取（pms_sku_info）        
+      SkuInfoEntity info = getById(skuId);   
+      skuItemVo.setInfo(info);        
+      return info;       
+    }, executor);    
+    /*后续三个都需要等待第一个执行完成的结果之后，这三个同步执行*/      
+    CompletableFuture<Void> saleAttrFuture = infoFuture.thenAcceptAsync((result) -> {     
+      //3、获取spu销售属性组合（）       
+      List<SkuItemSaleAttrsVo> saleAttrsVos = saleAttrValueService.getSaleAttrsBySpuId(result.getSpuId());   
+      skuItemVo.setSaleAttrs(saleAttrsVos);   
+    }, executor);    
+    CompletableFuture<Void> despFuture = infoFuture.thenAcceptAsync((result) -> {      
+      //4、获取spu介绍(pms_spu_info_desc)   
+      SpuInfoDescEntity spuInfoDesc = infoDescService.getById(result.getSpuId());   
+      skuItemVo.setDesp(spuInfoDesc);  
+    }, executor);     
+    CompletableFuture<Void> baseAttrFuture = infoFuture.thenAcceptAsync((result) -> {           
+      //5、获取规格参数信息       
+      List<SpuItemAttrGroupVo> spuItemAttrGroupVos = attrGroupService.getAttrGroupWithAttrsBySpuId(result.getSpuId(), result.getCatalogId());    
+      skuItemVo.setGroupAttrs(spuItemAttrGroupVos);      
+    });    
+    /*因为和其他都不冲突，可以创建一个新的进行执行*/      
+    CompletableFuture<Void> imageFuture = CompletableFuture.runAsync(() -> {          
+      //2、sku图片信息（pms_sku_images）      
+      List<SkuImagesEntity> images = imagesService.getImagesBySkuId(skuId);    
+      skuItemVo.setImages(images);    
+    }, executor);   
+    /*等到所有任务都完成*/     
+    CompletableFuture.anyOf(saleAttrFuture, despFuture, baseAttrFuture, imageFuture).get();   
+    return skuItemVo;   
+  }
 ```
 
 
