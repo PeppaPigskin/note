@@ -6111,6 +6111,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   }
 ```
 
+
+
 ## 24、重定向与请求转发
 
 ### 1、请求转发
@@ -6195,6 +6197,202 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # 分布式下session问题
 	详见————2-1-25、Session共享问题
+```
+
+
+
+## 25、Session共享问题
+
+```markdown
+# Session原理
+```
+
+<img src="image/img2_1_25_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 存在问题
+-- 问题
+	1、同一服务,复制多份,Session不同步问题
+	2、不同服务,Session不共享问题
+
+-- 图示,如下图所示
+```
+
+<img src="image/img2_1_25_1_2.png" style="zoom:50%;" />
+
+```markdown
+# 分布式session解决方案原理
+-- Session复制,如图所示:
+```
+
+<img src="image/img2_1_25_1_3.png" style="zoom:50%;" />
+
+```markdown
+-- 客户端存储,如图所示:
+```
+
+<img src="image/img2_1_25_1_4.png" style="zoom:50%;" />
+
+```markdown
+-- hash一致性,如图所示:
+```
+
+<img src="image/img2_1_25_1_5.png" style="zoom:50%;" />
+
+```markdown
+-- 统一存储,如图所示:
+```
+
+<img src="image/img2_1_25_1_6.png" style="zoom:50%;" />
+
+```markdown
+-- 不同服务,子域session共享
+	1、说明————子域之间session共享,发卡时指定域名为父域名，这样即使是子域发的卡，也能让父域使用到
+	2、实现方式
+		1)原生方式————参数传递HttpServletResponse对象,调用其addCookie设置
+			Cookie cookie = new Cookie("JSESSIONID", "xxx");
+      cookie.setDomain("pigskinmall.com");
+      servletResponse.addCookie(cookie);
+    2)使用SpringSession方式————详见——SpringSession
+	3、图示,如图所示:
+```
+
+<img src="image/img2_1_25_1_7.png" style="zoom:50%;" />
+
+```markdown
+# SpringSession
+-- 核心原理————装饰者模式
+	1、@EnableRedisHttpSession导入了RedisHttpSessionConfiguration配置    
+  	1)给容器中添加了一个组件      
+    	sessionRedisOperationsSessionRepository:redis操作session.即session的增删改查封装类   
+    2)设置了一个Session存储的过滤器         
+    	SessionRepositoryFilter:每一个请求都要经过这个过滤器.   
+        -- 创建时,就自动从容器中获取到了SessionRepository    
+        -- 原始的request,response都被包装了SessionRepositoryRequestWrapper、SessionRepositoryResponseWrapper             
+        -- 以后获取Session都会调用request.getSession()    
+        -- 由于被包装,放行的是SessionRepositoryRequestWrapper.所以调用的getSession其实是Wrapper的getSession,则是从SessionRepository中获取的,因为SessionRepository真正添加的其实是sessionRedisOperationsSessionRepository,所以就是使用的redis操作session
+
+-- 整合
+	1、添加依赖
+		<dependency> 
+      <groupId>org.springframework.session</groupId>  
+      <artifactId>spring-session-data-redis</artifactId> 
+    </dependency>
+    <!--redis依赖-->   
+    <dependency>           
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-data-redis</artifactId>   
+    </dependency>
+	2、添加配置
+		#redis相关配置
+		spring.redis.host=192.168.56.101
+		spring.redis.port=6379
+		#设置session保存位置
+		spring.session.store-type=redis
+		#设置session超时时间
+		spring.session.timeout=30m
+	3、开启SpringSession配置功能
+		@EnableRedisHttpSession 
+		public class Config { 
+			@Bean 
+			public LettuceConnectionFactory connectionFactory() { 
+      	return new LettuceConnectionFactory();
+      }
+    }
+	4、存在问题及解决方案
+		1)默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题
+			package com.pigskin.mall.auth.config;
+			import org.springframework.context.annotation.Bean;
+			import org.springframework.context.annotation.Configuration;
+			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+			import org.springframework.data.redis.serializer.RedisSerializer;
+			import org.springframework.session.web.http.CookieSerializer;
+			import org.springframework.session.web.http.DefaultCookieSerializer;
+			
+			/** 
+			* session配置类
+      */
+      @Configuration
+      public class MallSessionConfig {   
+      	/**  
+        * 设置Cookie序列化器组件     
+        * 解决问题（默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题）   
+        *   
+        * @return  
+        */    
+        @Bean   
+        public CookieSerializer cookieSerializer() {  
+        	DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();  
+          /*指定Session作用域（放大）*/        
+          cookieSerializer.setDomainName("pigskinmall.com");   
+          cookieSerializer.setCookieName("PIGSKINSESSION");    
+          return cookieSerializer; 
+        }
+      }
+		2)使用json序列化方式来序列化对象数据到redis中
+			package com.pigskin.mall.auth.config;
+			
+			import org.springframework.context.annotation.Bean;
+			import org.springframework.context.annotation.Configuration;
+			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+			import org.springframework.data.redis.serializer.RedisSerializer;
+			import org.springframework.session.web.http.CookieSerializer;
+			import org.springframework.session.web.http.DefaultCookieSerializer;
+			
+			/**
+      * session配置类 
+      */
+      @Configuration
+      public class MallSessionConfig {  
+      	/**   
+        * 设置redis序列化器组件   
+        * 解决问题（使用json序列化方式来序列化对象数据到redis中）   
+        *    
+        * @return    
+        */   
+        @Bean   
+        public RedisSerializer<Object> springSessionDefaultRedisSerializer() {  
+        	return new GenericJackson2JsonRedisSerializer();   
+        }
+      }
+```
+
+
+
+## 26、ThredLocal
+
+```markdown
+# 说明————JDK提供的同一线程共享数据
+
+# 说明
+-- 因为每一个请求进来，tomcat都会开一个线程进行处理
+-- 从拦截器(Interceptor)——>控制器(controller)——>业务处理层(service)——>数据访问层(dao)
+-- 一直到请求结束到给浏览器响应，从始至终都是同一个线程，所以就可以依据ThreadLocal的特性，进行同一线程数据共享
+-- 其核心原理：Map<Thread,Object> threadLocal
+
+# 使用
+	public static ThreadLocal<UserInfoTo> toThreadLocal = new ThreadLocal<>();
+```
+
+
+
+## 27、消息中间件——RabbitMQ
+
+```ma
+```
+
+
+
+## 28、性能监控
+
+```markdown
+```
+
+
+
+## 29、压力测试
+
+```markdown
 ```
 
 
