@@ -2066,6 +2066,14 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 # 说明
 	针对特定问题一种解决方案
 
+# 图示
+```
+
+<img src="image/img2_1_12_1_0.png" style="zoom:30%;" />
+
+```markdown
+
+
 # 主要解决问题
 -- 开放系统间的授权
 	1)说明————给对应需要访问某个服务授权访问权限
@@ -3623,55 +3631,106 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ## 19、登录方式
 
-```markdown
-# 单一服务器模式
--- 特点————没有集群，没有分布式
--- 缺点————单点性能压力，无法扩展
--- 实现方式————【Session对象实现】
-	1、实现过程：登录成功后将用户信息放到session中，判断是否登录，通过判断是否能够从session中取到数据
-	2、核心代码：
-		-- 向session中放数据————session.setAttribute("user",user);
-		-- 从session中获取数据————session.getAttribute("user");
-	3、实现原理：基于cookie实现
+### 1、单一服务器模式——Session对象实现
 
-# 服务器集群模式————SSO（Single sign on）模式【单点登录】
--- 特点————集群部署（多台服务器，部署不同的服务，构成一个项目）
--- 说明————一个项目有多个模块，每个模块独立运行，相互不产生影响，在一个模块登录了之后，其他模块都不需要进行二次登录
--- 常见实现方式
-	1、session广播机制实现【session的复制】
-		-- 实现过程
+```markdown
+# 特点————没有集群，没有分布式
+
+# 缺点————单点性能压力，无法扩展
+
+# 实现方式————【Session对象实现】
+
+# 实现过程
+	登录成功后将用户信息放到session中，判断是否登录，通过判断是否能够从session中取到数据
+
+# 核心代码
+	-- 向session中放数据————session.setAttribute("user",user);
+	-- 从session中获取数据————session.getAttribute("user");
+
+# 实现原理————基于cookie实现
+```
+
+
+
+### 2、服务器集群模式——SSO（Single sign on）单点登录模式
+
+```markdown
+# 解决的问题
+	多系统时,因为通过Session只能将作用范围扩展到xxx.com这一级,所以就不能使用redis共享session方式
+
+# 特点————集群部署（多台服务器，部署不同的服务，构成一个项目）
+
+# 说明
+	一个项目有多个模块，每个模块独立运行，相互不产生影响，在一个模块登录了之后，其他模块都不需要进行二次登录
+
+# 核心————多个系统使用不同的域名,想办法给这多个系统同步同一个用户的票据
+	1、中央认证服务器:登录认证服务器
+	2、其他系统想要登录去中央认证服务器登录,登陆成功跳转回来
+	3、只要有一个登陆,其他都不用登陆
+	4、全系统统一一个唯一标识的cookie,所有系统可能域名都不相同
+
+# 常见实现方式
+	-- session广播机制实现【session的复制】
+		1、实现过程
 			1)一个模块登录后，通过session.setAttribute()将session保存起来
 			2)同时将session数据复制到其他各个模块
-		-- 缺点————模块太多的话。进行复制太消耗资源，同时浪费空间
-		-- 过期时间————session默认失效时间30分钟（可以自定义）
+		2、缺点————模块太多的话。进行复制太消耗资源，同时浪费空间
+		3、过期时间————session默认失效时间30分钟（可以自定义）
 
-	2、使用cookie+redis实现
-		-- 实现过程
+	-- 使用cookie+redis实现
+		1、实现过程
 			1)在项目中任何一个模块进行登录，登录之后，将数据放到两个地方
 				redis————在key中放【生成唯一随机值】，ip\用户id\UUid等,在value中放【用户数据】
 				cookie————将redis中生成的key值放到cookie中
 			2)访问项目中其他模块，发送请求带着cookie进行发送，获取cookie值，拿着cookie,把cookie获取值，到redis进行查询，根据key进行查询，如果查到数据就代表已经登录
-		-- 过期时间————通过配置redis的过期时间来实现
-		-- cookie————客户端技术:每次发送请求，都会带着cookie值进行发送
-		-- redis————基于key-value存储
- 
-	3、使用token实现【自包含令牌】
-		-- 实现过程
+		2、过期时间————通过配置redis的过期时间来实现
+		3、cookie————客户端技术:每次发送请求，都会带着cookie值进行发送
+		4、redis————基于key-value存储
+
+	-- 使用token实现【自包含令牌】
+		1、实现过程
 			1)在项目中某个模块登录，登录之后，按照骨子生成字符串，将登陆之后的用户信息包含到生成的字符串中，将字符串返回（1、放到cookie中；2、把字符串通过地址栏返回）
 			2)再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。能获取到就是已经登录
-		-- 过期时间————可以进行设置，详见1-1-18、JWT
-		-- token————即按照一定规则（可以自己指定一定的规则）生成的字符串，生成的字符串可以包含用户信息.通用（官方）规则【JWT】，详见JWT
+		2、过期时间————可以进行设置，详见1-1-18、JWT
+		3、token————即按照一定规则（可以自己指定一定的规则）生成的字符串，生成的字符串可以包含用户信息.通用（官方）规则【JWT】，详见JWT
 
-	4、使用OAuth2方式
-		-- 实现过程
+	-- 使用OAuth2方式
+		1、实现过程
 			1)登录成功之后，【按照一定规则生成字符串】，字符串包含用户信息
 			2)将生成的字符串通过路径传递，或者放入cookie中
 			3)再发送请求时，每次带着字符串发送（从字符串中能获取到用户信息就是已经登录，否则未登录）
 
--- 单点登陆流程图如下:
+# 单点登陆流程图如下:
 ```
 
 <img src="image/img2_1_19_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 单点登录框架&原理演示
+	-- 源码地址
+		https://gitee.com/xuxueli0323/xxl-sso
+	-- 说明
+		XXL-SSO 是一个分布式单点登录框架。只需要登录一次就可以访问所有相互信任的应用系统。 拥有"轻量级、分布式、跨域、Cookie+Token均支持、Web+APP均支持"等特性。现已开放源代码，开箱即用。
+	-- 原理演示
+		1、xxl-sso-server域名编排
+			1)www.ssoserver.com————登录认证服务器
+			2)www.client1.com————项目1
+			3)www.client2.com————项目2
+		2、服务搭建(端口/服务)
+			1)8080/xxl-sso-server
+			2)8081/xxl-sso-web-sample-springboot
+			3)8082/xxl-sso-web-sample-springboot
+		3、打包并启动
+			1)打包————sudo mvn clean package -Dmaven.skip.test=true
+			2)启动jar包
+				java -jar xxl-sso-server-1.1.1-SNAPSHOT.jar
+				java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8081
+				java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8082
+			3)访问
+				http://ssoserver.com:8080/xxl-sso-server
+				http://client1.com:8081/xxl-sso-web-sample-springboot
+				http://client2.com:8082/xxl-sso-web-sample-springboot
+```
 
 
 
@@ -7529,10 +7588,132 @@ error => {   
 		}
 ```
 
+## 9、微博社交登陆
 
+```markdown
+# 准备工作
+	-- 微博开放平台登陆——>微连接——>网站接入——>创建应用并设置(可以使用微博登陆功能)
+		1、应用信息——>基本信息————App Key/App Secret
+		2、应用信息——>高级信息————OAuth2.0 授权设置
+			1)授权回调页————登陆成功跳转的页面
+			2)取消授权回调页————登陆失败跳转的页面
 
-```java
+	-- OAuth2.0授权机制————web网站的授权
+		0、文档链接————https://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6%E8%AF%B4%E6%98%8E
+		1、引导需要授权的用户跳转到指定地址————其中client_id即基本信息中的App Key,redirect_uri即高级信息OAuth2.0授权设置的授权回调页
+			https://api.weibo.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REGISTERED_REDIRECT_URI
+		2、如果用户同意授权，页面跳转至 YOUR_REGISTERED_REDIRECT_URI/?code=CODE
+		3、换取Access Token————其中client_id即基本信息中的App Key,client_secret即基本信息中的App Secret,redirect_uri即高级信息OAuth2.0授权设置的授权回调页,code即上一步回调返回的code(code只能使用一次)————同一个用户的accesstoken在一段时间是不变的
+			https://api.weibo.com/oauth2/access_token?client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&grant_type=authorization_code&redirect_uri=YOUR_REGISTERED_REDIRECT_URI&code=CODE
+		4、使用获得的Access Token调用API————支持接口——详见接口管理——已有权限
 
+# 微博社交登陆功能实现流程图
+```
+
+<img src="image/img2_2_9_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 代码实现
+-- 前端代码
+	 <a href="https://api.weibo.com/oauth2/authorize?client_id=3016927340&response_type=code
+	 &redirect_uri=http://auth.pigskinmall.com/oauth2.0/weibo/success">
+			<img style="width: 50px;height: 18px" src="/static/login/JD_img/weibo.png"/>
+   </a>
+
+-- 后段请求处理代码
+    package com.pigskin.mall.auth.controller;
+
+    import com.alibaba.fastjson.JSON;
+    import com.alibaba.fastjson.TypeReference;
+    import com.pigskin.common.constant.AuthConstant;
+    import com.pigskin.common.utils.HttpUtils;
+    import com.pigskin.common.utils.R;
+    import com.pigskin.mall.auth.feign.MemberFeignService;
+    import com.pigskin.common.vo.MemberResponseVo;
+    import com.pigskin.mall.auth.vo.SocialUserVo;
+    import lombok.extern.slf4j.Slf4j;
+    import org.apache.http.HttpResponse;
+    import org.apache.http.util.EntityUtils;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestParam;
+
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import javax.servlet.http.HttpSession;
+    import java.util.HashMap;
+    import java.util.Map;
+
+    /**
+     * 处理社交登陆请求
+     */
+    @Controller
+    @Slf4j
+    public class OAuth2Controller {
+
+        @Autowired
+        private MemberFeignService memberFeignService;
+
+        @GetMapping("/oauth2.0/weibo/success")
+        public String weibo(@RequestParam("code") String code, 
+        										HttpSession session, 
+        										HttpServletResponse servletResponse, 
+        										HttpServletRequest servletRequest) throws Exception {
+            /*获取Session的代码*/
+            HttpSession session1 = servletRequest.getSession();
+
+            /*设置请求所需参数*/
+            Map<String, String> params = new HashMap<>();
+            params.put("client_id", "3712523380");
+            params.put("client_secret", "c828e0d1g6a939be56eta69bcdb0a971");
+            params.put("grant_type", "authorization_code");
+            params.put("redirect_uri", "http://auth.pigskinmall.com/oauth2.0/weibo/success");
+            params.put("code", code);
+
+            /*根据code获取accessToken*/
+            HttpResponse httpResponse = HttpUtils.doPost(
+                    "https://api.weibo.com",
+                    "/oauth2/access_token",
+                    "post",
+                    new HashMap<>(),
+                    null,
+                    params);
+
+            /*token处理*/
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
+                /*响应成功*/
+                String s = EntityUtils.toString(httpResponse.getEntity());
+                SocialUserVo socialUserVo = JSON.parseObject(s, SocialUserVo.class);
+                /*知道当前是哪个社交用户登陆成功了*/
+                /*1）如果当前登陆的社交用户是第一次进入该网站，就自动注册（为当前社交用户生成一个会员信息账号，以后这个社交账号就对应指定的会员）*/
+                R r = memberFeignService.oauthLogin(socialUserVo);
+                if (r.getCode() == 0) {
+                    MemberResponseVo responseVo = r.getData("data",
+                    	new TypeReference<MemberResponseVo>() {});
+                    System.out.println("登陆成功，用户信息为：" + responseVo);
+                    log.info("登陆成功，用户信息为：{}", responseVo.toString());
+                    /*第一次使用session,命令浏览器保存卡号，jsessionid这个cookie,以后浏览器访问那个网站就会带上这个网站的cookie*/
+                    /*todo:子域之间session共享,发卡时指定域名为父域名，这样即使是子域发的卡，也能让父域使用到*/
+                    /*登陆成功跳回首页*/
+                    session.setAttribute(AuthConstant.LOGIN_USER, responseVo);
+                    /*原生方式*/
+    //                Cookie cookie = new Cookie("JSESSIONID", "xxx");
+    //                cookie.setDomain("pigskinmall.com");
+    //                servletResponse.addCookie(cookie);
+                    return "redirect:http://pigskinmall.com";
+                } else {
+                    /*响应失败*/
+                    return "redirect:http://auth.pigskinmall.com/login.html";
+                }
+                /*2）*/
+            } else {
+                /*响应失败*/
+                return "redirect:http://auth.pigskinmall.com/login.html";
+            }
+        }
+    }
 ```
 
 
