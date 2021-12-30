@@ -6376,9 +6376,851 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 27、消息中间件——RabbitMQ
+## 27、消息中间件
 
-```ma
+### 1、消息中间件说明
+
+```markdown
+# 微服务(分布式系统)消息中间件使用场景
+-- 异步处理
+```
+
+<img src="image/img2_1_27_1_1.png" style="zoom:50%;" />
+
+```markdown
+-- 应用解耦
+```
+
+<img src="image/img2_1_27_1_2.png" style="zoom:50%;" />
+
+```markdown
+-- 流量控制
+```
+
+<img src="image/img2_1_27_1_3.png" style="zoom:50%;" />
+
+```markdown
+# 消息中间件概述
+-- 说明————大多数应用中,可以通过消息服务中间件来提升系统异步通信、扩展解耦能力
+
+-- 消息服务中有两个重要概念
+	1、消息代理(message broker)————当消息发送者发送消息后,将由消息代理接管,消息代理保证消息传递到指定目的地
+	2、目的地(destination)
+		1)队列(queue)————点对点(point-to-point)消息通信————消息发送者发送消息,消息代理将其放入一个队列中,消息接收者从队列中获取消息内容,消息读取后被移出队列.消息只有唯一的发送者和接受者,但不是说只能有一个接收者
+		2)主题(topic)————发布(publish)/订阅(subscribe)消息通信————发送者(发布者)发送消息到主题,多个接收者(订阅者)监听(订阅)这个主题,那么就会在消息到达时同时收到消息
+
+-- 消息代理规范
+	1、JMS(Java Message Service)————基于JVM消息代理的规范.ActiveMQ、HornetMQ是JMS的实现
+	2、AMQP(Advanced Message Queuing Protocal————高级消息队列协议,也是一个消息代理的规范,兼容JMS.RabbitMQ是AMQP的实现
+	3、JMS与AMQP对比,如图所示:
+```
+
+<img src="image/img2_1_27_1_4.png" style="zoom:50%;" />
+
+```markdown
+-- Spring支持
+	1、对JMS的支持
+		1)spring-jms提供了对JMS的支持
+		2)需要ConnectionFactory的实现来连接消息代理
+		3)提供JmsTemplate来发送消息
+		4)@JmsListener注解在方法上监听消息代理发布的消息
+		5)@EnableJms
+		6)SpringBoot自动配置————JmsAutoConfiguration
+	2、对AMQP的支持
+		1)spring-rabbit提供了对AMQP的支持
+		2)需要ConnectionFactory的实现来连接消息代理
+		3)提供RabbitTemplate来发送消息
+		4)@RabbitListener注解在方法上监听消息代理发布的消息
+		5)@EnableRabbit开启支持
+		7)SpringBoot自动配置————RabbitAutoConfiguration
+
+-- 市面上的MQ产品————ActiveMQ、RabbitMQ、RocketMQ、Kafka
+	1、ActiveMQ
+		1)优点
+			-- 单机吞吐量————万级
+			-- 时效性————ms级
+			-- 可用性————高，基于主从架构实现高可用性
+			-- 消息可靠性————有较低的概率丢失数据
+			-- 功能支持————MQ领域的功能极其完备
+		2)缺点————官方社区现在对ActiveMQ 5.x维护越来越少，较少在大规模吞吐的场景中使用
+			
+	2、Kafka
+		1)说明
+			号称大数据的杀手锏，谈到大数据领域内的消息传输，则绕不开Kafka，这款为大数据而生的消息中间件，以其百万级TPS的吞吐量名声大噪，迅速成为大数据领域的宠儿，在数据采集、传输、存储的过程中发挥着举足轻重的作用。Apache Kafka它最初由LinkedIn公司基于独特的设计实现为一个分布式的提交日志系统( a distributed commit log)，之后成为Apache项目的一部分。目前已经被LinkedIn，Uber, Twitter, Netflix等大公司所采纳。
+		2)优点
+			-- 性能卓越，单机写入TPS约在百万条/秒，最大的优点，就是吞吐量高。
+			-- 时效性————ms级
+			-- 可用性————非常高，kafka是分布式的，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用
+消费者采用Pull方式获取消息, 消息有序, 通过控制能够保证所有消息被消费且仅被消费一次;
+			-- 有优秀的第三方Kafka Web管理界面Kafka-Manager；
+			-- 在日志领域比较成熟，被多家公司和多个开源项目使用；
+			-- 功能支持————功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用
+		3)缺点
+			-- Kafka单机超过64个队列/分区，Load会发生明显的飙高现象，队列越多，load越高，发送消息响应时间变长
+使用短轮询方式，实时性取决于轮询间隔时间；
+			-- 消费失败不支持重试；
+			-- 支持消息顺序，但是一台代理宕机后，就会产生消息乱序；
+			-- 社区更新较慢；
+	3、RabbitMQ
+		1)说明
+			RabbitMQ 2007年发布，是一个在AMQP(高级消息队列协议)基础上完成的，可复用的企业消息系统，是当前最主流的消息中间件之一。
+		2)优点
+			-- 由于erlang语言的特性，mq 性能较好，高并发；
+			-- 吞吐量到万级，MQ功能比较完备
+			-- 健壮、稳定、易用、跨平台、支持多种语言、文档齐全；
+			-- 开源提供的管理界面非常棒，用起来很好用
+			-- 社区活跃度高；
+		3)缺点
+			-- erlang开发，很难去看懂源码，基本职能依赖于开源社区的快速维护和修复bug，不利于做二次开发和维护。
+			-- RabbitMQ确实吞吐量会低一些，这是因为他做的实现机制比较重。
+			-- 需要学习比较复杂的接口和协议，学习和维护成本较高。
+	3、RocketMQ
+		1)说明
+			RocketMQ出自 阿里公司的开源产品，用 Java 语言实现，在设计时参考了 Kafka，并做出了自己的一些改进。RocketMQ在阿里集团被广泛应用在订单，交易，充值，流计算，消息推送，日志流式处理，binglog分发等场景。
+		2)优点
+			-- 单机吞吐量————十万级
+			-- 可用性————非常高，分布式架构
+			-- 消息可靠性————经过参数优化配置，消息可以做到0丢失
+			-- 功能支持————MQ功能较为完善，还是分布式的，扩展性好
+			-- 支持10亿级别的消息堆积，不会因为堆积导致性能下降
+			-- 源码是java，我们可以自己阅读源码，定制自己公司的MQ，可以掌控
+		3)缺点
+			-- 支持的客户端语言不多，目前是java及c++，其中c++不成熟；
+			-- 社区活跃度一般
+			-- 没有在 mq 核心中去实现JMS等接口，有些系统要迁移需要修改大量代码
+```
+
+
+
+### 2、RabbitMQ
+
+```markdown
+# RabbitMQ概念
+-- 图示————如下图所示
+```
+
+<img src="image/img2_1_27_2_1.png" style="zoom:50%;" />
+
+```markdown
+-- 核心概念
+	1、Message(消息)————消息是不具名的,它是由消息头和消息体组成,消息体是不透明的,而消息头是由一系列的可选属性组成,这些属性包括routing-key(路由键)、priority(相对于其他消息的优先权)、delivery-mode(指出该消息可能需要持久性存储)等
+	2、Publisher————消息的生产者
+		也是一个向交换器发布消息的客户端应用程序
+	3、Exchange(交换器)————用来接收消息生产者发送的消息并将这些消息路由给服务器中的队列
+		1)四种类型————不同类型的Exchange转发消息的策略有所区别
+			-- direct(默认)
+			-- fanout
+			-- topic
+			-- headers
+	4、Queue(消息队列)————用来保存消息直到发送给消费者,它是消息的容器,也是消息的终点
+		1)一个消息可以投入到一个或多个队列
+		2)消息一直在队列里,等到消费者连接到这个队列将其取走
+	5、Binding(绑定)————用于消息队列和交换器之间的关联
+		1)一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则,所以可以将路由器理解成一个由绑定构成的路由表
+	6、Connection(网络连接)————比如一个TCP连接
+	7、Channel(信道)————多路复用连接中的一条独立的双向数据流通道
+		1)信道是建立在真实的TCP连接内的虚拟连接,AMPQP命令都是通过信道发出去的.不管是发布消息、订阅队列还是接收消息,这些动作都是通过信道完成的
+		2)因为对于操作系统来说,建立和销毁TCP都是非常昂贵的开销,所以引入了信道的概念,以复用一条TCP连接
+	8、Consumer(消息的消费者)————表示从消息队列中取得消息的客户端应用程序
+	9、Virtual Host(虚拟主机)————表示一批交换器、消息队列和相关对象
+		1)是共享相同的身份认证和加密环境的独立服务器域
+		2)每个vhost本质上就是一个mini版的RabbitMQ服务器,拥有自己的队列、交换器、绑定和权限机制
+		3)vhost是AMQP概念的基础,必须在连接时指定,RabbitMQ默认的vhost是/
+	10、Broker(消息队列服务器实体)
+
+# 工作原理
+-- 图示,如下图所示
+```
+
+<img src="image/img2_1_27_2_2.png" style="zoom:50%;" />
+
+```markdown
+# Docker安装RabbitMQ
+	详见————1、Java开发之工具环境篇-5-9、Docker中安装RabbitMQ
+
+# RabbitMQ运行机制
+-- AMQP中的消息路由
+	1、说明————AMQP中消息的路由过程和Java开发者熟悉的JMS存在一些差别,AMQP中增加了Exchange和Binding的角色.生产之把消息发送到Exchange上,消息最终到达队列被消费者接收,而Binding决定交换器的消息应该发送到那个队列
+	2、图示,如下图所示
+```
+
+<img src="image/img2_1_27_2_3.png" style="zoom:50%;" />
+
+```markdown
+-- Exchange类型————分发消息时根据类型的不同分发策略有所区别
+	1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
+```
+
+<img src="image/img2_1_27_2_4.png" style="zoom:50%;" />
+
+```markdown
+	2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
+```
+
+<img src="image/img2_1_27_2_5.png" style="zoom:50%;" />
+
+```markdown
+	3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
+```
+
+<img src="image/img2_1_27_2_6.png" style="zoom:50%;" />
+
+```markdown
+	4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
+
+# SpringBoot整合
+-- 引入spring-boot-start-amqp
+	<!-- 引入高级消息队列场景启动器——RabbitAutoConfiguration会自动生效--> 
+  <dependency>          
+  <groupId>org.springframework.boot</groupId>   
+  <artifactId>spring-boot-starter-amqp</artifactId> 
+  </dependency>
+  <!-- 给容器中自动配置了AmqpAdmin、RabbitTemple、CachingConnectionFactory、RabbitMessagingTemplate-->
+  <!-- 所有的属性在@ConfigurationProperties(prefix = "spring.rabbitmq")进行绑定-->
+
+-- application.yml配置连接安装的RabbitMQ
+	#RabbitMQ相关配置
+	##主机地址
+	spring.rabbitmq.host=192.168.56.101
+	##端口号（高级工作协议端口、客户端要连接的端口）
+	spring.rabbitmq.port=5672
+	##虚拟主机
+	spring.rabbitmq.virtual-host=/
+
+-- 使用注解启用
+	@EnableRabbit
+
+-- 使用JSON序列化消息
+	/** 
+	* RabbitMQ配置类
+  */
+	@Configuration
+	public class MyRabbitConfig {   
+  	/**     
+  	* 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）   
+    */    
+    @Bean  
+    public MessageConverter messageConverter() {   
+    	return new Jackson2JsonMessageConverter();  
+    }
+	}
+
+# RabbitMQ组件使用测试
+-- AmqpAdmin————管理组件
+	1、创建交换机
+		package com.pigskin.mall.order;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+    import lombok.extern.slf4j.Slf4j;
+    import org.junit.Test;
+    import org.junit.runner.RunWith;
+    import org.springframework.amqp.core.AmqpAdmin;
+    import org.springframework.amqp.core.Binding;
+    import org.springframework.amqp.core.DirectExchange;
+    import org.springframework.amqp.core.Queue;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.context.SpringBootTest;
+    import org.springframework.test.context.junit4.SpringRunner;
+
+    import javax.annotation.Resource;
+    import java.util.Date;
+
+    @Slf4j
+    @RunWith(SpringRunner.class)
+    @SpringBootTest
+    public class MallOrderApplicationTests {
+        /**
+         * 高级消息管理组件
+         */
+        @Autowired
+        AmqpAdmin amqpAdmin;
+
+        /**
+         * 创建交换机
+         * 1、如何创建Exchange、Queue、Binding
+         * 1）使用AmqpAdmin进行创建
+         * 2、如何收发消息
+         */
+        @Test
+        public void createExchange() {
+            /*创建交换机——直接交换机(交换机名，是否持久化，是否自动删除，交换机参数)*/
+            DirectExchange directExchange = new DirectExchange("hello-java-exchange", true, false);
+            /*声明一个交换机*/
+            amqpAdmin.declareExchange(directExchange);
+            log.info("Exchange[{}]创建成功", directExchange.getName());
+        }
+    }
+
+	2、创建队列
+		package com.pigskin.mall.order;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+    import lombok.extern.slf4j.Slf4j;
+    import org.junit.Test;
+    import org.junit.runner.RunWith;
+    import org.springframework.amqp.core.AmqpAdmin;
+    import org.springframework.amqp.core.Binding;
+    import org.springframework.amqp.core.DirectExchange;
+    import org.springframework.amqp.core.Queue;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.context.SpringBootTest;
+    import org.springframework.test.context.junit4.SpringRunner;
+
+    import javax.annotation.Resource;
+    import java.util.Date;
+
+    @Slf4j
+    @RunWith(SpringRunner.class)
+    @SpringBootTest
+    public class MallOrderApplicationTests {
+        /**
+         * 高级消息管理组件
+         */
+        @Autowired
+        AmqpAdmin amqpAdmin;
+
+        /**
+         * 创建队列
+         */
+        @Test
+        public void createQueue() {
+            /*创建队列(队列名，是否持久化，是否排他（是否只能被声明的连接使用），是否自动删除，队列参数)*/
+            Queue queue = new Queue("hello-java-queue", true, false, false);
+            /*声明一个交换机*/
+            amqpAdmin.declareQueue(queue);
+            log.info("Queue[{}]创建成功", queue.getName());
+        }
+    }
+
+	3、队列和交换机绑定
+		package com.pigskin.mall.order;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+    import lombok.extern.slf4j.Slf4j;
+    import org.junit.Test;
+    import org.junit.runner.RunWith;
+    import org.springframework.amqp.core.AmqpAdmin;
+    import org.springframework.amqp.core.Binding;
+    import org.springframework.amqp.core.DirectExchange;
+    import org.springframework.amqp.core.Queue;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.context.SpringBootTest;
+    import org.springframework.test.context.junit4.SpringRunner;
+
+    import javax.annotation.Resource;
+    import java.util.Date;
+
+    @Slf4j
+    @RunWith(SpringRunner.class)
+    @SpringBootTest
+    public class MallOrderApplicationTests {
+        /**
+         * 高级消息管理组件
+         */
+        @Autowired
+        AmqpAdmin amqpAdmin;
+
+        /**
+         * 创建交换机和队列的绑定
+         */
+        @Test
+        public void createBinding() {
+            /*创建绑定(目的地（指定交换机或者队列），目的地类型（交换机/队列），被绑定的交换机，路由键，自定义参数)*/
+            Binding binding = new Binding("hello-java-queue",
+                    Binding.DestinationType.QUEUE,
+                    "hello-java-exchange",
+                    "hello.java",
+                    null);
+            /*声明一个绑定*/
+            amqpAdmin.declareBinding(binding);
+            log.info("Binding[{}]创建成功", binding.getRoutingKey());
+        }
+    }
+
+-- RabbitTemple————消息发送处理组件
+    package com.pigskin.mall.order.controller;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+    import lombok.extern.slf4j.Slf4j;
+    import org.springframework.amqp.rabbit.connection.CorrelationData;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestParam;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import java.util.Date;
+    import java.util.UUID;
+
+    /**
+     * 消息队列测试控制器
+     */
+    @RestController
+    @Slf4j
+    public class RabbitController {
+
+        final
+        RabbitTemplate rabbitTemplate;
+
+        public RabbitController(RabbitTemplate rabbitTemplate) {
+            this.rabbitTemplate = rabbitTemplate;
+        }
+        /**
+       	* 消息发送的Get请求测试
+       	* @param num 发送多少条消息
+       	* @return
+       	*/
+        @GetMapping("/sendMq")
+        public String sendMq(@RequestParam(value = "num", defaultValue = "10") Integer num) {
+            /*发送消息*/
+    //        rabbitTemplate.send();
+            /*转换并且发送(指定发往的交换机、路由键、消息——发送的消息如果是个对象，需要使用序列化机制，将对象写出去。所以要发送的对象必须实现序列化接口/JSON、消息的唯一ID)*/
+            /**/
+            for (int i = 0; i < num; i++) {
+                if (i % 2 == 0) {
+                    OrderReturnReasonEntity orderReturnReasonEntity = new OrderReturnReasonEntity();
+                    orderReturnReasonEntity.setId((long) i);
+                    orderReturnReasonEntity.setName("哈哈" + i);
+                    orderReturnReasonEntity.setCreateTime(new Date());
+                    rabbitTemplate.convertAndSend("hello-java-exchange", "hello.java", orderReturnReasonEntity, new CorrelationData(UUID.randomUUID().toString()));
+                    log.info("消息发送完成[{}]", orderReturnReasonEntity.toString());
+                } else {
+                    OrderEntity order = new OrderEntity();
+                    order.setId((long) i);
+                    order.setOrderSn("哈哈" + i);
+                    order.setCreateTime(new Date());
+                    rabbitTemplate.convertAndSend("hello-java-exchange", "hello22.java", order, new CorrelationData(UUID.randomUUID().toString()));
+                    log.info("消息发送完成[{}]", order.toString());
+                }
+            }
+            return "ok";
+        }
+    }
+
+-- RabbitLinstener————消息监听组件
+	1、注解说明
+		1)RabbitLinstener————可使用位置:类和方法上(监听那些队列)
+		2)RabbitHandler————可使用位置:方法上(通过重载区分不同类型的消息)
+	2、代码示例
+		package com.pigskin.mall.order.service.impl;
+
+    import com.alibaba.fastjson.JSON;
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+    import com.rabbitmq.client.Channel;
+    import org.springframework.amqp.core.Message;
+    import org.springframework.amqp.core.MessageProperties;
+    import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.stereotype.Service;
+
+    import java.io.IOException;
+    import java.util.Map;
+
+    import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+    import com.baomidou.mybatisplus.core.metadata.IPage;
+    import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+    import com.pigskin.common.utils.PageUtils;
+    import com.pigskin.common.utils.Query;
+
+    import com.pigskin.mall.order.dao.OrderItemDao;
+    import com.pigskin.mall.order.entity.OrderItemEntity;
+    import com.pigskin.mall.order.service.OrderItemService;
+
+
+    @Service("orderItemService")
+    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+    public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
+
+        @Override
+        public PageUtils queryPage(Map<String, Object> params) {
+            IPage<OrderItemEntity> page = this.page(
+                    new Query<OrderItemEntity>().getPage(params),
+                    new QueryWrapper<OrderItemEntity>()
+            );
+
+            return new PageUtils(page);
+        }
+
+
+        /**
+         * 消息监听：必须使用注解@EnableRabbit开启Rabbit相关功能支持
+         * 消息类型为：org.springframework.amqp.core.Message
+         * 参数可以设置以下类型：
+         * 1、Message————原生消息详细信息（消息头+消息体）
+         * 2、T<发送的消息的类型>————当时发送的消息是啥类型，就可以直接接收啥类型的
+         * 3、Channel[com.rabbitmq.client.Channel]————当前传输数据的通道
+         * 1）场景1：订单服务启动多个————同一个消息只能被一个客户端收到
+         * 2）场景2：只有一个消息处理完，方法运行结束，就可以接收到下一个消息
+         * <p>
+         * Queue:可以很多人都来监听，只要收到消息，队列就会删除消息，最终只能有一个收到此消息。
+         */
+    		//@RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+        @RabbitHandler
+        public void listenerMessage(Message message,
+                                    OrderReturnReasonEntity reasonEntity,
+                                    Channel channel) throws InterruptedException {
+            /*消息体*/
+            byte[] body = message.getBody();
+            /*消息属性（消息头信息）*/
+            MessageProperties messageProperties = message.getMessageProperties();
+            Thread.sleep(3000);
+            System.out.println("接收消息。。。" + reasonEntity);
+
+            /*消息内容*/
+            System.out.println("消息处理完成=>" + reasonEntity.getName());
+            /*通道(channel)内按顺序自增*/
+            long deliveryTag = message.getMessageProperties().getDeliveryTag();
+            System.out.println("deliveryTag:" + deliveryTag);
+
+            try {
+                if (deliveryTag % 2 == 0) {
+                    //收货
+                    /*签收消息(对应交货标签，是否批量签收——false代表之前收当前消息)*/
+                    channel.basicAck(deliveryTag, false);
+                    System.out.println("货物被签收了：" + deliveryTag);
+                } else {
+                    boolean requeue = false;
+                    //退货
+                    /*(long deliveryTag——交货标签, boolean multiple——是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeue——是否重新入队列)*/
+                    channel.basicNack(deliveryTag, false, requeue);
+                    /*(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
+    //                channel.basicReject();
+                    System.out.println("货物被拒收了：" + deliveryTag + "并且" + (requeue ? "被退回" : "被扔了"));
+                }
+            } catch (IOException e) {
+                //网络中断了
+                e.printStackTrace();
+            }
+
+        }
+
+        //@RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+    		//@RabbitHandler
+        public void listenerMessage2(Message message,
+                                     OrderEntity order,
+                                     Channel channel) throws InterruptedException {
+            /*消息体*/
+            byte[] body = message.getBody();
+            /*消息属性（消息头信息）*/
+            MessageProperties messageProperties = message.getMessageProperties();
+            Thread.sleep(3000);
+            System.out.println("接收消息。。。" + order);
+
+            /*消息内容*/
+            System.out.println("消息处理完成=>" + order.getOrderSn());
+
+        }
+    }
+
+-- CachingConnectionFactory————连接工厂
+
+-- RabbitMessagingTemplate
+
+# RabbitMQ消息确认机制————可靠性抵达
+-- 图示,如下图所示
+```
+
+<img src="image/img2_1_27_2_7.png" style="zoom:50%;" />
+
+```markdown
+-- 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
+
+-- 定制RabbitTemplate
+	1、服务器收到消息就回调————publisher发送端————confirmCallback确认模式
+  	1)基本原理
+  		在创建connectionFactory的时候设置PublisherConfirms(true)选项，从而开启confirmCallback.消息只要被broker接收到就会执行confirmCallback方法，如果是cluster(集群)模式，需要所有broker接收到才会调用confirmCallback.被broker接收到只能表示message已经到达服务器,并不能保证消息一定会被投递到queue中,所以需要用到接下来的returnCallback
+		1)实现步骤
+			[1]配置文件添加配置
+				#开启发送端确认配置
+				spring.rabbitmq.publisher-confirms=true  
+    	[2]配置类进行定制,设置确认回调ConfirmCallback,代码示例如下:
+				package com.pigskin.mall.order.config;
+
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.rabbit.connection.CorrelationData;
+        import org.springframework.amqp.rabbit.core.RabbitTemplate;
+        import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+        import org.springframework.amqp.support.converter.MessageConverter;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Configuration;
+        import javax.annotation.PostConstruct;
+
+        /**
+         * RabbitMQ配置类
+         */
+        @Configuration
+        public class MyRabbitConfig {
+            @Autowired
+            RabbitTemplate rabbitTemplate;
+
+            /**
+             * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+             */
+            @Bean
+            public MessageConverter messageConverter() {
+                return new Jackson2JsonMessageConverter();
+            }
+
+            /**
+             * 定制RabbitTemplate
+             */
+            @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+            public void initRabbitTemplate() {
+                /*1、设置服务器收到消息就回调*/
+                rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+                    /**
+                     *  1、只要消息抵达Broker就ack为true
+                     * @param correlationData 当前消息的唯一关联数据（唯一id）
+                     * @param b 消息是否成功收到
+                     * @param s 失败的原因
+                     */
+                    @Override
+                    public void confirm(CorrelationData correlationData, boolean b, String s) {
+                        System.out.println("confirm....correlationData["
+                                + correlationData
+                                + "]==>ack["
+                                + b
+                                + "]==>s["
+                                + s
+                                + "]");
+                    }
+                });
+            }
+        }
+
+	2、消息正确抵达队列进行回调————publisher发送端————returnCallback未投递到Queue退回模式  
+  	1)基本原理
+    	confirmCallback确认模式只能保证消息到达broker,不能保证消息准确投递到目标queue中。在有些业务场景中我们就需要保证消息准确投递到目标queue中，此时就需要用到returnCallback未投递到Queue退回模式.这样如果未能投递到目标queue中，将回调returnCallback,可以记录下详细到投递数据，定期的巡检或者自动纠错都需要这些数据。
+  	2)实现步骤
+  		[1]配置文件进行配置
+  			#开启发送端消息抵达队列确认    
+    		spring.rabbitmq.publisher-returns=true     
+    		#只要抵达队列，以异步模式优先回调这个returnConfirm    
+    		spring.rabbitmq.template.mandatory=true    
+    	[2]配置类进行定制,设置消息未抵达队列退回回调ReturnCallback,代码示例如下:
+				package com.pigskin.mall.order.config;
+
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.rabbit.connection.CorrelationData;
+        import org.springframework.amqp.rabbit.core.RabbitTemplate;
+        import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+        import org.springframework.amqp.support.converter.MessageConverter;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Configuration;
+        import javax.annotation.PostConstruct;
+
+        /**
+         * RabbitMQ配置类
+         */
+        @Configuration
+        public class MyRabbitConfig {
+            @Autowired
+            RabbitTemplate rabbitTemplate;
+
+            /**
+             * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+             */
+            @Bean
+            public MessageConverter messageConverter() {
+                return new Jackson2JsonMessageConverter();
+            }
+
+            /**
+             * 定制RabbitTemplate
+             */
+            @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+            public void initRabbitTemplate() {
+                /*1、设置服务器收到消息就回调*/
+                //TODO:
+
+                /*2、设置消息正确抵达队列进行回调*/
+                rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+                    /**
+                     *  只要消息没有投递给指定队列，就触发这个失败回调
+                     * @param message 投递失败消息的详细信息
+                     * @param i  回复的状态码
+                     * @param s 回复的文本内容
+                     * @param s1 当时这个消息发给那个交换机
+                     * @param s2 当时这个消息用那个路由键
+                     */
+                    @Override
+                    public void returnedMessage(Message message, int i, String s, String s1, String s2) {
+                        System.out.println("Fail Message["
+                                + message
+                                + "]==>i["
+                                + i
+                                + "]==>s["
+                                + s
+                                + "]==>s1["
+                                + s1
+                                + "]==>s2["
+                                + s2
+                                + "]");
+                    }
+                });
+            }
+        }
+
+	3、消费端确认（保证每一个消息被正确消费，此时才可以让broker删除这个消息）————consumer消费端  
+  	1)默认是自动确认的，只要消息接收到，客户端就会自动确认，服务端就会移除这个消息     
+    	问题：收到很多消息，自动回复给服务器ack，但是实际只有一个消息处理成功后，服务器宕机了。此时消息队列中的消息就都没有了，发生了消息丢失    
+    	解决思路：
+    		不进行自动确认——通过手动确认来解决（每处理一个消息确认一个消息）    
+      	手动确认——只要没明确告诉MQ货物已经被签收(没有ACK)消息就一直是unacked状态，即使服务器宕机，消息也不会丢失，会重新变为Ready状态.    
+    2)手动ACK
+    	[1]分类
+    		-- 消息处理成功————接收下一个消息,此消息broker就会移除
+    			basic.ack————用于肯定确认,此消息broker就会移除
+    		-- 消息处理失败————重新发送给其他人处理,或者容错处理后ack
+    			basic.nack————用于否定确认,可以指定broker是否丢弃此消息,可以批量
+    			basic.rejest————用于否定确认,可以指定broker是否丢弃此消息,不可以批量
+    		-- 消息一直没有被调用————broker认为此消息正在被处理,不会投递给别人,此时客户端断开,消息不会被broker移除,会投递给别人
+    			basic.ack
+    			basic.nack
+    	[2]实现步骤
+        -- 1、开启手动签收配置
+        	#设置消息回复模式为手工模式manual（默认auto）
+        	spring.rabbitmq.listener.simple.acknowledge-mode=manual
+        -- 2、签收方通过message获取对应消息的签收标签
+        	/*通道(channel)内按顺序自增*/
+        	long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        -- 3、签收
+        	/*签收消息————业务成功完成就应该签收(对应交货标签，是否批量签收——false代表之前收当前消息)*/
+        	channel.basicAck(deliveryTag, false);
+        -- 4、拒签————业务失败就应该拒签 
+          /*basicNack(long deliveryTag:交货标签, boolean multiple:是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeu:是否重新入队列)*/
+          channel.basicNack(deliveryTag, false, requeue);
+          /*basicReject(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
+          channel.basicReject();
+			[3]代码实现
+				package com.pigskin.mall.order.service.impl;
+
+        import com.alibaba.fastjson.JSON;
+        import com.pigskin.mall.order.entity.OrderEntity;
+        import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+        import com.rabbitmq.client.Channel;
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.core.MessageProperties;
+        import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+        import org.springframework.amqp.rabbit.annotation.RabbitListener;
+        import org.springframework.stereotype.Service;
+
+        import java.io.IOException;
+        import java.util.Map;
+
+        import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+        import com.baomidou.mybatisplus.core.metadata.IPage;
+        import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+        import com.pigskin.common.utils.PageUtils;
+        import com.pigskin.common.utils.Query;
+
+        import com.pigskin.mall.order.dao.OrderItemDao;
+        import com.pigskin.mall.order.entity.OrderItemEntity;
+        import com.pigskin.mall.order.service.OrderItemService;
+
+
+        @Service("orderItemService")
+        @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+        public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
+
+            @Override
+            public PageUtils queryPage(Map<String, Object> params) {
+                IPage<OrderItemEntity> page = this.page(
+                        new Query<OrderItemEntity>().getPage(params),
+                        new QueryWrapper<OrderItemEntity>()
+                );
+
+                return new PageUtils(page);
+            }
+
+
+            /**
+             * 消息监听：必须使用注解@EnableRabbit开启Rabbit相关功能支持
+             * 消息类型为：org.springframework.amqp.core.Message
+             * 参数可以设置以下类型：
+             * 1、Message————原生消息详细信息（消息头+消息体）
+             * 2、T<发送的消息的类型>————当时发送的消息是啥类型，就可以直接接收啥类型的
+             * 3、Channel[com.rabbitmq.client.Channel]————当前传输数据的通道
+             * 1）场景1：订单服务启动多个————同一个消息只能被一个客户端收到
+             * 2）场景2：只有一个消息处理完，方法运行结束，就可以接收到下一个消息
+             * <p>
+             * Queue:可以很多人都来监听，只要收到消息，队列就会删除消息，最终只能有一个收到此消息。
+             */
+        //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+            @RabbitHandler
+            public void listenerMessage(Message message,
+                                        OrderReturnReasonEntity reasonEntity,
+                                        Channel channel) throws InterruptedException {
+                /*消息体*/
+                byte[] body = message.getBody();
+                /*消息属性（消息头信息）*/
+                MessageProperties messageProperties = message.getMessageProperties();
+                Thread.sleep(3000);
+                System.out.println("接收消息。。。" + reasonEntity);
+
+                /*消息内容*/
+                System.out.println("消息处理完成=>" + reasonEntity.getName());
+                /*通道(channel)内按顺序自增*/
+                long deliveryTag = message.getMessageProperties().getDeliveryTag();
+                System.out.println("deliveryTag:" + deliveryTag);
+
+                try {
+                    if (deliveryTag % 2 == 0) {
+                        //收货
+                        /*签收消息(对应交货标签，是否批量签收——false代表之前收当前消息)*/
+                        channel.basicAck(deliveryTag, false);
+                        System.out.println("货物被签收了：" + deliveryTag);
+                    } else {
+                        boolean requeue = false;
+                        //退货
+                        /*(long deliveryTag——交货标签, boolean multiple——是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeue——是否重新入队列)*/
+                        channel.basicNack(deliveryTag, false, requeue);
+                        /*(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
+        //                channel.basicReject();
+                        System.out.println("货物被拒收了：" + deliveryTag + "并且" + (requeue ? "被退回" : "被扔了"));
+                    }
+                } catch (IOException e) {
+                    //网络中断了
+                    e.printStackTrace();
+                }
+
+            }
+
+            //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+        //    @RabbitHandler
+            public void listenerMessage2(Message message,
+                                         OrderEntity order,
+                                         Channel channel) throws InterruptedException {
+                /*消息体*/
+                byte[] body = message.getBody();
+                /*消息属性（消息头信息）*/
+                MessageProperties messageProperties = message.getMessageProperties();
+                Thread.sleep(3000);
+                System.out.println("接收消息。。。" + order);
+
+                /*消息内容*/
+                System.out.println("消息处理完成=>" + order.getOrderSn());
+
+            }
+        }
+
+# RabbitMQ延时队列————实现定时任务
+-- 场景————比如未付款订单,多了一段时间后,系统自动取消订单并释放占有物品
+-- 常用解决方案————spring的schedule定时任务轮询数据库
+-- 缺点————消耗系统内存,增加了数据库的压力,存在较大的时间误差
+-- 解决————rabbit的消息TTL和死信Exchange结合
 ```
 
 
