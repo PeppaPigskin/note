@@ -410,12 +410,16 @@ brew install VisualVM
 
 ### 5、压力测试工具
 
-```
-1、下载
-https://archive.apache.org/dist/jmeter/binaries/
-2、启动
-cd MyInstall/apache-jmeter-5.2.1/bin/
-sh jmeter
+```markdown
+# 下载
+	https://archive.apache.org/dist/jmeter/binaries/
+
+# 安装
+	解压下载的压缩包————apache-jmeter-5.2.1.tgz
+
+# 启动
+	-- 进入指定目录————cd MyInstall/apache-jmeter-5.2.1/bin/
+	-- 运行————jmeter.bat/终端————执行sh jmeter
 ```
 
 ### 6、Git 环境配置
