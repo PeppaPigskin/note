@@ -6488,8 +6488,17 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     }
 
 # 业务代码使用异步编排
-  @Override 
-  public SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException {  
+	/**
+	* 注入自己的线程池
+	*/
+	@Autowired
+	private ThreadPoolExecutor executor;
+	
+	/**
+	* 开始使用一异步编排
+	*/
+	@Override 
+	public SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException {  
     SkuItemVo skuItemVo = new SkuItemVo();      
     /*TODO:进行异步编排*/   
     CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {   
@@ -6523,7 +6532,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     /*等到所有任务都完成*/     
     CompletableFuture.anyOf(saleAttrFuture, despFuture, baseAttrFuture, imageFuture).get();   
     return skuItemVo;   
-  }
+	}
 ```
 
 
@@ -10999,6 +11008,157 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- 放入redis
 	浏览器即是关闭,下次进入临时购物车数据还在(采用)
 ```
+
+
+
+## 18、Feign远程调用丢失请求头问题
+
+```markdown
+# 图示
+```
+
+<img src="image/img2_3_18_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 问题说明
+-- 正常的当前服务内进行页面访问,相对应的当前用户的session信息会被携带上,但是Feign远程调用时,会构造新请求,新请求的请求头中没有响应的请求头信息,远端服务就会认为该请求未登录.
+
+# Feign远程调用原理
+-- 1、Feign在远程调用之前会构造请求对象,新的请求模版
+	Object executeAndDecode(RequestTemplate template) throws Throwable {
+        Request request = this.targetRequest(template);
+        ...
+	}
+-- 2、构造请求时会调用很多的拦截器RequestInterceptor interceptor:requestInterceptors,
+	Request targetRequest(RequestTemplate template) {
+        Iterator var2 = this.requestInterceptors.iterator();
+
+        while(var2.hasNext()) {
+            RequestInterceptor interceptor = (RequestInterceptor)var2.next();
+            interceptor.apply(template);
+        }
+
+        return this.target.apply(template);
+    }
+-- 3、默认生成的请求RequestTemplate对象没有请求头,此时远端服务没有获取到请求头,认为未登录.如下图所示:
+```
+
+<img src="image/img2_3_18_1_2.png" style="zoom:50%;" />
+
+```markdown
+# 问题解决
+-- 设置feign远程调用的请求拦截器,实现如下:
+	// 在FeignConfig配置类中进行请求头同步操作
+		package com.pigskin.mall.cart.config;
+
+    import feign.RequestInterceptor;
+    import feign.RequestTemplate;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.context.request.RequestAttributes;
+    import org.springframework.web.context.request.RequestContextHolder;
+    import org.springframework.web.context.request.ServletRequestAttributes;
+
+    import javax.servlet.http.HttpServletRequest;
+
+    /**
+     * Feign远端请求配置类
+     */
+    @Configuration
+    public class MallFeignConfig {
+
+        /**
+         * 创建feign远程请求拦截器，会被自动添加到
+         * private final List<RequestInterceptor> requestInterceptors;中
+         *
+         * @return
+         */
+        @Bean("requestInterceptor")
+        public RequestInterceptor requestInterceptor() {
+            return new RequestInterceptor() {
+                /**
+                 * feign远程之前先进行RequestInterceptor.apply方法，进行原始请求头的设置
+                 * @param requestTemplate 新请求
+                 */
+                @Override
+                public void apply(RequestTemplate requestTemplate) {
+                    /***********************************************************/
+                    /*1、因为拦截器、Controller、Service都是同一个线程，所以拦截器根据ThreadLocal获取刚进来的请求数据，并转换成ServletRequestAttributes*/
+                    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                    /*2、获取原始的当前请求对象*/
+                    HttpServletRequest request = attributes.getRequest();
+                    /*3、新请求同步原始当前请求对象的请求头数据————主要是Cookie信息*/
+                    requestTemplate.header("Cookie", request.getHeader("Cookie"));
+                    /***********************************************************/
+
+                }
+            };
+        }
+
+    }
+
+```
+
+
+
+## 19、Feign异步情况丢失上下文问题
+
+```markdown
+# 图示
+```
+
+<img src="image/img2_3_19_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 问题说明
+-- 由于开启的是异步编排,每个异步任务使用的线程和主线程不共享一个ThreadLocal,每一个线程进入自己的Interceptor拦截器,而获取不到主线程共享的数据.
+
+# 解决方式
+-- 开启每一个异步任务的时候,让其线程共享一下主线程的RequestAttributes数据,代码如下:
+		@Override
+    public OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException {
+        System.out.println("主线程————" + Thread.currentThread().getId());
+        /*1、获取主线程的RequestAttributes数据*/
+        /***********************************************************/        
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+
+
+        OrderConfirmVo confirmVo = new OrderConfirmVo();
+        /*todo:从拦截器中获取用户信息*/
+        MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+        CompletableFuture<Void> getAddressFuture = CompletableFuture.runAsync(() -> {
+            System.out.println("会员服务线程————" + Thread.currentThread().getId());
+            //2、每个异步线程共享主线程的RequestAttributes数据
+            /***********************************************************/            
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            //1、远程查询所有的收获地址列表
+            List<MemberAddressVo> address = memberFeignService.getAddress(memberResponseVo.getId());
+            confirmVo.setAddressVos(address);
+        }, threadPoolExecutor);
+
+        CompletableFuture<Void> cartFuture = CompletableFuture.runAsync(() -> {
+            System.out.println("购物车服务线程————" + Thread.currentThread().getId());
+            //2、每个异步线程共享主线程的RequestAttributes数据
+            /***********************************************************/
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            /*2、远程查询购物车所有选中的购物项*/
+            List<OrderItemVo> currentUserCartItems = cartFeignService.getCurrentUserCartItems();
+            confirmVo.setItemVos(currentUserCartItems);
+        }, threadPoolExecutor);
+        CompletableFuture.allOf(getAddressFuture, cartFuture).get();
+
+        /*3、查询用户积分*/
+        Integer integration = memberResponseVo.getIntegration();
+        confirmVo.setIntegration(integration);
+        /*4、其他自动计算*/
+
+        /*TODO:5、防重令牌*/
+        return confirmVo;
+    }
+
+```
+
+
 
 
 
