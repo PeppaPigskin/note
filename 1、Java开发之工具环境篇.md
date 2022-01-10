@@ -332,23 +332,47 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ### 2、IDEA安装与配置
 
-```bash
-1、说明
+```markdown
+# 说明
 	IDEA 全称 IntelliJ IDEA，是java编程语言开发的集成环境。IntelliJ在业界被公认为最好的java开发工具，尤其在智能代码助手、代码自动提示、重构、JavaEE支持、各类版本工具(git、svn等)、JUnit、CVS整合、代码分析、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主。它的旗舰版本还支持HTML，CSS，PHP，MySQL，Python等。免费版只支持Java,Kotlin等少数语言。
-2、安装
+
+# 安装
 	brew install intellij-idea
-3、注册激活
-	# 插件激活(建议)
-		-- 设置第三方插件仓库地址[https://plugins.zhile.io]
+
+# 注册激活
+-- 插件激活(建议)
+	1、设置第三方插件仓库地址[https://plugins.zhile.io]
 			IntelliJ IDEA——>Preferences——>Plugins——>设置图标——>Manage Plugin Repositories...——>添加第三方插件仓库地址
-		-- 下载安装IDE Eval Reset插件
+	2、下载安装IDE Eval Reset插件
 			IntelliJ IDEA——>Preferences——>Plugins——>Marketplace——>搜索[IDE Eval Reset]
-		-- 设置每次开启自动重置注册信息
+	3、设置每次开启自动重置注册信息
 			Help——>Eval Reset——>勾选[Auto reset before per restart]项
-	# 注册码激活
+-- 注册码激活
 		-- 石墨文档————https://shimo.im/docs/XvW3WpHgHdRHVXgV/read
 		-- 文档获取————https://docs.qq.com/doc/DTVh3bkxWSEpvVm5N
 		-- 网址激活————http://www.lookdiv.com/————输入[7788]获取激活码
+
+# 常用插件
+-- Vuesion Theme————一款皮肤插件.非常适中的UI颜色,漂亮的代码高亮主题
+
+-- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或是鼠标中键滚屏时有点卡顿
+
+-- File Expander————能在Idea里直接打开Jar包,并且反编译代码查看.甚至于能打开tar.gz,zip等压缩格式
+
+-- GitToolBox————能在项目上提示你还有多少文件没提交,远程还有多少文件没更新下来,还能在每一行代码上提示上次提交的时间,查版本提交问题的时候尤其方便
+
+-- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
+
+-- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文时理解的更加透彻。
+
+-- arthas idea————阿里开源的一款强大的java在线诊断工具
+
+-- Search In Repository————平时我们如果要依赖一个第三方jar包，但是不知道它的maven/gradle的坐标。搓点的做法基本上就是baidu了，稍微高级点的就是到中央仓库去查下，最新版本的坐标是什么。然后复制下来，贴到pom里去。这款插件，无需你来回跳转，直接把中央仓库的查找集成到了Idea里面。你只需要打开这款插件，输入jar包的名字或者gav关键字，就能查到到这个jar包所有的版本，然后可以直接复制gav坐标。方便又快捷，干净又卫生！
+
+-- VisualGC————Idea堆栈的可视化工具，和Idea深度集成。直接显示所有进程，双击即可打开JVM的堆栈可视化界面。堆栈和垃圾收集情况一目了然！
+
+-- Zoolytic————一款zookeeper节点的查看分析插件。其实第三方也有一些zk的节点信息查看工具，但是我都觉得不够方便，直到我发现了这款插件。
+
 ```
 
 ### 3、域名访问环境
