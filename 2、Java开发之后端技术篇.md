@@ -11158,6 +11158,162 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 
 ```
 
+## 20、接口幂等性问题
+
+```markdown
+# 幂等性
+	接口幂等性就是用户对于同一操作发起的一次请求或者多次请求的结果是一致的.不会因为多次点击而产生副作用————比如:支付场景,用户购买了商品支付扣款成功,但是返回结果的时候网络异常,此时钱已经扣了,用户再次点击按钮,此时会进行第二次扣款,返回结果成功,用户查询余额返发现多扣钱了,流水记录也变成了两条这就没有保证接口的幕等性
+
+# 需要防止的情况
+	1、用户多次点击按钮
+	2、用户页面回退再次提交
+	3、微服务互相调用,由于网络问题,导致请求失败.feign触发重试机制
+	4、其他业务情况
+
+# 需要幂等的情况
+-- 以SQL为例,有些操作是天然幂等的
+	1、SELECT* FROM table WHER id=?————无论执行多少次都不会改变状态,是天然的幂等
+	2、UPDATE tab1 SET col11 WHERE col2=2————无论执行成功多少次状态都是一致的,也是幂等操作
+	3、delete from user where userid=1————多次操作,结果一样,具备幂等性
+	4、insert into user( userid name) values(1,a)————如userid为唯一主键,即重复操作上面的业务,只会插入一条用户数据,具备幂等性。
+
+-- 以SQL为例,有些操作不是幂等的
+	1、UPDATE tab1 SET col1=co+1 WHERE col2=2————每次执行的结果都会发生变化,不是幂等的。
+	2、insert into userluserid, name) values(1,a)————如userid不是主键,可以重复,那上面业务多次操作,数据都会新增多条,不具备幂等性
+
+# 幂等解决方案
+-- token机制(验证码机制)
+	1、实现原理
+		1)服务端提供了发送token的接口。我们在分析业务的时候,哪些业务是存在幂等问题的,就必须在执行业务前,先去获取 token,服务器会把token保存到redis中。
+		2)然后调用业务接口请求时,把token携带过去,一般放在请求头部。
+		3)服务器判断token是否存在redis中,存在表示第一次请求,然后删除token,继续执行业务
+		4)如果判断token不存在redis中,就表示是重复操作,直接返回重复标记给client,这样就保证了业务代码,不被重复执行
+	2、危险性:
+		1)先删除token还是后删除token;
+			(1)先删除可能导致,业务确实没有执行,重试还带上之前token,由于防重设计导致,请求还是不能执行
+			(2)后删除可能导致,业务处理成功,但是服务闪断,出现超时,没有删除token,别人继续重试,导致业务被执行两边			
+      (3)我们最好设计为先删除token,如果业务调用失败,就重新获取token再次请求
+		2)Token获取、比较和删除必须是原子性,防止分布式情况下的问题
+			(1) redis.get(token)、token.equals、redis.del(token)如果这两个操作不是原子,可能导致,高并发下都get到同样的数据,判断都成功,继续业务并发执行,通过如下方式解决
+			(2)可以在redis便用lua脚本完成这个操作,详细使用请见————2-3-21、令牌原子验证和删除
+				if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end
+
+-- 各种锁机制
+	1、数据库悲观锁————select * from xxx where id = 1 for update;
+		1)悲观锁使用时一般伴随事务一起使用,数据锁定时间可能会很长,需要根据实际情况选用
+		2)另外要注意的是,jd字段一定是主键或者唯一索引,不然可能造成锁表的结果,处理起来会非常麻烦
+	2、数据库乐观锁————乐观锁主要使用于处理读多写少的问题
+		1)这种方法适合在更新的场景中————update t goods set count= count-1, version=version 1 where good id=2 and version=1————根据version版本,也就是在操作库存前先获取当前商品的version版本号,然后操作的时候带上此version号。
+		2)流程梳理
+			1]我们第一次操作库存时,得到version为1,调用库存服务version变成了2;
+			2]但返回给订单服务出现了问题,订单服务又一次发起调用库存服务,当订单服务假如传的version还是1,再执行上面的sq语句时,就不会执行;
+			3]因为version已经变为2了, where条件就不成立。这样就保证了不管调用几次,只会真正的处理一次。
+	3、业务层分布式锁
+		如果多个机器可能在同一时间同时处理相同的数据,比如多台机器定时任务都拿到了相同数据处理,我们就可以加分布式锁,锁定此数据,处理完成后释放锁。获取到锁的必须先判断这个数据是否被处理过。
+
+-- 各种约束机制
+	1、数据表唯一约束
+		插入数据,应该按照唯一索引进行插入,比如订单号,相同的订单就不可能有两条记录插入。我们在数据库层面防止重复。这个机制是利用了数据库的主键唯一约束的特性,解决了在 insert场景时幂等冋题。但主键的要求不是自增的主键,这样就需要业务生成全局唯一的主键。如果是分库分表场景下,路由规则要保证相同请求下,落地在同一个数据库和同一表中,要不然数据库主键约束就不起效果了,因为是不同的数据库和表主键不相关。
+
+-- 防重表
+	1、使用订单号orderNo做为去重表的唯一索引,把唯一索引插入去重表,再进行业务操作,且他们在同一个事务中。这个保证了重复请求时,因为去重表有唯一约束,导致请求失败,避免了幂等问题。这里要注意的是,去重表和业务表应该在同一库中,这样就保证了在同一个事务,即使业务操作失败了,也会把去重表的数据回滚。这个很好的保证了数据一致性。
+	2、redis set集合防重
+		很多数据需要处理,只能被处理一次,比如我们可以计算数据的MD5将其放入redis的set,每次处理数据,先看这个MD5是否已经存在,存在就不处理
+
+-- 全局请求唯一ID(也可以用来做链路追踪)
+	1、调用接口时,生成一个唯一id,redis将数据保存到集合中(去重),存在即处理过。可以使用nginx设置每一个请求的唯一id,如下所示:
+		proxy_set_header X-Request-Id $request_id;
+
+# 接口幂等性问题解决步骤
+-- 使用令牌机制
+	1、业务流程示例,如下图:
+```
+
+<img src="image/img2_3_20_1_1.png" style="zoom:50%;" />
+
+```markdown
+	2、引入相关依赖
+		<!--SpringSession依赖-->
+    <dependency>
+    	<groupId>org.springframework.session</groupId>
+    	<artifactId>spring-session-data-redis</artifactId>
+    	<exclusions>
+    		<!--排除lettuce使用jedis解决内存泄漏问题-->
+    		<exclusion>
+    		<groupId>io.lettuce</groupId>
+    		<artifactId>lettuce-core</artifactId>
+    		</exclusion>
+    	</exclusions>
+    </dependency>
+    <dependency>
+    	<groupId>redis.clients</groupId>
+    	<artifactId>jedis</artifactId>
+    </dependency>
+	3、创建常量
+		package com.pigskin.mall.order.constant;
+
+    /**
+     * 订单常量
+     */
+    public class OrderConstant {
+        /**
+         * 用户订单令牌前缀
+         */
+        public static final String USER_ORDER_TOKEN_PREFIX = "order:token";
+    }
+	4、业务实现的地方————注入Redis操作对象
+		/**
+     * 注入Redis操作对象
+     */
+    final StringRedisTemplate redisTemplate;
+
+    public OrderServiceImpl(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+	5、购物车进入订单结算页面之前————业务最终执行操作时————设置防重令牌
+    /*TODO:防重令牌*/
+    //1、设置UUID作为防重令牌
+    String token = UUID.randomUUID().toString().replace("_", "");
+    //2、给页面返回一个令牌
+    confirmVo.setOrderToken(token);
+    //3、给服务器保存一个(key——指定前缀+用户ID，value——生成的UUID,过期时间——30min)
+    redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberResponseVo.getId(), token, 30, TimeUnit.MINUTES);
+	6、前端结算页面保存令牌————用于存放提交结算操作时传递的token————不刷新这个值就一直不变
+		<input name="orderToken" type="hidden" th:value="${confirmDate.orderToken}"/>
+    <button class="tijiao">提交订单</button>
+```
+
+
+
+## 21、令牌原子验证和删除
+
+```markdown
+# 说明
+	为了保证Token令牌的获取、比较和删除必须是原子性,防止分布式情况下的出现并发操作问题.
+
+# 使用说明
+-- 设置删除令牌的脚本,0-删除失败，1-删除成功
+	String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+
+-- 获取被验证的令牌(传过来的数据)
+	String orderToken = submitVo.getOrderToken();
+
+-- 获取当前用户便于区分令牌,设置详见————20、接口幂等性问题
+	MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+
+-- 通过lua脚本,原子验证和删除令牌
+	Long execute = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),Arrays.asList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberResponseVo.getId()),orderToken);
+
+-- 判断验证结果
+	if (execute == 0L) {
+		/*令牌验证失败*/
+		//TODO:
+	} else {
+		/*令牌验证成功*/
+		//TODO:
+	}
+```
+
 
 
 
