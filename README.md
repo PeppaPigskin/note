@@ -5,21 +5,35 @@
 
 #### 2、文件目录结构
 
-​	`0、Java从入门到成神经病--------文档-----------Java系列知识体系`
+[0、Java从入门到成神经病](https://gitee.com/PeppaPigskin/note/blob/master/0、Java从入门到成神经病.md)————文档————Java系列知识体系
 
-​	`1、Java开发之工具环境篇--------文档-----------开发环境相关工具软件介绍、安装及配置说明`
 
-​	`2、Java开发之后端技术篇--------文档-----------Java开发相关主流技术说明`
 
-​	`3、Java开发之数据库篇----------文档-----------Mysql、Oracle等主流数据库常用命令说明`
+[1、Java开发之工具环境篇](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md)————文档————开发环境相关工具软件介绍、安装及配置说明
 
-​	`4、Java开发之前端技术篇--------文档-----------个人开发工作相关前端知识点整理`
 
-​	`5、Java面试题题库-------------文档-----------相关Java面试题及答案依据知识点进行整理`
 
-​	`attachments-----------------目录-----------用于存放整理文件中提及的相关附件文件`
+[2、Java开发之后端技术篇](https://gitee.com/PeppaPigskin/note/blob/master/2、Java开发之后端技术篇.md)————文档————Java开发相关主流技术说明
 
-​	`image-----------------------目录-----------用于存放整理文件中显示的图片资源`
+
+
+[3、Java开发之数据库篇](https://gitee.com/PeppaPigskin/note/blob/master/3、Java开发之数据库篇.md)————文档————Mysql、Oracle等主流数据库常用命令说明
+
+
+
+[4、Java开发之前端技术篇](https://gitee.com/PeppaPigskin/note/blob/master/4、Java开发之前端技术篇.md)————文档————个人开发工作相关前端知识点整理
+
+
+
+[5、Java面试题题库](https://gitee.com/PeppaPigskin/note/blob/master/5、Java面试题题库.md)————文档————相关Java面试题及答案依据知识点进行整理
+
+
+
+[attachments](https://gitee.com/PeppaPigskin/note/blob/master/attachments)————目录————用于存放整理文件中提及的相关附件文件
+
+
+
+[image](https://gitee.com/PeppaPigskin/note/blob/master/image)————文档————用于存放整理文件中显示的图片资源
 
 
 
@@ -27,7 +41,7 @@
 
 ##### 0、Java从入门到成神经病——————Java系列知识体系
 
-` //TODO:待完善`
+
 
 
 
