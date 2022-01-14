@@ -352,7 +352,29 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 		-- 文档获取————https://docs.qq.com/doc/DTVh3bkxWSEpvVm5N
 		-- 网址激活————http://www.lookdiv.com/————输入[7788]获取激活码
 
+# 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
+
+
 # 常用插件
+-- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及链式调用方法，总之就是为了简化实体类而生的插件
+
+-- Free Mybatis Plugin————一个提高mybatis编码的插件。实现了dao层跳转到xml层的跳转功能
+
+-- Mybatis-log-plugin————根据mybatis输出的sql日志，转换为拼接好参数的sql
+
+-- Jrebel————一款比较好用的热部署插件，省去了一直重启的麻烦，尤其适合项目比较大的，能够节省不少时间
+	1、详情参考1————https://blog.csdn.net/top_explore/article/details/107321541
+	1、详情参考2————https://blog.csdn.net/seanxwq/article/details/89892614
+
+-- RestfulToolkit
+	1、根据 URL 直接跳转到对应的方法定义 ( Ctrl \ or Ctrl Alt N );
+	2、提供了一个 Services tree 的显示窗口;
+	3、一个简单的 http 请求工具;
+	4、在请求方法上添加了有用功能: 复制生成 URL;,复制方法参数...
+	5、其他功能: java 类上添加 Convert to JSON 功能，格式化 json 数据 ( Windows: Ctrl + Enter; Mac: Command + Enter )
+	
+-- redis————redis客户端工具，不需要再去安装第三方客户端，相对方便许多
+
 -- Vuesion Theme————一款皮肤插件.非常适中的UI颜色,漂亮的代码高亮主题
 
 -- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或是鼠标中键滚屏时有点卡顿
@@ -363,9 +385,11 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 -- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
 
+-- GsonFormat————超级实用的一个插件，对接第三方接口，通常需要将对方的json字符串转实体类，搞的很是头疼。使用GsonFormat我们只需要创建一个类，然后把要转换的json字符串复制进去，点击OK它就会给我们生成相应的实体对象。
+
 -- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文时理解的更加透彻。
 
--- arthas idea————阿里开源的一款强大的java在线诊断工具
+-- arthas idea————阿里开源的一款强大的java在线诊断工具.有了arthas这种神器可以线上输出日志，但是watch语法还是不够简单，因此Idea arthas 插件就此横空出世，插件安装成功后，只需要将光标放置在具体的类、字段、方法上面 右键选择需要执行的命令，部分会有窗口弹出、根据界面操作获取命令；部分直接获取命令复制到了剪切板 ，自己启动arthas 后粘贴即可执行。
 
 -- Search In Repository————平时我们如果要依赖一个第三方jar包，但是不知道它的maven/gradle的坐标。搓点的做法基本上就是baidu了，稍微高级点的就是到中央仓库去查下，最新版本的坐标是什么。然后复制下来，贴到pom里去。这款插件，无需你来回跳转，直接把中央仓库的查找集成到了Idea里面。你只需要打开这款插件，输入jar包的名字或者gav关键字，就能查到到这个jar包所有的版本，然后可以直接复制gav坐标。方便又快捷，干净又卫生！
 
@@ -1542,3 +1566,15 @@ brew install VisualVM
 <img src="image/img1_5_18_3.png" style="zoom:50%;" />
 
 ​		
+
+### 18、Mac安卓模拟器安装
+
+```markdown
+# 说明
+	Nox App Player是一个免费的Android操作系统模拟器,可让您在PC上运行Android应用程序。也提供单独的Mac版本。
+
+# 安装
+	brew install --cask noxappplayer
+
+```
+
