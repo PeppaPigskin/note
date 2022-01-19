@@ -36,7 +36,7 @@
 
 # 2、Windows——常用软件环境搭建
 
-### 1、Win10 企业版密钥
+## 1、Win10 企业版密钥
 
 ```bash
 # 密钥 1:
@@ -47,7 +47,7 @@ XKY4K-2NRWR-8F6P2-448RF-CRYQH
 NTVHT-YF2M4-J9FJG-BJD66-YG667
 ```
 
-### 2、Windows下使用SQLyog定时备份数据库
+## 2、Windows下使用SQLyog定时备份数据库
 
 ​		`1、在自己想要备份数据的文件目录中创建三个空文件backup.sql,backup.xml,backuplog.log，分别用于存储备份的数据脚本、配置文件、日志信息:`
 
@@ -95,7 +95,7 @@ NTVHT-YF2M4-J9FJG-BJD66-YG667
 
 
 
-### 3、Windows计划任务设置数据自动备份
+## 3、Windows计划任务设置数据自动备份
 
 ​		`1、使用记事本创建文本文件，并设置其内容如备注内容:`
 
@@ -140,7 +140,7 @@ Exit
 
 # 3、Mac——常用软件环境搭建
 
-### 1、iTerm2 + Oh My Zsh 终端安装
+## 1、iTerm2 + Oh My Zsh 终端安装
 
 ```bash
 1、zsh安装
@@ -193,7 +193,7 @@ Exit
 
 [附件1](attachments/Meslo LG S Regular for Powerline.ttf)
 
-### 2、Brew 安装和卸载
+## 2、Brew 安装和卸载
 
 ```markdown
 # 安装命令
@@ -239,7 +239,7 @@ Exit
 	3、同理，如果想要初始化配置啥的，也可以删除对应的目录，重启即可
 ```
 
-### 3、Mac OS 环境搭建
+## 3、Mac OS 环境搭建
 
 ```bash
 # 解决brew安装软件检测不安全
@@ -258,7 +258,7 @@ sudo spctl --master-enable
           earlier disabling.
 ```
 
-### 4、VMware Fusion 12pro 密钥
+## 4、VMware Fusion 12pro 密钥
 
 ```bash
 # 许可证密钥一:
@@ -269,7 +269,7 @@ YF390-0HF8P-M81RQ-2DXQE-M2UT6
 ZF71R-DMX85-08DQY-8YMNC-PPHV8
 ```
 
-### 5、向日葵远程控制工具
+## 5、向日葵远程控制工具
 
 ```bash
 1、说明
@@ -288,7 +288,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 			授权说明——https://service.oray.com/question/10558.html
 ```
 
-### 6、终端工具Tabby
+## 6、终端工具Tabby
 
 ```
 1、说明
@@ -300,7 +300,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 # 4、Java——开发环境搭建
 
-### 1、jdk安装与配置
+## 1、JDK安装与配置
 
 ```markdown
 # 安装
@@ -330,7 +330,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	java -version
 ```
 
-### 2、IDEA安装与配置
+## 2、IDEA安装与配置
 
 ```markdown
 # 说明
@@ -399,7 +399,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ```
 
-### 3、域名访问环境
+## 3、域名访问环境
 
 ​		IP访问规则
 
@@ -448,7 +448,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	 http://pigskinmall.com:5601/ ————就会成功跳转到虚拟机中的指定端口
 ```
 
-### 4、性能测试工具
+## 4、性能测试工具
 
 ```bash
 1、下载
@@ -456,7 +456,7 @@ brew install VisualVM
 2、使用
 ```
 
-### 5、压力测试工具
+## 5、压力测试工具
 
 ```markdown
 # 下载
@@ -470,7 +470,7 @@ brew install VisualVM
 	-- 运行————jmeter.bat/终端————执行sh jmeter
 ```
 
-### 6、Git 环境配置
+## 6、Git 环境配置
 
 ```markdown
 # 注册码云账号————https://gitee.com/
@@ -487,7 +487,7 @@ brew install VisualVM
 
 ```
 
-### 7、Tomcat 安装与配置
+## 7、Tomcat 安装与配置
 
 ```bash
 1、安装完提示信息
@@ -500,9 +500,9 @@ brew install VisualVM
 
 
 
-### 8、Mysql 安装与配置
+## 8、Mysql 安装与配置
 
-#### 1、安装mysql@5.7
+### 1、安装mysql@5.7
 
 ```bash
 1、安装mysql@5.7
@@ -516,7 +516,7 @@ brew install VisualVM
 	FLUSH PRIVILEGES;
 ```
 
-#### 2、安装mysql 8.0.26
+### 2、安装mysql 8.0.26
 
 ```bash
 1、安装mysql 8.0.26
@@ -530,7 +530,7 @@ brew install VisualVM
 	FLUSH PRIVILEGES;
 ```
 
-### 9、Nacos环境搭建
+## 9、Nacos环境搭建
 
 ```bash
 1、下载
@@ -550,7 +550,7 @@ brew install VisualVM
 		kill -9 xxx 
 ```
 
-### 10、Webpack安装
+## 10、Webpack安装
 
 ```bash
 1、安装
@@ -565,7 +565,7 @@ brew install VisualVM
 	npm uninstall webpack webpack-cli --save-dev
 ```
 
-### 11、Node环境搭建(npm同时也会安装好)
+## 11、Node环境搭建(npm同时也会安装好)
 
 ```bash
 1、安装nvm
@@ -594,7 +594,7 @@ brew install VisualVM
 		export PATH=$PATH:$NODE_HOME/bin
 ```
 
-### 12、Apifox安装与配置
+## 12、Apifox安装与配置
 
 ```bash
 1、说明
@@ -603,7 +603,7 @@ brew install VisualVM
 	https://www.apifox.cn/help/
 ```
 
-### 13、SVN环境搭建
+## 13、SVN环境搭建
 
 ```bash
 1、安装示例
@@ -643,7 +643,7 @@ brew install VisualVM
 	版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
 ```
 
-### 14、Go语言开发环境搭建
+## 14、Go语言开发环境搭建
 
 ```bash
 1、安装Golang的SDK
@@ -695,7 +695,7 @@ brew install VisualVM
 	brew install goland
 ```
 
-### 15、Maven环境搭建
+## 15、Maven环境搭建
 
 ```markdown
 # 说明
@@ -760,9 +760,280 @@ brew install VisualVM
 
 
 
+## 16、Seata环境搭建
+
+```markdown
+# 下载并安装————根据依赖导入时seata-all-x.x.x.jar的版本选择对应版本seata
+-- 从 https://github.com/seata/seata/releases,下载服务器软件包，将其解压缩
+
+# 目录文件说明,及相关配置说明
+-- /conf/registry.conf————注册中心相关配置————进行对seata配置中心以及配置所在位置的配置
+	registry {
+    # 指定注册中心的版本——可选择项为[file 、nacos 、eureka、redis、zk、consul、etcd3、sofa]
+    type = "nacos"
+
+    nacos {
+      serverAddr = "localhost:8848" # 设置nacos的主机地址
+      namespace = "public"
+      cluster = "default"
+    }
+    eureka {
+      serviceUrl = "http://localhost:1001/eureka"
+      application = "default"
+      weight = "1"
+    }
+    redis {
+      serverAddr = "localhost:6379"
+      db = "0"
+    }
+    zk {
+      cluster = "default"
+      serverAddr = "127.0.0.1:2181"
+      session.timeout = 6000
+      connect.timeout = 2000
+    }
+    consul {
+      cluster = "default"
+      serverAddr = "127.0.0.1:8500"
+    }
+    etcd3 {
+      cluster = "default"
+      serverAddr = "http://localhost:2379"
+    }
+    sofa {
+      serverAddr = "127.0.0.1:9603"
+      application = "default"
+      region = "DEFAULT_ZONE"
+      datacenter = "DefaultDataCenter"
+      cluster = "default"
+      group = "SEATA_GROUP"
+      addressWaitTime = "3000"
+    }
+    file {
+      name = "file.conf"
+    }
+	}
+  config {
+    # 指定seata的配置所在的位置————file、nacos 、apollo、zk、consul、etcd3
+    type = "file"
+
+    nacos {
+      serverAddr = "localhost"
+      namespace = "public"
+      cluster = "default"
+    }
+    consul {
+      serverAddr = "127.0.0.1:8500"
+    }
+    apollo {
+      app.id = "seata-server"
+      apollo.meta = "http://192.168.1.204:8801"
+    }
+    zk {
+      serverAddr = "127.0.0.1:2181"
+      session.timeout = 6000
+      connect.timeout = 2000
+    }
+    etcd3 {
+      serverAddr = "http://localhost:2379"
+    }
+    file {
+      name = "file.conf"
+    }
+	}
+
+-- /conf/file.conf————注册中心配置类型为file时使用的seate配置文件
+	transport {# 传输配置
+    # tcp udt unix-domain-socket
+    type = "TCP" # 配置使用的传输协议
+    #NIO NATIVE
+    server = "NIO" # 服务端模式
+    #enable heartbeat
+    heartbeat = true # 是否有心跳
+    #thread factory for netty
+    thread-factory { # 线程工厂
+      boss-thread-prefix = "NettyBoss"
+      worker-thread-prefix = "NettyServerNIOWorker"
+      server-executor-thread-prefix = "NettyServerBizHandler"
+      share-boss-worker = false
+      client-selector-thread-prefix = "NettyClientSelector"
+      client-selector-thread-size = 1
+      client-worker-thread-prefix = "NettyClientWorkerThread"
+      # netty boss thread size,will not be used for UDT
+      boss-thread-size = 1
+      #auto default pin or 8
+      worker-thread-size = 8
+    }
+    shutdown {
+      # when destroy server, wait seconds
+      wait = 3
+    }
+    serialization = "seata"
+    compressor = "none"
+	}
+	service { 
+    #vgroup->rgroup
+    vgroup_mapping.my_test_tx_group = "default"
+    #only support single node
+    default.grouplist = "127.0.0.1:8091"
+    #degrade current not support
+    enableDegrade = false
+    #disable
+    disable = false
+    #unit ms,s,m,h,d represents milliseconds, seconds, minutes, hours, days, default permanent
+    max.commit.retry.timeout = "-1"
+    max.rollback.retry.timeout = "-1"
+	}
+
+	client { # 客户端配置
+    async.commit.buffer.limit = 10000
+    lock {
+      retry.internal = 10
+      retry.times = 30
+    }
+    report.retry.count = 5
+	}
+
+	## transaction log store 事务日志存储位置
+	store {
+    ## store mode: file、db
+    mode = "file"
+
+    ## file store
+    file {
+      dir = "sessionStore"
+
+      # branch session size , if exceeded first try compress lockkey, still exceeded throws exceptions
+      max-branch-session-size = 16384
+      # globe session size , if exceeded throws exceptions
+      max-global-session-size = 512
+      # file buffer size , if exceeded allocate new buffer
+      file-write-buffer-cache-size = 16384
+      # when recover batch read size
+      session.reload.read_size = 100
+      # async, sync
+      flush-disk-mode = async
+    }
+
+    ## database store
+    db {
+      ## the implement of javax.sql.DataSource, such as DruidDataSource(druid)/BasicDataSource(dbcp) etc.
+      datasource = "dbcp"
+      ## mysql/oracle/h2/oceanbase etc.
+      db-type = "mysql"
+      url = "jdbc:mysql://127.0.0.1:3306/seata"
+      user = "mysql"
+      password = "mysql"
+      min-conn = 1
+      max-conn = 3
+      global.table = "global_table" # 相关结构查看db_store.sql文件
+      branch.table = "branch_table" # 相关结构查看db_store.sql文件
+      lock-table = "lock_table" # 相关结构查看db_store.sql文件
+      query-limit = 100
+    }
+	}
+	lock {
+    ## the lock store mode: local、remote
+    mode = "remote"
+
+    local {
+      ## store locks in user's database
+    }
+
+    remote {
+      ## store locks in the seata's server
+    }
+	}
+	recovery {
+    committing-retry-delay = 30
+    asyn-committing-retry-delay = 30
+    rollbacking-retry-delay = 30
+    timeout-retry-delay = 30
+	}
+
+	transaction {
+    undo.data.validation = true
+    undo.log.serialization = "jackson"
+	}
+
+	## metrics settings
+	metrics {
+    enabled = false
+    registry-type = "compact"
+    # multi exporters use comma divided
+    exporter-list = "prometheus"
+    exporter-prometheus-port = 9898
+	}
+
+-- /conf/db_store.sql————展示file.conf文件中,日志存放位置为db store时相关表的结构
+    -- the table to store GlobalSession data
+    drop table if exists `global_table`;
+    create table `global_table` (
+      `xid` varchar(128)  not null,
+      `transaction_id` bigint,
+      `status` tinyint not null,
+      `application_id` varchar(32),
+      `transaction_service_group` varchar(32),
+      `transaction_name` varchar(64),
+      `timeout` int,
+      `begin_time` bigint,
+      `application_data` varchar(2000),
+      `gmt_create` datetime,
+      `gmt_modified` datetime,
+      primary key (`xid`),
+      key `idx_gmt_modified_status` (`gmt_modified`, `status`),
+      key `idx_transaction_id` (`transaction_id`)
+    );
+
+    -- the table to store BranchSession data
+    drop table if exists `branch_table`;
+    create table `branch_table` (
+      `branch_id` bigint not null,
+      `xid` varchar(128) not null,
+      `transaction_id` bigint ,
+      `resource_group_id` varchar(32),
+      `resource_id` varchar(256) ,
+      `lock_key` varchar(128) ,
+      `branch_type` varchar(8) ,
+      `status` tinyint,
+      `client_id` varchar(64),
+      `application_data` varchar(2000),
+      `gmt_create` datetime,
+      `gmt_modified` datetime,
+      primary key (`branch_id`),
+      key `idx_xid` (`xid`)
+    );
+
+    -- the table to store lock data
+    drop table if exists `lock_table`;
+    create table `lock_table` (
+      `row_key` varchar(128) not null,
+      `xid` varchar(96),
+      `transaction_id` long ,
+      `branch_id` long,
+      `resource_id` varchar(256) ,
+      `table_name` varchar(32) ,
+      `pk` varchar(32) ,
+      `gmt_create` datetime ,
+      `gmt_modified` datetime,
+      primary key(`row_key`)
+		);
+
+# 启动
+-- 	前提
+	1、nacos已经启动
+
+-- 启动
+	1、windows————双击运行/bin/seata-server.bat
+	2、mac————终端/bin/下运行[sh seata-server.sh -p 8091 -h 127.0.0.1 -m file]命令
+	
+```
+
+
+
 # 5、Java——虚拟机环境搭建
 
-### 1、虚拟机安装
+## 1、虚拟机安装
 
 ​		本项目使用virtualbox虚拟机.采用homebrew命令进行安装操作,具体安装命令如下:
 
@@ -778,7 +1049,7 @@ brew install VisualVM
 
 ​		`BOSS——>Advanced——>CPU Configuration ——>Intel Virtualization Technology[Enable]`
 
-### 2、Vagrant
+## 2、Vagrant
 
 ​		Vagrant 是一个基于 Ruby 的工具，用于创建和部署虚拟化开发环境。它使用 Oracle 的开源 VirtualBox 虚拟化系统，使用 Chef 创建自动化虚拟环境.具体安装步骤如下:
 
@@ -798,7 +1069,7 @@ brew install VisualVM
 
 ​		<img src="image/img1_5_2_2.png" alt="img" style="zoom:50%;" />
 
-### 3、Linux虚拟机安装
+## 3、Linux虚拟机安装
 
 ​		本项目虚拟环境使用centos7系统.通过vagrant进行centos7的安装,具体安装步骤如下:
 
@@ -879,7 +1150,7 @@ brew install VisualVM
 	3)接下来可以使用【passwd】命令修改root账户密码
 ```
 
-### 4、Linux中Docker环境搭建		
+## 4、Linux中Docker环境搭建		
 
 ```bash
 1、卸载旧的docker
@@ -937,7 +1208,7 @@ brew install VisualVM
 
 
 
-### 5、Docker中安装mysql
+## 5、Docker中安装mysql
 
 ​		MySQL是一个**关系型数据库管理系统**，由瑞典MySQL AB公司开发，属于 [Oracle](https://baike.baidu.com/item/Oracle) 旗下产品。MySQL 是最流行的关系型数据库管理系统之一，在 WEB应用方面，MySQL是最好的 RDBMS(Relational Database Management System，关系数据库管理系统) 应用软件之一。docker中安装步骤如下:
 
@@ -991,7 +1262,7 @@ brew install VisualVM
 	sudo docker update mysql --restart=always
 ```
 
-### 6、Docker中安装redis
+## 6、Docker中安装redis
 
 ​		Redis（Remote Dictionary Server )，即远程字典服务，是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。从2010年3月15日起，Redis的开发工作由VMware主持。从2013年5月开始，Redis的开发由Pivotal赞助。docker中安装redis步骤如下:
 
@@ -1031,7 +1302,7 @@ brew install VisualVM
 	brew install another-redis-desktop-manager
 ```
 
-### 7、Docker中安装elasticSearch及kibana
+## 7、Docker中安装elasticSearch及kibana
 
 ```markdown
 # 下载镜像文件
@@ -1145,7 +1416,7 @@ brew install VisualVM
 	6)重启ES进行测试
 ```
 
-### 8、Docker中安装nginx
+## 8、Docker中安装nginx
 
 ```bash
 1、创建nginx目录
@@ -1183,7 +1454,7 @@ brew install VisualVM
 	
 ```
 
-### 9、Docker中安装RabbitMQ
+## 9、Docker中安装RabbitMQ
 
 ```bash
 1、创建并启动kibana实例
@@ -1212,7 +1483,7 @@ brew install VisualVM
 	https://hub.docker.com/_/rabbitmq?tab=tags
 ```
 
-### 10、Docker中安装Oracle
+## 10、Docker中安装Oracle
 
 ```bash
 1、安装
@@ -1230,7 +1501,7 @@ brew install VisualVM
     初始用户名密码：system/helowin；服务名：helowin
 ```
 
-### 11、Linux虚拟机中安装Redis
+## 11、Linux虚拟机中安装Redis
 
 ```markdown
 # 安装
@@ -1259,7 +1530,7 @@ brew install VisualVM
 7、重启redis【ps aux | grep redis】-查看redis进程、【kill -9 xxxx】-杀掉指定进程
 ```
 
-### 12、Linux中JDK环境搭建
+## 12、Linux中JDK环境搭建
 
 ```markdown
 -- 1、下载jdk————http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
@@ -1278,7 +1549,7 @@ brew install VisualVM
 -- 6、测试是否安装成功————java -version
 ```
 
-### 13、Linux中MySQL环境搭建【LNMP】
+## 13、Linux中MySQL环境搭建【LNMP】
 
 ```markdown
 # 准备工作
@@ -1428,7 +1699,7 @@ brew install VisualVM
 	https://blog.csdn.net/weixin_42109012/article/details/94443391
 ```
 
-### 14、Linux中Canal环境搭建
+## 14、Linux中Canal环境搭建
 
 ```markdown
 # 前提条件
@@ -1490,7 +1761,7 @@ brew install VisualVM
 	3、查看是否已启动————ps -ef | grep canal
 ```
 
-### 15、Linux中Maven环境搭建
+## 15、Linux中Maven环境搭建
 
 ```markdown
 -- 上传或下载安装介质
@@ -1509,14 +1780,14 @@ brew install VisualVM
 -- 测试是否成功————mvn -v
 ```
 
-### 16、Linux中Git环境搭建
+## 16、Linux中Git环境搭建
 
 ```markdown
 -- 执行安装命令————yum -y install git
 -- 测试是否成功————git --version
 ```
 
-### 17、Linux中Jenkins搭建
+## 17、Linux中Jenkins搭建
 
 ```markdown
 -- 上传或下载安装介质
@@ -1567,7 +1838,7 @@ brew install VisualVM
 
 ​		
 
-### 18、Mac安卓模拟器安装
+## 18、Mac安卓模拟器安装
 
 ```markdown
 # 说明
