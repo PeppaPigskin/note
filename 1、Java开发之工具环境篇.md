@@ -1030,6 +1030,33 @@ brew install VisualVM
   	1)seata TC注册到nacos的地址不是服务器的地址导致不能链接——————只需要启动时命令增加-h 指定ip地址 
 ```
 
+## 17、Eclipse安装与配置
+
+```markdown
+# 安装
+	brew install eclipse-java
+
+# 配置
+-- JDK配置
+	1、打开Eclipse的偏好设置，我们需要对Eclipse做一下配置
+	2、从左侧栏选择java下面的Installed JREs,然后点击Add按钮，我们要为Eclipse配置JDK
+	3、选择“Standard VM”后点击“Next”按钮
+	4、在Add JRE界面中点击JRE home后面的那个“Directory”按钮，选择安装JDK时的Home文件夹路径
+	5、输入JRE的名称(如： JRE1_8),点击“Finish”按钮
+	6、勾选这个新增的JRE，点击右下角的Apply按钮，应用该配置
+
+-- 编码配置
+	1、在左侧栏General的Workspace下确定编码为UTF-8，点击Apply应用配置(如果你看到默认的编码就是UTF－8，那就可以不管)
+
+-- 没有Server解决办法————https://blog.csdn.net/weixin_44093607/article/details/106203861
+
+-- 集成Tomcat
+	1、首先打开eclipse，选择eclipse的偏好设置，选择server--Runtime Environments
+	2、然后点击Add,由于我下载的是Tomcat8版本，所以我选择tomcat8，根据自己下载的版本选择，选择后点击next
+	3、配置Tomcat Server相关信息(自定义名字、tomcat文件存放路径、jre版本选择)
+	3、点击，finish，然后ok保存就好了
+```
+
 
 
 # 5、Java——虚拟机环境搭建
