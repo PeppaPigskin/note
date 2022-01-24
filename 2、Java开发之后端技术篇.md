@@ -1,4 +1,4 @@
-# 一、主流技术
+#   一、主流技术
 
 ## 1、MybatisPlus
 
@@ -6811,7 +6811,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 27、消息中间件
+## 27、消息中间件——RabbitMQ
 
 ### 1、消息中间件说明
 
@@ -6886,13 +6886,13 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			-- 性能卓越，单机写入TPS约在百万条/秒，最大的优点，就是吞吐量高。
 			-- 时效性————ms级
 			-- 可用性————非常高，kafka是分布式的，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用
-消费者采用Pull方式获取消息, 消息有序, 通过控制能够保证所有消息被消费且仅被消费一次;
+			-- 消费者采用Pull方式获取消息, 消息有序, 通过控制能够保证所有消息被消费且仅被消费一次;
 			-- 有优秀的第三方Kafka Web管理界面Kafka-Manager；
 			-- 在日志领域比较成熟，被多家公司和多个开源项目使用；
 			-- 功能支持————功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用
 		3)缺点
 			-- Kafka单机超过64个队列/分区，Load会发生明显的飙高现象，队列越多，load越高，发送消息响应时间变长
-使用短轮询方式，实时性取决于轮询间隔时间；
+			-- 使用短轮询方式，实时性取决于轮询间隔时间；
 			-- 消费失败不支持重试；
 			-- 支持消息顺序，但是一台代理宕机后，就会产生消息乱序；
 			-- 社区更新较慢；
@@ -6927,17 +6927,16 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-### 2、RabbitMQ
+### 2、RabbitMQ简介
 
 ```markdown
-# RabbitMQ概念
--- 图示————如下图所示
+# 图示————如下图所示
 ```
 
 <img src="image/img2_1_27_2_1.png" style="zoom:50%;" />
 
 ```markdown
--- 核心概念
+# 核心概念
 	1、Message(消息)————消息是不具名的,它是由消息头和消息体组成,消息体是不透明的,而消息头是由一系列的可选属性组成,这些属性包括routing-key(路由键)、priority(相对于其他消息的优先权)、delivery-mode(指出该消息可能需要持久性存储)等
 	2、Publisher————消息的生产者
 		也是一个向交换器发布消息的客户端应用程序
@@ -6972,39 +6971,47 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 ```markdown
 # Docker安装RabbitMQ
 	详见————1、Java开发之工具环境篇-5-9、Docker中安装RabbitMQ
+```
 
-# RabbitMQ运行机制
--- AMQP中的消息路由
+### 3、RabbitMQ运行机制
+
+```markdown
+# AMQP中的消息路由
 	1、说明————AMQP中消息的路由过程和Java开发者熟悉的JMS存在一些差别,AMQP中增加了Exchange和Binding的角色.生产之把消息发送到Exchange上,消息最终到达队列被消费者接收,而Binding决定交换器的消息应该发送到那个队列
 	2、图示,如下图所示
 ```
 
-<img src="image/img2_1_27_2_3.png" style="zoom:50%;" />
+
+
+<img src="image/img2_1_27_3_1.png" style="zoom:50%;" />
 
 ```markdown
--- Exchange类型————分发消息时根据类型的不同分发策略有所区别
+# Exchange类型————分发消息时根据类型的不同分发策略有所区别
 	1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
 ```
 
-<img src="image/img2_1_27_2_4.png" style="zoom:50%;" />
+<img src="image/img2_1_27_3_2.png" style="zoom:50%;" />
 
 ```markdown
 	2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
 ```
 
-<img src="image/img2_1_27_2_5.png" style="zoom:50%;" />
+<img src="image/img2_1_27_3_3.png" style="zoom:50%;" />
 
 ```markdown
 	3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
 ```
 
-<img src="image/img2_1_27_2_6.png" style="zoom:50%;" />
+<img src="image/img2_1_27_3_4.png" style="zoom:50%;" />
 
 ```markdown
 	4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
+```
 
-# SpringBoot整合
--- 引入spring-boot-start-amqp
+### 4、SpringBoot整合流程
+
+```markdown
+# 引入spring-boot-start-amqp
 	<!-- 引入高级消息队列场景启动器——RabbitAutoConfiguration会自动生效--> 
   <dependency>          
   <groupId>org.springframework.boot</groupId>   
@@ -7013,7 +7020,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   <!-- 给容器中自动配置了AmqpAdmin、RabbitTemple、CachingConnectionFactory、RabbitMessagingTemplate-->
   <!-- 所有的属性在@ConfigurationProperties(prefix = "spring.rabbitmq")进行绑定-->
 
--- application.yml配置连接安装的RabbitMQ
+# application.yml配置连接安装的RabbitMQ
 	#RabbitMQ相关配置
 	##主机地址
 	spring.rabbitmq.host=192.168.56.101
@@ -7022,10 +7029,10 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	##虚拟主机
 	spring.rabbitmq.virtual-host=/
 
--- 使用注解启用
+# 使用注解启用
 	@EnableRabbit
 
--- 使用JSON序列化消息
+# 使用JSON序列化消息
 	/** 
 	* RabbitMQ配置类
   */
@@ -7039,9 +7046,12 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     	return new Jackson2JsonMessageConverter();  
     }
 	}
+```
 
-# RabbitMQ组件使用测试
--- AmqpAdmin————管理组件
+### 5、RabbitMQ组件使用测试
+
+```markdown
+# AmqpAdmin————管理组件
 	1、创建交换机
 		package com.pigskin.mall.order;
 
@@ -7181,7 +7191,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }
     }
 
--- RabbitTemple————消息发送处理组件
+# RabbitTemple————消息发送处理组件
     package com.pigskin.mall.order.controller;
 
     import com.pigskin.mall.order.entity.OrderEntity;
@@ -7241,7 +7251,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }
     }
 
--- RabbitLinstener————消息监听组件
+# RabbitLinstener————消息监听组件
 	1、注解说明
 		1)RabbitLinstener————可使用位置:类和方法上(监听那些队列)
 		2)RabbitHandler————可使用位置:方法上(通过重载区分不同类型的消息)
@@ -7357,20 +7367,24 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }
     }
 
--- CachingConnectionFactory————连接工厂
+# CachingConnectionFactory————连接工厂
 
--- RabbitMessagingTemplate
+# RabbitMessagingTemplate
 
-# RabbitMQ消息确认机制————可靠性抵达
--- 图示,如下图所示
 ```
 
-<img src="image/img2_1_27_2_7.png" style="zoom:50%;" />
+### 6、RabbitMQ消息确认机制——可靠性抵达
 
 ```markdown
--- 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
+# 可靠性抵达————图示,如下图所示
+```
 
--- 定制RabbitTemplate
+<img src="image/img2_1_27_6_1.png" style="zoom:50%;" />
+
+```markdown
+# 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
+
+# 定制RabbitTemplate
 	1、服务器收到消息就回调————publisher发送端————confirmCallback确认模式
   	1)基本原理
   		在创建connectionFactory的时候设置PublisherConfirms(true)选项，从而开启confirmCallback.消息只要被broker接收到就会执行confirmCallback方法，如果是cluster(集群)模式，需要所有broker接收到才会调用confirmCallback.被broker接收到只能表示message已经到达服务器,并不能保证消息一定会被投递到queue中,所以需要用到接下来的returnCallback
@@ -7650,12 +7664,399 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
             }
         }
+```
 
-# RabbitMQ延时队列————实现定时任务
--- 场景————比如未付款订单,多了一段时间后,系统自动取消订单并释放占有物品
--- 常用解决方案————spring的schedule定时任务轮询数据库
--- 缺点————消耗系统内存,增加了数据库的压力,存在较大的时间误差
--- 解决————rabbit的消息TTL和死信Exchange结合
+### 7、RabbitMQ延时队列——实现定时任务
+
+```markdown
+# 定时任务说明
+	1、适用场景————比如未付款订单,多了一段时间后,系统自动取消订单并释放占有物品
+	2、常用解决方案————spring的schedule定时任务轮询数据库
+	3、缺点————消耗系统内存,增加了数据库的压力,存在较大的时间误差
+	4、解决————rabbit的消息TTL和死信Exchange结合
+
+# 定时任务的时效性问题
+	定时任务每30分钟查一次,当一个订单在第一个次定时任务查询后立即产生,那么就会导致此次的任务在第三次的定时任务才能被查到,产生时效性问题.如下图所示:
+```
+
+<img src="image/img2_1_27_7_1.png" style="zoom:50%;" />
+
+```markdown
+# RabbitMQ延时队列实现定时任务
+	通过MQ暂缓存消息,不占用系统任何资源,实现事务最终一致性,并有效解决了定时任务产生的时效性问题,如下图所示
+```
+
+<img src="image/img2_1_27_7_2.png" style="zoom:50%;" />
+
+```markdown
+# 消息的存活时间--TTL————Time To Live
+-- 说明————消息的TTL就是消息的存活时间
+
+-- RabbitMQ可以对队列和消息分别设置TTL
+	1、对队列设置就是队列没有消费者时连接的保留时间.也可以对每个单独的消息做单独的设置,超过这个时间,我们认为这个消息就死了,称之为死信.
+	2、如果队列设置了,消息也设置了.那么就会取小的.所以一个消息如果被路由到不同的队列中,这个消息的死亡时间有可能不一样(不同的队列设置).
+	3、此处单讲单个消息的TTL,因为它才是实现延时任务的关键.可以通过设置消息的expiration字段或者x-message-ttl属性来设置时间,两者效果一样
+
+# 死信路由--DLX————Dead Letter Exchanges
+-- 什么是死信————一个消息在满足如下条件下,会进入死信路由,注意此处是路由而不是队列,一个路由可以对应很多队列
+	1、一个消息被Consumer拒收了,并且reject方法的参数里requeue是false.也就是说不会被再次放入队列中被其它消费者使用(basic.reject/basic.nack) requeue=false
+	2、上面的消息的TTL到了,消息过期了
+	3、队列的长度限制满了.排在前面的消息会被丢弃或者扔到死信路由上
+
+-- 死信路由————其实就是一种普通的exchange,和创建其它exchange没有两样.只是在某一个设置Dead Letter Exchange的队列中有消息过期了,会自动触发消息的转发,发送到Dead Letter Exchange中去
+
+-- 实现一个延时队列————我们既可以控制消息在一段时间后变成死信,又可以控制变成死信的消息被路由到某一指定的交换机,结合二者,其实就可以实现一个延时队列,如下图所示:
+```
+
+<img src="image/img2_1_27_7_3.png" style="zoom:50%;" />
+
+```markdown
+-- 手动ack&异常消息统一放在一个队列处理建议的两种方式
+	1、catch异常后,手动发送到指定队列,然后使用channel给RabbitMQ确认消息已消费
+	2、给Queue绑定死信队列,使用nack(requeue为false)确认消息消费失败
+
+# 延时队列实现方式
+-- 方式一————设置队列过期时间实现延时队列————推荐使用
+```
+
+<img src="image/img2_1_27_7_4.png" style="zoom:50%;" />
+
+```markdown
+-- 方式二————设置消息过期时间实现延时队列————使用的是懒检查(消息队列中的消息逐个检查,不会根据设置过期时间的长短优先处理)
+```
+
+<img src="image/img2_1_27_7_5.png" style="zoom:50%;" />
+
+```markdown
+# 代码整合————延时队列定时订单关单模拟
+-- 业务流程基本图示,如下图所示
+```
+
+<img src="image/img2_1_27_7_6.png" style="zoom:50%;" />
+
+```markdown
+-- 业务流程升级图示,如下图所示
+```
+
+<img src="image/img2_1_27_7_7.png" style="zoom:50%;" />
+
+```markdown
+-- 说明
+	使用Bean直接注入在服务启动的时候会出现注入的东西在RabbitMQ中并没有,因为我们导入的RabbitMQ只有在第一次链接RabbitMQ监听消息时才会创建这些队列和交换机
+
+-- 准备工作
+	1、创建交换机和队列
+
+-- 业务代码实现步骤
+	1、导入依赖
+	 <!--引入高级消息队列场景启动器-->
+   <dependency>
+   	<groupId>org.springframework.boot</groupId>
+   	<artifactId>spring-boot-starter-amqp</artifactId>
+   </dependency>
+	2、创建配置类————用于创建队列、交换机、绑定关系,为了方便,测试的监听也放在此处了
+		package com.pigskin.mall.order.config;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.rabbitmq.client.Channel;
+    import org.springframework.amqp.core.*;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    import java.io.IOException;
+    import java.util.Date;
+    import java.util.HashMap;
+    import java.util.Map;
+
+    /**
+     * MQ配置————用于创建并注入Binding(绑定关系)、Queue(队列)、Exchange(交换机)
+     * 使用@Bean进行注入——RabbitMQ没有时给容器中自动创建
+     * 使用@Bean声明，当属性发生变化也不会覆盖
+     *
+     * @author pigskin
+     * @date 2022年01月18日 3:17 下午
+     */
+    @Configuration
+    public class MyMQConfig {
+
+        /**
+         * 进行消息队列的监听
+         *
+         * @param order
+         */
+
+        @RabbitListener(queues = "order.release.order.queue")//设置监听的队列
+        public void listener(OrderEntity order, Channel channel, Message message) throws IOException {
+            System.out.println("收到过期的订单信息：创建时间为————" + order.getModifyTime() + "，" + new Date() + "准备关闭订单————" + order.getOrderSn());
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        }
+
+
+        /**
+         * 创建队列(延时队列-死信队列)
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Queue
+        public Queue orderDelayQueue() {
+            // 设置特殊属性
+            Map<String, Object> arguments = new HashMap<>();
+            /*指定死信路由*/
+            arguments.put("x-dead-letter-exchange", "order-event-exchange");
+            /*指定死信使用的路由键*/
+            arguments.put("x-dead-letter-routing-key", "order.release.order");
+            /*指定消息过期时间*/
+            arguments.put("x-message-ttl", 60000);
+
+            // 队列名————String name,
+            // 是否持久化————boolean durable,
+            // 是否排他————boolean exclusive,
+            // 是否自动删除————boolean autoDelete,
+            // 包含的自定义属性————Map<String, Object> arguments
+            return new Queue("order.delay.queue", true, false, false, arguments);
+        }
+
+        /**
+         * 创建队列(普通队列)
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Queue
+        public Queue orderReleaseOrderQueue() {
+            return new Queue("order.release.order.queue", true, false, false);
+        }
+
+        /**
+         * 创建交换机
+         *
+         * @return
+         */
+        @Bean//RabbitMQ没有时给容器中自动创建Exchange
+        public Exchange orderEventExchange() {
+            // 交换机的名字————String name,
+            // 否持久化————boolean durable,
+            // 是否自动删除————boolean autoDelete,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new TopicExchange("order-event-exchange", true, false);
+        }
+
+        /**
+         * 创建交换机和orderDelayQueue队列的绑定关系
+         *
+         * @return
+         */
+        @Bean//RabbitMQ没有时给容器中自动创建Binding
+        public Binding orderCreateOrder() {
+            // 目的地————String destination,
+            // 目的地类型————Binding.DestinationType destinationType,
+            // 绑定此目的地的交换机————String exchange,
+            // 绑定使用的路由键————String routingKey,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new Binding("order.delay.queue",
+                    Binding.DestinationType.QUEUE,
+                    "order-event-exchange",
+                    "order.create.order",
+                    null);
+        }
+
+        /**
+         * 创建交换机和orderReleaseOrderQueue队列的绑定关系
+         *
+         * @return
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Binding
+        public Binding orderReleaseOrder() {
+    // 目的地————String destination,
+            // 目的地类型————Binding.DestinationType destinationType,
+            // 绑定此目的地的交换机————String exchange,
+            // 绑定使用的路由键————String routingKey,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new Binding("order.release.order.queue",
+                    Binding.DestinationType.QUEUE,
+                    "order-event-exchange",
+                    "order.release.order",
+                    null);
+        }
+    }
+	3、请求测试
+  	/**
+     * 进行测试延时队列的使用
+     *
+     * @return
+     */
+    @GetMapping("/test/createOrder")
+    @ResponseBody
+    public String createOrderTest() {
+        /*模拟下单成功*/
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(UUID.randomUUID().toString());
+        orderEntity.setModifyTime(new Date());
+        /*给MQ发送消息,通过指定路由键，到达延时队列*/
+        rabbitTemplate.convertAndSend("order-event-exchange", "order.create.order", orderEntity);
+        return "ok";
+    }
+
+
+```
+
+### 8、如何保证消息可靠性
+
+```markdown
+# 保证消息可靠性————防止消息丢失
+	1、做好消息确认机制（publisher,consumer[手动ACK-消费成功再ACK]）
+	2、每一个发送的消息，都在数据库做好记录。定期将失败的消息再次发送
+
+# 消息丢失
+-- 消息发送出去,由于网络问题没有抵达服务器
+	1、做好容错方法(try-catch),发送消息可能会网络失败,失败后要有重试机制,可记录到数据库,采用定期彐描重发的方式
+	2、做好日志记录,每个消息状态是否都被服务器收到都应该记录————//TODO:每一个消息做好日志记录（给数据库保存每一个消息的详细信息）
+	3、做好定期重发,如果消息没有发送成功,定期去数据库扫描末成功的消息进行重发————//TODO:定期扫描数据库将失败的消息再发送一次   
+
+-- 消息抵达 Broker, Broker要将消息写入磁盘(持久化)オ算成功。此时Brokers尚未持久化完成,宕机。
+	1、publisher也必须加入确认回调机制,确认成功的消息,修改数据车消息状态
+
+-- 自动ACK的状态下。消费者收到消息,但没来得及消息然后宕机
+	1、一定开启手动ACK,消费成功才移除,失败或者没来得及处理就noAck并重新入队
+
+# 消息重复
+-- 消息消费成功,事务已经提交,ack时,机器宕机。导致没有ack成功,Broker的消息重新由unack变为ready,并发送给其他消费者
+
+-- 消息消费失败,由于重试机制,自动又将消息发送出去
+
+-- 成功消费,ack时宕机,消息由unack变为ready, Broker又重新发送
+	1、消费者的业务消费接口应该设计为幂等性的。比如扣库存有工作单的状态标志
+	2、使用防重表(redis/mysq),发送消息每一个都有业务的唯标识,处理过就不用处理
+	3、rabbitMQ的每一个消息都有redelivered字段,可以获取是否是被重新投递过来的,而不是第一次投递过来的
+
+# 消息积压
+-- 消费者宕机积压
+
+-- 消费者消费能力不足积压
+
+-- 发送者发送流量太大
+	1、上线更多的消费者,进行正常消费
+	2、上线专门的队列消费服务,将消息先批量取出来,记录数据库,离线慢慢处理
+
+# 相关处理
+-- 创建消息记录表
+	CREATE TABLE mq_message
+  (
+      message_id     char(32) NOT NULL COMMENT '消息ID',
+      content        text COMMENT '消息内容（需要序列化成Json）',
+      to_exchange    varchar(255) DEFAULT NULL COMMENT '消息发给的交换机',
+      routing_key    varchar(255) DEFAULT NULL COMMENT '使用的路由键',
+      class_type     varchar(255) DEFAULT NULL COMMENT '发的的消息的类型',
+      message_status int(1)       DEFAULT 0 COMMENT '0-新建 1-已发送 2-错误抵达 3-已抵达',
+      create_time    datetime     DEFAULT NULL COMMENT '创建时间',
+      update_time    datetime     DEFAULT NULL COMMENT '修改时间',
+      PRIMARY KEY (message_id)
+  ) ENGINE = Innodb DEFAULT CHARSET = utf8mb4
+
+-- 消息回调配置方法进行对消息记录表数据的记录、修改及消息的重新发送
+    package com.pigskin.mall.order.config;
+
+    import org.springframework.amqp.core.Message;
+    import org.springframework.amqp.rabbit.connection.CorrelationData;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+    import org.springframework.amqp.support.converter.MessageConverter;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    import javax.annotation.PostConstruct;
+
+    /**
+     * RabbitMQ配置类
+     */
+    @Configuration
+    public class MyRabbitConfig {
+        @Autowired
+        RabbitTemplate rabbitTemplate;
+
+        /**
+         * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+         */
+        @Bean
+        public MessageConverter messageConverter() {
+            return new Jackson2JsonMessageConverter();
+        }
+
+
+        /**
+         * 定制RabbitTemplate
+         * 1、服务器收到消息就回调
+         * 1）spring.rabbitmq.publisher-confirms=true
+         * 2）设置确认回调ConfirmCallback
+         * 2、消息正确抵达队列进行回调
+         * 1)##开启发送端消息抵达队列确认
+         * spring.rabbitmq.publisher-returns=true
+         * #只要抵达队列，以异步模式优先回调这个returnConfirm
+         * spring.rabbitmq.template.mandatory=true
+         * 2)设置消息抵达队列确认回调ReturnCallback
+         * 3、消费端确认（保证每一个消息被正确消费，此时才可以让broker删除这个消息）
+         * 1)默认是自动确认的，只要消息接收到，客户端就会自动确认，服务端就会移除这个消息
+         * 问题：收到很多消息，自动回复给服务器ack，但是实际只有一个消息处理成功后，服务器宕机了。此时消息队列中的消息就都没有了，发生了消息丢失
+         * 解决思路：不进行自动确认——通过手动确认来解决（每处理一个消息确认一个消息）
+         * 手动确认——只要没明确告诉MQ货物已经被签收(没有ACK)消息就一直是unacked状态，即使服务器宕机，消息也不会丢失，会重新变为Ready状态.
+         * 2)如何签收
+         * channel.basicAck(deliveryTag, false);————签收货物；业务成功完成就应该签收；
+         * channel.basicNack(deliveryTag, false, requeue);————拒签货物；业务失败就应该拒签
+         */
+        @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+        public void initRabbitTemplate() {
+            /*1、设置服务器收到消息就回调*/
+            rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+                /**
+                 *  1、只要消息抵达Broker就ack为true
+                 * @param correlationData 当前消息的唯一关联数据（唯一id）
+                 * @param b 消息是否成功收到
+                 * @param s 失败的原因
+                 */
+                @Override
+                public void confirm(CorrelationData correlationData, boolean b, String s) {
+                    /*1、做好消息确认机制（publisher,consumer[手动ACK-消费成功再ACK]）*/
+                    /*2、每一个发送的消息，都在数据库做好记录。定期将失败的消息再次发送*/
+
+                    /*TODO:服务器收到了*/
+                    //1、确认消息到了就通过消息的唯一ID进行消息的状态设置,标识消息已经被服务器收到
+                    //2、创建代码————定期从服务器中获取失败的消息,重新发送,并记录消息的日志
+                    System.out.println("confirm....correlationData["
+                            + correlationData
+                            + "]==>ack["
+                            + b
+                            + "]==>s["
+                            + s
+                            + "]");
+                }
+            });
+
+            /*2、设置消息正确抵达队列进行回调*/
+            rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+                /**
+                 *  只要消息没有投递给指定队列，就触发这个失败回调
+                 * @param message 投递失败消息的详细信息
+                 * @param i  回复的状态码
+                 * @param s 回复的文本内容
+                 * @param s1 当时这个消息发给那个交换机
+                 * @param s2 当时这个消息用那个路由键
+                 */
+                @Override
+                public void returnedMessage(Message message, int i, String s, String s1, String s2) {
+                    /*TODO:报错误了，修改数据库当前消息的状态*/
+                  System.out.println("Fail Message["
+                          + message
+                          + "]==>i["
+                          + i
+                          + "]==>s["
+                          + s
+                          + "]==>s1["
+                          + s1
+                          + "]==>s2["
+                          + s2
+                          + "]");
+              }
+          });
+      }
+  	}
+
 ```
 
 
@@ -7977,6 +8378,1180 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			2.然后双击 MaxUserPort,输入数值数据为65534,基数选择十进制(如果是分布式运行的话,控制机器和负载机器都需要这样操作)
 		3)修改配置完毕之后记得重启机器オ会生效
 		4)注意————一个额外的 TCPTimedWaitDelay 注册表参数确定关闭的端口在可以重用关闭的端口之前等待的时间。
+```
+
+
+
+## 31、本地事务与分布式事务
+
+### 1、本地事务
+
+```markdown
+# 事务的基本性质
+-- 说明
+		数据库事务的几个特征:原子性(Atomicity)、一致性(Consistency)、隔离性或独立性(Isolation)和持久性(Durabilily),简称ACID.
+
+-- 详细说明
+	1、原子性————一系列的操作整体不可拆分,要么同时成功,要么同时失败
+	2、一致性————数据在事务的前后,业务整体一致
+	3、隔离性————事务之间相互隔离
+	4、持久性————一旦事务成功,数据一定会落盘在数据库
+
+-- 在以往的单体应用中,我们多个业务操作使用同一条连接操作不同的数据表,一旦有异常,我们可以很容易的整体回滚
+
+# 事务的隔离级别————@Transactional(isolation = Isolation.xxx)
+-- READ UNCOMMITTED————读未提交
+	该隔离级别的事务会读到其它未提交事务(被回滚了)的数据,此现象也称之为脏读.
+
+-- READ COMMITTED————读已提交
+	一个事务可以读取另一个已提交的事务,多次读取会造成不一样的结果,此现象称为不可重复读问题;	Oracle和SqlServer的默认隔离级别
+
+-- REPEATABLE READ————可重复读
+	该隔离级别是MYSQL默认的隔离级别,在同一个事务中,select的结果是事务开始时时间点的状态,因此,同样的select操作读到的结果会是一致的,但是会产生幻读现象.Mysql的InnoDB引擎可以通过next-key locks机制(参考————行锁的算法)来避免幻读.
+
+-- SERIALIZABLE————序列化
+	在该隔离级别下事务都是串行顺序执行的,Mysql数据库的InnoDB引擎会给读操作隐式加一把读共享锁,从而避免了脏读、不可重复读和幻读问题.
+
+# 事务的传播行为
+-- 说明
+	多个事务方法互相调用时,是否共用一个事务,通过propagation设置传播行为,timeout设置超时回滚时间
+
+-- 使用
+	@Transactional(propagation = Propagation.xxx,timeout = xxx)
+
+-- Spring中七种事务传播行为
+	1、PROPAGATION_REQUIRED
+		如果当前没有事务,就创建一个新事务,如果当前存在事务,就加入该事务,该设置是最常用的,也是默认的设置。
+	2、PROPAGATION_SUPPORTS
+		支持当前事务,如果当前存在事务,就加入该事务,如果当前不存在事务,就以非事务执行。
+	3、PROPAGATION_MANDATORY
+		支持当前事务,如果当前存在事务,就加入该事务,如果当前不存在事务,就抛出异常。
+	4、PROPAGATION_REQUIRES_NEW
+		创建新事务,无论当前存不存在事务,都创建新事务。如果当前存在事务，把当前事务挂起。（一个新的事务将启动，而且如果有一个现有的事务在运行的话，则这个方法将在运行期被挂起，直到新的事务提交或者回滚才恢复执行。）
+	5、PROPAGATION_NOT_SUPPORTED
+		以非事务方式执行操作,如果当前存在事务,就把当前事务挂起。
+	6、PROPAGATION_NEVER
+		以非事务方式执行,如果当前存在事务,则抛出异常。
+	7、PROPAGATION_NESTED
+		如果当前存在事务,则在嵌套事务內执行。如果当前没有事务,则执行与 PROPAGATION_REQUIRED类似的操作。(外层事务抛出异常回滚，那么内层事务必须回滚，反之内层事务并不影响外层事务）
+
+# SpringBoot事务关键点
+-- 事务的自动配置————TransactionAutoConfiguration
+
+-- 事务的坑
+	1、本类方法互调事务失效问题————解决方式详见2、3、23、本类方法互调导致事务失效问题
+
+# 本地事务在分布式下的问题
+-- 问题
+	1、本地事务在分布式系统中,只能控制住自己的回滚,控制不了其他服务的回滚
+		1)远程服务执行完成,后续逻辑出问题————导致已执行的远程请求肯定不能回滚
+	2、导致分布式事务出现异常的最大原因为网络问题+分布式机器
+		1)远程服务假失败:远程服务其实成功了,由于网络故障等没有返回————导致订单回滚,库存却扣减了
+
+-- 示例流程说明
+		(订单服务下订单——>库存服务锁定库存——>用户服务扣减积分)整个过程是一个分布式事务
+
+-- 事务保证
+	1、订单服务异常,库存锁定不运行,全部回滚,撤销操作
+	2、库存服务事务自治,锁定失败全部回滚,订单感受到,继续回滚
+	3、库存服务锁定成功了,但是网络原因返回数据途中出问题?
+	4、库存服务锁定成功,库存服务下边的逻辑发生问题,订单回滚了如何处理?
+
+-- 利用消息队列实现最终一致
+	库存服务锁定成功后发送消息给消息队列(当前库存工作单),过段时间自动解锁,解锁时先查询订单的支付状态.解锁成功修改库存工作单详情项状态为已解锁
+```
+
+### 2、分布式事务
+
+```markdown
+# 为什么有分布式事务
+-- 分布式事务经常出现的异常
+	机器宕机、网络异常、消息丢失、消息乱序、数据错误、不可靠的TCP、存储数据丢失...
+
+-- 分布式事务是企业集成中的一个技术难点,也是每一个分布式系统架构中都会涉及到的一个东西,特别是在微服务架构中,几乎可以说是无法避免的
+
+# CAP定理与BASE理论
+-- CAP定理
+	1、CAP是什么?
+		1)CAP原则又称CAP定理,指的是在一个分布式系统中,一致性(Consistency)、可用性(Availability)、分区容错性(Partiation tolarance)三者不可同时获得,最多只能同时实现两点
+		2)一般来说,分区容错无法避免,因此可以认定CAP的P总是成立.CAP定理告诉我们,剩下的C和A无法同时满足
+		3)分布式系统中实现一致性的raft算法,即使有分区错误也能保证一致性————http://thesecretlivesofdata.com/raft/
+			1、领导选举————分布式系统中只能选一个领导,通过以下两个超时时间来选举
+				1)选举超时(150ms~300ms)————随从想要变成候选者的这一段时间,我们一般称之为节点的自旋时间
+				2)心跳时间(10ms-100ms)————通过不断发送通信,重置随从自旋时间,保证领导和随从之间的关系
+			2、日志复制————所有的改变通过领导,领导以一个日志,让随从也跟着写
+				1)在心跳时间发送日志时,让其他节点同步改变日志
+  2、详细说明
+  	1)一致性(Consistency)————所有节点在同一时间的数据完全一致,越多节点,数据同步耗时越多
+    	在分布式系统中的所有数据备份,在同一时刻是否具有相同值————等同与所有节点访问同一份最新的数据副本
+  	2)可用性(Availability)————服务一直可以用,而且响应时间正常
+    	负载过大时,在集群中一部分节点故障后,集群整体是否还能响应客户端的读写请求————对数据更新具备高可用性
+		3)分区容错性(Partiation tolarance)————100个节点,崩了几个,不影响服务,越多机器越好
+    	大多数分布式系统都分布在多个子网络.每个子网络就叫做一个区(Partiation).
+    	分区容错的意思是————区间通信可能失败.比如,一台服务器放在国外,另外一台放在国内,这就是两个区,它们之间可能无法通信.
+	3、不能同时三者满足的原因
+  	1)CA满足,P不能满足————数据同步(A)需要时间,也要正常的时间内响应(A),那么机器数量就要少(P不满足)
+		2)CP满足,A不能满足————数据同步(A)需要时间,机器数量(P)也多,但同步数据需要时间,所以不能在正常时间内响应(A不满足)
+		3)AP满足,C不能满足————机器数量多(P),也要正常的时间内响应(A),那么数据就不能及时同步到其他节点(C不满足)
+
+-- 面临的问题
+	对于多数互联网应用的场景,主机众多、部署分散,而且现在的集群规模越来越大,所以节点故障、网络故障是常态,而且要保证服务可用性达到99.99999...%,即保证P和A,舍弃C
+
+-- BASE理论
+	1、BASE是什么?
+		1)是对CAP理论的延伸,思想是即使无法做到强一致性(CAP的一致性就是强一致性),但可以适当的采用弱一致性,即最终一致性.
+		2)BASE是指基本可用(Basically Available)、软状态(Soft State)、最终一致性()
+	2、详细说明
+		1)基本可用(Basically Available)————指分布式系统在出现故障的时候,允许损失部分的可用性(例如响应时间、功能上的可用性),允许损失部分可用性.需要注意的是,基本可用绝对不等价于系统不可用.
+			-- 响应时间上的损失————正常情况下,搜索引擎需要在0.5秒之内返回给用户相应的查询结果,但是由于出现故障(),查询结果的响应时间增加到1~2秒
+			-- 功能上的损失————购物网站在购物高峰(如双十一)时,为了保护系统的稳定性,部分消费者可能会被引导到一个降级页面
+		2)软状态(Soft State)————指允许系统存在中间状态,而该中间状态不会影响系统整体可用性.分布式存储中一般一份数据会有多个副本,允许不同副本同步的延时就是软状态的体现.Mysql Replication的异步复制也是一种体现.
+		3)最终一致性(Eventual Consistency)————指系统中的所有数据副本经过一定时间后,最终能够达到一致的状态.弱一致性和强一致性相反,最终一致性是弱一致性的一种特殊情况.		
+
+-- 强一致性、弱一致性、最终一致性
+	从客户端角度,多进程并发访问时,更新过的数据在不同进程中如何获取的不同策略,决定了不同的一致性.
+	对于关系型数据库,要求更新过的数据能被后续的访问都能看到,这是强一致性.
+	如果能容忍后续的部分或者全部访问不到,则是弱一致性.
+	如果经过一段时间后要求能访问到更新后的数据,则是最终一致性
+
+# 分布式事务几种方案
+-- 2PC模式————非高并发方案
+	1、说明
+		数据库支持的2PC「2 phase commit 二阶提交」,又叫XA Transactions.MYSQL从5.5版本开始支持,Oracle7开始支持.其中XA是一个两阶段提交协议,该协议分为以下两个阶段:
+		1)第一阶段————事务协调器要求每个涉及到事务对的数据库预提交(precommit)此操作,并反应是否可以提交.
+		2)第二阶段————事务协调器要求每个数据库提交数据.其中,如果有任何一个数据库否决此次提交,那么所有数据库都会被要求回滚它们在此事务中的那部分信息.
+	2、图示,如下图所示:
+```
+
+<img src="image/img2_1_31_2_1.png" style="zoom:50%;" />
+
+```markdown
+	3、注意
+		1)XA协议比较简单,而且一旦商业数据库实现了XA协议,使用分布式事务的成本也比较低。
+		2)XA性能不理想,特别是在交易下单链路,往往并发量很高,XA无法满足高并发场景
+		3)XA目前在商业数据库支持的比较理想,在mysq数据库中支持的不太理想,msq的XA实现,没有记录 prepare阶段日志,主备切换回导致主库与备库数据不一致。
+		4)许多nosq也没有支持XA,这让XA的应用场景变得非常狭隘。
+		5)也有3PC,引入了超时机制(无论协调者还是参与者,在向对方发送请求后,若长时间未收到回应则做出相应处理)
+
+-- 柔性事务-TCC(Try-Commit-Cancel)事务补偿型方案————相当于手动的3PC(自动准备数据、自动预提交、自动回滚)————非高并发方案
+	1、刚醒事务与柔性事务说明
+		1)刚性事务————遵循ACID原则,强一致性
+		2)柔性事务————遵循BASE理论,最终一致性
+		3)与刚性事务不同,柔性事务允许一定时间内,不同节点的数据不一致,但要求最终一致.
+	2、图示,如下图所示:
+```
+
+<img src="image/img2_1_31_2_2.png" style="zoom:50%;" />
+
+```markdown
+	3、注意
+		1)一阶段prepare行为————调用自定义的prepare逻辑
+		2)二阶段commit行为————调用自定义的commit逻辑
+		3)三阶段rollback行为————调用自定义的rollback逻辑
+		4)所谓TCC模式,是指支持把自定义的分支事务纳入到全局事务的管理中
+
+-- 柔性事务————最大努力通知型方案————保证最终一致性————高并发方案
+	1、说明
+		按规律进行通知,不保证数据一定能通知成功,但会提供可查询操作接口进行核对。这种方案主要用在与第三方系统通讯时,比如:调用微信或支付宝支付后的支付结果通知。这种方案也是结合MQ进行实现,例如:通过MQ发送http请求,设置最大通知次数。达到通知次数后即不再通知。
+	2、案例
+		银行通知、商户通知等(各大交易业务平台间的商户通知:多次通知、查询校对、对账文件),支付宝的支付成功异步回调
+
+-- 柔性事务————可靠消息+最终一致性方案(异步确保型)————保证最终一致性————高并发方案
+	1、实现
+		业务处理服务在业务事务提交之前,向实时消息服务请求发送消息,实时消息服务只记录消息数据,而不是真正的发送。业务处理服务在业务事务提交之后,向实时消息服务确认发送。只有在得到确认发送指令后,实时消息服务才会真正发送。
+```
+
+
+
+## 32、Seata—分布式事务解决方案——非高并发适用
+
+```markdown
+# 文档地址————https://seata.io/zh-cn/docs/overview/what-is-seata.html
+
+# 概述
+-- Seata是什么?
+	Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。 
+
+-- Seata术语
+	1、TC (Transaction Coordinator) - 事务协调者————维护全局和分支事务的状态，驱动全局事务提交或回滚
+	2、TM (Transaction Manager) - 事务管理器————定义全局事务的范围：开始全局事务、提交或回滚全局事务
+	3、RM (Resource Manager) - 资源管理器————管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚
+
+-- 工作流程,如下图所示:
+```
+
+<img src="image/img2_1_32_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 整体机制————两阶段提交协议的演变：
+	一阶段：业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源。
+	二阶段：
+		提交异步化，非常快速地完成。
+		回滚通过一阶段的回滚日志进行反向补偿。
+
+# 使用步骤————Seata-AT模式————会将并发串行化,适用不要求超高的并发,成功就成功,失败就失败的场景
+-- 1、建立具有InnoDB引擎的MySQL数据库————多个微服务使用自己的数据库连接配置
+
+-- 2、每一个微服务对应的数据库中创建UNDO_LOG(回滚日志)表————SEATA_AT模式需要UNDO_LOG表————关键
+	1、注意此处0.3.0+ 增加唯一索引 ux_undo_log
+    CREATE TABLE `undo_log` (
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `branch_id` bigint(20) NOT NULL,
+      `xid` varchar(100) NOT NULL,
+      `context` varchar(128) NOT NULL,
+      `rollback_info` longblob NOT NULL,
+      `log_status` int(11) NOT NULL,
+      `log_created` datetime NOT NULL,
+      `log_modified` datetime NOT NULL,
+      `ext` varchar(100) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- 3、代码整合seata
+  1、引入依赖————单独只导入依赖不进行后续操作,将会无法启动服务,或者通用服务一起引用,不需要的服务再单独排除
+  	1)每个微服务单独导入seata依赖,如果是通用配置已经导入,就不用再导入
+      <!--SpringCloud-alibaba-Seata分布式事务解决方案依赖-->
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        <version>2.1.0.RELEASE</version>
+      </dependency>	
+    2)如果某些微服务必须导入通用配置依赖,但是不想使用通用配置的某些依赖,可以排除指定依赖
+      <dependency>
+        <groupId>com.pigskin.mall</groupId>
+        <artifactId>mall-common</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <exclusions>
+          <!--排除seata场景-->
+          <exclusion>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+  2、安装、配置并启动seata-server(事务协调器)服务————根据依赖导入时seata-all-x.x.x.jar的版本选择对应seata版本
+  	安装、配置并启动过程详见————1-4-16、Seata环境搭建
+  3、所有想要使用分布式事务的微服务都应该使用Seata DataSourceProxy代理自己的数据源————因为Seata通过代理数据源实现分支事务，如果没有注入，事务无法成功回滚
+  	//spring2.0Boot之前——————之后的使用容易产生循环依赖
+  	package com.pigskin.mall.order.config;
+
+    import com.zaxxer.hikari.HikariDataSource;
+    import io.seata.rm.datasource.DataSourceProxy;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.util.StringUtils;
+
+    import javax.sql.DataSource;
+
+    /**
+     * Seata配置类
+     *
+     * @author pigskin
+     * @date 2022年01月17日 2:35 下午
+     */
+    @Configuration
+    public class MySeataConfig {
+
+        /**
+         * 获取容器中所有的数据源配置属性信息
+         */
+        @Autowired
+        DataSourceProperties dataSourceProperties;
+
+        /**
+         * 参照DataSourceConfiguration类中的方式自行创建数据源
+         *
+         * @param dataSourceProperties
+         * @return
+         */
+        @Bean
+        public DataSource dataSource(DataSourceProperties dataSourceProperties) {
+            /**/
+            HikariDataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+
+            if (StringUtils.hasText(dataSourceProperties.getName())) {
+                dataSource.setPoolName(dataSourceProperties.getName());
+            }
+            /*使用Seata对数据源代理对象进行包装，并返回*/
+            return new DataSourceProxy(dataSource);
+        }
+    }
+
+  	//springBoot2.0之后
+  4、资源文件夹下导入配置文件————必须导入,不然会导致启动服务的过程中莫名其妙的找不见其它类
+  	所有想要使用分布式事务的微服务的resource资源文件夹都应该导入seata文件包下的registry.conf、file.conf两个文件
+  5、配置文件修改
+  	1)说明————在 org.springframework.cloud:spring-cloud-starter-alibaba-seata 的org.springframework.cloud.alibaba.seata.GlobalTransactionAutoConfiguration 类中，默认会使用 ${spring.application.name}-fescar-service-group作为服务名注册到 Seata Server上，如果和file.conf 中的配置不一致，会提示 no available server to connect错误.也可以通过配置 spring.cloud.alibaba.seata.tx-service-group修改后缀，但是必须和file.conf中的配置保持一致
+  	2)设置file.conf的service.vgroup_mapping服务名配置必须使用如下结构格式
+  		vgroup_mapping.{spring.application.name}-fescar-service-group = "default"
+  	3)或在项目配置文件中通过配置修改后缀
+  		spring.cloud.alibaba.seata.tx-service-group=xxx
+  6、给分布式大事务的入口标注全局事务注解@GlobalTransactional
+  7、每一个远程的小事务(分支事务)只需添加@Transactional注解
+
+# 其它模式参照————https://github.com/seata/seata-samples
+```
+
+## 33、延迟队列——可靠消息+最终一致性方案——高并发适用
+
+```markdown
+# 相关知识及使用示例
+	详见————2-1-27-7、RabbitMQ延时队列————实现定时任务
+
+# 案例————以下订单并锁定及解锁库存的过程为例————图示说明,如下图所示
+```
+
+<img src="image/img2_1_33_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 案例————以下订单并锁定及解锁库存的过程为例————库存锁定及解锁业务实现核心代码
+-- 导入依赖
+    <!--高级消息队列-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
+-- 配置文件配置RabbitMQ相关配置
+		# RabbitMQ服务器地址
+    spring.rabbitmq.host=192.168.56.106
+    # RabbitMQ虚拟主机
+    spring.rabbitmq.virtual-host=/
+    #端口号（高级工作协议端口、客户端要连接的端口）
+    spring.rabbitmq.port=5672
+		#手动ACK
+    spring.rabbitmq.listener.simple.acknowledge-mode=manual
+
+-- 配置类或主类添加注解,特别针对消息监听
+  	@EnableRabbit
+		public class MallWareApplication {
+			...
+		}
+
+-- 创建RabbitMQ配置类
+		package com.pigskin.mall.ware.config;
+
+    import org.springframework.amqp.core.*;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+    import org.springframework.amqp.support.converter.MessageConverter;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    import java.util.HashMap;
+    import java.util.Map;
+
+    /**
+     * RabbitMQ配置类
+     */
+    @Configuration
+    public class MyRabbitConfig {
+        @Autowired
+        RabbitTemplate rabbitTemplate;
+
+        ...
+    }
+
+		1、添加序列化机制,发送和接收消息以JSON格式
+       /**
+        * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+        */
+        @Bean
+        public MessageConverter messageConverter() {
+          return new Jackson2JsonMessageConverter();
+        }
+		2、创建库存服务交换机、消息队列以及二者绑定关系
+				/**
+         * 创建库存服务交换机
+         *
+         * @return
+         */
+        @Bean
+        public Exchange exchange() {
+
+            return new TopicExchange("stock-event-exchange",
+                    true,
+                    false);
+
+        }
+        /**
+         * 创建库存服务延时队列————延时一段时间后,死信将通过死信路由键发送到指定的队列中
+         *
+         * @return
+         */
+        @Bean
+        public Queue stockDelayQueue() {
+            // 设置特殊属性
+            Map<String, Object> arguments = new HashMap<>();
+            /*指定死信路由*/
+            arguments.put("x-dead-letter-exchange", "stock-event-exchange");
+            /*指定死信使用的路由键*/
+            arguments.put("x-dead-letter-routing-key", "stock.release");
+            /*指定消息过期时间*/
+            arguments.put("x-message-ttl", 120000);
+
+            // 队列名————String name,
+            // 是否持久化————boolean durable,
+            // 是否排他————boolean exclusive,
+            // 是否自动删除————boolean autoDelete,
+            // 包含的自定义属性————Map<String, Object> arguments
+            return new Queue("stock.delay.queue",
+                    true,
+                    false,
+                    false,
+                    arguments);
+        }
+
+        /**
+         * 创建库存服务存放死信队列
+         *
+         * @return
+         */
+        @Bean
+        public Queue orderReleaseStockQueue() {
+            return new Queue("stock.release.stock.queue",
+                    true,
+                    false,
+                    false);
+        }
+
+        /**
+         * 交换机和延时队列绑定
+         *
+         * @return
+         */
+        @Bean
+        public Binding stockReleaseBinding() {
+            return new Binding("stock.delay.queue",
+                    Binding.DestinationType.QUEUE,
+                    "stock-event-exchange",
+                    "stock.locked",
+                    null);
+        }
+
+        /**
+         * 交换机和死信队列绑定
+         *
+         * @return
+         */
+        @Bean
+        public Binding stockLockedBinding() {
+            return new Binding("stock.release.stock.queue",
+                    Binding.DestinationType.QUEUE,
+                    "stock-event-exchange",
+                    "stock.release.#",
+                    null);
+        }
+
+-- 创建库存工作单表和库存工作单详情表
+	1、库存工作单表
+			create table db_mall_wms.wms_ware_order_task
+      (
+          id               bigint auto_increment comment 'id'
+              primary key,
+          order_id         bigint       null comment 'order_id',
+          order_sn         varchar(255) null comment 'order_sn',
+          consignee        varchar(100) null comment '收货人',
+          consignee_tel    char(15)     null comment '收货人电话',
+          delivery_address varchar(500) null comment '配送地址',
+          order_comment    varchar(200) null comment '订单备注',
+          payment_way      tinyint(1)   null comment '付款方式【 1:在线付款 2:货到付款】',
+          task_status      tinyint(2)   null comment '任务状态',
+          order_body       varchar(255) null comment '订单描述',
+          tracking_no      char(30)     null comment '物流单号',
+          create_time      datetime     null comment 'create_time',
+          ware_id          bigint       null comment '仓库id',
+          task_comment     varchar(500) null comment '工作单备注'
+      )comment '库存工作单';
+	2、库存工作单详情表
+			create table db_mall_wms.wms_ware_order_task_detail
+      (
+          id          bigint auto_increment comment 'id'
+              primary key,
+          sku_id      bigint       null comment 'sku_id',
+          sku_name    varchar(255) null comment 'sku_name',
+          sku_num     int          null comment '购买个数',
+          task_id     bigint       null comment '工作单id',
+          ware_id     bigint       null comment '仓库id',
+          lock_status int(1)       null comment '1-已锁定  2-已解锁  3-扣减'
+      )comment '库存工作单';
+
+-- 业务代码实现
+	1、库存锁定业务代码如下
+        /**
+         * 为某个订单锁定库存
+         *
+         * @param vo 库存解锁的场景
+         *           1、下订单成功，但是订单过期没有支付，被系统自动取消
+         *           2、被用户手动取消
+         *           3、下订单成功，库存锁定成功，但是后续业务失败，导致订单回滚，之前锁定的库存就需要回滚
+         * @return 锁定库存是否成功
+         */
+        @Transactional
+        @Override
+        public Boolean orderLockStock(WareSkuLockVo vo) {
+
+            /*
+             * 保存库存工作单的详情，用于追溯
+             */
+            WareOrderTaskEntity wareOrderTaskEntity = new WareOrderTaskEntity();
+            wareOrderTaskEntity.setOrderSn(vo.getOrderSn());
+            wareOrderTaskService.save(wareOrderTaskEntity);
+
+            //按照下单收货地址，找到一个就近仓库，锁定库存
+            List<OrderItemVo> locks = vo.getLocks();
+            List<SkuWareHasStock> collect = locks.stream().map(orderItemVo -> {
+                SkuWareHasStock skuWareHasStock = new SkuWareHasStock();
+                Long skuId = orderItemVo.getSkuId();
+                Integer count = orderItemVo.getCount();
+                skuWareHasStock.setSkuId(skuId);
+                skuWareHasStock.setNumber(count);
+                /*查询该商品在哪里都有库存*/
+                List<Long> wareIds = wareSkuDao.listWareIdHasSkuStock(skuId, count);
+                skuWareHasStock.setWareId(wareIds);
+                return skuWareHasStock;
+            }).collect(Collectors.toList());
+            /*找到每个商品在那个仓库都有库存*/
+
+
+            /*1、如果没个商品锁定成功，将当前商品锁定了几件的工作单记录发给MQ*/
+            /*2、如果有锁定失败，前面保存的工作单信息就会回滚，发送出消息，即使要解锁记录，由于数据库中找不到锁库存的记录，就不用*/
+            for (SkuWareHasStock hasStock : collect) {
+                boolean skuStocked = false;
+                Long skuId = hasStock.getSkuId();
+                List<Long> wareIds = hasStock.getWareId();
+                if (wareIds == null || wareIds.size() == 0) {
+                    /*没有任何仓库有该商品*/
+                    throw new NoStockException(skuId);
+                }
+                for (Long wareId : wareIds) {
+                    Long updateRowCount = wareSkuDao.lockSkuStock(skuId, wareId, hasStock.getNumber());
+                    if (updateRowCount == 1) {
+                        /*成功*/
+                        skuStocked = true;
+                        //TODO:保存工作单详情，并告诉消息队列，锁定库存成功
+                        WareOrderTaskDetailEntity wareOrderTaskDetailEntity = new WareOrderTaskDetailEntity(null, skuId, "", hasStock.getNumber(), wareOrderTaskEntity.getId(), wareId, 1);
+                        wareOrderTaskDetailService.save(wareOrderTaskDetailEntity);
+
+                        /*创建消息队列传输的对象*/
+                        StockLockedTo stockLockedTo = new StockLockedTo();
+                        stockLockedTo.setId(wareOrderTaskEntity.getId());
+                        StockDetailTo stockDetailTo = new StockDetailTo();
+                        BeanUtils.copyProperties(wareOrderTaskDetailEntity, stockDetailTo);
+                        stockLockedTo.setStockDetailTo(stockDetailTo);
+
+                        //向消息队列发送库存锁定的消息
+                        rabbitTemplate.convertAndSend("stock-event-exchange", "stock.locked", stockLockedTo);
+                        break;
+                    } else {
+                        /*失败————重试下一个仓库*/
+                        System.out.println("进行下一个仓库的重试操作");
+                    }
+                }
+                if (!skuStocked) {
+                    /*当前商品没被锁住*/
+                    throw new NoStockException(skuId);
+                }
+            }
+            /*肯定全部锁住了*/
+            return true;
+        }
+	2、库存自动解锁业务代码如下
+    		//说明————库存解锁的场景
+        // 1、下订单成功，但是订单过期没有支付，被系统自动取消
+        // 2、被用户手动取消
+        // 3、下订单成功，库存锁定成功，但是后续业务失败，导致订单回滚，之前锁定的库存就需要回滚
+    		package com.pigskin.mall.ware.listener;
+
+        import com.alibaba.fastjson.TypeReference;
+        import com.pigskin.common.enume.OrderStatusEnum;
+        import com.pigskin.common.to.mq.OrderTo;
+        import com.pigskin.common.to.mq.StockDetailTo;
+        import com.pigskin.common.to.mq.StockLockedTo;
+        import com.pigskin.common.utils.R;
+        import com.pigskin.mall.ware.entity.WareOrderTaskDetailEntity;
+        import com.pigskin.mall.ware.entity.WareOrderTaskEntity;
+        import com.pigskin.mall.ware.service.WareSkuService;
+        import com.pigskin.mall.ware.vo.OrderVo;
+        import com.rabbitmq.client.Channel;
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+        import org.springframework.amqp.rabbit.annotation.RabbitListener;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Service;
+
+        import java.io.IOException;
+        import java.util.Objects;
+
+        /**
+         * 库存释放监听器
+         *
+         * @author pigskin
+         * @date 2022年01月21日 10:26 上午
+         */
+        /*将其加入到业务逻辑组件中*/
+        @Service
+        /*设置监听的库存队列*/
+        @RabbitListener(queues = "stock.release.stock.queue")
+        public class StockReleaseListener {
+
+            @Autowired
+            WareSkuService wareSkuService;
+
+            /**
+             * 库存过期————库存自动解锁
+             *
+             * @param stockLockedTo
+             */
+            @RabbitHandler
+            public void handleStockLockedRelease(StockLockedTo stockLockedTo, Message message, Channel channel) throws IOException {
+                System.out.println("收到解锁库存的消息：");
+                try {
+                    wareSkuService.unLockStock(stockLockedTo);
+                    //没有异常，消息回复
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                } catch (Exception e) {
+                    /*消息拒绝以后重新放入队列。让别人继续消费消息*/
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+                }
+            }
+
+            /**
+             * 订单关闭————解锁库存处理（为了防止订单服务器卡顿导致订单状态一直未发生改变
+             * ，库存消息有限到期，查询订单状态是新建的状态，什么都没做，就走了，导致卡顿的订单永远无法解锁）
+             *
+             * @param orderTo
+             * @param message
+             * @param channel
+             * @throws IOException
+             */
+            @RabbitHandler
+            public void handleOrderCloseRelease(OrderTo orderTo, Message message, Channel channel) throws IOException {
+                System.out.println("订单关闭，准备解锁库存的消息：");
+                try {
+                    wareSkuService.unLockStock(orderTo);
+                    //没有异常，消息回复
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                } catch (Exception e) {
+                    /*消息拒绝以后重新放入队列。让别人继续消费消息*/
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+                }
+            }
+        }
+        
+        ---------------------详细调用解锁代码——————开始-----------------------------------
+        @Override
+        public void unLockStock(StockLockedTo stockLockedTo) {
+            /*库存工作单的ID*/
+            StockDetailTo detailTo = stockLockedTo.getStockDetailTo();
+            Long detailId = detailTo.getId();
+
+            /*解锁
+             * 1、查询数据库关于这个订单的锁定库存信息
+             *   1）有————证明库存锁定成功，但是是否解锁也要分情况
+             *      1」订单存在————不是解锁不解锁
+             *          1-看订单状态————已取消——解锁库存
+             *          2-看订单状态————没取消——不能解锁
+             *      2」订单不存在————此时必须解锁
+             *   2）没有————库存锁定失败了，库存回滚了，此时无需解锁*/
+            WareOrderTaskDetailEntity byId = wareOrderTaskDetailService.getById(detailId);
+            if (byId != null) {//有锁定的库存信息
+                //判断是否解锁
+                Long id = stockLockedTo.getId();
+                /*获取订单详情*/
+                WareOrderTaskEntity byId1 = wareOrderTaskService.getById(id);
+                /*获取订单号*/
+                String orderSn = byId1.getOrderSn();
+                /*根据订单号获取订单信息*/
+                R r = orderFeignService.getOrderByOrderSn(orderSn);
+                if (r.getCode() == 0) {//订单数据返回成功
+                    OrderVo data = r.getData(new TypeReference<OrderVo>() {
+                    });
+                    /*如果订单不存在或已经被取消，此时就需要解锁*/
+                    if (data == null || Objects.equals(data.getStatus(), OrderStatusEnum.CANCLED.getCode())) {
+                        if (Objects.equals(byId.getLockStatus(), WareOrderTaskDetailEnum.LOCKED.getCode())) {//当前工作单详情单状态是未解锁才需要解锁
+                            unDoLockStock(detailTo.getSkuId(), detailTo.getWareId(), detailTo.getSkuNum(), detailId);
+                        }
+                    }
+                } else {
+                    /*远程服务异常————消息拒绝以后重新放回队列，让别人继续消费解锁*/
+                    throw new RuntimeException("远程服务异常，未能正确消费消息");
+
+                }
+            } else {
+                /*无需解锁——监听器会手动消费消息*/
+            }
+        }
+        
+        /**
+         * 订单关闭————解锁库存处理（为了防止订单服务器卡顿导致订单状态一直未发生改变
+         * ，库存消息有限到期，查询订单状态是新建的状态，什么都没做，就走了，导致卡顿的订单永远无法解锁）
+         *
+         * @param orderTo
+         */
+        @Transactional
+        @Override
+        public void unLockStock(OrderTo orderTo) {
+
+            String orderSn = orderTo.getOrderSn();
+            /*查询最新的库存解锁状态，防止重复解锁*/
+            WareOrderTaskEntity wareOrderTaskEntity = wareOrderTaskService.getOrderTaskByOrderSn(orderSn);
+            /*根据库存库存工作单ID获取所有未解锁的库存工作单详情单数据*/
+            List<WareOrderTaskDetailEntity> wareOrderTaskDetailEntities = wareOrderTaskDetailService.listByOrderTaskIdAndStatus(wareOrderTaskEntity.getId(), WareOrderTaskDetailEnum.LOCKED.getCode());
+            wareOrderTaskDetailEntities.forEach(entity -> {
+                unDoLockStock(entity.getSkuId(), entity.getWareId(), entity.getSkuNum(), entity.getId());
+            });
+        }
+        
+        /**
+         * 解锁库存的方法
+         *
+         * @param skuId        商品ID
+         * @param wareId       仓库ID
+         * @param num          需要解锁的库存数量
+         * @param taskDetailId 库存工作详情单ID
+         */
+        private void unDoLockStock(Long skuId, Long wareId, Integer num, Long taskDetailId) {
+            System.out.println("将要进行库存工作明细单的解锁：" + taskDetailId);
+            /*库存解锁*/
+            Long aLong = wareSkuDao.unLockStock(skuId, wareId, num);
+            if (aLong == 1) {
+                /*更新库存工作单的状态*/
+                WareOrderTaskDetailEntity wareOrderTaskDetailEntity = new WareOrderTaskDetailEntity();
+                wareOrderTaskDetailEntity.setId(taskDetailId);
+                wareOrderTaskDetailEntity.setLockStatus(WareOrderTaskDetailEnum.UN_LOCKED.getCode());//状态变为已解锁
+                wareOrderTaskDetailService.updateById(wareOrderTaskDetailEntity);
+            }
+        }
+
+        ---------------------详细调用解锁代码——————结束-----------------------------------
+
+# 案例————以下订单并锁定及解锁库存的过程为例————下订单业务实现核心代码
+-- 导入依赖
+    <!--高级消息队列-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
+-- 配置文件配置RabbitMQ相关配置
+		#RabbitMQ相关配置
+    ##主机地址
+    spring.rabbitmq.host=192.168.56.106
+    ##端口号（高级工作协议端口、客户端要连接的端口）
+    spring.rabbitmq.port=5672
+    ##虚拟主机
+    spring.rabbitmq.virtual-host=/
+    ##在创建connectionFactory的时候设置PublisherConfirms(true)选项，开启confirmCallback.
+    ##CorrelationData:用来表示当前消息唯一性
+    ##消息只要被broker接收到就会执行confirmCallback，如果是cluster模式，需要所有broker接收到才会调用confirmCallback
+    ##被broker接收到只能表示message已经到达服务器，并不能保证消息一定会被投递到queue中。所以需要用到接下来的returnCallback
+    spring.rabbitmq.publisher-confirms=true
+
+    ##confrim模式只能保证消息到达broker,不能保证消息准确投递到目标queue中。在有些业务场景中我们就需要保证消息准确投递到目标queue中，此时就需要用到return退回模式
+    ##这样如果未能投递到目标queue中，将回调returnCallback,可以记录下详细到投递数据，定期的巡检或者自动纠错都需要这些数据。
+
+    ##开启发送端消息抵达队列确认
+    spring.rabbitmq.publisher-returns=true
+    #只要抵达队列，以异步模式优先回调这个returnConfirm
+    spring.rabbitmq.template.mandatory=true
+    #设置消息回复模式为手工模式manual（默认auto）
+    spring.rabbitmq.listener.simple.acknowledge-mode=manual
+
+-- 配置类或主类添加注解,特别针对消息监听
+  	@EnableRabbit
+		public class MallOrderApplication {
+			...
+		}
+
+-- 创建RabbitMQ配置类
+	1、RabbitMQ配置类
+		package com.pigskin.mall.order.config;
+
+    import org.springframework.amqp.core.Message;
+    import org.springframework.amqp.rabbit.connection.CorrelationData;
+    import org.springframework.amqp.rabbit.core.RabbitTemplate;
+    import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+    import org.springframework.amqp.support.converter.MessageConverter;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    import javax.annotation.PostConstruct;
+
+    /**
+     * RabbitMQ配置类
+     */
+    @Configuration
+    public class MyRabbitConfig {
+        @Autowired
+        RabbitTemplate rabbitTemplate;
+
+        /**
+         * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+         */
+        @Bean
+        public MessageConverter messageConverter() {
+            return new Jackson2JsonMessageConverter();
+        }
+
+
+        /**
+         * 定制RabbitTemplate
+         * 1、服务器收到消息就回调
+         *      1）spring.rabbitmq.publisher-confirms=true
+         *      2）设置确认回调ConfirmCallback
+         * 2、消息正确抵达队列进行回调
+         *      1)##开启发送端消息抵达队列确认
+         *      spring.rabbitmq.publisher-returns=true
+         *      #只要抵达队列，以异步模式优先回调这个returnConfirm
+         *      spring.rabbitmq.template.mandatory=true
+         *      2)设置消息抵达队列确认回调ReturnCallback
+         * 3、消费端确认（保证每一个消息被正确消费，此时才可以让broker删除这个消息）
+         *      1)默认是自动确认的，只要消息接收到，客户端就会自动确认，服务端就会移除这个消息
+         *      问题：收到很多消息，自动回复给服务器ack，但是实际只有一个消息处理成功后，服务器宕机了。此时消息队列中的消息就都没有了，发生了消息丢失
+         *      解决思路：不进行自动确认——通过手动确认来解决（每处理一个消息确认一个消息）
+         *              手动确认——只要没明确告诉MQ货物已经被签收(没有ACK)消息就一直是unacked状态，即使服务器宕机，消息也不会丢失，会重新变为Ready状态.
+         *      2)如何签收
+         *                channel.basicAck(deliveryTag, false);————签收货物；业务成功完成就应该签收；
+         *                channel.basicNack(deliveryTag, false, requeue);————拒签货物；业务失败就应该拒签
+         */
+        @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+        public void initRabbitTemplate() {
+            /*1、设置服务器收到消息就回调*/
+            rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+                /**
+                 *  1、只要消息抵达Broker就ack为true
+                 * @param correlationData 当前消息的唯一关联数据（唯一id）
+                 * @param b 消息是否成功收到
+                 * @param s 失败的原因
+                 */
+                @Override
+                public void confirm(CorrelationData correlationData, boolean b, String s) {
+                    System.out.println("confirm....correlationData["
+                            + correlationData
+                            + "]==>ack["
+                            + b
+                            + "]==>s["
+                            + s
+                            + "]");
+                }
+            });
+
+            /*2、设置消息正确抵达队列进行回调*/
+            rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+                /**
+                 *  只要消息没有投递给指定队列，就触发这个失败回调
+                 * @param message 投递失败消息的详细信息
+                 * @param i  回复的状态码
+                 * @param s 回复的文本内容
+                 * @param s1 当时这个消息发给那个交换机
+                 * @param s2 当时这个消息用那个路由键
+                 */
+                @Override
+                public void returnedMessage(Message message, int i, String s, String s1, String s2) {
+                    System.out.println("Fail Message["
+                            + message
+                            + "]==>i["
+                            + i
+                            + "]==>s["
+                            + s
+                            + "]==>s1["
+                            + s1
+                            + "]==>s2["
+                            + s2
+                            + "]");
+                }
+            });
+        }
+    }
+	2、路由、消息队列及绑定关系配置类
+		package com.pigskin.mall.order.config;
+
+    import com.pigskin.mall.order.entity.OrderEntity;
+    import com.rabbitmq.client.Channel;
+    import org.springframework.amqp.core.*;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    import java.io.IOException;
+    import java.util.Date;
+    import java.util.HashMap;
+    import java.util.Map;
+
+    /**
+     * MQ配置————用于创建并注入Binding(绑定关系)、Queue(队列)、Exchange(交换机)
+     * 使用@Bean进行注入——RabbitMQ没有时给容器中自动创建
+     * 使用@Bean声明，当属性发生变化也不会覆盖
+     *
+     * @author pigskin
+     * @date 2022年01月18日 3:17 下午
+     */
+    @Configuration
+    public class MyMQConfig {
+
+
+        /**
+         * 创建队列(延时队列-死信队列)
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Queue
+        public Queue orderDelayQueue() {
+            // 设置特殊属性
+            Map<String, Object> arguments = new HashMap<>();
+            /*指定死信路由*/
+            arguments.put("x-dead-letter-exchange", "order-event-exchange");
+            /*指定死信使用的路由键*/
+            arguments.put("x-dead-letter-routing-key", "order.release.order");
+            /*指定消息过期时间*/
+            arguments.put("x-message-ttl", 60000);
+
+            // 队列名————String name,
+            // 是否持久化————boolean durable,
+            // 是否排他————boolean exclusive,
+            // 是否自动删除————boolean autoDelete,
+            // 包含的自定义属性————Map<String, Object> arguments
+            return new Queue("order.delay.queue", true, false, false, arguments);
+        }
+
+        /**
+         * 创建队列(普通队列-存放死信)
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Queue
+        public Queue orderReleaseOrderQueue() {
+            return new Queue("order.release.order.queue", true, false, false);
+        }
+
+        /**
+         * 创建交换机
+         *
+         * @return
+         */
+        @Bean//RabbitMQ没有时给容器中自动创建Exchange
+        public Exchange orderEventExchange() {
+            // 交换机的名字————String name,
+            // 否持久化————boolean durable,
+            // 是否自动删除————boolean autoDelete,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new TopicExchange("order-event-exchange", true, false);
+        }
+
+        /**
+         * 创建交换机和orderDelayQueue队列的绑定关系
+         *
+         * @return
+         */
+        @Bean//RabbitMQ没有时给容器中自动创建Binding
+        public Binding orderCreateOrder() {
+            // 目的地————String destination,
+            // 目的地类型————Binding.DestinationType destinationType,
+            // 绑定此目的地的交换机————String exchange,
+            // 绑定使用的路由键————String routingKey,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new Binding("order.delay.queue",
+                    Binding.DestinationType.QUEUE,
+                    "order-event-exchange",
+                    "order.create.order",
+                    null);
+        }
+
+        /**
+         * 创建交换机和orderReleaseOrderQueue队列的绑定关系
+         *
+         * @return
+         */
+        @Bean //RabbitMQ没有时给容器中自动创建Binding
+        public Binding orderReleaseOrder() {
+    // 目的地————String destination,
+            // 目的地类型————Binding.DestinationType destinationType,
+            // 绑定此目的地的交换机————String exchange,
+            // 绑定使用的路由键————String routingKey,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new Binding("order.release.order.queue",
+                    Binding.DestinationType.QUEUE,
+                    "order-event-exchange",
+                    "order.release.order",
+                    null);
+        }
+        
+        /**
+         * 创建订单释放直接和库存释放绑定——————解决订单的释放时间超过库存释放时间的情况下导致的库存未释放问题
+         */
+        @Bean
+        public Binding orderReleaseOtherBinding() {
+            // 目的地————String destination,
+            // 目的地类型————Binding.DestinationType destinationType,
+            // 绑定此目的地的交换机————String exchange,
+            // 绑定使用的路由键————String routingKey,
+            // 包含的自定义参数————Map<String, Object> arguments
+            return new Binding("stock.release.stock.queue",
+                    Binding.DestinationType.QUEUE,
+                    "order-event-exchange",
+                    "order.release.other.#",
+                    null);
+        }
+    }
+
+-- 业务代码实现————实现定时关单服务
+	1、订单提交业务代码
+		/**
+     * Token机制，原子验证和删除令牌
+     *
+     * @param submitVo 提交的订单数据
+     * @return
+     */
+	//@GlobalTransactional————————Seata--AT模式,不太适用
+    @Transactional
+    @Override
+    public SubmitOrderResponseVo submitOrder(OrderSubmitVo submitVo) {
+        SubmitOrderResponseVo submitOrderResponseVo = new SubmitOrderResponseVo();
+        submitOrderResponseVo.setCode(0);//设置默认成功        /*设置线程共享的数据*/
+        orderSubmitVoThreadLocal.set(submitVo);
+        //TODO:原子验证和删除令牌
+        /*1、验证令牌是否合法【令牌的对比和删除必须保证原子性】*/
+        //设置删除令牌的脚本,0-删除失败，1-删除成功
+        String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+        //获取被验证的令牌
+        String orderToken = submitVo.getOrderToken();
+        //获取当前用户
+        MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+        //通过lua脚本,原子验证和删除令牌
+        Long execute = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                Arrays.asList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberResponseVo.getId()),
+                orderToken);
+        if (execute == 0L) {
+            /*令牌验证失败*/
+            submitOrderResponseVo.setCode(1);
+            return submitOrderResponseVo;
+        } else {
+            /*令牌验证成功*/
+            /*去创建订单，验证令牌、验证价格、锁库存*/
+            //创建订单
+            OrderCreateTo orderCreateTo = createOrder();
+
+            //验价
+            BigDecimal payAmount = orderCreateTo.getOrder().getPayAmount();
+            BigDecimal payPrice = submitVo.getPayPrice();
+            if (Math.abs(payAmount.subtract(payPrice).doubleValue()) < 0.01) {
+                /*金额对比*/
+								//保存订单
+                saveOrder(orderCreateTo);
+								//锁定库存___只要有异常，就回滚订单数据
+                /*订单号*/
+                WareSkuLockVo lockVo = new WareSkuLockVo();
+                lockVo.setOrderSn(orderCreateTo.getOrder().getOrderSn());
+                List<OrderItemVo> collect = orderCreateTo.getOrderItems().stream().map(item -> {
+                    OrderItemVo itemVo = new OrderItemVo();
+                    itemVo.setSkuId(item.getSkuId());
+                    itemVo.setCount(item.getSkuQuantity());
+                    itemVo.setTitle(item.getSkuName());
+                    return itemVo;
+                }).collect(Collectors.toList());
+                lockVo.setLocks(collect);
+                /*TODO:调用仓储服务锁定库存远端*/
+
+                /*1、为了保证高并发，库存服务自己回滚，可以发消息给库存服务*/
+                /*2、库存服务也可以自动解锁模式，参与消息队列*/
+
+                R r = wareFeignService.orderLockStock(lockVo);
+                if (r.getCode() == 0) {
+                    /*锁定库存成功*/
+                    submitOrderResponseVo.setOrder(orderCreateTo.getOrder());
+  									//int i = 10 / 0;
+
+                    /*TODO:订单创建成功，发送消息给RabbitMQ*/
+                    rabbitTemplate.convertAndSend("order-event-exchange",
+                            "order.create.order",
+                            orderCreateTo);
+                    /*TODO:远程扣减积分*/
+                    return submitOrderResponseVo;
+                } else {
+                    /*锁定失败*/
+                    String msg = (String) r.get("msg");
+                    throw new NoStockException(msg);
+										//submitOrderResponseVo.setCode(3);
+										//return submitOrderResponseVo;
+                }
+                /*所有订单项信息——skuID，skuName,件数*/
+            } else {
+                submitOrderResponseVo.setCode(2);//金额对比失败，验价失败
+                return submitOrderResponseVo;
+            }
+        }
+    }
+  2、订单超时及订单自动取消关单消息监听
+  	1)消息监听器
+  		package com.pigskin.mall.order.listener;
+
+      import com.pigskin.mall.order.entity.OrderEntity;
+      import com.pigskin.mall.order.service.OrderService;
+      import com.rabbitmq.client.Channel;
+      import org.springframework.amqp.core.Message;
+      import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+      import org.springframework.amqp.rabbit.annotation.RabbitListener;
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.stereotype.Service;
+
+      import java.io.IOException;
+      import java.util.Date;
+
+      /**
+       * 订单关单监听器
+       *
+       * @author pigskin
+       * @date 2022年01月21日 11:28 上午
+       */
+      @Service
+      @RabbitListener(queues = "order.release.order.queue")//设置监听的队列
+      public class OrderCloseListener {
+
+          @Autowired
+          OrderService orderService;
+
+          /**
+           * 进行订单释放消息队列的监听
+           *
+           * @param order
+           */
+
+          @RabbitHandler
+          public void listener(OrderEntity order, Channel channel, Message message) throws IOException {
+              System.out.println("收到过期的订单信息：创建时间为————" + order.getModifyTime() + "，" + new Date() + "准备关闭订单————" + order.getOrderSn());
+              try {
+                  orderService.closeOrder(order);
+                  channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+              } catch (Exception e) {//消息拒绝，重新回到队列
+                  channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+
+              }
+          }
+      }
+      ------------------------------调用详细关单代码————开始-------------------------------------------
+        @Override
+        public void closeOrder(OrderEntity order) {
+            //查询当前订单的状态
+            OrderEntity orderEntity = this.getById(order.getId());
+            if (Objects.equals(orderEntity.getStatus(), OrderStatusEnum.CREATE_NEM.getCode())) {
+                /*更新迪昂单状态为已取消状态*/
+                OrderEntity updateOrderEntity = new OrderEntity();
+                updateOrderEntity.setId(orderEntity.getId());
+                updateOrderEntity.setStatus(OrderStatusEnum.CANCLED.getCode());
+                this.updateById(updateOrderEntity);
+                OrderTo orderTo = new OrderTo();
+                BeanUtils.copyProperties(orderEntity, orderTo);
+                /*TODO:订单解锁成功，发给消息队列一个消息*/
+                rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
+            }
+        }
+      ------------------------------调用详细关单代码————结束-------------------------------------------
+
+
+  		
 ```
 
 
@@ -9949,23 +11524,13 @@ error => {   
 
 
 
-## 3、分布式系统的CAP原理
-
-### 1、CAP是什么?
+## 3、Java开发常见异常
 
 ```markdown
--- 指的是在一个分布式系统中,Consistency(一致性)Availability(可用性)Partiation tolarance(分区容错性)三者不可同时获得
-	一致性————在分布式系统中的所有数据备份,在同一时刻是否具有相同值(所有节点在同一时间的数据完全一致,越多节点,数据同步耗时越多)
-	可用性————负载过大后,集群整体是否还能响应客户端的读写请求(服务一直可以用,而且响应时间正常)
-	分区容错性————高可用性,一个节点崩了,不影响其他节点(100个节点,崩了几个,不影响服务,越多机器越好)
-```
+# com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'xxx' at row 1
+-- 说明————插入的数据长度超过数据表中字段的最大长度
+-- 解决————1)修改表中对应字段长度2)设置生成的数据长度不超过表中字段的最大长度
 
-### 2、不能同时三者满足的原因
-
-```markdown
--- CA满足,P不能满足————数据同步(A)需要时间,也要正常的时间内响应(A),那么机器数量就要少(P不满足)
--- CP满足,A不能满足————数据同步(A)需要时间,机器数量(P)也多,但同步数据需要时间,所以不能在正常时间内响应(A不满足)
--- AP满足,C不能满足————机器数量多(P),也要正常的时间内响应(A),那么数据就不能及时同步到其他节点(C不满足)
 ```
 
 
@@ -11312,9 +12877,81 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 		/*令牌验证成功*/
 		//TODO:
 	}
+
+# 以下单流程为例图示————如下图所示
 ```
 
 
+
+## 22、本类方法互调导致事务失效问题
+
+```markdown
+# 存在问题
+	同一个对象内,事务方法互调绕过了代理对象,导致设置的事务传播行为失效问题
+
+# 解决方案————使用代理对象调用事务方法,具体实现步骤如下
+-- 引入spring-boot-starter-aop依赖,其引入了org.aspectj可以进行动态代理
+  <!--引入AOP Starter,主要使用其中的org.aspectj进行动态代理-->
+  <dependency>
+  	<groupId>org.springframework.boot</groupId>
+  	<artifactId>spring-boot-starter-aop</artifactId>
+  </dependency>
+
+-- 开启aspectj动态代理功能,并对外暴露代理对象
+	1、主类使用注解@EnableAspectJAutoProxy开启aspectj动态代理功能(从而替代JDK默认的动态代理,即使没有接口也能创建动态代理),并使用属性(exposeProxy = true)对外暴露代理对象
+    
+    //开启动AspectJ动态代理
+    @EnableAspectJAutoProxy(exposeProxy = true)
+    public class MallOrderApplication {
+      public static void main(String[] args) {
+      SpringApplication.run(MallOrderApplication.class, args);
+      }
+    }
+
+-- 本类互调使用代理对象互调示例
+	1、使用AOP上下文获取当前代理对象,并转换为对应接口或实现类
+		OrderServiceImpl  orderService = (OrderServiceImpl) AopContext.currentProxy();
+	2、直接进行同一个对象内事务方法的互调,此时事务传播行为就不会失效
+    /**
+    * 默认事务
+    *
+    * @author pigskin
+    * @date 2022/1/14 10:42 上午
+    */
+    @Transactional(timeout = 30)
+    public void a() {
+      //1、正常使用JDK默认动态代理时，b和c做任何事务设置都没用，都是和a公用同一个事务
+      this.b();//b方法设置的事务相关无效
+      this.c();//c方法设置的事务相关无效
+
+      //2、解决方式，使用代理对象调用事务方法
+      OrderServiceImpl orderService = (OrderServiceImpl) AopContext.currentProxy();
+      orderService.b();//使用代理对象调用，就采用b方法设置的事务相关配置
+      orderService.c();//使用代理对象调用，就采用c方法设置的事务相关配置
+    }
+
+    /**
+    * 如果当前没有事务,就创建一个新事务,如果当前存在事务,就加入该事务,该设置是最常用的设置。
+    *
+    * @author pigskin
+    * @date 2022/1/14 10:34 上午
+    */
+    @Transactional(propagation = Propagation.REQUIRED, timeout = 2)
+    public void b() {
+
+    }
+
+    /**
+    * 创建新事务,无论当前存不存在事务,都创建新事务
+    *
+    * @author pigskin
+    * @date 2022/1/14 10:39 上午
+    */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 20)
+    public void c() {
+
+    }
+```
 
 
 

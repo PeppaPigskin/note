@@ -1025,8 +1025,9 @@ brew install VisualVM
 
 -- 启动
 	1、windows————双击运行/bin/seata-server.bat
-	2、mac————终端/bin/下运行[sh seata-server.sh -p 8091 -h 127.0.0.1 -m file]命令
-	
+	2、mac————终端/bin/下运行[./seata-server.sh -p 8091 -h 192.168.xxx.xx -m file]命令
+	3、出现异常————seata can not connect to services-server
+  	1)seata TC注册到nacos的地址不是服务器的地址导致不能链接——————只需要启动时命令增加-h 指定ip地址 
 ```
 
 

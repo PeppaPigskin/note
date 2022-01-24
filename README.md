@@ -97,6 +97,7 @@
   - [15、Linux中Maven环境搭建](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#15linux中maven环境搭建)
   - [16、Linux中Git环境搭建](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#16linux中git环境搭建)
   - [17、Linux中Jenkins搭建](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#17linux中jenkins搭建)
+  - [18、Mac安卓模拟器安装](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#18mac安卓模拟器安装)
 
 
 
