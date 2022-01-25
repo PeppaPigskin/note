@@ -489,13 +489,29 @@ brew install VisualVM
 
 ## 7、Tomcat 安装与配置
 
-```bash
-1、安装完提示信息
-  tomcat@8 is keg-only, which means it was not symlinked into /usr/local,because this is an alternate version of another formula.
+```markdown
+# 安装命令
+	brew install tomcat@8
+
+# 安装完提示信息
+  Configuration files: /usr/local/etc/tomcat@8
+
+  tomcat@8 is keg-only, which means it was not symlinked into /usr/local,
+  because this is an alternate version of another formula.
+
   If you need to have tomcat@8 first in your PATH, run:
-    echo ‘export PATH=“/usr/local/opt/tomcat@8/bin:$PATH”’ >> ~/.zshrc
-  To have launchd start tomcat@8 now and restart at login:
-    brew services start tomcat@8
+    echo 'export PATH="/usr/local/opt/tomcat@8/bin:$PATH"' >> ~/.zshrc
+
+
+  To restart tomcat@8 after an upgrade:
+    brew services restart tomcat@8
+  Or, if you don't want/need a background service you can just run:
+    /usr/local/opt/tomcat@8/bin/catalina run
+
+# 配置
+	1、执行命令———— echo 'export PATH="/usr/local/opt/tomcat@8/bin:$PATH"' >> ~/.zshrc
+	2、重启服务———— brew services restart tomcat@8
+	3、查看安装文件所在目录————brew list tomcat@8
 ```
 
 
@@ -1048,7 +1064,11 @@ brew install VisualVM
 -- 编码配置
 	1、在左侧栏General的Workspace下确定编码为UTF-8，点击Apply应用配置(如果你看到默认的编码就是UTF－8，那就可以不管)
 
--- 没有Server解决办法————https://blog.csdn.net/weixin_44093607/article/details/106203861
+-- 没有Server解决办法
+	1、查看Eclipse的版本号【Help】->【About Eclipse IDE】
+	2、添加server插件【Help】->【Install New Software…】->点击添加【Add…】
+	3、填写【Name】和【Location】,【Name】为版本号,本人的Eclipse版本为【2021-12】,【Location】为 http://download.eclipse.org/releases/2021-12,然后点击【Add】
+	4、勾选【 Web, XML, Java EE and OSGi Enterprise Development 】,点击【Next >】->【Finish】
 
 -- 集成Tomcat
 	1、首先打开eclipse，选择eclipse的偏好设置，选择server--Runtime Environments
