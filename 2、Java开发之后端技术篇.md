@@ -9554,7 +9554,50 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   		
 ```
 
+## 34、加密算法
 
+```markdown
+# 相关概念
+-- 公钥私钥————公钥和私钥是一个相对概念.它们的公私性是相对于生产者来说的.一对密钥生成后,保存在生产者手里的就是私钥.生产者发布出去大家用的就是公钥.
+
+-- 加密和数字签名
+	1、加密————我们使用一对公私密钥中的一个密钥来对数据进行加密,而使用另外一个密钥来进行解密
+	2、
+# 对称加密————金融领域不能使用
+-- 说明————加密和解密使用的是同一把钥匙
+
+-- 图示传送流程————如下图所示
+```
+
+<img src="image/img2_1_34_1_1.png" style="zoom:50%;" />
+
+```markdown
+-- 常见算法
+	1、ES
+	2、3DES(TripleDES)
+	3、AES
+	4、RC2
+	5、RC4
+	6、RC5
+	7、Blowfish
+
+-- 存在问题(不安全)————只要有一方密钥泄漏,都会影响完整的通信流程
+
+# 非对称加密————适用于金融领域
+-- 说明————加密和解密使用不同的钥匙
+
+-- 图示传送流程————如下图所示
+```
+
+<img src="image/img2_1_34_1_2.png" style="zoom:50%;" />
+
+```markdown
+-- 常见算法
+	1、RSA————现阶段比较流行
+	2、Elgamal
+
+-- 特点(相对安全)————单纯的获取到其中的一方密钥,不会影响完整的通信流程,除非获取到所有的密钥
+```
 
 
 
@@ -11159,6 +11202,163 @@ error => {   
             }
         }
     }
+```
+
+## 10、支付宝支付
+
+```markdown
+# 使用步骤
+-- 1、进入”蚂蚁金服开放平台“————https://opendocs.alipay.com/open/270/105898
+
+-- 2、创建应用————网页&移动应用列表————进行基本信息的填写————进行功能的签约
+
+# 使用沙箱进行Demo测试
+-- 下载Demo地址
+	1、支付宝官方地址————https://gw.alipayobjects.com/os/bmw-prod/43bbc4ba-4d71-402f-a03b-778dfef047a8.zip
+	2、本地附件地址————可见[附件2]
+
+-- 配置类中配置Demo————相关信息详见————https://openhome.alipay.com/platform/appDaily.htm?tab=info
+	package com.alipay.config;
+
+    import java.io.FileWriter;
+    import java.io.IOException;
+
+    /* *
+     *类名：AlipayConfig
+     *功能：基础配置类
+     *详细：设置帐户有关信息及返回路径
+     *修改日期：2017-04-05
+     *说明：
+     *以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己网站的需要，按照技术文档编写,并非一定要使用该代码。
+     *该代码仅供学习和研究支付宝接口使用，只是提供一个参考。
+     */
+
+    public class AlipayConfig {
+
+    //↓↓↓↓↓↓↓↓↓↓请在这里配置您的基本信息↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+      // 1、应用ID,您的APPID，收款账号既是您的APPID对应支付宝账号
+      public static String app_id = "2021000119605083";
+
+      // 3、商户私钥，您的PKCS8格式RSA2私钥————支付宝在线密钥生成地址————https://miniu.alipay.com/keytool/create
+        public static String merchant_private_key = "";
+
+      // 4、支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
+        public static String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI2GXnGEDV+ElNorCO2BVFus8z1HN+uUpTtEFL/Qnb/2RpcxrOXQDEolKjZeb3W9yy/2AOaRumf3kdo4epXaK1AakVXkEC2UmmgxWlP8O/oPXHEc0Kmk3A48LNPEvF1RXPZE/T0qsSs5759P+PMLySMxC/WiTHtvyqJBjRvToUfxwYIqKkNsqVTcz3xW7q/O0e7dL+g2U4pjpyQk3ahysaQYlf7Wy3hSaWvNBIkJ78MzfIShuXffKigJzeXid2lkI7SQ+l/65HXFBqdfnLFlINEENlvmYJG+hmo3JE96wCGUQO3/QMUFE1IfPUdmPpdPDZS1pDfw11MBJj9JrvTLaQIDAQAB";
+
+      // 5、服务器异步通知页面路径————支付宝支付成功,每隔几秒发送一条支付成功的消息,方便后台进行后续业务的操作  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
+      public static String notify_url = "http://localhost:8080/alipay.trade.page.pay-JAVA-UTF-8/notify_url.jsp";
+
+      // 6、页面跳转同步通知页面路径————支付宝支付成功跳转的成功展示页面地址 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
+      public static String return_url = "http://localhost:8080/alipay.trade.page.pay-JAVA-UTF-8/return_url.jsp";
+
+      // 签名方式
+      public static String sign_type = "RSA2";
+
+      // 字符编码格式
+      public static String charset = "utf-8";
+
+      // 2、支付宝网关————正式为————https://openapi.alipay.com/gateway.do
+      public static String gatewayUrl = "https://openapi.alipaydev.com/gateway.do";
+
+      // 日志信息
+      public static String log_path = "C:\\";
+
+
+    //↑↑↑↑↑↑↑↑↑↑请在这里配置您的基本信息↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+        /** 
+         * 写日志，方便测试（看网站需求，也可以改成把记录存入数据库）
+         * @param sWord 要写入日志里的文本内容
+         */
+        public static void logResult(String sWord) {
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter(log_path + "alipay_log_" + System.currentTimeMillis()+".txt");
+                writer.write(sWord);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+-- 运行Demo
+	1、解压下载的安装包
+	2、导入开发IDE工具
+	3、在Tomcat下运行
+
+-- 测试Demo
+	1、使用沙箱账户进行测试————https://open.alipay.com/platform/appDaily.htm?tab=account
+
+-- 允许我们使用外网的地址来访问主机进行测试
+	详情请见————2、Java开发之后段技术篇-2-11、内网穿透
+
+# 相关概念
+	详见————2、Java开发之后段技术篇-1-34、加密算法
+
+# 支付宝加密算法流程
+-- 流程图示————如下图所示
+```
+
+<img src="image/img2_2_10_1_1.png" style="zoom:50%;" />
+
+```markdown
+-- 流程说明
+	1、商户通过[商户私钥]对明文数据进行[加签————生成签名的过程]操作,并将明文数据和加签结果[作为一个整体]传输给支付宝
+	2、支付宝使用商户传送过来的明文数据进行业务操作时,通过[商户公钥]对同时传过来的加签结果进行[验签————验证签名的过程]操作,验签通过后再去使用该数据进行业务处理(验签不通过证明原始数据发生过修改,进行响应处理)
+	3、支付宝验签通过,处理业务,生成响应数据.并通过[支付宝私钥]对响应结果进行[加签————生成签名的过程]操作,将响应结果和加签结果[作为一个整体]传输给商户
+	4、商户使用支付宝传送过来的响应结果进行业务操作时,通过[支付宝公钥]对响应结果进行[验签————验证签名的过程]操作,验证正确,就证明支付宝发过来的数据是没有被中途修改过的
+```
+
+[附件2](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
+
+## 11、内网穿透
+
+```markdown
+# 简介
+	内网穿透功能可以允许我们使用外网的地址来访问主机.正常的外网需要访问我们的项目的流程如下:
+	1、买服务器,并且有公网固定IP
+	2、买域名映射到服务器的IP
+	3、域名需要备案和审核
+
+# 原理图
+-- 场景一————注册公共域名
+```
+
+<img src="image/img2_2_11_1_1.png" style="zoom:50%;" />
+
+```markdown
+-- 场景二————借助内网穿透服务商
+```
+
+<img src="image/img2_2_11_1_2.png" style="zoom:50%;" />
+
+```markdown
+# 使用场景
+	1、开发测试(微信、支付宝)
+	2、智慧互联
+	3、远程控制
+	4、私有云
+
+# 网络穿透的几个常用软件
+	1、natapp————https://natapp.cn/
+	2、续断————https://www.zhexi.tech
+	3、花生壳————https://www.oray.com/
+
+# 使用步骤示例(续断)
+	0、进入客户端地址————https://cloud.zhexi.tech/xd/device/terminal
+	1、安装每个客户端唯一的网络穿透软件————https://www.zhexi.tech/help/xd/setup.html#macos————mac安装命令[sudo curl -o install.sh "http://cloud.zhexi.tech/upgrade/install.sh" && sudo bash ./install.sh --token HztBHa]
+	2、建立隧道————选择购买的隧道
+	3、设置内网URL————http://127.0.0.1:8089(依照个人项目所在的内网URL进行设置)
+	4、保存之后就会分配一个用于外部访问的公共域名地址————这样就可以在任何一台网络中的电脑访问我们的项目
 ```
 
 
