@@ -1092,180 +1092,6 @@ return interceptor;
 	spring.profiles.active=dev
 ```
 
-
-
-### 3、SpringBoot定时任务
-
-([玩转SpringBoot之定时任务详解](https://www.cnblogs.com/mmzs/p/10161936.html#_labelTop))
-
-```markdown
-# 说明
-	在固定时间自动执行程序
-
-# Cron表达式（七子/域表达式）
--- 在线生成地址————https://cron.qqe2.com/|https://www.pppet.net/
-
--- 每一位分别代表的意义————秒 分钟 小时 日 月 星期 年
-	1、秒（0~59） 例如0/5表示每5秒
-	2、分（0~59）
-	2、时（0~23）
-	4、日（0~31）的某天，需计算
-	5、月（0~11）
-	6、周几（可填1~7 或 SUN/MON/TUE/WED/THU/FRI/SAT）
-
--- springboot默认当年，只能指定六位，指定第七位会报错
-
--- Cron表达式示例
-	1)每隔5秒执行一次————*/5 * * * * ?
-	2)每隔1分钟执行一次————0 */1 * * * ?
-	3)每天23点执行一次————0 0 23 * * ?
-	4)每天凌晨1点执行一次————0 0 1 * * ?
-	5)每月1号凌晨1点执行一次————0 0 1 1 * ?
-	6)每月最后一天23点执行一次————0 0 23 L * ?
-	7)每周星期天凌晨1点实行一次————0 0 1 ? * L
-	8)在26分、29分、33分执行一次————0 26,29,33 * * * ?
-	9)每天的0点、13点、18点、21点都执行一次————0 0 0,13,18,21 * * ?
-
-# 使用SpringBoot创建定时任务非常简单，目前主要有以下三种创建方式:
--- 静态————基于注解(@Scheduled)
-	1、说明
-		1)基于注解@Scheduled默认为单线程，开启多个任务时，任务的执行时机会受上一个任务执行时间的影响。
-		2)除了支持灵活的参数表达式cron之外，还支持简单的延时操作，例如 fixedDelay ，fixedRate 填写相应的毫秒数即可.
-	2、缺点————当我们调整了执行周期的时候，需要重启应用才能生效，这多少有些不方便。为了达到实时生效的效果，可以使用接口来完成定时任务。
-	3、使用步骤————如下:
-		1)创建定时器
-			@Configuration      //1.主要用于标记配置类，兼备Component的效果。
-			@EnableScheduling   //2.开启定时任务
-      public class SaticScheduleTask {
-          //3.添加定时任务
-          @Scheduled(cron = "0/5 * * * * ?")
-          //或直接指定时间间隔，例如：5秒
-          //@Scheduled(fixedRate=5000)
-          private void configureTasks() {
-              System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
-          }
-      }
-    2)启动测试————启动应用，可以看到控制台打印对应内容.
-
--- 动态————基于接口(SchedulingConfigurer)————用于从数据库库中读取指定时间来动态执行定时任务
-	1、说明————基于接口（SchedulingConfigurer）,能够达到实时生效的效果.
-	2、注意————如果在数据库修改时格式出现错误，则定时任务会停止，即使重新修改正确,此时只能重新启动项目才能恢复。
-	3、使用步骤————如下:
-		1)导入依赖包
-			<parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-        <version>2.0.4.RELEASE</version>
-      </parent>
-
-      <dependencies>
-        <dependency><!--添加Web依赖 -->
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency><!--添加MySql依赖 -->
-          <groupId>mysql</groupId>
-          <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency><!--添加Mybatis依赖 配置mybatis的一些初始化的东西-->
-          <groupId>org.mybatis.spring.boot</groupId>
-          <artifactId>mybatis-spring-boot-starter</artifactId>
-          <version>1.3.1</version>
-        </dependency>
-        <dependency><!-- 添加mybatis依赖 -->
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis</artifactId>
-          <version>3.4.5</version>
-          <scope>compile</scope>
-        </dependency>
-      </dependencies>
-    2)添加数据库记录————开启本地数据库mysql，随便打开查询窗口，然后执行脚本内容
-    	DROP DATABASE IF EXISTS `socks`;
-      CREATE DATABASE `socks`;
-      USE `SOCKS`;
-      DROP TABLE IF EXISTS `cron`;
-      CREATE TABLE `cron`  (
-        `cron_id` varchar(30) NOT NULL PRIMARY KEY,
-        `cron` varchar(30) NOT NULL  
-      );
-      INSERT INTO `cron` VALUES ('1', '0/5 * * * * ?');
-    3)配置文件application.yml配置数据源信息
-    	spring:
-        datasource:
-          url: jdbc:mysql://localhost:3306/socks
-          username: root
-          password: 123456
-    4)创建定时器————注意这里添加的是TriggerTask，目的是循环读取我们在数据库设置好的执行周期，以及执行相关定时任务的内容。
-    	@Configuration      //1.主要用于标记配置类，兼备Component的效果。
-      @EnableScheduling   //2.开启定时任务
-      public class DynamicScheduleTask implements SchedulingConfigurer {
-        @Mapper
-        public interface CronMapper {
-          @Select("select cron from cron limit 1")
-          public String getCron();
-        }
-
-        @Autowired      //注入mapper
-        @SuppressWarnings("all")
-        CronMapper cronMapper;
-
-        /**
-        * 执行定时任务.
-        */
-        @Override
-        public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-          taskRegistrar.addTriggerTask(
-            //1.添加任务内容(Runnable)
-            () -> System.out.println("执行动态定时任务: " + LocalDateTime.now().toLocalTime()),
-            //2.设置执行周期(Trigger)
-            triggerContext -> {
-              //2.1 从数据库获取执行周期
-              String cron = cronMapper.getCron();
-              //2.2 合法性校验.
-              if (StringUtils.isEmpty(cron)) {
-              	// Omitted Code ..
-              }
-              //2.3 返回执行周期(Date)
-              return new CronTrigger(cron).nextExecutionTime(triggerContext);
-            }
-          );
-        }
-      }
-		5)启动测试
-			-- 启动应用后，查看控制台，打印时间是我们预期的每10秒一次
-			-- 然后打开Navicat ，将执行周期修改为每6秒执行一次
-			-- 查看控制台，发现执行周期已经改变，并且不需要我们重启应用，十分方便。
--- 多线程定时任务
-	1、说明————基于注解设定多线程定时任务
-	2、注意————第一个定时任务和第二个定时任务互不影响；并且，由于开启了多线程，第一个任务的执行时间也不受其本身执行时间的限制，所以需要注意可能会出现重复操作导致数据异常。
-	3、使用步骤————如下
-		1)创建多线程定时任务
-			//@Component注解用于对那些比较中立的类进行注释；
-      //相对与在持久层、业务层和控制层分别采用 @Repository、@Service 和 @Controller 对分层中的类进行注释
-      @Component
-      @EnableScheduling   // 1.开启定时任务
-      @EnableAsync        // 2.开启多线程
-      public class MultithreadScheduleTask {
-        @Async //这里的@Async注解很关键
-        @Scheduled(fixedDelay = 1000)  //间隔1秒
-        public void first() throws InterruptedException {
-          System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
-          System.out.println();
-          Thread.sleep(1000 * 10);
-        }
-
-        @Async //这里的@Async注解很关键
-        @Scheduled(fixedDelay = 2000)
-        public void second() {
-          System.out.println("第二个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
-          System.out.println();
-        }
-      }
-    2)启动测试————启动应用后，查看控制台
-```
-
-
-
 ## 8、SpringCloud
 
 ### 1、微服务简介
@@ -9758,6 +9584,246 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- 特点(相对安全)————单纯的获取到其中的一方密钥,不会影响完整的通信流程,除非获取到所有的密钥
 ```
 
+## 35、限流
+
+```markdown
+# 说明
+	解决瞬时高并发的问题
+
+# 限流方式
+-- 前端限流————一些高并发的网站直接在前端页面开始限流(例如:小米的验证码设计)
+
+-- Nginx限流————直接负载部分请求到错误的静态页面(令牌算法、漏斗算法)
+
+-- 网关限流————限流的过滤器
+
+-- 代码中使用分布式信号量
+
+-- RabbitMQ限流(能者多劳:chanel.basicQos(1))————保证发挥所有服务器的性能
+```
+
+## 36、定时任务([玩转SpringBoot之定时任务详解](https://www.cnblogs.com/mmzs/p/10161936.html#_labelTop))
+
+```markdown
+# 定时任务
+-- Cron表达式（七子/域表达式）
+	1、说明————在固定时间自动执行程序(http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html)
+	2、在线生成地址————https://cron.qqe2.com/|https://www.pppet.net/
+	3、每一位分别代表的意义————秒 分钟 小时 日 月 星期 年(Spring不支持《年》的设定)
+    1)秒(是否强制————是)(可取值————0~59)(可取字符————, - * /)
+    2)分(是否强制————是)(可取值————0~59)(可取字符————, - * /)
+    2)时(是否强制————是)(可取值————0~23)(可取字符————, - * /)
+    4)日(是否强制————是)(可取值————1~31)(可取字符————, - * / ? L W)
+    5)月(是否强制————是)(可取值————1~12或JAN~DEC)(可取字符————, - * /)
+    6)周(是否强制————是)(可取值————1~7或SUN/MON/TUE/WED/THU/FRI/SAT)(可取字符————, - * / ? L #)
+		7)年(是否强制————否)(可取值————empty或1970~2099)(可取字符————, - * /)springboot默认当年,只能指定六位,指定第七位会报错
+	4、特殊字符说明
+		,————枚举
+			(cron="7,9,23 * * * * ?")————任意时刻的7,9,23秒触发这个任务
+		-————范围
+			(cron="7-20 * * * * ?")————任意时刻的7-20秒之间,每秒触发一次
+		*————任意
+			指定位置的任意时刻都可以
+		/————步长
+			(cron="7/5 * * * * ?")————第7秒启动,每5秒触发一次
+			(cron="/5 * * * * ?")————任意时刻的7-20秒之间,每秒触发一次
+		?————出现在日和周的位置————为防止日和周冲突,其中一个精确时,另一个通配,在周和日上如果要写通配符使用
+			(cron="* * * 1 * ?")————每月的1号触发
+		L————出现在日和周的位置————last(最后一个)
+			(cron="* * * ? * 3L")————每个月的最后一个周二触发
+		W————Work Day(工作日)
+			(cron="* * * W * ?")————每个月的工作日触发
+			(cron="* * * LW * ?")————每个月的最后一个工作日触发,每秒执行一次
+		#————第几个
+			(cron="* * * ? * 5#2")————每个月第2个周4触发,每秒执行一次
+
+-- Cron表达式示例
+	1、每隔5秒执行一次————*/5 * * * * ?
+	2、每隔1分钟执行一次————0 */1 * * * ?
+	3、每天23点执行一次————0 0 23 * * ?
+	4、每天凌晨1点执行一次————0 0 1 * * ?
+	5、每月1号凌晨1点执行一次————0 0 1 1 * ?
+	6、每月最后一天23点执行一次————0 0 23 L * ?
+	7、每周星期天凌晨1点实行一次————0 0 1 ? * L
+	8、在26分、29分、33分执行一次————0 26,29,33 * * * ?
+	9、每天的0点、13点、18点、21点都执行一次————0 0 0,13,18,21 * * ?
+
+# SpringBoot整合————使用SpringBoot创建定时任务非常简单，目前主要有以下三种创建方式:
+-- 静态————基于注解(@Scheduled)
+	1、说明
+		1)基于注解@Scheduled默认为单线程，开启多个任务时，任务的执行时机会受上一个任务执行时间的影响。
+		2)除了支持灵活的参数表达式cron之外，还支持简单的延时操作，例如 fixedDelay ，fixedRate 填写相应的毫秒数即可.
+	2、缺点————当我们调整了执行周期的时候，需要重启应用才能生效，这多少有些不方便。为了达到实时生效的效果，可以使用接口来完成定时任务。
+	3、使用步骤————如下:
+		1)创建定时器
+			@Configuration      //1.主要用于标记配置类，兼备Component的效果。
+			@EnableScheduling   //2.开启定时任务
+      public class SaticScheduleTask {
+          //3.添加定时任务
+          @Scheduled(cron = "0/5 * * * * ?")
+          //或直接指定时间间隔，例如：5秒
+          //@Scheduled(fixedRate=5000)
+          private void configureTasks() {
+              System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
+          }
+      }
+    2)启动测试————启动应用，可以看到控制台打印对应内容.
+	4、注意
+		1)Spring中6位组成,不允许第七位的年
+		2)spring中的周是1-7代表周一到周日
+		3)定时任务不应该阻塞(一个定时任务超时不应该影响阻塞其它定时任务的执行),默认是阻塞的,因为默认的自动配置TaskSchedulingAutoConfiguration类中只有一个线程池
+	5、解决默认阻塞的方式
+		详见————2、Java开发之后端技术篇-3-25、解决Spring定时任务阻塞问题
+
+-- 动态————基于接口(SchedulingConfigurer)————用于从数据库库中读取指定时间来动态执行定时任务
+	1、说明————基于接口（SchedulingConfigurer）,能够达到实时生效的效果.
+	2、注意————如果在数据库修改时格式出现错误，则定时任务会停止，即使重新修改正确,此时只能重新启动项目才能恢复。
+	3、使用步骤————如下:
+		1)导入依赖包
+			<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>2.0.4.RELEASE</version>
+      </parent>
+
+      <dependencies>
+        <dependency><!--添加Web依赖 -->
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency><!--添加MySql依赖 -->
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency><!--添加Mybatis依赖 配置mybatis的一些初始化的东西-->
+          <groupId>org.mybatis.spring.boot</groupId>
+          <artifactId>mybatis-spring-boot-starter</artifactId>
+          <version>1.3.1</version>
+        </dependency>
+        <dependency><!-- 添加mybatis依赖 -->
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+          <version>3.4.5</version>
+          <scope>compile</scope>
+        </dependency>
+      </dependencies>
+    2)添加数据库记录————开启本地数据库mysql，随便打开查询窗口，然后执行脚本内容
+    	DROP DATABASE IF EXISTS `socks`;
+      CREATE DATABASE `socks`;
+      USE `SOCKS`;
+      DROP TABLE IF EXISTS `cron`;
+      CREATE TABLE `cron`  (
+        `cron_id` varchar(30) NOT NULL PRIMARY KEY,
+        `cron` varchar(30) NOT NULL  
+      );
+      INSERT INTO `cron` VALUES ('1', '0/5 * * * * ?');
+    3)配置文件application.yml配置数据源信息
+    	spring:
+        datasource:
+          url: jdbc:mysql://localhost:3306/socks
+          username: root
+          password: 123456
+    4)创建定时器————注意这里添加的是TriggerTask，目的是循环读取我们在数据库设置好的执行周期，以及执行相关定时任务的内容。
+    	@Configuration      //1.主要用于标记配置类，兼备Component的效果。
+      @EnableScheduling   //2.开启定时任务
+      public class DynamicScheduleTask implements SchedulingConfigurer {
+        @Mapper
+        public interface CronMapper {
+          @Select("select cron from cron limit 1")
+          public String getCron();
+        }
+
+        @Autowired      //注入mapper
+        @SuppressWarnings("all")
+        CronMapper cronMapper;
+
+        /**
+        * 执行定时任务.
+        */
+        @Override
+        public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+          taskRegistrar.addTriggerTask(
+            //1.添加任务内容(Runnable)
+            () -> System.out.println("执行动态定时任务: " + LocalDateTime.now().toLocalTime()),
+            //2.设置执行周期(Trigger)
+            triggerContext -> {
+              //2.1 从数据库获取执行周期
+              String cron = cronMapper.getCron();
+              //2.2 合法性校验.
+              if (StringUtils.isEmpty(cron)) {
+              	// Omitted Code ..
+              }
+              //2.3 返回执行周期(Date)
+              return new CronTrigger(cron).nextExecutionTime(triggerContext);
+            }
+          );
+        }
+      }
+		5)启动测试
+			-- 启动应用后，查看控制台，打印时间是我们预期的每10秒一次
+			-- 然后打开Navicat ，将执行周期修改为每6秒执行一次
+			-- 查看控制台，发现执行周期已经改变，并且不需要我们重启应用，十分方便。
+-- 多线程定时任务
+	1、说明————基于注解设定多线程定时任务
+	2、注意————第一个定时任务和第二个定时任务互不影响；并且，由于开启了多线程，第一个任务的执行时间也不受其本身执行时间的限制，所以需要注意可能会出现重复操作导致数据异常。
+	3、使用步骤————如下
+		1)创建多线程定时任务
+			//@Component注解用于对那些比较中立的类进行注释；
+      //相对与在持久层、业务层和控制层分别采用 @Repository、@Service 和 @Controller 对分层中的类进行注释
+      @Component
+      @EnableScheduling   // 1.开启定时任务
+      @EnableAsync        // 2.开启多线程
+      public class MultithreadScheduleTask {
+        @Async //这里的@Async注解很关键
+        @Scheduled(fixedDelay = 1000)  //间隔1秒
+        public void first() throws InterruptedException {
+          System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
+          System.out.println();
+          Thread.sleep(1000 * 10);
+        }
+
+        @Async //这里的@Async注解很关键
+        @Scheduled(fixedDelay = 2000)
+        public void second() {
+          System.out.println("第二个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
+          System.out.println();
+        }
+      }
+    2)启动测试————启动应用后，查看控制台
+
+# 分布式定时任务
+-- 定时任务问题
+	1、解决Spring定时任务阻塞问题————详见:2、Java开发之后段技术篇-2-3-25、解决Spring定时任务阻塞问题
+	2、幂等性问题
+		1)图示
+```
+
+<img src="image/img2_1_36_1_1.png" style="zoom:50%;" />
+
+```markdown
+		2)解决方式————详见:2、Java开发之后段技术篇-2-3-20、接口幂等性问题——#幂等解决方案--各种锁机制3、业务层分布式锁
+-- 扩展——分布式调度
+	//TODO:待完善
+```
+
+## 37、日期工具类使用说明
+
+```markdown
+# LocalDate————(yyyy-MM-dd)
+-- 获取当前的日期————LocalDate.now();
+-- 获取当前日期的下x日期————LocalDate.now().plusDays(x);
+
+# LocalTime————(HH:mm:ss)
+-- 获取最大时间————LocalTime.MAX;
+-- 获取最小时间————Localtime.MIN;
+
+# LocalDateTime————(yyyy-MM-dd HH:mm:ss)
+-- 合并日期与时间————LocalDateTime.of(LocalDate.now(),Localtime.MIN);
+
+# DateTimeFormatter
+-- 获取日期格式————DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+```
+
 
 
 # 二、第三方服务技术
@@ -11403,7 +11469,7 @@ error => {   
         public static String merchant_private_key = "";
 
       // 4、支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
-        public static String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI2GXnGEDV+ElNorCO2BVFus8z1HN+uUpTtEFL/Qnb/2RpcxrOXQDEolKjZeb3W9yy/2AOaRumf3kdo4epXaK1AakVXkEC2UmmgxWlP8O/oPXHEc0Kmk3A48LNPEvF1RXPZE/T0qsSs5759P+PMLySMxC/WiTHtvyqJBjRvToUfxwYIqKkNsqVTcz3xW7q/O0e7dL+g2U4pjpyQk3ahysaQYlf7Wy3hSaWvNBIkJ78MzfIShuXffKigJzeXid2lkI7SQ+l/65HXFBqdfnLFlINEENlvmYJG+hmo3JE96wCGUQO3/QMUFE1IfPUdmPpdPDZS1pDfw11MBJj9JrvTLaQIDAQAB";
+        public static String alipay_public_key = "";
 
       // 5、服务器异步通知页面路径————支付宝支付成功,每隔几秒发送一条支付成功的消息,方便后台进行后续业务的操作  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
       public static String notify_url = "http://localhost:8080/alipay.trade.page.pay-JAVA-UTF-8/notify_url.jsp";
@@ -11506,6 +11572,8 @@ error => {   
 	alipay.gatewayUrl=https://openapi.alipaydev.com/gateway.do
 	##配置日期的格式化方式————否则会导致支付宝异步通知时转换日期格式失败
 	spring.mvc.date-format=yyyy-MM-dd HH:mm:ss
+	#支付宝支付超时时间
+	alipay.timeOut=1m
 
 -- 3、添加数据传输对象
 	1)支付异步响应传输对象
@@ -11664,6 +11732,15 @@ error => {   
         // 支付宝网关； https://openapi.alipaydev.com/gateway.do
         @Value("${alipay.gatewayUrl}")
         private String gatewayUrl;
+        
+        /**
+         * 支付宝支付超时时间设定
+         * 支付超时参数（相对超时参数）：在订单创建后开始生效，超时未支付订单将关闭。
+         * 取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天
+         * （在“1c-当天”的情况下，无论交易何时创建，都将在 0 点关闭）。
+         */
+        @Value("${alipay.timeOut}")
+        private String timeOut;
 
         public String pay(PayVo vo) throws AlipayApiException {
 
@@ -11691,8 +11768,9 @@ error => {   
                     + "\"total_amount\":\"" + total_amount + "\","
                     + "\"subject\":\"" + subject + "\","
                     + "\"body\":\"" + body + "\","
+                    /*TODO：设置支付超时时间*/
+                    + "\"timeout_express\":\"" + timeOut + "\","
                     + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
-
             String result = alipayClient.pageExecute(alipayRequest).getBody();
 
             //会收到支付宝的响应，响应的是一个页面，只要浏览器显示这个页面，就会自动来到支付宝的收银台页面
@@ -12050,6 +12128,146 @@ error => {   
 ```
 
 <img src="image/img2_2_10_1_2.png" style="zoom:50%;" />
+
+```markdown
+	10、收单操作相关问题及解决方式
+		1)订单在支付页,不支付,一直刷新,订单过期了オ支付,订单状态改为已支付了,但是库存解锁了
+			-- 解决方案————使用支付宝自动收单功能解決。只要一段时间不支付,就不能支付了
+			-- 实现步骤————支付模版工具类AlipayTemplate类中设定————如果超时未支付再去支付就会跳转到支付失败页面
+       /*TODO：设置支付超时时间*/
+       /*支付超时参数（相对超时参数）：在订单创建后开始生效，超时未支付订单将关闭。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（在“1c-当天”的情况下，无论交易何时创建，都将在 0 点关闭）。*/
+       String timeOut = "1m";//此处设定一分钟超时
+
+       alipayRequest.setBizContent("{\"out_trade_no\":\"" + out_trade_no + "\","
+        + "\"total_amount\":\"" + total_amount + "\","
+        + "\"subject\":\"" + subject + "\","
+        + "\"body\":\"" + body + "\","
+        + "\"timeout_express\":\"" + timeOut + "\","
+        + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+		2)由于时延等问题。订单解锁完成,正在解锁库存的时候,异步通知才到
+			-- 解决方案————订单解锁,手动调用收单
+			-- 实现步骤————订单解锁监听器OrderCloseListener类中手动调用支付宝收单功能
+				package com.pigskin.mall.order.listener;
+
+        import com.alipay.api.AlipayApiException;
+        import com.alipay.api.AlipayClient;
+        import com.alipay.api.DefaultAlipayClient;
+        import com.alipay.api.request.AlipayTradeRefundRequest;
+        import com.pigskin.mall.order.entity.OrderEntity;
+        import com.pigskin.mall.order.service.OrderService;
+        import com.pigskin.mall.order.utils.AlipayTemplate;
+        import com.rabbitmq.client.Channel;
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+        import org.springframework.amqp.rabbit.annotation.RabbitListener;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Service;
+        import org.springframework.util.StringUtils;
+
+        import javax.servlet.http.HttpServletRequest;
+        import java.io.IOException;
+        import java.io.UnsupportedEncodingException;
+        import java.util.Date;
+
+        /**
+         * 订单关单监听器
+         *
+         * @author pigskin
+         * @date 2022年01月21日 11:28 上午
+         */
+        @Service
+        @RabbitListener(queues = "order.release.order.queue")//设置监听的队列
+        public class OrderCloseListener {
+
+            @Autowired
+            OrderService orderService;
+            /**
+             * 支付宝支付模版
+             */
+            @Autowired
+            AlipayTemplate alipayTemplate;
+
+            /**
+             * 进行订单释放消息队列的监听
+             *
+             * @param order
+             */
+
+            @RabbitHandler
+            public void listener(OrderEntity order, Channel channel, Message message, HttpServletRequest request) throws IOException {
+                System.out.println("收到过期的订单信息：创建时间为————" + order.getModifyTime() + "，" + new Date() + "准备关闭订单————" + order.getOrderSn());
+                try {
+                    orderService.closeOrder(order);
+                    /*TODO:手动调用支付宝收单功能*/
+                    alipayTradeRefund(order.getOrderSn(), false, order.getPayAmount().toString(), "支付宝支付失败", "");
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                } catch (Exception e) {//消息拒绝，重新回到队列
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+
+                }
+            }
+
+            /**
+             * 支付宝收单功能
+             *
+             * @param outTradeNoOrTradeNo 商户订单号与支付宝交易号请二选一设置
+             * @param isTradeNo           是否为支付宝交易号（ture————outTradeNoOrTradeNo为支付宝交易号，否则为商户订单号）
+             * @param refund_amount       需要退款的金额，该金额不能大于订单金额，必填
+             * @param refund_reason       退款的原因说明
+             * @param out_request_no      标识一次退款请求，同一笔交易多次退款需要保证唯一，如需部分退款，则此参数必传
+             * @throws UnsupportedEncodingException
+             * @throws AlipayApiException
+             */
+            private void alipayTradeRefund(String outTradeNoOrTradeNo, Boolean isTradeNo, String refund_amount, String refund_reason, String out_request_no) throws UnsupportedEncodingException, AlipayApiException {
+                //获得初始化的AlipayClient
+                AlipayClient alipayClient = new DefaultAlipayClient(alipayTemplate.getGatewayUrl(),
+                        alipayTemplate.getApp_id(),
+                        alipayTemplate.getMerchant_private_key(),
+                        "json",
+                        alipayTemplate.getCharset(),
+                        alipayTemplate.getAlipay_public_key(),
+                        alipayTemplate.getSign_type());
+                if (StringUtils.isEmpty(outTradeNoOrTradeNo))
+                    throw new RuntimeException("未设置商户订单号或者支付宝交易号");
+                //设置请求参数
+                AlipayTradeRefundRequest alipayRequest = new AlipayTradeRefundRequest();
+                //商户订单号与支付宝交易号请二选一设置
+                if (isTradeNo) {
+                    alipayRequest.setBizContent("{\"trade_no\":\"" + outTradeNoOrTradeNo + "\","
+                            + "\"refund_amount\":\"" + refund_amount + "\","
+                            + "\"refund_reason\":\"" + refund_reason + "\","
+                            + "\"out_request_no\":\"" + out_request_no + "\"}");
+                } else {
+                    alipayRequest.setBizContent("{\"out_trade_no\":\"" + outTradeNoOrTradeNo + "\","
+                            + "\"refund_amount\":\"" + refund_amount + "\","
+                            + "\"refund_reason\":\"" + refund_reason + "\","
+                            + "\"out_request_no\":\"" + out_request_no + "\"}");
+                }
+                //商户订单号，商户网站订单系统中唯一订单号
+                // String out_trade_no = new String(request.getParameter("WIDTRout_trade_no").getBytes("ISO-8859-1"), "UTF-8");
+                //支付宝交易号
+                //String trade_no = new String(request.getParameter("WIDTRtrade_no").getBytes("ISO-8859-1"), "UTF-8");
+
+                //需要退款的金额，该金额不能大于订单金额，必填
+                //String refund_amount = new String(request.getParameter("WIDTRrefund_amount").getBytes("ISO-8859-1"), "UTF-8");
+                //退款的原因说明
+                //String refund_reason = new String(request.getParameter("WIDTRrefund_reason").getBytes("ISO-8859-1"), "UTF-8");
+                //标识一次退款请求，同一笔交易多次退款需要保证唯一，如需部分退款，则此参数必传
+                //String out_request_no = new String(request.getParameter("WIDTRout_request_no").getBytes("ISO-8859-1"), "UTF-8");
+
+                //请求
+                String result = alipayClient.execute(alipayRequest).getBody();
+                //输出
+                System.out.println(result);
+            }
+        }			
+		3)网络阻塞问题,订单支付成功的异步通知一直不到达
+			查询订单列表时,ajax获取当前未支付的订单状态,查询订单状态时,再获取一下支付宝此订单的状态
+		4)其他各种问题
+			每天晚上闲时下载支付宝对账单进行对账
+```
+
+
 
 [附件2](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
@@ -12464,7 +12682,6 @@ error => {   
 # com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'xxx' at row 1
 -- 说明————插入的数据长度超过数据表中字段的最大长度
 -- 解决————1)修改表中对应字段长度2)设置生成的数据长度不超过表中字段的最大长度
-
 ```
 
 
@@ -13345,10 +13562,26 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 ```markdown
 # 原因————因为存在时区问题
 
-# 解决方式————配置文件添加返回json的全局时间格式配置,内容如下:
+# 处理情形
+-- 数据库设置
+	#配置mysql数据源
+	spring.datasource.username=xxx
+	spring.datasource.password=xxx
+	spring.datasource.url=jdbc:mysql://192.168.x.xxx:3306/db_xxx?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+	spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+-- 配置文件添加返回json的全局时间格式配置
 	#返回json的全局时间格式
 	spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
 	spring.jackson.time-zone=GMT+8
+
+-- 前端传入日期配置
+	1、js中进行日期类型转换————moment(new Date).format("YYYY-MM-DD hh:mm:ss")
+	2、vue中进行日期类型格式属性设置————value-format="yyyy-MM-dd HH:mm:ss"
+
+-- Thymeleaf格式转换
+	1、数字转换为日期类型对象————${new java.util.Date(item.seckillInfoVo.startTime)}
+	2、格式化日期类型对象————${#dates.format(new java.util.Date(item.seckillInfoVo.startTime),"yyyy-YY-dd HH:mm:ss")}
 ```
 
 ## 14、新建的SpringBoot模块启动异常
@@ -13707,8 +13940,33 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 			1]我们第一次操作库存时,得到version为1,调用库存服务version变成了2;
 			2]但返回给订单服务出现了问题,订单服务又一次发起调用库存服务,当订单服务假如传的version还是1,再执行上面的sq语句时,就不会执行;
 			3]因为version已经变为2了, where条件就不成立。这样就保证了不管调用几次,只会真正的处理一次。
-	3、业务层分布式锁
-		如果多个机器可能在同一时间同时处理相同的数据,比如多台机器定时任务都拿到了相同数据处理,我们就可以加分布式锁,锁定此数据,处理完成后释放锁。获取到锁的必须先判断这个数据是否被处理过。
+	3、业务层分布式锁————如果多个机器可能在同一时间同时处理相同的数据,比如多台机器定时任务都拿到了相同数据处理,我们就可以加分布式锁,锁定此数据,处理完成后释放锁。获取到锁的必须先判断这个数据是否被处理过。
+		1)使用示例
+      //TODO:幂等性问题处理————分布式锁防止分布式多服务导致问题
+      RLock lock = redissonClient.getLock(upload_lock);
+      lock.lock(10, TimeUnit.SECONDS);
+      try {
+        //1、重复上架无需处理
+        log.info("上架秒杀商品信息。。。");
+        //TODO:执行的业务
+        seckillService.uploadSeckillSkuLatestThreeDays();
+      } finally {
+        lock.unlock();
+      }
+      ------------调用代码--开始----------
+      String key = SESSIONS_CACHE_PREFIX + startTime + "_" + endTime;
+      /*缓存活动信息*/
+      //2、幂等性问题处理————判断是否已经有了————缓存幂等性
+      if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+        ...
+      }
+
+      String key= seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString();
+      BoundHashOperations<String, Object, Object> operations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+      if(Boolean.FALSE.equals(operations.hasKey(key))) {
+        ...
+      }
+      ------------调用代码--结束----------
 
 -- 各种约束机制
 	1、数据表唯一约束
@@ -13782,8 +14040,6 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
     <button class="tijiao">提交订单</button>
 ```
 
-
-
 ## 21、令牌原子验证和删除
 
 ```markdown
@@ -13811,11 +14067,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 		/*令牌验证成功*/
 		//TODO:
 	}
-
-# 以下单流程为例图示————如下图所示
 ```
-
-
 
 ## 22、本类方法互调导致事务失效问题
 
@@ -14101,6 +14353,608 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # 获取并使用当前登陆的用户信息
 	/*从拦截器中获取用户信息*/
 	MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+```
+
+## 24、大型商城秒杀服务
+
+```markdown
+# 秒杀业务
+	秒杀具有瞬时高并发的特点,针对这一特点,必须要做到限流+异步+缓存(页面静态化)+独立部署
+
+# 秒杀商品定时上架及秒杀展示业务
+-- 1、商品定时上架————定时任务相关知识详见:2-1-36、定时任务(玩转SpringBoot之定时任务详解)
+	1)流程图,如下所示:
+```
+
+<img src="image/img2_3_24_1_1.png" style="zoom:50%;" />
+
+```markdown
+	2)业务实现代码如下:
+		package com.pigskin.mall.seckill.scheduled;
+
+    import com.pigskin.mall.seckill.service.SeckillService;
+    import lombok.extern.slf4j.Slf4j;
+    import org.redisson.api.RLock;
+    import org.redisson.api.RedissonClient;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.scheduling.annotation.Scheduled;
+    import org.springframework.stereotype.Service;
+
+    import java.util.concurrent.TimeUnit;
+
+    /**
+     * 商城秒杀定时任务
+     *
+     * @author pigskin
+     * @date 2022年02月02日 4:18 下午
+     */
+    @Slf4j
+    @Service
+    public class SeckillSkuScheduled {
+
+        @Autowired
+        SeckillService seckillService;
+
+        @Autowired
+        RedissonClient redissonClient;
+
+        /**
+         * 秒杀商品上架分布式锁名
+         */
+        private final String upload_lock = "seckill:upload:lock";
+
+        /**
+         * 每分钟，上架最近三天需要秒杀的商品
+         * ---当天：00：00：00————23：59：59
+         * ---明天：00：00：00————23：59：59
+         * ---后天：00：00：00————23：59：59
+         */
+        @Scheduled(cron = "0 * * * * ?")
+        public void uploadSeckillSkuLatestThreeDays() {
+            //TODO:幂等性问题处理
+            //分布式锁
+            RLock lock = redissonClient.getLock(upload_lock);
+            lock.lock(10, TimeUnit.SECONDS);
+            try {
+                //1、重复上架无需处理
+                log.info("上架秒杀商品信息。。。");
+                seckillService.uploadSeckillSkuLatestThreeDays();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+    ---------------------------详细调用方法实现——开始----------------
+    package com.pigskin.mall.seckill.service.impl;
+
+    import com.alibaba.fastjson.JSON;
+    import com.alibaba.fastjson.TypeReference;
+    import com.pigskin.common.utils.R;
+    import com.pigskin.mall.seckill.feign.CouponFeignService;
+    import com.pigskin.mall.seckill.feign.ProductFeignService;
+    import com.pigskin.mall.seckill.service.SeckillService;
+    import com.pigskin.mall.seckill.to.SeckillSkuRedisTo;
+    import com.pigskin.mall.seckill.vo.SeckillSessionWithSkuVo;
+    import com.pigskin.mall.seckill.vo.SeckillSkuVo;
+    import com.pigskin.mall.seckill.vo.SkuInfoVo;
+    import lombok.extern.slf4j.Slf4j;
+    import org.apache.ibatis.logging.Log;
+    import org.redisson.api.RSemaphore;
+    import org.redisson.api.RedissonClient;
+    import org.springframework.beans.BeanUtils;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.data.redis.core.BoundHashOperations;
+    import org.springframework.data.redis.core.StringRedisTemplate;
+    import org.springframework.stereotype.Service;
+
+    import java.util.*;
+    import java.util.regex.Pattern;
+    import java.util.stream.Collectors;
+
+    /**
+     * @author pigskin
+     * @date 2022年02月02日 4:41 下午
+     */
+    @Slf4j
+    @Service
+    public class SeckillServiceImpl implements SeckillService {
+        final CouponFeignService couponFeignService;
+        final ProductFeignService productFeignService;
+        final StringRedisTemplate redisTemplate;
+        final RedissonClient redissonClient;
+
+        /**
+         * redis缓存秒杀活动键前缀
+         */
+        private final String SESSIONS_CACHE_PREFIX = "seckill:sessions:";
+        /**
+         * redis缓存秒杀商品键前缀
+         */
+        private final String SKUKILL_CACHE_PREFIX = "seckill:skus";
+        /**
+         * 秒杀商品的分布式信号量前缀
+         */
+        private final String SKUKILL_STOCK_SEMAPHORE_PREFIX = "seckill:stock:";//+商品随机码
+
+        public SeckillServiceImpl(CouponFeignService couponFeignService, StringRedisTemplate redisTemplate, ProductFeignService productFeignService, RedissonClient redissonClient) {
+            this.couponFeignService = couponFeignService;
+            this.redisTemplate = redisTemplate;
+            this.productFeignService = productFeignService;
+            this.redissonClient = redissonClient;
+        }
+
+
+        @Override
+        public void uploadSeckillSkuLatestThreeDays() {
+            //1、数据库中扫描需要参与秒杀的活动
+            R r = couponFeignService.getLatesThreeDaySession();
+            if (r.getCode() == 0) {
+                List<SeckillSessionWithSkuVo> data = r.getData(new TypeReference<List<SeckillSessionWithSkuVo>>() {
+                });
+                if (data != null) {
+                    //2、缓存到Redis中
+                    /*1、缓存活动信息*/
+                    saveSessionInfos(data);
+                    /*2、缓存活动相关的关联商品信息*/
+                    saveSessionSkuInfos(data);
+                }
+            }
+        }
+
+        /**
+         * 缓存活动相关信息
+         *
+         * @param data
+         */
+        private void saveSessionInfos(List<SeckillSessionWithSkuVo> data) {
+            data.forEach(seckillSessionWithSkuVo -> {
+                long startTime = seckillSessionWithSkuVo.getStartTime().getTime();
+                long endTime = seckillSessionWithSkuVo.getEndTime().getTime();
+                String key = SESSIONS_CACHE_PREFIX + startTime + "_" + endTime;
+                /*缓存活动信息*/
+                //判断是否已经有了
+                if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+                    List<String> collect = seckillSessionWithSkuVo.getRelationEntities().stream().map(seckillSkuVo -> seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString()).collect(Collectors.toList());
+                    redisTemplate.opsForList().leftPushAll(key, collect);
+                    log.info("发布秒杀场次：" + key);
+                }
+            });
+        }
+
+        /**
+         * TODO:分布式信号量————缓存活动相关商品信息
+         *
+         * @param data
+         */
+        private void saveSessionSkuInfos(List<SeckillSessionWithSkuVo> data) {
+            data.stream().forEach(seckillSessionWithSkuVo -> {
+                BoundHashOperations<String, Object, Object> operations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                seckillSessionWithSkuVo.getRelationEntities().stream().forEach(seckillSkuVo -> {
+                    if (Boolean.FALSE.equals(operations.hasKey(seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString()))) {
+                        //缓存商品信息
+                        SeckillSkuRedisTo seckillSkuRedisTo = new SeckillSkuRedisTo();
+                        //1、sku的基本数据
+                        R r = productFeignService.getSkuInfo(seckillSkuVo.getSkuId());
+                        if (r.getCode() == 0) {
+                            SkuInfoVo skuInfo = r.getData("skuInfo", new TypeReference<SkuInfoVo>() {
+                            });
+                            seckillSkuRedisTo.setSkuInfoVo(skuInfo);
+                        }
+                        //2、sku的秒杀信息
+                        BeanUtils.copyProperties(seckillSkuVo, seckillSkuRedisTo);
+                        //3、设置上当前商品的秒杀时间信息
+                        seckillSkuRedisTo.setStartTime(seckillSessionWithSkuVo.getStartTime().getTime());//当前活动的开始时间
+                        seckillSkuRedisTo.setEndTime(seckillSessionWithSkuVo.getEndTime().getTime());//当前活动的结束时间
+                        //4、商品随机码————防止被恶意攻击
+                        String token = UUID.randomUUID().toString().replace("-", "");
+                        seckillSkuRedisTo.setRandomCode(token);
+                        String jsonString = JSON.toJSONString(seckillSkuRedisTo);
+                        operations.put(seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString(), jsonString);
+                        log.info("上架秒杀商品：" + seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString());
+                        //5、使用库存作为分布式的信号量————限流
+                        RSemaphore semaphore = redissonClient.getSemaphore(SKUKILL_STOCK_SEMAPHORE_PREFIX + token);
+                        //商品参与秒杀的件数作为信号量
+                        semaphore.trySetPermits(seckillSkuVo.getSeckillCount());
+                        log.info("上架秒杀商品：" + seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString() + "——秒杀库存量为：" + seckillSkuVo.getSeckillCount());
+                    }
+                });
+            });
+        }
+    }
+    ---------------------------详细调用方法实现——结束----------------
+
+-- 2、获取当前秒杀商品信息
+	1)业务实现代码如下:
+	  package com.pigskin.mall.seckill.controller;
+
+    import com.pigskin.common.utils.R;
+    import com.pigskin.mall.seckill.service.SeckillService;
+    import com.pigskin.mall.seckill.to.SeckillSkuRedisTo;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import java.util.List;
+
+    /**
+     * @author pigskin
+     * @date 2022年02月04日 5:43 下午
+     */
+    @RestController
+    public class SeckillController {
+
+        @Autowired
+        SeckillService seckillService;
+
+        /**
+         * 返回当前时间可以参与秒杀的商品信息
+         *
+         * @return
+         */
+        @GetMapping("/currentSeckillSkus")
+        public R getCurrentSeckillSkus() {
+            List<SeckillSkuRedisTo> skuRedisToList = seckillService.getCurrentSeckillSkus();
+            return R.ok().setData(skuRedisToList);
+        }
+
+        /**
+         * 获取指定商品秒杀信息
+         *
+         * @return
+         */
+        @GetMapping("/sku/seckill/{skuId}")
+        public R getSkuSeckillInfo(@PathVariable("skuId") Long skuId) {
+            SeckillSkuRedisTo to = seckillService.getSkuSeckillInfo(skuId);
+            return R.ok().setData(to);
+        }
+    }
+    ---------------------------详细调用方法实现——开始----------------
+     /**
+     * 获取当前时间参与秒杀的商品信息
+     *
+     * @return
+     */
+    @Override
+    public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+        /*1、确定当前时间属于那个秒杀场次*/
+        long time = new Date().getTime();
+        System.out.println("time:" + time);
+        //获取所有场次信息
+        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+        for (String key : keys) {
+            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+            String[] s = replace.split("_");
+            long start = Long.parseLong(s[0]);
+            long end = Long.parseLong(s[1]);
+            if (time >= start && time <= end) {
+                System.out.println("key:" + key);
+                /*2、获取这个场次需要的所有商品信息*/
+                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                List<String> list = hashOperations.multiGet(range);
+                if (list != null) {
+                    return list.stream().map(item -> {
+//                        seckillSkuRedisTo.setRandomCode("");
+                        return JSON.parseObject(item.toString(), SeckillSkuRedisTo.class);
+                    }).collect(Collectors.toList());
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取指定的秒杀商品的秒杀信息
+     *
+     * @param skuId 指定商品ID
+     * @return
+     */
+    @Override
+    public SeckillSkuRedisTo getSkuSeckillInfo(Long skuId) {
+        /*1、找到所有需要参与秒杀的商品的key*/
+        BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        Set<String> keys = hashOperations.keys();
+        if (keys != null && keys.size() > 0) {
+            String regx = "\\d_" + skuId;
+            for (String key : keys) {
+                if (Pattern.matches(regx, key)) {
+                    String s = hashOperations.get(key);
+                    SeckillSkuRedisTo seckillSkuRedisTo = JSON.parseObject(s, SeckillSkuRedisTo.class);
+                    if (seckillSkuRedisTo != null) {//随机码处理
+                        long currentTime = new Date().getTime();
+                        if (!(currentTime >= seckillSkuRedisTo.getStartTime() && currentTime <= seckillSkuRedisTo.getEndTime())) {
+                            seckillSkuRedisTo.setRandomCode(null);
+                        }
+                        return seckillSkuRedisTo;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    ---------------------------详细调用方法实现——结束----------------
+
+    ---------------------------前端获取展示——开始----------------
+		/*设置点击秒杀商品跳转方法*/
+    function to_href(skuId) {
+        location.href = "http://item.pigskinmall.com/" + skuId + ".html";
+    }
+
+    /*获取当前场次秒杀商品信息*/
+    $.get("http://seckill.pigskinmall.com/currentSeckillSkus", function (response) {
+        if (response.data.length > 0) {
+            response.data.forEach(function (item) {
+                $("<li onclick='to_href(" + item.skuId + ")'></li>")
+                    .append($("<img style='width: 130px;height:130px' src='" + item.skuInfoVo.skuDefaultImg + "'/>"))
+                    .append($("<p>" + item.skuInfoVo.skuTitle + "</p>"))
+                    .append($("<span> ¥ " + item.seckillPrice + "</span>"))
+                    .append($("<s style='padding-left: 10px'>¥ " + item.skuInfoVo.price + "</s>"))
+                    /*TODO:将结果追加到指定id选择器容器<ul>中*/
+                    .appendTo("#seckillSkuContent")
+            })
+
+            // <li id="seckillSkuContent">
+            //     <img src="/static/index/img/section_second_list_img1.jpg" alt="">
+            //         <p>花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千克） （日本官方直采） 花王 (Merries) 妙而舒 纸尿裤 大号 L54片
+            //             尿不湿（9-14千</p>
+            //         <span>¥83.9</span><s>¥99.9</s>
+            // </li>
+        }
+    })
+    ---------------------------前端获取展示——结束----------------
+
+# 秒杀流程
+-- 秒杀流程图一————和其它服务相互融合
+	1、优点————加入购物车,可以使流量分散
+	2、缺点————流量会级联映射到其他系统
+```
+
+<img src="image/img2_3_24_1_2.png" style="zoom:50%;" />
+
+```markdown
+-- 秒杀流程图二————独立服务,处理秒杀业务——————应对超高并发流量使用
+	1、优点————截止到给用户返回前端页面,没有操作过数据库,以及远端调用,处理非常快,单纯的秒杀崩溃,不会影响整体
+	2、缺点————抢购成功后,订单服务出现异常的情况下,消息队列的消息一直未被消费,然后订单数据一直准备不好,就会一直无法支付
+```
+
+<img src="image/img2_3_24_1_3.png" style="zoom:50%;" />
+
+```markdown
+-- 秒杀消息队列流程图,如下所示
+```
+
+<img src="image/img2_3_24_1_4.png" style="zoom:50%;" />
+
+```markdown
+-- 秒杀服务业务代码实现————基于-秒杀流程图二
+	1、创建用于削峰的队列,并将队列绑定到订单交换器
+		 /**
+     * 创建秒杀服务队列————进行削峰
+     *
+     * @return
+     */
+    @Bean
+    public Queue orderSeckillOrderQueue() {
+        return new Queue("order.seckill.order.queue", true, false, false);
+    }
+
+    /**
+     * 创建秒杀服务消息队列与订单服务交换机的绑定
+     *
+     * @return
+     */
+    @Bean
+    public Binding orderSeckillOrderBinding() {
+        return new Binding("order.seckill.order.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "order.seckill.order",
+                null);
+    }
+	2、创建用于接收处理秒杀操作的请求控制器
+		/**
+     * 商品秒杀请求
+     *
+     * @param killId
+     * @param key
+     * @param num
+     * @return
+     */
+    @GetMapping("/kill")
+    public String secKill(@RequestParam("killId") String killId,
+                          @RequestParam("key") String key,
+                          @RequestParam("num") Integer num, Model model) {
+        /*1、是否登陆判断，通过拦截器进行实现*/
+        String orderSn = seckillService.kill(killId, key, num);
+        model.addAttribute("orderSn", orderSn);
+        return "success";
+    }
+    ---------------------------详细调用--开始--------------------------------------------
+    /**
+     * 秒杀请求
+     * TODO:上架秒杀商品的时候，每个数据都应该有过期时间
+     * TODO:秒杀后续操作，简化了收货地址的计算
+     *
+     * @param killId
+     * @param key
+     * @param num
+     * @return
+     */
+    @Override
+    public String kill(String killId, String key, Integer num) {
+        /*获取当前登陆用户信息*/
+        MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+        /*1、获取当前秒杀商品的详细信息*/
+        BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        String s = hashOperations.get(killId);
+        if (StringUtils.isEmpty(s)) {
+            return null;
+        }
+        SeckillSkuRedisTo seckillSkuRedisTo = JSON.parseObject(s, SeckillSkuRedisTo.class);
+        /*2、校验合法性*/
+        Long startTime = seckillSkuRedisTo.getStartTime();
+        Long endTime = seckillSkuRedisTo.getEndTime();
+        long currentTime = new Date().getTime();
+        long ttl = endTime - currentTime;
+        /*校验随机码和商品ID*/
+        String randomCode = seckillSkuRedisTo.getRandomCode();
+        String skuSeckillId = seckillSkuRedisTo.getPromotionSessionId().toString() + "_" + seckillSkuRedisTo.getSkuId();
+        /*验证购物数量是否合理*/
+        Integer seckillLimit = seckillSkuRedisTo.getSeckillLimit();
+        /*判断秒杀商品是否在秒杀时间内*/
+        if (currentTime >= startTime && currentTime <= endTime
+                && randomCode.equals(key) && skuSeckillId.equals(killId)
+                && num <= seckillLimit) {
+            /*验证这个人是否已经购买过。幂等性；如果只要秒杀成功，就去占位,用户ID_场次ID_商品ID*/
+            String redisKey = memberResponseVo.getId() + "_" + skuSeckillId;
+            /*自动过期时间————毫秒*/
+            Boolean aBoolean = redisTemplate.opsForValue().setIfAbsent(redisKey, num.toString(), ttl, TimeUnit.MILLISECONDS);
+            if (aBoolean) {//占位成功————第一次抢购
+                /*创建信号量操作---根据抢购数量进行信号量改变操作*/
+                RSemaphore semaphore = redissonClient.getSemaphore(SKUKILL_STOCK_SEMAPHORE_PREFIX + randomCode);
+                /*阻塞等待——————不适用*/
+                //semaphore.acquire(num);
+                /*非阻塞等待————快速尝试*/
+                try {
+                    boolean b = semaphore.tryAcquire(num, 100, TimeUnit.MILLISECONDS);
+                    if (b) {
+                        /*秒杀成功,快速下单，生成并返回一个订单号*/
+                        String orderSn = IdWorker.getTimeId();
+                        SeckillOrderTo seckillOrderTo = new SeckillOrderTo();
+                        seckillOrderTo.setOrderSn(orderSn);
+                        seckillOrderTo.setMemberId(memberResponseVo.getId());
+                        seckillOrderTo.setSkuId(seckillOrderTo.getSkuId());
+                        seckillOrderTo.setNum(num);
+                        seckillOrderTo.setPromotionSessionId(seckillOrderTo.getPromotionSessionId());
+                        seckillOrderTo.setSeckillPrice(seckillSkuRedisTo.getSeckillPrice());
+                        /*给消息队列发送消息*/
+                        rabbitTemplate.convertAndSend(exchange, routeKey, seckillOrderTo);
+                        return orderSn;
+                    }
+                } catch (InterruptedException e) {
+                    /*秒杀失败*/
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+    ---------------------------详细调用--结束--------------------------------------------
+	3、订单服务创建监听器进行队列的监听操作
+		package com.pigskin.mall.order.listener;
+
+    import com.pigskin.common.to.SeckillOrderTo;
+    import com.pigskin.mall.order.service.OrderService;
+    import com.rabbitmq.client.Channel;
+    import lombok.extern.slf4j.Slf4j;
+    import org.springframework.amqp.core.Message;
+    import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+    import org.springframework.amqp.rabbit.annotation.RabbitListener;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Component;
+
+    import javax.servlet.http.HttpServletRequest;
+    import java.io.IOException;
+
+    /**
+     * 秒杀服务订单监听器
+     *
+     * @author pigskin
+     * @date 2022年02月07日 2:44 下午
+     */
+
+    @Slf4j
+    @Component
+    @RabbitListener(queues = "order.seckill.order.queue")
+    public class OrderSeckillLinstener {
+        @Autowired
+        private OrderService orderService;
+
+        /**
+         * 进行秒杀订单队列的监听消费
+         *
+         * @param seckillOrderTo
+         * @param channel
+         * @param message
+         * @throws IOException
+         */
+        @RabbitHandler
+        public void listener(SeckillOrderTo seckillOrderTo, Channel channel, Message message) throws IOException {
+            try {
+                log.info("准备创建秒杀单的详细信息。。。");
+                orderService.createSeckillOrder(seckillOrderTo);
+                /*TODO:手动调用支付宝收单功能*/
+                //alipayTradeRefund(order.getOrderSn(), false, order.getPayAmount().toString(), "支付宝支付失败", "");
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            } catch (Exception e) {//消息拒绝，重新回到队列
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+            }
+        }
+    }
+    ---------------------------详细调用--开始--------------------------------------------
+ 		@Override
+    @Transactional
+    public void createSeckillOrder(SeckillOrderTo seckillOrderTo) {
+        //TODO:保存订单信息
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(seckillOrderTo.getOrderSn());
+        orderEntity.setMemberId(seckillOrderTo.getMemberId());
+        orderEntity.setStatus(OrderStatusEnum.CREATE_NEM.getCode());
+        orderEntity.setPayAmount(seckillOrderTo.getSeckillPrice().multiply(new BigDecimal(seckillOrderTo.getNum().toString())));
+        //收货地址可以获取默认地址
+        this.save(orderEntity);
+        //TODO:保存订单项信息
+        OrderItemEntity orderItemEntity = new OrderItemEntity();
+        orderItemEntity.setOrderSn(seckillOrderTo.getOrderSn());
+        orderItemEntity.setRealAmount(orderEntity.getPayAmount());
+        orderItemEntity.setSkuId(seckillOrderTo.getSkuId());
+        orderItemEntity.setSkuQuantity(seckillOrderTo.getNum());
+        /*其它可以远程获取*/
+        /*TODO:SPU以及SKU信息*/
+        //        R r = productFeignService.getSpuInfoBySkuId(seckillOrderTo.getSkuId());
+        //        if (r.getCode() == 0) {
+        //            SpuInfoVo spuInfoVo = r.getData(new TypeReference<SpuInfoVo>() {
+        //            });
+        ////            orderItemEntity.setSpuPic(t);
+        //            orderItemEntity.setSpuName(spuInfoVo.getSpuName());
+        ////            orderItemEntity.setSpuBrand(spuInfoVo.getBrandId());
+        //            orderItemEntity.setSpuId(spuInfoVo.getId());
+        //        }
+        orderItemService.save(orderItemEntity);
+    }
+    ---------------------------详细调用--结束--------------------------------------------
+
+# 秒杀(高并发)系统关注的问题
+```
+
+<img src="image/img2_3_24_1_5.png" style="zoom:50%;" />
+
+<img src="image/img2_3_24_1_6.png" style="zoom:50%;" />
+
+```markdown
+# 限流————详见——2、Java开发之后端技术-35、限流
+```
+
+## 25、解决Spring定时任务阻塞问题
+
+```markdown
+# 方式一————对业务代码进行异步编排
+    CompletableFuture.runAsync(() -> {
+    	xxxService.hello();
+    }, executor);
+
+# 方式二————支持定时任务线程池设定————不一定有效
+	#通过配置文件配置线程池个数
+	spring.task.scheduling.pool.size=5
+	spring.task.execution.pool.max-size=50
+
+# 方式二————让定时任务异步执行————使用异步+定时任务来完成定时任务且不阻塞
+	1、类上使用注解@EnableAsync//开启异步任务功能
+	2、方法使用注解@Async//给希望异步执行的方法添加该注解
+	3、对应自动配置类TaskExecutionAutoConfiguration
 ```
 
 
