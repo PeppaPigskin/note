@@ -11,6 +11,8 @@
 	ipconfig
 # 终端连接虚拟机
  	ssh [账户名]@[服务地址]
+# Mac显示“您没有权限来打开应用 eclipse”的问题
+	codesign -f -s - --deep 拖动软件app到终端
 ```
 
 ## 2、linux常用命令
