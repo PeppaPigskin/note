@@ -11403,7 +11403,7 @@ error => {   
         public static String merchant_private_key = "";
 
       // 4、支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
-        public static String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI2GXnGEDV+ElNorCO2BVFus8z1HN+uUpTtEFL/Qnb/2RpcxrOXQDEolKjZeb3W9yy/2AOaRumf3kdo4epXaK1AakVXkEC2UmmgxWlP8O/oPXHEc0Kmk3A48LNPEvF1RXPZE/T0qsSs5759P+PMLySMxC/WiTHtvyqJBjRvToUfxwYIqKkNsqVTcz3xW7q/O0e7dL+g2U4pjpyQk3ahysaQYlf7Wy3hSaWvNBIkJ78MzfIShuXffKigJzeXid2lkI7SQ+l/65HXFBqdfnLFlINEENlvmYJG+hmo3JE96wCGUQO3/QMUFE1IfPUdmPpdPDZS1pDfw11MBJj9JrvTLaQIDAQAB";
+        public static String alipay_public_key = "";
 
       // 5、服务器异步通知页面路径————支付宝支付成功,每隔几秒发送一条支付成功的消息,方便后台进行后续业务的操作  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
       public static String notify_url = "http://localhost:8080/alipay.trade.page.pay-JAVA-UTF-8/notify_url.jsp";
@@ -11506,6 +11506,8 @@ error => {   
 	alipay.gatewayUrl=https://openapi.alipaydev.com/gateway.do
 	##配置日期的格式化方式————否则会导致支付宝异步通知时转换日期格式失败
 	spring.mvc.date-format=yyyy-MM-dd HH:mm:ss
+	#支付宝支付超时时间
+	alipay.timeOut=1m
 
 -- 3、添加数据传输对象
 	1)支付异步响应传输对象
@@ -11664,6 +11666,15 @@ error => {   
         // 支付宝网关； https://openapi.alipaydev.com/gateway.do
         @Value("${alipay.gatewayUrl}")
         private String gatewayUrl;
+        
+        /**
+         * 支付宝支付超时时间设定
+         * 支付超时参数（相对超时参数）：在订单创建后开始生效，超时未支付订单将关闭。
+         * 取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天
+         * （在“1c-当天”的情况下，无论交易何时创建，都将在 0 点关闭）。
+         */
+        @Value("${alipay.timeOut}")
+        private String timeOut;
 
         public String pay(PayVo vo) throws AlipayApiException {
 
@@ -11691,8 +11702,9 @@ error => {   
                     + "\"total_amount\":\"" + total_amount + "\","
                     + "\"subject\":\"" + subject + "\","
                     + "\"body\":\"" + body + "\","
+                    /*TODO：设置支付超时时间*/
+                    + "\"timeout_express\":\"" + timeOut + "\","
                     + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
-
             String result = alipayClient.pageExecute(alipayRequest).getBody();
 
             //会收到支付宝的响应，响应的是一个页面，只要浏览器显示这个页面，就会自动来到支付宝的收银台页面
@@ -12050,6 +12062,146 @@ error => {   
 ```
 
 <img src="image/img2_2_10_1_2.png" style="zoom:50%;" />
+
+```markdown
+	10、收单操作相关问题及解决方式
+		1)订单在支付页,不支付,一直刷新,订单过期了オ支付,订单状态改为已支付了,但是库存解锁了
+			-- 解决方案————使用支付宝自动收单功能解決。只要一段时间不支付,就不能支付了
+			-- 实现步骤————支付模版工具类AlipayTemplate类中设定————如果超时未支付再去支付就会跳转到支付失败页面
+       /*TODO：设置支付超时时间*/
+       /*支付超时参数（相对超时参数）：在订单创建后开始生效，超时未支付订单将关闭。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（在“1c-当天”的情况下，无论交易何时创建，都将在 0 点关闭）。*/
+       String timeOut = "1m";//此处设定一分钟超时
+
+       alipayRequest.setBizContent("{\"out_trade_no\":\"" + out_trade_no + "\","
+        + "\"total_amount\":\"" + total_amount + "\","
+        + "\"subject\":\"" + subject + "\","
+        + "\"body\":\"" + body + "\","
+        + "\"timeout_express\":\"" + timeOut + "\","
+        + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+		2)由于时延等问题。订单解锁完成,正在解锁库存的时候,异步通知才到
+			-- 解决方案————订单解锁,手动调用收单
+			-- 实现步骤————订单解锁监听器OrderCloseListener类中手动调用支付宝收单功能
+				package com.pigskin.mall.order.listener;
+
+        import com.alipay.api.AlipayApiException;
+        import com.alipay.api.AlipayClient;
+        import com.alipay.api.DefaultAlipayClient;
+        import com.alipay.api.request.AlipayTradeRefundRequest;
+        import com.pigskin.mall.order.entity.OrderEntity;
+        import com.pigskin.mall.order.service.OrderService;
+        import com.pigskin.mall.order.utils.AlipayTemplate;
+        import com.rabbitmq.client.Channel;
+        import org.springframework.amqp.core.Message;
+        import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+        import org.springframework.amqp.rabbit.annotation.RabbitListener;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Service;
+        import org.springframework.util.StringUtils;
+
+        import javax.servlet.http.HttpServletRequest;
+        import java.io.IOException;
+        import java.io.UnsupportedEncodingException;
+        import java.util.Date;
+
+        /**
+         * 订单关单监听器
+         *
+         * @author pigskin
+         * @date 2022年01月21日 11:28 上午
+         */
+        @Service
+        @RabbitListener(queues = "order.release.order.queue")//设置监听的队列
+        public class OrderCloseListener {
+
+            @Autowired
+            OrderService orderService;
+            /**
+             * 支付宝支付模版
+             */
+            @Autowired
+            AlipayTemplate alipayTemplate;
+
+            /**
+             * 进行订单释放消息队列的监听
+             *
+             * @param order
+             */
+
+            @RabbitHandler
+            public void listener(OrderEntity order, Channel channel, Message message, HttpServletRequest request) throws IOException {
+                System.out.println("收到过期的订单信息：创建时间为————" + order.getModifyTime() + "，" + new Date() + "准备关闭订单————" + order.getOrderSn());
+                try {
+                    orderService.closeOrder(order);
+                    /*TODO:手动调用支付宝收单功能*/
+                    alipayTradeRefund(order.getOrderSn(), false, order.getPayAmount().toString(), "支付宝支付失败", "");
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                } catch (Exception e) {//消息拒绝，重新回到队列
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
+
+                }
+            }
+
+            /**
+             * 支付宝收单功能
+             *
+             * @param outTradeNoOrTradeNo 商户订单号与支付宝交易号请二选一设置
+             * @param isTradeNo           是否为支付宝交易号（ture————outTradeNoOrTradeNo为支付宝交易号，否则为商户订单号）
+             * @param refund_amount       需要退款的金额，该金额不能大于订单金额，必填
+             * @param refund_reason       退款的原因说明
+             * @param out_request_no      标识一次退款请求，同一笔交易多次退款需要保证唯一，如需部分退款，则此参数必传
+             * @throws UnsupportedEncodingException
+             * @throws AlipayApiException
+             */
+            private void alipayTradeRefund(String outTradeNoOrTradeNo, Boolean isTradeNo, String refund_amount, String refund_reason, String out_request_no) throws UnsupportedEncodingException, AlipayApiException {
+                //获得初始化的AlipayClient
+                AlipayClient alipayClient = new DefaultAlipayClient(alipayTemplate.getGatewayUrl(),
+                        alipayTemplate.getApp_id(),
+                        alipayTemplate.getMerchant_private_key(),
+                        "json",
+                        alipayTemplate.getCharset(),
+                        alipayTemplate.getAlipay_public_key(),
+                        alipayTemplate.getSign_type());
+                if (StringUtils.isEmpty(outTradeNoOrTradeNo))
+                    throw new RuntimeException("未设置商户订单号或者支付宝交易号");
+                //设置请求参数
+                AlipayTradeRefundRequest alipayRequest = new AlipayTradeRefundRequest();
+                //商户订单号与支付宝交易号请二选一设置
+                if (isTradeNo) {
+                    alipayRequest.setBizContent("{\"trade_no\":\"" + outTradeNoOrTradeNo + "\","
+                            + "\"refund_amount\":\"" + refund_amount + "\","
+                            + "\"refund_reason\":\"" + refund_reason + "\","
+                            + "\"out_request_no\":\"" + out_request_no + "\"}");
+                } else {
+                    alipayRequest.setBizContent("{\"out_trade_no\":\"" + outTradeNoOrTradeNo + "\","
+                            + "\"refund_amount\":\"" + refund_amount + "\","
+                            + "\"refund_reason\":\"" + refund_reason + "\","
+                            + "\"out_request_no\":\"" + out_request_no + "\"}");
+                }
+                //商户订单号，商户网站订单系统中唯一订单号
+                // String out_trade_no = new String(request.getParameter("WIDTRout_trade_no").getBytes("ISO-8859-1"), "UTF-8");
+                //支付宝交易号
+                //String trade_no = new String(request.getParameter("WIDTRtrade_no").getBytes("ISO-8859-1"), "UTF-8");
+
+                //需要退款的金额，该金额不能大于订单金额，必填
+                //String refund_amount = new String(request.getParameter("WIDTRrefund_amount").getBytes("ISO-8859-1"), "UTF-8");
+                //退款的原因说明
+                //String refund_reason = new String(request.getParameter("WIDTRrefund_reason").getBytes("ISO-8859-1"), "UTF-8");
+                //标识一次退款请求，同一笔交易多次退款需要保证唯一，如需部分退款，则此参数必传
+                //String out_request_no = new String(request.getParameter("WIDTRout_request_no").getBytes("ISO-8859-1"), "UTF-8");
+
+                //请求
+                String result = alipayClient.execute(alipayRequest).getBody();
+                //输出
+                System.out.println(result);
+            }
+        }			
+		3)网络阻塞问题,订单支付成功的异步通知一直不到达
+			查询订单列表时,ajax获取当前未支付的订单状态,查询订单状态时,再获取一下支付宝此订单的状态
+		4)其他各种问题
+			每天晚上闲时下载支付宝对账单进行对账
+```
+
+
 
 [附件2](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
