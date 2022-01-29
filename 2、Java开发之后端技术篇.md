@@ -212,39 +212,190 @@ return interceptor;
 
 ```markdown
 # 说明
-PageHelper类似
+	PageHelper类似
+
+# 核心依赖
+	<!--        mybatis plus-->
+  <dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-boot-starter</artifactId>
+    <version>3.2.0</version>
+  </dependency>
 
 # 实现步骤
 -- 1、配置分页插件
-  /**    
-  * 分页插件
-  * 
-  * @return 
-  */ 
-  @Bean 
-  public PaginationInterceptor paginationInterceptor() {
-    return new PaginationInterceptor();
-  }
-  
+    /**    
+    * 分页插件
+    * 
+    * @return 
+    */ 
+    @Bean 
+    public PaginationInterceptor paginationInterceptor() {
+    	PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+      // 设置请求的页面大于最大页后操作， true调回到首页，false 继续请求  默认false
+      paginationInterceptor.setOverflow(false);
+      // 设置最大单页限制数量，默认 500 条，-1 不受限制
+      paginationInterceptor.setLimit(1000);
+      // 开启 count 的 join 优化,只针对部分 left join
+      // paginationInterceptor.setCountSqlParser(new JsqlParserCountOptimize(true));
+      return paginationInterceptor;
+    }
+
 -- 2、编写分页代码
-  /**     
-  * 分页查询    
-  */
-  @Test
-  void testPageSelect() {  
-    //1、创建page对象(分页当前页，每页条数)  
-    Page<User> page = new Page<>(2, 2);  
-    //2、调用mp分页查询方法(分页对象，条件)，会将分页所有的对象封装到page对象中 
-    userMapper.selectPage(page, null);  
-    //3、通过page对象获取分页数据  
-    System.out.println("当前页：" + page.getCurrent());  
-    System.out.println("每页数据list集合：" + page.getRecords()); 
-    System.out.println("每页显示记录数：" + page.getSize());  
-    System.out.println("总记录数：" + page.getTotal()); 
-    System.out.println("总页数：" + page.getPages());  
-    System.out.println("是否有下一页：" + page.hasNext()); 
-    System.out.println("是否有上一页：" + page.hasPrevious()); 
-  }
+    /**     
+    * 分页查询    
+    */
+    @Test
+    void testPageSelect() {  
+      //1、创建page对象(分页当前页，每页条数)  
+      Page<User> page = new Page<>(2, 2);  
+      //2、调用mp分页查询方法(分页对象，条件)，会将分页所有的对象封装到page对象中 
+      userMapper.selectPage(page, null);  
+      //3、通过page对象获取分页数据  
+      System.out.println("当前页：" + page.getCurrent());  
+      System.out.println("每页数据list集合：" + page.getRecords()); 
+      System.out.println("每页显示记录数：" + page.getSize());  
+      System.out.println("总记录数：" + page.getTotal()); 
+      System.out.println("总页数：" + page.getPages());  
+      System.out.println("是否有下一页：" + page.hasNext()); 
+      System.out.println("是否有上一页：" + page.hasPrevious()); 
+    }
+
+# 进阶使用
+-- 1、设置分页查询工具类
+    package com.pigskin.common.utils;
+
+    import com.baomidou.mybatisplus.core.metadata.IPage;
+    import java.io.Serializable;
+    import java.util.List;
+
+    /**
+     * 分页工具类
+     *
+     * @author Mark sunlightcs@gmail.com
+     */
+    public class PageUtils implements Serializable {
+      private static final long serialVersionUID = 1L;
+      /**
+       * 总记录数
+       */
+      private int totalCount;
+      /**
+       * 每页记录数
+       */
+      private int pageSize;
+      /**
+       * 总页数
+       */
+      private int totalPage;
+      /**
+       * 当前页数
+       */
+      private int currPage;
+      /**
+       * 列表数据
+       */
+      private List<?> list;
+
+      /**
+       * 分页
+       * @param list        列表数据
+       * @param totalCount  总记录数
+       * @param pageSize    每页记录数
+       * @param currPage    当前页数
+       */
+      public PageUtils(List<?> list, int totalCount, int pageSize, int currPage) {
+        this.list = list;
+        this.totalCount = totalCount;
+        this.pageSize = pageSize;
+        this.currPage = currPage;
+        this.totalPage = (int)Math.ceil((double)totalCount/pageSize);
+      }
+
+      /**
+       * 分页
+       */
+      public PageUtils(IPage<?> page) {
+        this.list = page.getRecords();
+        this.totalCount = (int)page.getTotal();
+        this.pageSize = (int)page.getSize();
+        this.currPage = (int)page.getCurrent();
+        this.totalPage = (int)page.getPages();
+      }
+
+      public int getTotalCount() {
+        return totalCount;
+      }
+
+      public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+      }
+
+      public int getPageSize() {
+        return pageSize;
+      }
+
+      public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+      }
+
+      public int getTotalPage() {
+        return totalPage;
+      }
+
+      public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
+      }
+
+      public int getCurrPage() {
+        return currPage;
+      }
+
+      public void setCurrPage(int currPage) {
+        this.currPage = currPage;
+      }
+
+      public List<?> getList() {
+        return list;
+      }
+
+      public void setList(List<?> list) {
+        this.list = list;
+      }
+
+    }
+
+-- 2、分页查询使用
+		/**
+     * 分页查询当前用户订单信息数据
+     *
+     * @param params 分页查询条件
+     * @return
+     */
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        /*获取当前登陆用户*/
+        MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+
+        /*分页查询*/
+        IPage<OrderEntity> page = this.page(
+                /*设置分页查询条件*/
+                new Query<OrderEntity>().getPage(params),
+                /*设置自定义查询条件*/
+                new QueryWrapper<OrderEntity>().eq("member_id", memberResponseVo.getId()).orderByDesc("id")
+        );
+        /*对查询出的结果进一步处理*/
+        List<OrderEntity> collect = page.getRecords().stream().map(order -> {
+            /*TODO:获取订单项*/
+            List<OrderItemEntity> list = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", order.getOrderSn()));
+            order.setItemEntityList(list);
+            return order;
+        }).collect(Collectors.toList());
+        /*使用处理后的查询结果重设原始结果*/
+        page.setRecords(collect);
+        /*返沪查询结果*/
+        return new PageUtils(page);
+    }
 ```
 
 ### 9、简单查询
@@ -746,6 +897,14 @@ PageHelper类似
 	-- 2、使用cmd启动（niginx.exe所在目录，执行niginx.exe）
 	-- 3、使用命令停止运行（niginx.exe所在目录，执行niginx.exe -s stop）
 	-- 注：cmd启动的niginx.exe直接关闭不会被退出
+
+# 记录
+	-- 查看Nginx的运行日志
+		1、进入nginx的日志目录————cd nginx/logs/
+		2、查看日志信息,并查找指定的内容————cat access.log |grep 'xxx'
+	-- 查看Nginx的错误日志
+		1、进入nginx的日志目录————cd nginx/logs/
+		2、查看日志信息,并查找指定的内容————cat error.log |grep 'xxx'
 ```
 
 
@@ -11316,7 +11475,581 @@ error => {   
 	2、支付宝使用商户传送过来的明文数据进行业务操作时,通过[商户公钥]对同时传过来的加签结果进行[验签————验证签名的过程]操作,验签通过后再去使用该数据进行业务处理(验签不通过证明原始数据发生过修改,进行响应处理)
 	3、支付宝验签通过,处理业务,生成响应数据.并通过[支付宝私钥]对响应结果进行[加签————生成签名的过程]操作,将响应结果和加签结果[作为一个整体]传输给商户
 	4、商户使用支付宝传送过来的响应结果进行业务操作时,通过[支付宝公钥]对响应结果进行[验签————验证签名的过程]操作,验证正确,就证明支付宝发过来的数据是没有被中途修改过的
+
+# 电脑网站支付宝支付功能整合————https://opendocs.alipay.com/open/270
+-- 1、添加依赖
+	 <!--导入支付宝的SDK-->
+   <dependency>
+     <groupId>com.alipay.sdk</groupId>
+     <artifactId>alipay-sdk-java</artifactId>
+     <version>4.22.30.ALL</version>
+   </dependency>
+
+-- 2、配置文件添加相关配置信息
+	# 支付宝支付业务相关配置
+	## 在支付宝创建的应用的id
+	alipay.app_id=xxx
+	## 商户私钥，您的PKCS8格式RSA2私钥
+	alipay.merchant_private_key=xxx
+	## 支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
+	alipay.alipay_public_key=xxx
+	## 服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问————支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息
+	alipay.notify_url=http://xxx/alipay.trade.page.pay-JAVA-UTF-8/notify_url.jsp
+	## 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问————同步通知，支付成功，一般跳转到成功页
+	##设置成http://member.pigskinmall.com/memberOrder.html
+	alipay.return_url=http://xxx/alipay.trade.page.pay-JAVA-UTF-8/return_url.jsp
+	## 签名方式
+	alipay.sign_type=RSA2
+	## 字符编码格式
+	alipay.charset=utf-8
+	## 支付宝网关； https://openapi.alipaydev.com/gateway.do
+	alipay.gatewayUrl=https://openapi.alipaydev.com/gateway.do
+	##配置日期的格式化方式————否则会导致支付宝异步通知时转换日期格式失败
+	spring.mvc.date-format=yyyy-MM-dd HH:mm:ss
+
+-- 3、添加数据传输对象
+	1)支付异步响应传输对象
+    package com.pigskin.mall.order.vo;
+
+    import lombok.Data;
+    import lombok.ToString;
+
+    @ToString
+    @Data
+    public class PayAsyncVo {
+
+        private String gmt_create;
+        private String charset;
+        private String gmt_payment;
+        private String notify_time;
+        private String subject;
+        private String sign;
+        /**
+         * 支付者的id
+         */
+        private String buyer_id;
+        /**
+         * 订单的信息
+         */
+        private String body;
+        /**
+         * 支付金额
+         */
+        private String invoice_amount;
+        private String version;
+        /**
+         * 通知id
+         */
+        private String notify_id;
+        private String fund_bill_list;
+        /**
+         * 通知类型； trade_status_sync
+         */
+        private String notify_type;
+        /**
+         * 订单号
+         */
+        private String out_trade_no;
+        /**
+         * 支付的总额
+         */
+        private String total_amount;
+        /**
+         * 交易状态  TRADE_SUCCESS
+         */
+        private String trade_status;
+        /**
+         * 流水号
+         */
+        private String trade_no;
+        private String auth_app_id;
+        /**
+         * 商家收到的款
+         */
+        private String receipt_amount;
+        private String point_amount;
+        /**
+         * 应用id
+         */
+        private String app_id;
+        /**
+         * 最终支付的金额
+         */
+        private String buyer_pay_amount;
+        /**
+         * /签名类型
+         */
+        private String sign_type;
+        /**
+         * 商家的id
+         */
+        private String seller_id;
+
+    }
+
+	2)支付数据信息传输类
+		package com.pigskin.mall.order.vo;
+
+    import lombok.Data;
+
+    @Data
+    public class PayVo {
+        /**
+         * 商户订单号 必填
+         */
+        private String out_trade_no;
+        /**
+         * 订单名称 必填
+         */
+        private String subject;
+        /**
+         * 付款金额 必填
+         */
+        private String total_amount;
+        /**
+         * 商品描述 可空
+         */
+        private String body;
+    }
+
+-- 4、设置支付模版工具类
+    package com.pigskin.mall.order.utils;
+
+    import com.alipay.api.AlipayApiException;
+    import com.alipay.api.AlipayClient;
+    import com.alipay.api.DefaultAlipayClient;
+    import com.alipay.api.request.AlipayTradePagePayRequest;
+
+    import com.pigskin.mall.order.vo.PayVo;
+    import lombok.Data;
+    import org.springframework.beans.factory.annotation.Value;
+    import org.springframework.boot.context.properties.ConfigurationProperties;
+    import org.springframework.stereotype.Component;
+
+    import javax.annotation.Resource;
+
+    @ConfigurationProperties(prefix = "alipay")
+    @Component
+    @Data
+    public class AlipayTemplate {
+
+        //在支付宝创建的应用的id
+        @Value("${alipay.app_id}")
+        private String app_id;
+
+        // 商户私钥，您的PKCS8格式RSA2私钥
+        @Value("${alipay.merchant_private_key}")
+        private String merchant_private_key;
+        // 支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
+        @Value("${alipay.alipay_public_key}")
+        private String alipay_public_key;
+        // 服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
+        // 支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息
+        @Value("${alipay.notify_url}")
+        private String notify_url;
+
+        // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
+        //同步通知，支付成功，一般跳转到成功页
+        @Value("${alipay.return_url}")
+        private String return_url;
+
+        // 签名方式
+        @Value("${alipay.sign_type}")
+        private String sign_type;
+
+        // 字符编码格式
+        @Value("${alipay.charset}")
+        private String charset;
+
+        // 支付宝网关； https://openapi.alipaydev.com/gateway.do
+        @Value("${alipay.gatewayUrl}")
+        private String gatewayUrl;
+
+        public String pay(PayVo vo) throws AlipayApiException {
+
+            //AlipayClient alipayClient = new DefaultAlipayClient(AlipayTemplate.gatewayUrl, AlipayTemplate.app_id, AlipayTemplate.merchant_private_key, "json", AlipayTemplate.charset, AlipayTemplate.alipay_public_key, AlipayTemplate.sign_type);
+            //1、根据支付宝的配置生成一个支付客户端
+            AlipayClient alipayClient = new DefaultAlipayClient(gatewayUrl,
+                    app_id, merchant_private_key, "json",
+                    charset, alipay_public_key, sign_type);
+
+            //2、创建一个支付请求 //设置请求参数
+            AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
+            alipayRequest.setReturnUrl(return_url);
+            alipayRequest.setNotifyUrl(notify_url);
+
+            //商户订单号，商户网站订单系统中唯一订单号，必填
+            String out_trade_no = vo.getOut_trade_no();
+            //付款金额，必填
+            String total_amount = vo.getTotal_amount();
+            //订单名称，必填
+            String subject = vo.getSubject();
+            //商品描述，可空
+            String body = vo.getBody();
+
+            alipayRequest.setBizContent("{\"out_trade_no\":\"" + out_trade_no + "\","
+                    + "\"total_amount\":\"" + total_amount + "\","
+                    + "\"subject\":\"" + subject + "\","
+                    + "\"body\":\"" + body + "\","
+                    + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+
+            String result = alipayClient.pageExecute(alipayRequest).getBody();
+
+            //会收到支付宝的响应，响应的是一个页面，只要浏览器显示这个页面，就会自动来到支付宝的收银台页面
+            System.out.println("支付宝的响应：" + result);
+
+            return result;
+
+        }
+    }
+
+-- 5、使用支付宝支付的支付页面跳转设置
+	1、订单选择支付宝支付,支付宝支付页面链接设置
+		 <li>
+     		<img src="/static/order/pay/img/zhifubao.png" style="weight:auto;height:30px;" alt="">
+     		<a th:href="'http://order.pigskinmall.com/payOrder?orderSn='+${submitOrderResponse.order.orderSn}">支付宝</a>
+     </li>
+	2、支付链接请求地址控制器
+  	package com.pigskin.mall.order.web;
+
+    import com.alipay.api.AlipayApiException;
+    import com.pigskin.mall.order.service.OrderService;
+    import com.pigskin.mall.order.utils.AlipayTemplate;
+    import com.pigskin.mall.order.vo.PayVo;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestParam;
+    import org.springframework.web.bind.annotation.ResponseBody;
+
+    /**
+     * 支付业务控制器
+     *
+     * @author pigskin
+     * @date 2022年01月25日 5:36 下午
+     */
+    @Controller
+    public class PayWebController {
+        /**
+         * 支付宝支付模版工具
+         */
+        @Autowired
+        AlipayTemplate alipayTemplate;
+
+        /**
+         * 订单服务
+         */
+        @Autowired
+        OrderService orderService;
+
+        /**
+         * 1、将支付页让浏览器展示
+         * 2、支付成功后，跳转到用户呃订单列表页面
+         *
+         * @param orderSn
+         * @return
+         * @throws AlipayApiException
+         */
+        @ResponseBody
+        @GetMapping(value = "/payOrder", produces = "text/html")//produces————设置产生数据的类型（text/html或application/json）
+        public String payOrder(@RequestParam("orderSn") String orderSn) throws AlipayApiException {
+            PayVo payVo = orderService.getOrderPayInfo(orderSn);
+            String pay = alipayTemplate.pay(payVo);
+            /*返回的是一个页面，直接可以交给浏览器*/
+            System.out.println(pay);
+            return pay;
+        }
+    }
+
+    ----------------详细调用方法实现---开始-----------------------
+
+    @Override
+    public PayVo getOrderPayInfo(String orderSn) {
+        /*TODO:根据订单号，查询订单支付信息*/
+        OrderEntity orderEntity = this.geyOrderByOrderSn(orderSn);
+        if (orderEntity != null) {
+            PayVo payVo = new PayVo();
+            //订单备注
+            payVo.setBody(orderEntity.getNote());
+            //对外交易号————订单号
+            payVo.setOut_trade_no(orderEntity.getOrderSn());
+            //交易金额
+            payVo.setTotal_amount(orderEntity.getPayAmount().setScale(2, RoundingMode.UP).toString());
+            //订单标题————订单名称
+            List<OrderItemEntity> orderItemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+            OrderItemEntity orderItemEntity = orderItemEntities.get(0);
+            payVo.setSubject(orderItemEntity.getSkuName());
+            payVo.setBody(orderItemEntity.getSkuAttrsVals());
+            return payVo;
+        }
+        return null;
+    }
+    ----------------详细调用方法实现---结束-----------------------
+
+-- 6、使用支付宝沙箱账号支付成功后,跳转到订单列表————订单渲染列表忽略
+    package com.pigskin.mall.member.web;
+
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.GetMapping;
+
+    /**
+     * 会员Web控制器————想要跳转到此处,需要设置配置文件的alipay.return_url属性值为http://member.pigskinmall.com/memberOrder.html————根据个人项目情况配置)
+     *
+     * @author pigskin
+     * @date 2022年01月26日 3:27 下午
+     */
+    @Controller
+    public class MemberWebController {
+
+        @GetMapping("/memberOrder.html")
+        public String memberOrderPage(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,Model model) {
+            //TODO:获取支付宝传来的所有请求数据
+        // 1、进行签名验证，正确去修改订单状态（不推荐。也不好————如果支付成功，系统崩了或者浏览器崩溃就无法修改订单状态）
+        // 2、可以使用支付宝的异步通知————查看下一步操作
+        /*构造查询条件*/
+        HashMap<String, Object> page = new HashMap<>();
+        page.put(Constant.PAGE, pageNum.toString());
+        /*查询出当前登陆用户的所以订单列表数据*/
+        R r = orderFeignService.listWithItem(page);
+        model.addAttribute("orders", r);
+        System.out.println(JSON.toJSONString(r));
+        return "orderList";
+        }
+    }
+
+-- 7、异步通知内网穿透环境搭建————支付成功后,支付宝会不断的通知我们支付成功了,直到我们给发送success,其将不再通知————即是一种分布式事务的最大努力通知方案——————必须保证外网能访问通
+	1、修改内网穿透隧道的内网URL为————http://order.pigskinmall.com:80
+	2、外网访问外部访问地址时,因为我们安装了的内网穿透软件.内网穿透服务商就会将代理给我们的本机
+	3、电脑安装的内网穿透软件就会将所有请求发给我们设置的内网URL————order.pigskinmall.com
+	4、由于内网穿透软件并不是一个浏览器,所以其发送请求的时候不会携带Host头,就算带了也是外网的Host主机地址
+	5、由于请求头的问题无法转给订单服务,此时我们需要做精确映射,通过nginx进行精确映射配置设置如下:
+		1)nginx中有多个配置文件,那个配置起作用,就根据那个路径配置的更加精确
+			location /payed/ {
+        proxy_set_header Host order.pigskinmall.com;#精确设置主机地址
+        proxy_pass http://mall;
+    	}
+    2)server_name添加上外网地址————否则就会去本地的静态资源中找页面
+    	server_name pigskinmall.com *.pigskinmall.com 设定内网穿透的可访问外网域名地址;
+	6、配置文件设置异步通知跳转地址配置信息
+		alipay.notify_url=http://设定内网穿透的可访问外网域名地址/payed/notify
+	7、创建支付宝支付异步结果VO
+  	package com.pigskin.mall.order.vo;
+
+    import lombok.Data;
+    import lombok.ToString;
+
+    /**
+     * 支付宝支付成功异步通知参数
+     */
+    @ToString
+    @Data
+    public class PayAsyncVo {
+        /**
+         * 交易创建时间。格式为 yyyy-MM-dd HH:mm:ss
+         */
+        private String gmt_create;
+        /**
+         * 编码格式。如 utf-8、gbk、gb312等。
+         */
+        private String charset;
+        /**
+         * 交易付款时间。格式为 yyyy-MM-dd HH:mm:ss
+         */
+        private String gmt_payment;
+        /**
+         * 通知的发送时间。格式为 yyyy-MM-dd HH:mm:ss
+         */
+        private String notify_time;
+        /**
+         * 订单标题/商品标题/交易标题/订单关键字等，是请求时对应参数，会在通知中原样传回
+         */
+        private String subject;
+        /**
+         * 签名。详情参见 异步返回结果的验签
+         */
+        private String sign;
+        /**
+         * 支付者的id
+         */
+        private String buyer_id;
+        /**
+         * 订单的信息
+         */
+        private String body;
+        /**
+         * 支付金额
+         */
+        private String invoice_amount;
+        /**
+         * 调用的接口版本。固定为1.0
+         */
+        private String version;
+        /**
+         * 通知id
+         */
+        private String notify_id;
+        /**
+         * 支付金额信息。支付成功的各个渠道金额信息。详见下文 资金明细信息说明
+         */
+        private String fund_bill_list;
+        /**
+         * 通知类型； trade_status_sync
+         */
+        private String notify_type;
+        /**
+         * 订单号
+         */
+        private String out_trade_no;
+        /**
+         * 支付的总额
+         */
+        private String total_amount;
+        /**
+         * 交易状态  TRADE_SUCCESS
+         */
+        private String trade_status;
+        /**
+         * 流水号
+         */
+        private String trade_no;
+        /**
+         * 授权方的APPID。由于本接口暂不开放第三方应用授权，因此 auth_app_id=app_id
+         */
+        private String auth_app_id;
+        /**
+         * 商家收到的款
+         */
+        private String receipt_amount;
+        /**
+         * 使用集分宝支付金额，单位为人民币（元），精确到小数点后 2 位
+         */
+        private String point_amount;
+        /**
+         * 应用id
+         */
+        private String app_id;
+        /**
+         * 最终支付的金额
+         */
+        private String buyer_pay_amount;
+        /**
+         * /签名类型
+         */
+        private String sign_type;
+        /**
+         * 商家的id
+         */
+        private String seller_id;
+    }
+	8、创建接收支付宝支付成功异步通知的感知方法————异步通知结果参数说明详见————https://opendocs.alipay.com/open/270/105902
+		package com.pigskin.mall.order.listener;
+
+    import com.alipay.api.AlipayApiException;
+    import com.alipay.api.internal.util.AlipaySignature;
+    import com.pigskin.mall.order.service.OrderService;
+    import com.pigskin.mall.order.utils.AlipayTemplate;
+    import com.pigskin.mall.order.vo.PayAsyncVo;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import javax.servlet.http.HttpServletRequest;
+    import java.io.UnsupportedEncodingException;
+    import java.util.HashMap;
+    import java.util.Iterator;
+    import java.util.Map;
+
+    /**
+     * 订单支付成功监听器
+     *
+     * @author pigskin
+     * @date 2022年01月28日 4:35 下午
+     */
+    @RestController
+    public class OrderPayedListener {
+        /**
+         * 订单服务
+         */
+        @Autowired
+        OrderService orderService;
+        /**
+         * 支付宝支付模版
+         */
+        @Autowired
+        AlipayTemplate alipayTemplate;
+
+        /**
+         * 用于接收支付宝异步通知的方法
+         *
+         * @param payAsyncVo 支付宝传过来的很多请求参数，自动封装成该Vo
+         * @param request
+         * @return
+         * @throws AlipayApiException
+         * @throws UnsupportedEncodingException
+         */
+        @PostMapping("/payed/notify")
+        public String handleAliPayed(PayAsyncVo payAsyncVo, HttpServletRequest request) throws AlipayApiException, UnsupportedEncodingException {
+    //        Map<String, String[]> parameterMap = request.getParameterMap();
+    //        System.out.println("支付宝通知到位了。。。数据是：" + parameterMap);
+    //        for (String key : parameterMap.keySet()) {
+    //            String value = request.getParameter(key);
+    //            System.out.println("参数名：" + key + "——————参数值：" + value);
+    //        }
+            /*1、验签*/
+            //获取支付宝POST过来反馈信息
+            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String[]> requestParams = request.getParameterMap();
+            for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
+                String name = (String) iter.next();
+                String[] values = (String[]) requestParams.get(name);
+                String valueStr = "";
+                for (int i = 0; i < values.length; i++) {
+                    valueStr = (i == values.length - 1) ? valueStr + values[i]
+                            : valueStr + values[i] + ",";
+                }
+                //乱码解决，这段代码在出现乱码时使用
+                //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+                params.put(name, valueStr);
+            }
+            boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayTemplate.getAlipay_public_key(), alipayTemplate.getCharset(), alipayTemplate.getSign_type()); //调用SDK验证签名
+            if (!signVerified) {//签名验证失败————返回非"success"的字符串即可
+                System.out.println("签名验证失败");
+                return "error";
+            }
+            System.out.println("签名验证成功");
+            /*2、只要我们收到了支付宝给我们的异步通知，告诉我们订单支付成功。那么我们就应该返回"success",支付宝将不再通知*/
+            return orderService.handlePayResult(payAsyncVo);
+        }
+    }
+    --------------------调用相关方法详细实现---开始-----------------------------------------
+    @Override
+    public String handlePayResult(PayAsyncVo payAsyncVo) {
+        /*1、保存交易流水*/
+        PaymentInfoEntity paymentInfoEntity = new PaymentInfoEntity();
+        paymentInfoEntity.setAlipayTradeNo(payAsyncVo.getTrade_no());
+        paymentInfoEntity.setOrderSn(payAsyncVo.getOut_trade_no());
+        paymentInfoEntity.setPaymentStatus(payAsyncVo.getTrade_status());
+        paymentInfoEntity.setCallbackTime(payAsyncVo.getNotify_time());
+        /*保存的订单号和交易号数据库需要唯一*/
+        paymentInfoService.save(paymentInfoEntity);
+        /*2、判断支付宝返回的支付状态，修改订单状态信息*/
+        //WAIT_BUYER_PAY————交易创建，等待买家付款。
+        //TRADE_CLOSED————未付款交易超时关闭，或支付完成后全额退款。
+        //TRADE_SUCCESS————交易支付成功。
+        //TRADE_FINISHED————交易结束，不可退款。
+        if (payAsyncVo.getTrade_status().equals("TRADE_SUCCESS") || payAsyncVo.getTrade_status().equals("TRADE_FINISHED")) {
+            /*支付成功状态*/
+            /*获取订单号*/
+            String out_trade_no = payAsyncVo.getOut_trade_no();
+            this.baseMapper.updateOrderStatus(out_trade_no,OrderStatusEnum.PAYED.getCode());
+        }
+        return "success";
+    }
+    --------------------调用相关方法详细实现---结束-----------------------------------------
+	9、内网穿透联调图示如下
 ```
+
+<img src="image/img2_2_10_1_2.png" style="zoom:50%;" />
 
 [附件2](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
@@ -11359,6 +12092,7 @@ error => {   
 	2、建立隧道————选择购买的隧道
 	3、设置内网URL————http://127.0.0.1:8089(依照个人项目所在的内网URL进行设置)
 	4、保存之后就会分配一个用于外部访问的公共域名地址————这样就可以在任何一台网络中的电脑访问我们的项目
+
 ```
 
 
@@ -13153,6 +13887,222 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
     }
 ```
 
+## 23、当前登陆用户拦截器
+
+```markdown
+# 导入依赖————因为session使用SpringSession共享,每有一个系统SpringSession就需要配置一遍(也可以公共类统一配置一遍,其他类不需要排除即可)
+	<!--redis作为缓存依赖-->
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+    <exclusions>
+      <!--排除使用lettuce，因为其没有好的方案解决堆外内存溢出问题-->
+      <exclusion>
+        <groupId>io.lettuce</groupId>
+        <artifactId>lettuce-core</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+
+  <!--引入jedis解决lettuce导致的堆外内存溢出问题-->
+  <dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+  </dependency>
+
+  <!--整合SpringSession完成Session共享依赖-->
+  <dependency>
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-data-redis</artifactId>
+  </dependency>
+
+# 添加主要配置信息
+	# session存储类型
+  spring.session.store-type=redis
+	# redis相关配置信息
+  spring.redis.host=192.168.56.xx
+
+# 主类或者配置类通过注解启用
+	@EnableRedisHttpSession
+	public class MallMemberApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MallMemberApplication.class, args);
+    }
+	}
+# 创建Session配置类
+    package com.pigskin.mall.member.config;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+    import org.springframework.data.redis.serializer.RedisSerializer;
+    import org.springframework.session.web.http.CookieSerializer;
+    import org.springframework.session.web.http.DefaultCookieSerializer;
+
+    /**
+     * session配置类
+     */
+    @Configuration
+    public class MallSessionConfig {
+
+        /**
+         * 设置Cookie序列化器组件
+         * 解决问题（默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题）
+         *
+         * @return
+         */
+        @Bean
+        public CookieSerializer cookieSerializer() {
+
+            DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
+            /*指定Session作用域（放大）*/
+            cookieSerializer.setDomainName("pigskinmall.com");
+            cookieSerializer.setCookieName("PIGSKINSESSION");
+            return cookieSerializer;
+        }
+
+        /**
+         * 设置redis序列化器组件
+         * 解决问题（使用json序列化方式来序列化对象数据到redis中）
+         *
+         * @return
+         */
+        @Bean
+        public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+            return new GenericJackson2JsonRedisSerializer();
+        }
+    }
+
+# 创建拦截器
+    package com.pigskin.mall.member.interceptor;
+
+    import com.pigskin.common.constant.AuthConstant;
+    import com.pigskin.common.vo.MemberResponseVo;
+    import org.springframework.stereotype.Component;
+    import org.springframework.util.AntPathMatcher;
+    import org.springframework.web.servlet.HandlerInterceptor;
+
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+
+    /**
+     * 订单模块通用拦截器
+     */
+    @Component
+    public class LoginUserInterceptor implements HandlerInterceptor {
+        /**
+         * 登陆的用户线程池
+         */
+        public static ThreadLocal<MemberResponseVo> loginUser = new ThreadLocal<>();
+
+        /**
+         * 前置拦截操作
+         *
+         * @param request
+         * @param response
+         * @param handler
+         * @return
+         * @throws Exception
+         */
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            /*获取当前请求的路径*/
+            String requestURI = request.getRequestURI();
+            /*适应spring的路径匹配，判断当前路径是否为我们匹配的路径，如果是则放行*/
+            //正常用户服务要放行各种登陆请求以及注册请求
+            //boolean match = new AntPathMatcher().match("/xxx/xxx/status/**", requestURI);
+            //示例代码
+            /*放行账户登陆请求*/
+        		boolean match = new AntPathMatcher().match("/member/member/login", requestURI);
+        		/*放行社区登陆请求*/
+        		boolean match1 = new AntPathMatcher().match("/member/member/oauth2/login", requestURI);
+        		/*放行注册请求*/
+        		boolean match2 = new AntPathMatcher().match("/member/member/regist", requestURI);
+        
+            if (match || match1 || match2) {
+                return true;
+            }
+
+            /*从Session中获取当前登陆的用户*/
+            MemberResponseVo attribute = (MemberResponseVo) request.getSession().getAttribute(AuthConstant.LOGIN_USER);
+            if (attribute != null) {
+                loginUser.set(attribute);
+                return true;
+            } else {
+                request.getSession().setAttribute("msg", "请先登陆");
+                //没登陆，就去重定向到登陆页面
+                response.sendRedirect("http://auth.pigskinmall.com/login.html");
+                return false;
+            }
+        }
+    }
+
+# 创建对应服务的Web配置类————用于给控制器添加拦截器
+    package com.pigskin.mall.member.config;
+
+    import com.pigskin.mall.member.interceptor.LoginUserInterceptor;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+    import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+    /**
+     * @author pigskin
+     * @date 2022年01月26日 3:36 下午
+     */
+    @Configuration
+    public class MemberWebConfig implements WebMvcConfigurer {
+
+        /**
+         * 注入要添加的用户登陆拦截器
+         */
+        @Autowired
+        LoginUserInterceptor loginUserInterceptor;
+
+        /**
+         * 添加拦截器给指定的请求
+         *
+         * @param registry
+         */
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            /*给当前项目的所有请求添加自定义的登陆用户拦截器*/
+            registry.addInterceptor(loginUserInterceptor).addPathPatterns("/**");
+        }
+    }
+
+# 如果牵扯到远程调用或者页面直接请求时会出现丢失请求头问题
+	处理方式详见————2、Java开发之后段技术篇-3-18、Fegin远程调用丢失请求头问题
+
+# 如果是以Ajax方式直接发起请求,由于远影,导致Cookie信息不会被携带,可以使用如下方式解决
+    /*解决Ajax请求不携带Cookie问题*/
+    $.ajaxSetup({
+      crossDomain: true,
+      xhrFields: {
+      withCredentials: true
+      }
+    });
+    // 发送ajax请求获取运费信息
+    $.get("http://pigskinmall.com/api/ware/wareinfo/fare?addrId=" + addrId, function (resp) {
+      console.log(resp)
+      //设置运费现实金额
+      $("#fareEle").text(resp.data.fare)
+      /*设置寄送地址*/
+      $("#recieverAddressEle").text(resp.data.addressVo.province + " " + resp.data.addressVo.detailAddress)
+      /*设置收件人*/
+      $("#recieverEle").text(resp.data.addressVo.name)
+      /*应付总额=总金额+运费*/
+      var payTotal = [[${confirmDate.total}]] * 1 + resp.data.fare * 1
+      $("#payTotal").text(payTotal)
+      /*TODO:回填应付金额*/
+      $("#payPriceInput").val(payTotal)
+    })
+
+# 获取并使用当前登陆的用户信息
+	/*从拦截器中获取用户信息*/
+	MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+```
+
 
 
 # 四、相关注解说明
@@ -13211,6 +14161,9 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # @GetMapping("URI")
 	-- 说明————用于注解get请求的方法
   -- 使用————控制器类中的方法
+  -- 参数:
+  	1、value————设置请求映射的路径
+  	1、produces————设置产生数据的类型（text/html或application/json）
 
 # @DeleteMapping("{id}")
 	-- 说明————用于注解delete的相关请求方法
@@ -13343,6 +14296,9 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 		-- INSERT:插入填充字段
 		-- UPDATE:更新填充字段
 		-- INSERT_UPDATE:插入和更新填充字段
+	-- exist属性值分类
+		-- false:标识该属性在表中不存在
+		-- true:默认项,标识该属性在表中存在
 		
 # @TableLogic
 	-- 说明————用于逻辑删除设置
@@ -13384,6 +14340,15 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 		-- key【可选属性，可以使用SpEL标签自定义缓存的key】
 		-- allEntries【是否清空所有缓存，默认为false。如果指定为true，则方法调用后将立即清空所有的缓存】
 		-- beforeInvocation【是否在方法执行前就清空，默认为false。如果指定为true，则在方法执行前就会清空缓存】
+```
+
+## 5、其它注解
+
+```markdown
+# @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+-- 说明————属性不为空集合时才包含在JSON返回对象中
+-- 使用————属性上
+
 ```
 
 
