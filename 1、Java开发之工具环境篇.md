@@ -342,13 +342,14 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install intellij-idea
 
 # 注册激活
--- 插件激活(建议)
+-- 插件激活(建议————版本太新好像不支持,本人2021.2可以)
 	1、设置第三方插件仓库地址[https://plugins.zhile.io]
 			IntelliJ IDEA——>Preferences——>Plugins——>设置图标——>Manage Plugin Repositories...——>添加第三方插件仓库地址
 	2、下载安装IDE Eval Reset插件
 			IntelliJ IDEA——>Preferences——>Plugins——>Marketplace——>搜索[IDE Eval Reset]
 	3、设置每次开启自动重置注册信息
 			Help——>Eval Reset——>勾选[Auto reset before per restart]项
+
 -- 注册码激活
 		-- 石墨文档————https://shimo.im/docs/XvW3WpHgHdRHVXgV/read
 		-- 文档获取————https://docs.qq.com/doc/DTVh3bkxWSEpvVm5N
