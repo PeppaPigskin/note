@@ -1083,6 +1083,23 @@ brew install VisualVM
 	3、点击，finish，然后ok保存就好了
 ```
 
+## 18、Sentinel控制台环境搭建
+
+```markdown
+# 下载
+-- 方式一————下载指定版本的控制台 jar 包————https://github.com/alibaba/Sentinel/releases
+-- 方式二————下载最新版本的源码自行构建 Sentinel 控制台————https://github.com/alibaba/Sentinel/tree/master/sentinel-dashboard,并使用命令将代码打包成一个 fat jar————mvn clean package
+-- 方式三————Sentinel1.6.3版本jar包,详见————附件3
+
+# 启动————注意：启动 Sentinel 控制台需要 JDK 版本为 1.8 及以上版本
+-- 使用如下命令启动控制台:
+	java -Dserver.port=8080 -Dcsp.sentinel.dashboard.server=localhost:8080 -Dproject.name=sentinel-dashboard -jar sentinel-dashboard.jar
+-- 说明————其中 -Dserver.port=8080 用于指定 Sentinel 控制台端口为 8080。从 Sentinel 1.6.0 起，Sentinel 控制台引入基本的登录功能，默认用户名和密码都是 sentinel。可以参考 鉴权模块文档 配置用户名和密码
+-- 注意————若您的应用为 Spring Boot 或 Spring Cloud 应用，您可以通过 Spring 配置文件来指定配置，详情请参考 Spring Cloud Alibaba Sentinel 文档(https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel)
+```
+
+[附件3——sentinel-dashboard-1.6.3.jar](attachments/sentinel-dashboard-1.6.3.jar)
+
 
 
 # 5、Java——虚拟机环境搭建
