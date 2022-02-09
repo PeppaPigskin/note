@@ -1156,7 +1156,7 @@ return interceptor;
   </dependencyManagement>
 
 
-# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】——注册中心
+# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】————Nacos注册中心s
 -- 作用
 	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
 
@@ -1264,9 +1264,10 @@ return interceptor;
 			spring.cloud.nacos.config.group=DEFAULT_GROUP
 
 # 服务容错【SpringCloudAlibaba-Sentinel】————限流、降级、熔断
+	详见————2、Java开发之后段技术篇-1-38、SpringCloudAlibaba——Sentinel——限流&熔断&降级
 
 # 分布式事务解决方案【SpringCloudAlibaba-Seata】————原Fescar
-
+	详见————2、Java开发之后段技术篇-1-32、Seata—分布式事务解决方案——非高并发适用
 ```
 
 
@@ -1287,12 +1288,12 @@ return interceptor;
   Consul(原生，Go语言开发)
   Nacos内容详见【1.9————Nacos】
 
--- SpringCloudAlibaba使用Nacos作为注册中心————详见1-1-8-4、SpringCloudAlibaba相关服务组件
+-- SpringCloudAlibaba使用Nacos作为注册中心————置中心————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
 
 # 分布式配置【Spring Cloud Config（现多用Nacos）】
-	Nacos内容详见【1-1-8-4、SpringCloudAlibaba相关服务组件】
+-- SpringCloudAlibaba使用Nacos作为配置中心————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
 
-# 负载均衡[SpringCloud-Ribbon]
+# 负载均衡【SpringCloud-Ribbon】
 
 # 服务调用【Netflix Feign】
 -- Feign说明————声明式Http客户端(调用远程服务)
@@ -1307,7 +1308,6 @@ return interceptor;
 	2、SpringCloud根据@RequestBody注解,将该对象转为json对象
 	3、SpringCloud从注册中心找到该Feign服务,并根据Mapping路径给指定路径发送请求,同时将上一步转换的json对象放入请求体中,发送请求
 	4、远端服务接收到该请求.并根据@RequestBody注解,将请求体中的json对象转换成对应的对象
--- 
 
 -- 服务调用实现步骤
   1、调用方引入相关依赖
@@ -1361,6 +1361,8 @@ return interceptor;
 -- Hystrix说明
   1、查看被调用服务是否宕机（挂掉了），如果宕机，则进行熔断，否则继续执行
   2、一个供分布式系统使用，提供延迟和容错功能，保证复杂的分布系统在面临不可避免的失败时，仍能有其弹性。
+
+-- SpringCloudAlibaba使用Sentinel实现限流&熔断&降级————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
 
 -- Feign结合Hystrix使用步骤
   1、添加依赖
@@ -1717,7 +1719,7 @@ return interceptor;
 # 消息总线【Spring Cloud Bus（Nacos）】
 
 # 调用链监控【SpringCloud-Sleuth】
-
+	详见————2、Java开发之后段技术篇-1-39、Sleuth-链路追踪
 ```
 
 
@@ -9822,6 +9824,193 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # DateTimeFormatter
 -- 获取日期格式————DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+```
+
+## 38、SpringCloudAlibaba——Sentinel——限流&熔断&降级
+
+```markdown
+# 简介
+-- 熔断、降级、限流
+	1、什么是熔断
+		A服务调用B服务的某个功能,由于网络不稳定问题,或者B服务卡机,导致功能时间超长.如果这样子的次数过多.我们就可以直接将B服务断路了(A服务不再请求B服务的接口),凡是调用B服务的直接返回降级数据,不必等待B服务的超长执行.这样B服务的故障问题,就不会级联影响到A服务.
+	2、什么事降级
+		整个网站处于流量高峰期,服务器压力剧增,根据当前业务情况及流量,对一些服务和页面进行有策略的降级(停止服务,所有的调用直接返回降级数据).以此缓解服务器资源的压力,以保证核心业务的正常运行,同时也保持了客户和大部分客户的得到正确的响应.
+	3、熔断和降级的异同
+		1)相同点
+			1]为了保证集群大部分服务的可用性和可靠性,防止崩溃,牺牲小我
+			2]用户最终都是体验到某个功能不可用
+		2)不同点
+			1]熔断是被调方故障,触发的系统主动规则
+			2]降级是基于全局考虑,停止一些正常服务,释放资源
+	4、什么是限流
+		对打入服务的请求流量进行控制,使服务能够承担不超过自己能力的流量压力
+
+-- Sentinel简介
+	1、官方文档————https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D
+	2、项目地址————https://github.com/alibaba/Sentinel/
+	3、说明————随着微服务的流行,服务和服务之间的稳定性变得越来越重要.Sentinel以流量为切入点,从流量控制,熔断降级、系统负载保护等多个维度保护服务的稳定性.
+
+-- Sentinel特征
+	1、丰富的应用场景————Sentinel承接了阿里巴巴近10年的双十一大促流量的核心场景,例如秒杀(即突发流量控制在系统容量可以承受的范围)、消息削峰填谷、集群流量控制、实时熔断下游不可用应用等;
+	2、完备的实时监控————Sentinel同时提供实时的监控功能,可以在控制台中看到接入应用的单台机器秒级数据,甚至500台以下规模的集群的汇总运行情况;
+	3、广泛的开源生态————Sentinel提供开箱即用的与其它开源框架/库的整合模块,例如与SpringCloud、Dubbo、gRPC的整合.只需要引入相应的依赖并进行简单的配置即可快速的接入Sentinel;
+	4、完善的SPI扩展点————Sentinel提供简单易用、完善的SPI扩展接口.可以通过实现扩展接口来快速的定时逻辑.例如定制规则管理、适配动态数据源等;
+
+-- Sentinel组成
+	1、核心库(Java客户端)————不依赖任何框架/库,能够运行于所有Java运行时环境,同时对Dubbo/SpringCloud等框架也有较好的支持
+	2、控制台(Dashvboard)————基于SpringBoot开发,打包后可以直接运行,不需要额外的Tomcat等应用容器
+		1)说明————要根据Sentinel版本来决定使用的控制台版本
+		
+
+-- Hystrix与Sentinel比较
+```
+
+| 功能           | Sentinel                                                     | Hystrix                                   |
+| -------------- | ------------------------------------------------------------ | ----------------------------------------- |
+| 隔离策略       | 信号量隔离(并发线程数限流)——不用为每个请求创建专用的线程池,减少资源的消耗 | 线程池隔离/信号量隔离——线程池隔离比较彻底 |
+| 熔断降级策略   | 基于响应时间、异常比率、异常数                               | 基于异常比率                              |
+| 实时统计实现   | 滑动窗口(LzeapArray)                                         | 滑动窗口(基于RxJava)                      |
+| 动态规则配置   | 支持多种数据源                                               | 支持多种数据源                            |
+| 扩展性         | 多个扩展点                                                   | 插件形式                                  |
+| 基于注解的支持 | 支持                                                         | 支持                                      |
+| 限流           | 基于QPS,支持基于调用关系的限流                               | 有限的支持                                |
+| 流量整形       | 支持预热模式、匀速器模式、预热排队模式                       | 不支持                                    |
+| 系统自适应保护 | 支持                                                         | 不支持                                    |
+| 控制台         | 可配置规则、查看秒级监控、机器发现等                         | 简单的监控查看                            |
+
+```markdown
+# 基本概念
+-- 资源————我们说的资源，可以是任何东西，服务，服务里的方法，甚至是一段代码。先把可能需要保护的资源定义好（埋点），之后再配置规则。也可以理解为，只要有了资源，我们就可以在任何时候灵活地定义各种流量控制规则。在编码的时候，只需要考虑这个代码是否需要保护，如果需要保护，就将之定义为一个资源。对于主流的框架，我们提供适配，只需要按照适配中的说明配置，Sentinel就会默认定义提供的服务，方法等为资源。
+
+-- 规则————Sentinel的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。Sentinel支持以下几种规则：流量控制规则、熔断降级规则、系统保护规则、来源访问控制规则 和 热点参数规则。
+
+# Sentinel来进行资源保护，主要分为几个步骤:
+-- 定义资源
+	1、定义资源方式————详见————https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8
+		1)主流框架的默认适配————常用
+		2)抛出异常的方式定义资源————常用
+		3)返回布尔值方式定义资源
+		4)注解方式定义资源————常用
+		5)异步调用支持
+
+-- 定义规则————Sentinel 的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。
+	1、规则分类
+		1)流量控制规则(FlowRule)————同一个资源可以同时有多个限流规则，检查规则时会依次检查
+			1]重要属性
+        Field						说明																				 						 默认值
+        resource				资源名，资源名是限流规则的作用对象	
+        count						限流阈值	
+        grade						限流阈值类型，QPS 模式（1）或并发线程数模式（0）								QPS 模式
+        limitApp				流控针对的调用来源																					default，代表不区分调用来源
+        strategy				调用关系限流策略：直接、链路、关联								 						 根据资源本身（直接）
+        controlBehavior	流控效果（直接拒绝/WarmUp/匀速+排队等待），不支持按调用关系限流	直接拒绝
+        clusterMode			是否集群限流																							否
+      2]通过代码定义流量控制规则————通过调用 FlowRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+        private void initFlowQpsRule() {
+            List<FlowRule> rules = new ArrayList<>();
+            FlowRule rule = new FlowRule(resourceName);
+            // set limit qps to 20
+            rule.setCount(20);
+            rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+            rule.setLimitApp("default");
+            rules.add(rule);
+            FlowRuleManager.loadRules(rules);
+        }
+      3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6
+		2)熔断降级规则(DegradeRule)————同一个资源可以同时有多个降级规则
+			1]重要属性
+				Field								说明																																				默认值
+        resource						资源名，即规则的作用对象	
+        grade								熔断策略，支持慢调用比例/异常比例/异常数策略																			 慢调用比例
+        count								慢调用比例模式下为慢调用临界 RT（超出该值计为慢调用）；异常比例/异常数模式下为对应的阈值	
+        timeWindow					熔断时长，单位为 s	
+        minRequestAmount		熔断触发的最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断（1.7.0 引入）			5
+        statIntervalMs			统计时长（单位为 ms），如 60*1000 代表分钟级（1.8.0 引入）												1000 ms
+        slowRatioThreshold	慢调用比例阈值，仅慢调用比例模式有效（1.8.0 引入）	
+			2]通过代码定义流量控制规则————通过调用 DegradeRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+				private void initDegradeRule() {
+            List<DegradeRule> rules = new ArrayList<>();
+            DegradeRule rule = new DegradeRule();
+            rule.setResource(KEY);
+            // set threshold RT, 10 ms
+            rule.setCount(10);
+            rule.setGrade(RuleConstant.DEGRADE_GRADE_RT);
+            rule.setTimeWindow(10);
+            rules.add(rule);
+            DegradeRuleManager.loadRules(rules);
+        }
+      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
+		3)系统保护规则(SystemRule)————注意系统规则只针对入口资源（EntryType=IN）生效
+			1]说明————Sentinel 系统自适应限流从整体维度对应用入口流量进行控制，结合应用的 Load、CPU 使用率、总体平均 RT、入口 QPS 和并发线程数等几个维度的监控指标，通过自适应的流控策略，让系统的入口流量和系统的负载达到一个平衡，让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性.
+			2]重要属性
+				Field								说明																默认值
+        highestSystemLoad		load1 触发值，用于触发自适应控制阶段		 -1 (不生效)
+        avgRt								所有入口流量的平均响应时间							-1 (不生效)
+        maxThread						入口流量的最大并发数									-1 (不生效)
+        qps									所有入口资源的 QPS										-1 (不生效)
+        highestCpuUsage			当前系统的 CPU 使用率（0.0-1.0）			-1 (不生效)
+			3]通过代码定义流量控制规则————通过调用 SystemRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+				private void initSystemRule() {
+            List<SystemRule> rules = new ArrayList<>();
+            SystemRule rule = new SystemRule();
+            rule.setHighestSystemLoad(10);
+            rules.add(rule);
+            SystemRuleManager.loadRules(rules);
+        }
+      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%B3%BB%E7%BB%9F%E8%87%AA%E9%80%82%E5%BA%94%E9%99%90%E6%B5%81
+		4)来源访问控制规则(AuthorityRule)
+			1]说明————很多时候，我们需要根据调用方来限制资源是否通过，这时候可以使用 Sentinel 的访问控制（黑白名单）的功能。黑白名单根据资源的请求来源（origin）限制资源是否通过，若配置白名单则只有请求来源位于白名单内时才可通过；若配置黑名单则请求来源位于黑名单时不通过，其余的请求通过。
+			2]授权规则，即黑白名单规则（AuthorityRule）非常简单，主要有以下配置项：
+				resource：资源名，即规则的作用对象
+				limitApp：对应的黑名单/白名单，不同 origin 用 , 分隔，如 appA,appB
+				strategy：限制模式，AUTHORITY_WHITE 为白名单模式，AUTHORITY_BLACK 为黑名单模式，默认为白名单模式
+			3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E9%BB%91%E7%99%BD%E5%90%8D%E5%8D%95%E6%8E%A7%E5%88%B6
+		5)热点参数规则(ParamFlowRule)
+			1]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%83%AD%E7%82%B9%E5%8F%82%E6%95%B0%E9%99%90%E6%B5%81
+		6)查询更改规则
+			1]说明————引入了 transport 模块后，可以通过以下的 HTTP API 来获取所有已加载的规则：http://localhost:8719/getRules?type=<XXXX>.其中，type=flow 以 JSON 格式返回现有的限流规则，degrade 返回现有生效的降级规则列表，system 则返回系统保护规则.获取所有热点规则：http://localhost:8719/getParamRules
+		7)定制自己的持久化规则
+			1]说明————上面的规则配置，都是存在内存中的。即如果应用重启，这个规则就会失效。因此我们提供了开放的接口，您可以通过实现 DataSource 接口的方式，来自定义规则的存储数据源。通常我们的建议有:
+        1、整合动态配置系统，如 ZooKeeper、Nacos、Apollo 等，动态地实时刷新配置规则
+        2、结合 RDBMS、NoSQL、VCS 等来实现该规则
+        3、配合 Sentinel Dashboard 使用
+      2]更多详情请参考————https://github.com/alibaba/Sentinel/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%99%E6%89%A9%E5%B1%95
+
+-- 检验规则是否生效
+	1、判断限流降级异常————在 Sentinel 中所有流控降级相关的异常都是异常类 BlockException 的子类：
+      流控异常：FlowException
+      熔断降级异常：DegradeException
+      系统保护异常：SystemBlockException
+      热点参数限流异常：ParamFlowException
+    我们可以通过以下函数判断是否为 Sentinel 的流控降级异常：
+    	BlockException.isBlockException(Throwable t);
+    除了在业务代码逻辑上看到规则生效，我们也可以通过下面简单的方法，来校验规则生效的效果：
+			1)暴露的 HTTP 接口：通过运行下面命令 curl http://localhost:8719/cnode?id=<资源名称>，观察返回的数据。如果规则生效，在返回的数据栏中的 block 以及 block(m) 中会有显示
+			2)日志：Sentinel 提供秒级的资源运行日志以及限流日志，详情可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%97%A5%E5%BF%97
+	2、block 事件
+		Sentinel 提供以下扩展接口，可以通过 StatisticSlotCallbackRegistry 向 StatisticSlot 注册回调函数：
+      ProcessorSlotEntryCallback: callback when resource entry passed (onPass) or blocked (onBlocked)
+      ProcessorSlotExitCallback: callback when resource entry successfully completed (onExit)
+    可以利用这些回调接口来实现报警等功能，实时的监控信息可以从 ClusterNode 中实时获取。
+
+# SpringBoot整合
+-- 整合Feign+Sentinel测试熔断降级
+
+-- 整合Sentinel测试限流
+
+
+```
+
+
+
+## 39、Sleuth——链路追踪
+
+```markdown
+```
+
+## 40、K8S—集群
+
+```markdown
 ```
 
 
