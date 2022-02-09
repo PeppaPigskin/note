@@ -169,7 +169,7 @@ Exit
 	ZSH_THEME="agnoster" # 以agnoster为例，编辑【~/.zshrc】文件，修改【ZSH_THEME】配置
 5、设置字体
 	1)大部分主题用到的字体【Meslo for Powerline】
-	【详见:附件1】
+	【字体文件,详见————附件1】
 	2)agnoster还需要额外安装字体【Powerline Fonts】
 	【https://github.com/powerline/fonts】  
 	3)选择字体
@@ -193,7 +193,7 @@ Exit
 	3)执行【source ~/.zshrc】生效
 ```
 
-[附件1](attachments/Meslo LG S Regular for Powerline.ttf)
+[附件1——Meslo LG S Regular for Powerline.ttf](attachments/Meslo LG S Regular for Powerline.ttf)
 
 ## 2、Brew 安装和卸载
 
@@ -357,6 +357,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 # 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
 
+# IDEA风格配置导出文件详见————附件4
 
 # 常用插件
 -- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及链式调用方法，总之就是为了简化实体类而生的插件
@@ -401,6 +402,8 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 -- Zoolytic————一款zookeeper节点的查看分析插件。其实第三方也有一些zk的节点信息查看工具，但是我都觉得不够方便，直到我发现了这款插件。
 
 ```
+
+[附件4——settings.zip](attachments/settings.zip)
 
 ## 3、域名访问环境
 
