@@ -33,7 +33,8 @@
 	kill -9 [进程号]
 # 查看当前目录
 	pwd
-# 
+# 查看后台启动服务信息
+	tail  -300f nohup.out————300设置可查看的显示行数
 ```
 
 # 2、Windows——常用软件环境搭建
@@ -1103,6 +1104,32 @@ brew install VisualVM
 ```
 
 [附件3——sentinel-dashboard-1.6.3.jar](attachments/sentinel-dashboard-1.6.3.jar)
+
+## 19、Redis环境搭建
+
+```markdown
+# 安装
+-- brew install redis@3.2
+
+# 配置环境变量
+-- 我的安装完成提示信息,如下:
+  redis@3.2 is keg-only, which means it was not symlinked into /usr/local,
+  because this is an alternate version of another formula.
+
+  If you need to have redis@3.2 first in your PATH, run:
+    echo 'export PATH="/usr/local/opt/redis@3.2/bin:$PATH"' >> ~/.zshrc
+
+
+  To restart redis@3.2 after an upgrade:
+    brew services restart redis@3.2
+  Or, if you don't want/need a background service you can just run:
+    /usr/local/opt/redis@3.2/bin/redis-server /usr/local/etc/redis.conf --daemonize no
+-- 根据安装完成后的提示信息,配置环境变量
+	echo 'export PATH="/usr/local/opt/redis@3.2/bin:$PATH"' >> ~/.zshrc
+
+# 启动
+-- brew services restart redis@3.2————使用命令启动
+```
 
 
 
