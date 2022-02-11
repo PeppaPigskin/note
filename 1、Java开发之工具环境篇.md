@@ -27,14 +27,18 @@
 -- 上传整个目录到服务器————scp -r   [本地目录]  [账户名]@[服务地址]:/[远程目录]
 # 过滤查看所有进程
 	ps aux | grep [过滤条件:svnserve]
+# 查看系统上的运行的所有进程
+	ps -ef |grep [过滤条件:oauth]
+	-- 参数————-e————显示运行在系统上的所有进程
+	-- 参数————-f————扩展显示输出
 # 查看端口占用情况
 	lsof -i:[端口号]
 # 强行终止进程
 	kill -9 [进程号]
-# 查看当前目录
+# 查看当前所在目录
 	pwd
-# 查看后台启动服务信息
-	tail  -300f nohup.out————300设置可查看的显示行数
+# 实时查看服务启动日志
+	tail -300f nohup.out————300设置可查看的显示行数,nohup.out为日志文件名
 ```
 
 # 2、Windows——常用软件环境搭建
@@ -1904,7 +1908,10 @@ brew install VisualVM
 -- 重装
 	1、只需要删除安装jenkins用户的主目录（~）下的（.jenkins）文件夹，一般在/root/.jenkins
 	2、可以用 ls -a 查看隐藏的文件。然后 rm -rf .jenkins就可以删除了
--- 访问————http://当前虚拟机ip:8080
+-- 访问
+	1、访问地址————http://安装主机ip:8080
+	2、默认账户————admin
+	3、默认密码————详见————安装配置——解锁jenkins
 -- 安装配置
 	1、解锁jenkins
 		1)获取管理员密码————默认初始密码文件所在路径————/root/.jenkins/secrets/initialAdminPassword
@@ -1917,6 +1924,13 @@ brew install VisualVM
 		1)选择[安装推荐的插件]
 		2)创建管理员用户名和密码
 	4、实例配置,采用默认,可以知道Jenkins URL————http://当前虚拟机ip:8080
+-- 忘记密码解决
+	1、/root/.jenkins/
+	2、vi config.xml
+	3、修改标签内容为————<useSecurity>false</useSecurity>
+	4、重启服务
+	5、重启开启安全管理
+	6、重新设置密码
 -- 使用配置
 	1、使用[which 软件名]查找
 	2、配置自动化部署所需环境
