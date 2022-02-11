@@ -9859,9 +9859,46 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- Sentinel组成
 	1、核心库(Java客户端)————不依赖任何框架/库,能够运行于所有Java运行时环境,同时对Dubbo/SpringCloud等框架也有较好的支持
 	2、控制台(Dashvboard)————基于SpringBoot开发,打包后可以直接运行,不需要额外的Tomcat等应用容器
-		1)说明————要根据Sentinel版本来决定使用的控制台版本
-		
+		1)说明————要根据Sentinel版本来决定使用的控制台版本————详见————https://github.com/alibaba/Sentinel/wiki/%E6%8E%A7%E5%88%B6%E5%8F%B0
+      Sentinel 提供一个轻量级的开源控制台，它提供机器发现以及健康情况管理、监控（单机和集群），规则管理和推送的功能。这里，我们将会详细讲述如何通过简单的步骤就可以使用这些功能。接下来，我们将会逐一介绍如何整合 Sentinel 核心库和 Dashboard，让它发挥最大的作用。同时我们也在阿里云上提供企业级的 Sentinel 服务：AHAS Sentinel 控制台，您只需要几个简单的步骤，就能最直观地看到控制台如何实现这些功能，并体验多样化的监控及全自动托管的集群流控能力。
+    2)包含功能
+      1]查看机器列表以及健康情况：收集 Sentinel 客户端发送的心跳包，用于判断机器是否在线。
+      2]监控 (单机和集群聚合)：通过 Sentinel 客户端暴露的监控 API，定期拉取并且聚合应用监控信息，最终可以实现秒级的实时监控。
+      3]规则管理和推送：统一管理推送规则。
+      4]鉴权：生产环境中鉴权非常重要。这里每个开发者需要根据自己的实际情况进行定制。
+    3)注意————Sentinel 控制台目前仅支持单机部署。Sentinel 控制台项目提供 Sentinel 功能全集示例，不作为开箱即用的生产环境控制台，不提供安全可靠保障。若希望在生产环境使用请根据文档自行进行定制和改造。
+		4)启动控制台
+			详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
+	3、控制台使用
+		1)新增流控规则————主要配置项说明														
+```
 
+| 配置项                     | 配置项说明                                                   | 可选参数                  | 默认值  |
+| -------------------------- | :----------------------------------------------------------- | ------------------------- | ------- |
+| 资源名                     | 一般为请求的URI                                              |                           |         |
+| 针对来源                   |                                                              |                           | default |
+| 阀值类型                   |                                                              | QPS/线程数                |         |
+| 单机阀值/集群阀值/均摊阀值 | 非集群为**单机阀值**<br />集群模式且集群阀值模式为**总体阀值**时为集群阀值——集群中的多个服务总体不超过指定阀值<br />集群模式且集群阀值模式为**单机均摊**时为**均摊阈值**——每一个机器都不超过指定阀值 | 数字类型                  |         |
+| 是否集群                   |                                                              | ☑️                         |         |
+| 集群阀值模式               |                                                              | 单机均摊/总体阀值         |         |
+| 失败退化                   | 如果 Token Server 不可用是否退化到单机限流                   | ☑️                         |         |
+| 流控模式                   | 直接——直接限制该资源名的服务<br />关联——与本资源产生关联关系的资源访问时对本资源的流控生效<br />链路——从指定入口资源到本资源的请求对本资源的流控生效 | 直接/关联/链路            |         |
+| 关联资源/入口资源          | 关联资源——只有流控模式为关联时可设定<br />入口资源——只有流控模式为链路时可设定 |                           |         |
+| 流控效果                   | 只有阀值类型为QPS时可设定<br />Warm Up——预热启动,即冷启动模式 | 快速失败/Warm Up/排队等待 |         |
+| 预热时长/超时时长          | 预热时长——只有流控效果为Warm Up时可设定<br />超时时长——只有流控效果为排队等待时可设定 |                           |         |
+
+```markdown
+		2)新增降级规则————主要配置项说明(1.8.0及其以上)
+```
+
+| 配置项                     | 配置项说明                                                   | 可选参数           | 默认值 |
+| -------------------------- | ------------------------------------------------------------ | ------------------ | ------ |
+| 资源名                     | 一般为请求的URI                                              |                    |        |
+| 降级策略                   | 切换不同的降级策略                                           | RT/异常比例/异常数 |        |
+| 慢调用比例/异常比例/异常数 | 慢调用比例 (`SLOW_REQUEST_RATIO`)————选择以慢调用比例作为阈值，需要设置允许的慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且慢调用的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。 <br />异常比例 (`ERROR_RATIO`)————当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且异常的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。异常比率的阈值范围是 `[0.0, 1.0]`，代表 0% - 100%。<br /> 异常数 (`ERROR_COUNT`)————当单位统计时长内的异常数目超过阈值之后会自动进行熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。 | 依据类型不同而不同 |        |
+| 时间窗口                   | 降级时间间隔,单位秒                                          | 数值类型           |        |
+
+```markdown
 -- Hystrix与Sentinel比较
 ```
 
@@ -9887,8 +9924,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 # Sentinel来进行资源保护，主要分为几个步骤:
 -- 定义资源
 	1、定义资源方式————详见————https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8
-		1)主流框架的默认适配————常用
-		2)抛出异常的方式定义资源————常用
+		1)主流框架的默认适配————常用————以SpringBoot为例,详见本节————# SpringBoot整合
+		2)抛出异常的方式定义资源————常用————详见本节————
 		3)返回布尔值方式定义资源
 		4)注解方式定义资源————常用
 		5)异步调用支持
@@ -9994,23 +10031,316 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     可以利用这些回调接口来实现报警等功能，实时的监控信息可以从 ClusterNode 中实时获取。
 
 # SpringBoot整合
--- 整合Feign+Sentinel测试熔断降级
+-- 流量控制————整合Sentinel测试限流
+  1、每一个微服务引入以下依赖
+    <dependency>
+      <groupId>com.alibaba.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+    </dependency>
+    <!--引入信息审计依赖-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+  2、下载并启动控制台
+		详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
+  3、每一个微服务的配置文件添加配置信息
+    # Sentinel配置信息
+    ## 每一个微服务和Sentinel中央控制服务器(Sentinel控制台)进行数据传输使用的端口（随意，只要不被占用）
+    spring.cloud.sentinel.transport.port=8719
+    ## Sentinel控制台所在的地址
+    spring.cloud.sentinel.transport.dashboard=localhost:8333
+    ## 实时监控,默认不显示问题解决————暴露endpoint,使这些审计信息可以被别人访问
+    ### Spring Boot 1.x 中添加配置如下。暴露的 endpoint 路径为 /sentinel
+    #management.security.enabled=false
+    ### Spring Boot 2.x 中添加配置如下。暴露的 endpoint 路径为 /actuator/sentinel
+    management.endpoints.web.exposure.include=*
+  4、在控制台中进行相应的调整————默认所有的流控设置保存在内存中,重启失效
+  5、自定义流控响应信息————默认为[Blocked by Sentinel (flow limiting)]————添加自定义流控响应类,设置请求被限制时的处理器
+      package com.pigskin.mall.seckill.config;
 
--- 整合Sentinel测试限流
+      import com.alibaba.csp.sentinel.adapter.servlet.callback.UrlBlockHandler;
+      import com.alibaba.csp.sentinel.adapter.servlet.callback.WebCallbackManager;
+      import com.alibaba.csp.sentinel.slots.block.BlockException;
+      import com.alibaba.fastjson.JSON;
+      import com.pigskin.common.exception.BizCodeEnum;
+      import com.pigskin.common.utils.R;
+      import org.springframework.context.annotation.Configuration;
+
+      import javax.servlet.http.HttpServletRequest;
+      import javax.servlet.http.HttpServletResponse;
+      import java.io.IOException;
+
+      /**
+       * Sentinel流控配置类
+       *
+       * @author pigskin
+       * @date 2022年02月09日 4:11 下午
+       */
+      @Configuration
+      public class SeckillSentinelConfig {
+
+          /**
+           * 无参构造
+           */
+          public SeckillSentinelConfig() {
+              /*Spring5提供的WebFlux编程使用WebFluxCallbackManager*/
+              /*Sentinel提供的Web回调的管理器，设置请求被限制以后处理器，进行处理*/
+              WebCallbackManager.setUrlBlockHandler(new UrlBlockHandler() {
+                  /**
+                   * 自定义阻塞返回信息
+                   * @param request
+                   * @param response
+                   * @param e
+                   * @throws IOException
+                   */
+                  @Override
+                  public void blocked(HttpServletRequest request, HttpServletResponse response, BlockException e) throws IOException {
+                      R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+                      /*设置编码格式*/
+                      response.setCharacterEncoding("UTF-8");
+                      /*设置内容类型为Json*/
+                      response.setContentType("application/json");
+                      /*设置响应的内容*/
+                      response.getWriter().write(JSON.toJSONString(error));
+                  }
+              });
+          }
+      }
+  6、持久化流控规则
+
+-- 熔断降级————整合Feign+Sentinel测试熔断降级————详见————https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel#feign-%E6%94%AF%E6%8C%81
+  1、方式一(调用方)————熔断保护
+  	1)引入依赖
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.cloud</groupId>
+          <artifactId>spring-cloud-starter-openfeign</artifactId>
+      </dependency>
+    2)调用方配置文件添加配置
+      # 打开 Sentinel 对 Feign 的支持
+      feign.sentinel.enabled=true
+    3)创建远端接口所需要回调的实现类
+    	package com.pigskin.mall.product.feign.fallback;
+
+      import com.pigskin.common.exception.BizCodeEnum;
+      import com.pigskin.common.utils.R;
+      import com.pigskin.mall.product.feign.SeckillFeignService;
+      import lombok.extern.slf4j.Slf4j;
+      import org.springframework.stereotype.Component;
+
+      /**
+       * 秒杀服务远端接口异常回调实现类
+       *
+       * @author pigskin
+       * @date 2022年02月10日 10:59 上午
+       */
+      @Slf4j
+      @Component
+      public class SeckillFeignServiceFallBack implements SeckillFeignService {
+          @Override
+          public R getSkuSeckillInfo(Long skuId) {
+              log.info("嘿嘿，我是getSkuSeckillInfo的熔断方法，我被调了。。。");
+              return R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+          }
+      }
+    4)远端接口设置创建的回调实现类
+    	package com.pigskin.mall.product.feign;
+
+      import com.pigskin.common.utils.R;
+      import com.pigskin.mall.product.feign.fallback.SeckillFeignServiceFallBack;
+      import org.springframework.cloud.openfeign.FeignClient;
+      import org.springframework.web.bind.annotation.GetMapping;
+      import org.springframework.web.bind.annotation.PathVariable;
+
+      /**
+       * 秒杀服务远端接口
+       *
+       * @author pigskin
+       * @date 2022年02月06日 1:27 下午
+       */
+      @FeignClient(value = "mall-seckill",fallback = SeckillFeignServiceFallBack.class)
+      public interface SeckillFeignService {
+
+          /**
+           * 获取指定商品秒杀信息
+           *
+           * @return
+           */
+          @GetMapping("/sku/seckill/{skuId}")
+          R getSkuSeckillInfo(@PathVariable("skuId") Long skuId);
+      }
+  2、方式二(调用方)————Sentinel控制台手动指定相应远程服务的降级策略————远程服务被降级处理后,触发方式一设置的熔断回调方法
+  	详见————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
+  3、方式三(被远程调用方)————全局超大浏览量时,必须牺牲一些远程服务,在服务的提供方指定降级策略————提供方是在运行,但是不想运行自己的业务逻辑,返回的是默认的降级数据(限流后的数据).
+
+# 自定义受保护资源——————以下无论哪种方式都要配置被限流后的默认返回,URL通过配置可以设置统一返回,
+-- 方式一————使用 try (Entry entry = SphU.entry("自定义资源名")) { 需要保护的资源代码 }catch(BlockException exception) {//被限流后抛出异常在此处处理} 
+	1、设置被保护资源以及限流处理:
+    try (Entry entry = SphU.entry("SeckillSkus")) {//设置try包含的代码名为SeckillSkus资源
+        //获取所有场次信息
+        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+        for (String key : keys) {
+            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+            String[] s = replace.split("_");
+            long start = Long.parseLong(s[0]);
+            long end = Long.parseLong(s[1]);
+            if (time >= start && time <= end) {
+                System.out.println("key:" + key);
+                /*2、获取这个场次需要的所有商品信息*/
+                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                List<String> list = hashOperations.multiGet(range);
+                if (list != null) {
+                    return list.stream().map(item -> {
+                        // seckillSkuRedisTo.setRandomCode("");
+                        return JSON.parseObject(item.toString(), SeckillSkuRedisTo.class);
+                    }).collect(Collectors.toList());
+                }
+                break;
+            }
+        }
+    } catch (BlockException exception) {//被限流后抛出异常在此处处理
+        log.error("资源被限流异常————异常原因为{}", exception.getMessage());
+    }
+	2、Sentinel控制台进行限流和熔断设置
+
+-- 方式二————基于注解@SentinelResource
+	1、设置被保护资源,并使用blockHandler指定限流后本类中的回调处理容错方法
+		/**
+     * getCurrentSeckillSkusResource资源被限流回调方法（返回值、参数名要和原方法一致）
+     *
+     * @param exception 限流异常（可以比原方法多一个该参数）
+     * @return 返回值类型要和原方法一致
+     */
+    public List<SeckillSkuRedisTo> blockHandler(BlockException exception) {
+        log.error("原方法被限流了");
+        return null;
+    }
+
+		/**
+     * 基于注解限流设置
+     *
+     * @return
+     */
+		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler")//设置需要被保护的资源
+    @Override
+    public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+    	//TODO:业务代码
+    }
+  2、或使用fallback指定所有类型异常的回调方法,返回值、参数名要和原方法一致.如果在本类中设置不需要设置fallbackClass = XXX.class,示例如下:
+  		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler",fallback = "fallbackHandler",fallbackClass = XXX.class)//设置需要被保护的资源
+    	@Override
+    	public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+        //TODO:业务代码
+      }
+	3、Sentinel控制台进行限流和熔断设置
+
+# 网关流控————被其控制的将不会转发到指定服务————详见————https://github.com/alibaba/Sentinel/wiki/%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81
+-- 1、网关层引入依赖
+	 <!--引入网关流控依赖-->
+   <dependency>
+     <groupId>com.alibaba.cloud</groupId>
+     <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+     <version>2.1.0.RELEASE</version>
+   </dependency>
+
+-- 2、配置文件主要可配置信息示例如下
+	## 指定网关限流回调信息 
+	###内容类型
+	spring.cloud.sentinel.scg.fallback.content-type=application/json
+	###响应内容
+	spring.cloud.sentinel.scg.fallback.response-body="ajjasd"
+	###错误状态码
+	spring.cloud.sentinel.scg.fallback.response-status=400
+
+-- 3、Sentinel控制台进行配置
+	1、1.6.x的控制台————网关的簇点链路会显示当前请求匹配的对应路由配置,对应网关路由配置的id
+	2、1.7.x及其以上的控制台————网关相关配置会有特有的配置方式
+
+-- 4、定制网关流控返回数据
+	1、代码实现
+    package com.pigskin.mall.gateway.config;
+
+    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
+    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
+    import com.alibaba.fastjson.JSON;
+    import com.pigskin.common.exception.BizCodeEnum;
+    import com.pigskin.common.utils.R;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.reactive.function.server.ServerResponse;
+    import org.springframework.web.server.ServerWebExchange;
+    import reactor.core.publisher.Mono;
+
+    /**
+     * 网关Sentinel限流回调配置类
+     *
+     * @author pigskin
+     * @date 2022年02月10日 4:37 下午
+     */
+    @Configuration
+    public class SentinelGatewayConfig {
+        public SentinelGatewayConfig() {
+            GatewayCallbackManager.setBlockHandler(new BlockRequestHandler() {
+                /**
+                 * 网关限流了请求，就会调用此回调Mono Flux
+                 * @param serverWebExchange
+                 * @param throwable
+                 * @return
+                 */
+                @Override
+                public Mono<ServerResponse> handleRequest(ServerWebExchange serverWebExchange, Throwable throwable) {
+                    R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+                    String jsonString = JSON.toJSONString(error);
+                    /*Mono——返回0个或者一个数据*/
+                    /*Flux——返回0个或者多个数据*/
+                    return ServerResponse.ok().body(Mono.just(jsonString), String.class);
+                }
+            });
+        }
+    }
 
 
 ```
-
-
 
 ## 39、Sleuth——链路追踪
 
 ```markdown
 ```
 
-## 40、K8S—集群
+## 40、K8S
 
 ```markdown
+```
+
+## 41、Spring注入方式
+
+```markdown
+# 构造器注入
+
+
+# getter/setter注入
+
+
+# @Autowired注解注入
+
+
+```
+
+## 42、集群
+
+```markdown
+```
+
+## 43、响应式编程
+
+```markdown
+# Reactive
+
+# WebFlux
 ```
 
 
@@ -11629,7 +11959,7 @@ error => {   
 # 使用沙箱进行Demo测试
 -- 下载Demo地址
 	1、支付宝官方地址————https://gw.alipayobjects.com/os/bmw-prod/43bbc4ba-4d71-402f-a03b-778dfef047a8.zip
-	2、本地附件地址————可见[附件2]
+	2、沙箱环境Demo代码详见————附件2
 
 -- 配置类中配置Demo————相关信息详见————https://openhome.alipay.com/platform/appDaily.htm?tab=info
 	package com.alipay.config;
@@ -12458,7 +12788,7 @@ error => {   
 
 
 
-[附件2](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
+[附件2——alipay.trade.page.pay-JAVA-UTF-8.zip](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
 ## 11、内网穿透
 
@@ -15144,6 +15474,29 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	1、类上使用注解@EnableAsync//开启异步任务功能
 	2、方法使用注解@Async//给希望异步执行的方法添加该注解
 	3、对应自动配置类TaskExecutionAutoConfiguration
+```
+
+## 26、循环依赖问题
+
+```markdown
+# 自行注入————会丢失一些信息
+		/**
+     * 自行注入
+     *
+     * @param connectionFactory 连接工厂
+     * @return
+     */
+    @Primary//主要
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        this.rabbitTemplate = rabbitTemplate;
+        rabbitTemplate.setMessageConverter(messageConverter());
+        initRabbitTemplate();
+        return rabbitTemplate;
+    }
+
+# 
 ```
 
 
