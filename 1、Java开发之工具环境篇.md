@@ -1,7 +1,3 @@
----
-
----
-
 # 1、OS——终端常用命令
 
 ## 1、mac常用命令
@@ -1258,8 +1254,9 @@ brew install VisualVM
 
 ## 4、Linux中Docker环境搭建		
 
-```bash
-1、卸载旧的docker
+```markdown
+# 安装与配置
+-- 1、卸载旧的docker
   sudo yum remove docker \
   docker-client \
   docker-client-latest \
@@ -1268,7 +1265,8 @@ brew install VisualVM
   docker-latest-logrotate \
   docker-logrotate \
   docker-engine
-2、如果是Linux6,需要升级内核
+
+-- 2、如果是Linux6,需要升级内核
 	1)yum update
 	2)安装ssl————yum -y install curl nss openssl
 	3)查看当前内核版本————more /etc/issue————uname -a
@@ -1283,17 +1281,22 @@ brew install VisualVM
 	8)重启系统，这时候你的内核就成功升级了。
 		#重启————reboot
 		#查看内核版本————uname -r
-3、安装必要的系统工具————yum install -y yum-utils device-mapper-persistent-data lvm2
-4、添加软件源信息(二者选其一)
+
+-- 3、安装必要的系统工具
+	yum install -y yum-utils device-mapper-persistent-data lvm2
+
+-- 4、添加软件源信息(二者选其一)
 	1)阿里云安装镜像————yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 	2)本身镜像————yum-config-manager --add-repo   https://download.docker.com/linux/centos/docker-ce.repo
-5、安装docker相关[docker引擎社区版、操作docker的客户端、docker容器]
+
+-- 5、安装docker相关[docker引擎社区版、操作docker的客户端、docker容器]
 	1)制作缓存
 		# 针对Linux6————yum makecache fast
 		# 针对Linux8————yum makecache  
 	2)执行安装
 		sudo yum install docker-ce docker-ce-cli containerd.io	
-6、第四步采用了对应镜像就不用了,配置镜像加速(https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors)
+
+-- 6、第四步采用了对应镜像就不用了,配置镜像加速(https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors)
 	1)创建目录
 		sudo mkdir -p /etc/docker
 	2)配置镜像加速器地址
@@ -1306,33 +1309,40 @@ brew install VisualVM
 		sudo systemctl daemon-reload
 	4)重启docker服务
 		sudo systemctl restart docker
-7、测试是否安装成功————docker -v
-8、删除————https://blog.csdn.net/qq_18948359/article/details/102715729
+
+-- 7、测试是否安装成功————docker -v
+
+-- 8、删除————https://blog.csdn.net/qq_18948359/article/details/102715729
 	1)切换到 /etc/yum.repos.d 目录下，将所有 docker 相关的 repo全部删掉
 	2)sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
 
-
-
 ## 5、Docker中安装mysql
 
-​		MySQL是一个**关系型数据库管理系统**，由瑞典MySQL AB公司开发，属于 [Oracle](https://baike.baidu.com/item/Oracle) 旗下产品。MySQL 是最流行的关系型数据库管理系统之一，在 WEB应用方面，MySQL是最好的 RDBMS(Relational Database Management System，关系数据库管理系统) 应用软件之一。docker中安装步骤如下:
+​		docker中安装步骤如下:
 
-```bash
-1、镜像仓库搜索mysql,获取下载命令:
+```markdown
+# 说明
+	MySQL是一个关系型数据库管理系统，由瑞典MySQL AB公司开发，属于Oracle旗下产品。MySQL 是最流行的关系型数据库管理系统之一，在 WEB应用方面，MySQL是最好的 RDBMS(Relational Database Management System，关系数据库管理系统) 应用软件之一。
+
+# 安装与配置
+-- 1、镜像仓库搜索mysql,获取下载命令:
 	https://hub.docker.com/
-2、使用命令下载指定版本的mysql:
+
+-- 2、使用命令下载指定版本的mysql:
 	sudo docker pull mysql:5.7
-3、查看所有镜像:
+
+-- 3、查看所有镜像:
 	sudo docker images
-4、创建实例并启动
+
+-- 4、创建实例并启动
 	docker run -p 3306:3306 --name mysql \
 	-v /mydata/mysql/log:/var/log/mysql \
 	-v /mydata/mysql/data:/var/lib/mysql \
 	-v /mydata/mysql/conf:/etc/mysql \
 	-e MYSQL_ROOT_PASSWORD=root \
 	-d mysql:5.7
-	
+
 	参数说明
   -p 3306:3306————将容器的3306端口映射到主机的3306端口
   -v /mydata/mysql/master/conf:/etc/mysql————将配置文件夹挂在到主机
@@ -1340,11 +1350,14 @@ brew install VisualVM
   -v /mydata/mysql/master/data:/var/lib/mysql————将数据文件夹挂载到主机
   -e MYSQL_ROOT_PASSWORD=root————初始化root用户的密码    
   -d ————以后台方式运行指定对应镜像
-5、进入容器内部
+
+-- 5、进入容器内部
  	docker exec -it 容器名/id /bin/bash
-6、查看安装目录(容器内部)
+
+-- 6、查看安装目录(容器内部)
  	whereis mysql
-7、通过挂载配置文件修改配置文件
+
+-- 7、通过挂载配置文件修改配置文件
 	1)创建并编辑mysql配置文件
 		vi /mydata/mysql/conf/my.cnf
 	2)添加如下配置
@@ -1362,39 +1375,47 @@ brew install VisualVM
 		skip-character-set-client-handshake
 		#必须加,不然连接很慢
 		skip-name-resolve
-8、重启
+
+-- 8、重启
 	docker restart mysql
-9、设置开机自启
+
+-- 9、设置开机自启
 	sudo docker update mysql --restart=always
 ```
 
 ## 6、Docker中安装redis
 
-​		Redis（Remote Dictionary Server )，即远程字典服务，是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。从2010年3月15日起，Redis的开发工作由VMware主持。从2013年5月开始，Redis的开发由Pivotal赞助。docker中安装redis步骤如下:
+```markdown
+# 说明
+	Redis（Remote Dictionary Server )，即远程字典服务，是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。从2010年3月15日起，Redis的开发工作由VMware主持。从2013年5月开始，Redis的开发由Pivotal赞助。
 
-```bash
-1、下载redis镜像
+# 安装及配置
+-- 1、下载redis镜像
 	docker pull redis
-2、创建redis挂载配置文件
+
+-- 2、创建redis挂载配置文件
 	1)创建目录
 		mkdir -p /mydata/redis/conf
 	2)创建配置文件
 		touch redis.conf
-2、创建并启动redis实例
+
+-- 2、创建并启动redis实例
 	docker run -p 6379:6379 --name redis \
 	-v /mydata/redis/data:/data \
 	-v /mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
 	-d redis redis-server /etc/redis/redis.conf
-	
+
 	参数说明
 	-p 6379:6379：将容器的6379端口映射到主机的6379端口
 	-v /mydata/redis/data:/data————将数据文件夹挂载到主机
 	-v /mydata/redis/conf/redis.conf:/etc/redis/redis.conf————将配置文件挂在到主机对应配置文件
 	-d ————以后台方式运行指定对应镜像
 	redis-server /etc/redis/redis.conf————指定该服务已指定配置文件启动
-3、进入redis客户端
+
+-- 3、进入redis客户端
 	docker exec -it redis redis-cli
-4、持久化(防止重启redis后数据丢失)
+
+-- 4、持久化(防止重启redis后数据丢失)
 	1)修改redis在主机的挂载配置文件
 		vi /mydata/redis/conf/redis.conf
 	2)添加如下配置信息,启用aof持久化方式
@@ -1402,9 +1423,11 @@ brew install VisualVM
 	3)重启redis
 		docker restart redis
 	注:配置文档可配置项参考————https://redis.io/topics/config
-5、设置开机自动启动
+
+-- 5、设置开机自动启动
 	sudo docker update redis --restart=always
-6、redis可视化客户端
+
+-- 6、redis可视化客户端
 	brew install another-redis-desktop-manager
 ```
 
@@ -1964,4 +1987,36 @@ brew install VisualVM
 	brew install --cask noxappplayer
 
 ```
+
+## 19、Docker中安装Zipkin
+
+```markdown
+# 说明
+	通过 Sleuth产生的调用链监控信息,可以得知微服务之间的调用链路,但监控信息只输出到控制台不方便查看。我们需要一个图开化的工具Zipkin。Zipkin是Twitter开源的分布式踪系统,主要用来收集系统的时序数据,从而追踪系统的调用问题。
+
+# 安装
+-- 0、插件镜像包地址
+	https://hub.docker.com/r/openzipkin/zipkin/tags
+
+-- 1、Docker安装Zipkin服务器
+	docker run --name zipkin -d -p 9411:9411 openzipkin/zipkin:2.20.2
+
+-- 2、设置开机自启
+	docker update rabbitmq --restart=always
+
+-- 3、访问
+	http://虚拟机IP地址:15672
+
+-- 4、不使用[Try Lens UI]方式
+	1)FN+F12进入开发者模式
+	2)删除名为lens的Cookie信息
+
+# 基于Elasticsearch,数据持久化
+-- 1、启动改版的Zipkin并指定ES主机地址
+	docker run --env STORAGE_TYPE=elasticsearch --env ES_HOSTS=es所在IP:es占用端口 openzipkin/zipkin-dependencies
+
+-- 2、使用ES时Zipkin-dependencies支持的环境变量
+```
+
+<img src="image/img1_5_19_1_1.png" style="zoom:50%;" />
 
