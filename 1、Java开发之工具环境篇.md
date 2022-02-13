@@ -1431,7 +1431,7 @@ brew install VisualVM
 	brew install another-redis-desktop-manager
 ```
 
-## 7、Docker中安装elasticSearch及kibana
+## 7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
 
 ```markdown
 # 下载镜像文件
