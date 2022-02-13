@@ -1156,7 +1156,7 @@ return interceptor;
   </dependencyManagement>
 
 
-# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】————Nacos注册中心s
+# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】————Nacos注册中心
 -- 作用
 	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
 
@@ -1719,7 +1719,7 @@ return interceptor;
 # 消息总线【Spring Cloud Bus（Nacos）】
 
 # 调用链监控【SpringCloud-Sleuth】
-	详见————2、Java开发之后段技术篇-1-39、Sleuth-链路追踪
+	详见————2、Java开发之后段技术篇-1-39、SpringCloud——Sleuth+Zipkin——服务链路追踪
 ```
 
 
@@ -10306,9 +10306,125 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```
 
-## 39、Sleuth——链路追踪
+## 39、SpringCloud——Sleuth+Zipkin——服务链路追踪
 
 ```markdown
+# 作用
+	微服务架构是一个分布式架构,它按业务划分服务单元,一个分布式系统往往有很多个服务单元。由于服务单元数量众多,业务的复杂性,如果出现了错误和异常,很难去定位。主要体现在,一个请求可能需要调用很多个服务,而内部服务的调用复杂性,决定了问题难以定位。所以微服务架构中,必须实现分布式链路追踪,去跟进一个请求到底有哪些服务参与,参与的顺序又是怎样的,从而达到每个请求的步聚清晰可见,出了间題,很快定位。
+
+	链路追踪组件有 Google 的 Dapper, Twitter 的 Zipkin,以及阿里的 Eagleeye(鹰眼)等,它们都是非常优秀的链路追踪开源组件。
+
+# 基本术语
+-- Span(跨度)————基本工作单元,发送一个远程调度任务就会产生一个Span,Span是个64位ID唯一标识的, Trace是用另一个64位ID唯一标识的,Span还有其他数据信息,比如摘要、时间戳事件、Span的ID、以及进度ID。
+
+-- Trace(跟踪)————一系列span组成的一个树状结构。请求一个微服务系统的AP接口,这个AP接口,需要调用多个微服务,调用每个微服务都会产生一个新的Span,所有由这个请求产生的Span组成了这个 Trace。
+
+-- Annotation(标注)————用来及时记录一个事件的,一些核心注解用来定义一个请求的开始和结東。这些注解包括以下:
+	1、cs-Client Sent————客户端发送一个请求,这个注解描述了这个Span的开始
+	2、sr-Server Received————服务端获得请求并准备开始处理它,如果将其sr减去cs时间戳便可得到网络传输的时间。
+	3、ss-Server Sent(服务端发送响应)————该注解表明请求处理的完成(当请求返回客户端),如果ss的时间戳减去sr时间戳,就可以得到服务器请求的时间。
+	4、cr-Client Received(客户端接收响应)————此时pan的结束,如果cr的时间戳减去cs时间戳便可以得到整个请求所消耗的时间。
+
+-- 官方文档————https://cloud.spring.io/spring-cloud-static/spring-cloud-sleuth/2.1.3.RELEASE/single/spring-cloud-sleuth.html
+
+-- 图示说明
+	1、如果服务调用顺序如下:
+```
+
+<img src="image/img2_1_39_1_1.png" style="zoom:50%;" />
+
+```markdown
+	2、概念完整表示如下:
+```
+
+<img src="image/img2_1_39_1_2.png" style="zoom:50%;" />
+
+```markdown
+	3、Span之间的父子关系如下:
+```
+
+<img src="image/img2_1_39_1_3.png" style="zoom:50%;" />
+
+```markdown
+# 整合Sleuth
+-- 1、服务提供者与消费者导入依赖
+	<!--链路追踪依赖-->
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-sleuth</artifactId>
+  </dependency>
+
+-- 2、服务提供者与消费者配置文件中,设置日志等级为Debug(开发环境为了方便看)
+	# 链路追踪配置
+	## 开启Feign远程调用日志等级为debug
+	logging.level.org.springframework.cloud.openfeign=debug
+	## 开启Sleuth日志等级为debug
+	logging.level.org.springframework.cloud.sleuth=debug
+
+-- 3、发起一次远程调用,观察控制台
+	1、输出示例————[mall-product,8a0699552f23e9db,75b86e37fd484418,false] 
+	2、说明
+		1)mall-product————服务名
+		2)8a0699552f23e9db————是TranceId,一条链路中,只有一个TranceId
+		3)75b86e37fd484418————是SpanId,链路中的基本工作单元Id
+		4)false————表示是否将数据输出到其他服务,true则会把数据输出到其他可视化的服务上观察
+
+# 整合Zipkin可视化观察
+-- 说明
+	通过 Sleuth产生的调用链监控信息,可以得知微服务之间的调用链路,但监控信息只输出到控制台不方便查看。我们需要一个图开化的工具Zipkin。Zipkin是Twitter开源的分布式踪系统,主要用来收集系统的时序数据,从而追踪系统的调用问题。 
+
+-- zipkin官网地址————https://zipkin.io/
+
+-- 原理图,如下图所示
+```
+
+<img src="image/img2_1_39_1_4.png" style="zoom:50%;" />
+
+```markdown
+-- 安装
+	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
+
+-- SpringBoot整合
+	1、导入Zipkin依赖————也同时包含了Sleuth,可以省略Sleuth的引用
+		<!--链路追踪可视化操作依赖（可省略引入spring-cloud-starter-sleuth）-->
+		<dependency>
+  		<groupId>org.springframework.cloud</groupId>
+  		<artifactId>spring-cloud-starter-zipkin</artifactId>
+  	</dependency>
+	2、配置文件添加配置
+		# 链路追踪可视化工具zipkin配置信息
+    #spring.application.name=xxx
+    ## zipkin服务器的地址
+    spring.zipkin.base-url=http://虚拟机IP:9411
+    ## 关闭服务发现，否则spring cloud会把zipkin的url当作服务器名称
+    spring.zipkin.discovery-client-enabled=false
+    ## 设置使用http的方式传输数据
+    spring.zipkin.sender.type=web
+    ## 设置抽样采集率为100%，默认为0.1,即10%
+    spring.sleuth.sampler.probability=1
+  3、访问————http://虚拟机IP:9411
+  	1)可以查看服务调用链追踪信息统计
+  	2)可以查看服务依赖信息统计
+
+# Zipkin数据持久化————官方文档地址————https://github.com/openzipkin/zipkin#storage-component
+-- 说明
+	Zipkin默认是将监控数据存储在内存的,如果Zipkin挂掉或重启的话,那么监控数据就会丢失。所以如果想要搭建生产可用的Zipkin,就需要实现监控数据的持久化。而想要实现数据持久化,自然就是得将数据存储至数据库。
+
+-- zipkin支持将数据存储的位置
+	1、支持将数据存储的位置
+    1)内存(默认)
+    2)MySQL
+    3)Elasticsearch
+    4)Cassandra
+	2、Zipkin支持的这几种存储方式中,内存显然是不适用于生产的,这一点开始也说了。而使用MySQL的话,当数据量大时,查询较为缓慢,也不建议使用。Twitter官方使用的是Cassandra作为Zipkin的存储数据库,但国内大规模用Cassandra的公司较少,而且Cassandra相关文档也不多。综上,故采用 Elasticsearch是个比较好的选择,关于使用 Elasticsearch作为Zipkin的存储数据库的官方文档如下:
+		1)elasticsearch-storage————https://github.com/openzipkin/zipkin/tree/master/zipkin-server#elasticsearch-storage
+		2)zipkin-storage/elasticsearch————https://github.com/openzipkin/zipkin/tree/master/zipkin-storage/elasticsearch
+
+-- 通过docker的方式
+	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
+
+-- zipkin界面分析
+
 ```
 
 ## 40、K8S
