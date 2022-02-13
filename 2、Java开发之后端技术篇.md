@@ -1,46 +1,42 @@
-#   一、主流技术
+一、主流技术
 
 ## 1、MybatisPlus
 
-### 1、说明
-
-```java
-针对mybatis做的增强,简化开发
-```
-### 2、在线学习地址
-
-```java
-http://mp.baomidou.com
-```
-### 3、整合过程
+### 0、说明
 
 ```markdown
-# 导入依赖
-<!-- mybatisplus依赖 -->
-<dependency>            
-	<groupId>com.baomidou</groupId>      
-	<artifactId>mybatis-plus-boot-starter</artifactId>   
-	<version>3.2.0</version>  
-</dependency>
-<!-- mysql驱动 -->
-<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-<dependency>
-	<groupId>mysql</groupId>
-	<artifactId>mysql-connector-java</artifactId>    
-	<version>8.0.17</version>
-</dependency>
+# 说明
+	针对mybatis做的增强,简化开发
 
-# 配置文件配置
--- application.yml中配置数据源相关信息
-#配置mysql数据源
-spring:
-	datasource:
-		username: root
-		password: root
-		url: jdbc:mysql://192.168.56.106:3306/db_mall_sms
-		driver-class-name: com.mysql.jdbc.Driver
-		
--- 配置mybatisplus相关配置
+# 在线学习地址————http://mp.baomidou.com
+
+# SpringBoot整合
+-- 导入依赖
+  <!-- mybatisplus依赖 -->
+  <dependency>            
+    <groupId>com.baomidou</groupId>      
+    <artifactId>mybatis-plus-boot-starter</artifactId>   
+    <version>3.2.0</version>  
+  </dependency>
+  <!-- mysql驱动 -->
+  <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>    
+    <version>8.0.17</version>
+  </dependency>
+
+-- 配置文件配置
+	1、application配置文件中配置数据源相关信息
+    #配置mysql数据源
+    spring:
+      datasource:
+        username: root
+        password: root
+        url: jdbc:mysql://192.168.56.106:3306/db_mall_sms
+        driver-class-name: com.mysql.jdbc.Driver
+
+	2、application配置文件中配置mybatisplus相关配置
     #配置mybatis-plus查找sql映射文件
     mybatis-plus.mapper-locations=classpath:/mapper/**/*.xml
     #配置主键自增
@@ -50,85 +46,113 @@ spring:
     #逻辑已删除值[默认为1]
     mybatis-plus.global-config.db-config.logic-delete-value=1 
     #逻辑未删除值[默认为0]    
-    mybatis-plus.global-config.db-config.logic-not-delete-value=0                     
+    mybatis-plus.global-config.db-config.logic-not-delete-value=0
+
+# 详细使用步骤
+-- 创建数据库，创建数据表，添加数据用于mp操作
+
+-- 初始化工程
+	1、使用Spring Initializr快速初始化一个SpringBoot工程
+	2、当前使用版本：2.2.1.RELEASE
+	3、Artifact中安装mybatis-plus插件
+
+-- 添加依赖                     
+  <dependencies>
+    <!--springboot启动器依赖-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
+    <!--springboot测试依赖-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--mybatis-plus依赖-->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-boot-starter</artifactId>
+      <version>3.0.5</version>
+    </dependency>
+
+    <!--mysql依赖-->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+    <!--lombok用来简化实体类的开发（通过注解形式就不需要写get和set方法）-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+  </dependencies>
+
+-- 安装lombok插件
+	Settings-->Plugins-->Marketplace-->搜索lombok进行安装  
+
+-- 创建配置文件[application.properties或application.yml],并添加配置项内容如下:
+  #mysql5
+  #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+  #spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus
+  #mysql8以上（springboot2.1以上）
+  spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  ##【serverTimezone=GMT%2B8】表示时区;【&useUnicode=true&characterEncoding=utf8】用于设置编码格式，防止中文乱码
+  spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
+  spring.datasource.username=root
+  spring.datasource.password=root
+  #mybatis日志
+  ##查看更详细的内容
+  mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+  #设置逻辑删除默认值配置，可自动以配置
+  mybatis-plus.global-config.db-config.logic-delete-value=1
+  mybatis-plus.global-config.db-config.logic-not-delete-value=0
+
+-- 编写代码
+	1、创建对应实体类
+	2、创建对应mapper接口文件继承自BaseMapper<对应实体类名> 
+
+# 主要功能
+-- 主键生成策略
+	详见————2、Java开发之后端技术篇-1-1-1、主键生成策略
+
+-- 自动填充
+	详见————2、Java开发之后端技术篇-1-1-2、自动填充
+
+-- 乐观锁
+	详见————2、Java开发之后端技术篇-1-1-3、乐观锁
+
+-- 分页实现
+	详见————2、Java开发之后端技术篇-1-1-4、分页实现
+
+-- 简单查询
+	详见————2、Java开发之后端技术篇-1-1-5、简单查询
+
+-- 复杂条件查询
+	详见————2、Java开发之后端技术篇-1-1-6、复杂条件查询
+
+-- 物理删除
+	详见————2、Java开发之后端技术篇-1-1-7、物理删除
+
+-- 逻辑删除
+	详见————2、Java开发之后端技术篇-1-1-8、逻辑删除
+
+-- 性能分析插件
+	详见————2、Java开发之后端技术篇-1-1-9、性能分析插件
+
+-- 代码生成器生成接口结构
+	详见————2、Java开发之后端技术篇-1-1-10、代码生成器生成接口结构
 ```
-### 4、使用步骤
-
-```markdown
-# 创建数据库，创建数据表，添加数据用于mp操作
-
-# 初始化工程
--- 使用Spring Initializr快速初始化一个SpringBoot工程
--- 当前使用版本：2.2.1.RELEASE
--- Artifact中安装mybatis-plus插件
-
-# 添加依赖                     
-<dependencies>
-	<!--springboot启动器依赖-->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter</artifactId>
-	</dependency>
-
-	<!--springboot测试依赖-->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-test</artifactId>
-		<scope>test</scope>
-		<exclusions>
-			<exclusion>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      </exclusion>
-    </exclusions>
-  </dependency>
-
-  <!--mybatis-plus依赖-->
-  <dependency>
-  	<groupId>com.baomidou</groupId>
-  	<artifactId>mybatis-plus-boot-starter</artifactId>
-  	<version>3.0.5</version>
-  </dependency>
-
-  <!--mysql依赖-->
-  <dependency>
-  	<groupId>mysql</groupId>
-  	<artifactId>mysql-connector-java</artifactId>
-  </dependency>
-
-  <!--lombok用来简化实体类的开发（通过注解形式就不需要写get和set方法）-->
-  <dependency>
-  	<groupId>org.projectlombok</groupId>
-  	<artifactId>lombok</artifactId>
-  </dependency>
-</dependencies>
-
-# 安装lombok插件
-Settings-->Plugins-->Marketplace-->搜索lombok进行安装  
-
-# 创建配置文件[application.properties或application.yml],并添加配置项内容如下:
-#mysql5
-#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-#spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus
-#mysql8以上（springboot2.1以上）
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-##【serverTimezone=GMT%2B8】表示时区;【&useUnicode=true&characterEncoding=utf8】用于设置编码格式，防止中文乱码
-spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
-spring.datasource.username=root
-spring.datasource.password=root
-#mybatis日志
-##查看更详细的内容
-mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
-#设置逻辑删除默认值配置，可自动以配置
-mybatis-plus.global-config.db-config.logic-delete-value=1
-mybatis-plus.global-config.db-config.logic-not-delete-value=0
-
-# 编写代码
--- 创建对应实体类
--- 创建对应mapper接口文件继承自BaseMapper<对应实体类名>                     
-```
-
-### 5、主键生成策略
+### 1、主键生成策略
 
 ```markdown
 # 分类
@@ -141,7 +165,7 @@ MP自带策略————snowflake算法：使用41bit作为毫秒数，10bit�
 在要生成主键的属性上添加注解:@TableId（type=IdType.xxx）
 ```
 
-### 6、自动填充
+### 2、自动填充
 
 ```markdown
 # 实现步骤
@@ -169,7 +193,7 @@ MP自带策略————snowflake算法：使用41bit作为毫秒数，10bit�
     }
 ```
 
-### 7、乐观锁
+### 3、乐观锁
 
 ```markdown
 # 作用
@@ -208,7 +232,7 @@ return interceptor;
 }
 ```
 
-### 8、分页实现
+### 4、分页实现
 
 ```markdown
 # 说明
@@ -398,7 +422,7 @@ return interceptor;
     }
 ```
 
-### 9、简单查询
+### 5、简单查询
 
 ```markdown
 # 根据ID查询————xxxMapper.selectById([id值])
@@ -436,7 +460,7 @@ return interceptor;
   }
 ```
 
-### 10、复杂条件查询
+### 6、复杂条件查询
 
 ```markdown
 # 一般复杂查询使用QueryWrapper对象,结构图如下:
@@ -487,7 +511,7 @@ return interceptor;
   }
 ```
 
-### 11、物理删除
+### 7、物理删除
 
 ```markdown
 # 说明
@@ -528,9 +552,7 @@ return interceptor;
   }
 ```
 
-
-
-### 12、逻辑删除
+### 8、逻辑删除
 
 ```markdown
 # 1、表中添加逻辑删除字段，标识数据是否被删除
@@ -577,7 +599,7 @@ return interceptor;
 # 注意：配置了之后就查询不了删除的数据，要查只能自己配置Mapper对应的xml文件进行自定义语句查询
 ```
 
-### 13、性能分析插件
+### 9、性能分析插件
 
 ```markdown
 # 作用
@@ -604,7 +626,7 @@ return interceptor;
 	Caused by: com.baomidou.mybatisplus.core.exceptions.MybatisPlusException: The SQL execution time is too large, please optimize !
 ```
 
-### 14、代码生成器生成接口结构
+### 10、代码生成器生成接口结构
 
 ```markdown
 # 说明
@@ -684,10 +706,6 @@ return interceptor;
   }	
 ```
 
-
-
-
-
 ## 2、Swagger
 
 ```markdown
@@ -713,21 +731,21 @@ return interceptor;
 -- 3、common模块下创建子模块【service_base】
 
 -- 4、在其中创建swagger配置类
-  package com.pigskin.service_base;
-  import com.google.common.base.Predicates;
-  import org.springframework.context.annotation.Bean;
-  import org.springframework.context.annotation.Configuration;
-  import springfox.documentation.builders.ApiInfoBuilder;
-  import springfox.documentation.builders.PathSelectors;
-  import springfox.documentation.service.ApiInfo;
-  import springfox.documentation.service.Contact;
-  import springfox.documentation.spi.DocumentationType;
-  import springfox.documentation.spring.web.plugins.Docket;
-  import springfox.documentation.swagger2.annotations.EnableSwagger2;
-  
-  @Configuration
-  @EnableSwagger2//swagger注解
-  public class SwaggerConfig {  
+	package com.pigskin.service_base;
+	import com.google.common.base.Predicates;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import springfox.documentation.builders.ApiInfoBuilder;
+	import springfox.documentation.builders.PathSelectors;
+	import springfox.documentation.service.ApiInfo;
+	import springfox.documentation.service.Contact;
+	import springfox.documentation.spi.DocumentationType;
+ 	import springfox.documentation.spring.web.plugins.Docket;
+ 	import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+	@Configuration
+	@EnableSwagger2//swagger注解
+	public class SwaggerConfig {  
   	private ApiInfo webApiInfo() {   
     	return new ApiInfoBuilder().title("在线教育网-课程中心API文档")       
       	.description("本文档描述了课程中心微服务接口定义")    
@@ -750,24 +768,20 @@ return interceptor;
         .paths(Predicates.not(PathSelectors.regex("/error/.*")))//忽略显示的   
         .build(); 
     }
-  }
+	}
 
 -- 5、具体使用
-	-- 1、在对应模块中引入配置的依赖
+	1、在对应模块中引入配置的依赖
 		<dependency>           
     	<groupId>com.pigskin</groupId> 
       <artifactId>service_base</artifactId>   
       <version>0.0.1-SNAPSHOT</version> 
     </dependency>
-    
-	-- 2、在对应模块启动类中添加相应注解
+	2、在对应模块启动类中添加相应注解
 		@ComponentScan(basePackages = {"com.pigskin"})
-		
-	-- 3、访问swagger
+	3、访问swagger
 		http://localhost:[对应服务端口]/swagger-ui.html
 ```
-
-
 
 ## 3、Nginx
 
@@ -782,19 +796,18 @@ return interceptor;
 <img src="image/img2_1_3_1_1.png" style="zoom:50%;" />
 
 ```markdown
-# Nginx配置文件说明
-	-- 如图所示:
+# Nginx配置文件说明-- 如图所示:
 ```
 
 <img src="image/img2_1_3_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 设置本地域名配置,配置本地hosts文件
-	-- 安装switchhosts————brew install switchhosts
+-- 安装switchhosts————brew install switchhosts
 
-	-- 添加本地本配置[mac的hosts文件所在位置/etc/hosts]
-		#pigskin_mall
-		192.168.56.xxx pigskin.com
+-- 添加本地本配置[mac的hosts文件所在位置/etc/hosts]
+	# pigskin_mall
+	192.168.56.xxx pigskin.com
 # 域名映射效果
 -- 请求接口和请求页面都同时访问域名
 
@@ -803,111 +816,110 @@ return interceptor;
 	2、如果满足域名规则,转交给对应的服务
 
 # 功能
-  -- 请求转发
-  	-- 说明————根据用户请求，路径匹配，将请求转发到对应服务器
-  	-- 示例————如下:
-  		1、客户端浏览器发起请求
-  		2、nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
-  		3、如果地址包含（eduservice），请求转发到（eduservice）8001，如果地址包含（ossservice），请求转发到（ossservice）8002
-  	-- 实现步骤————如下:
-  		1、找到nginx配置文件【nginx.conf】
-  		2、修改nginx配置文件【nginx.conf】的【server{}】中的默认端口【80】，改为【81】————listen 81;
-  		3、配置nginx转发规则,图示如下.在【http{}】中创建如下配置:
-  			 server {		
-  			 	# 对外监听端口		
-  			 	listen 9001;
-          # 主机名称		
-          server_name localhost;	
-          # 规则(请求地址包含匹配路径，请求就会转发到对应地址；【~】表示匹配方式为正则匹配)	
-          location ~/edu_service/ {# 设置匹配路径		
-          	#设置请求转发地址			
-          	proxy_pass http://localhost:8001;	
-          }
-          location ~/oss_service/ {# 设置匹配路径		
-          	#设置请求转发地址			
-          	proxy_pass http://localhost:8002;
-          }	
+-- 请求转发
+  1、说明————根据用户请求，路径匹配，将请求转发到对应服务器
+  2、示例————如下:
+    1)客户端浏览器发起请求
+    2)nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
+    3)如果地址包含（eduservice），请求转发到（eduservice）8001，如果地址包含（ossservice），请求转发到（ossservice）8002
+  3、实现步骤————如下:
+    1)找到nginx配置文件【nginx.conf】
+    2)修改nginx配置文件【nginx.conf】的【server{}】中的默认端口【80】，改为【81】————listen 81;
+    3)配置nginx转发规则,图示如下.在【http{}】中创建如下配置:
+      server {		
+        # 对外监听端口		
+        listen 9001;
+        # 主机名称		
+        server_name localhost;	
+        # 规则(请求地址包含匹配路径，请求就会转发到对应地址；【~】表示匹配方式为正则匹配)	
+        location ~/edu_service/ {# 设置匹配路径		
+        	#设置请求转发地址			
+        	proxy_pass http://localhost:8001;	
         }
+        location ~/oss_service/ {# 设置匹配路径		
+        	#设置请求转发地址			
+        	proxy_pass http://localhost:8002;
+        }	
+      }
 ```
 
 <img src="image/img2_1_3_1_3.png" style="zoom:50%;" />
 
 ```markdown
-			4、重启nginx
-				#先停掉
-				nginx.exe -s stop
-				#再重启
-				nginx.exe
+		4)重启nginx
+      #先停掉
+      nginx.exe -s stop
+      #再重启
+      nginx.exe
 
 -- 负载均衡
-  	1、说明————多台服务器中放相同的内容（集群效果），多台服务器平均分摊压力
-  		1)分摊规则
-  			-- 轮询
-  			-- 根据请求时间
-  	2、示例
-  		1)客户端浏览器发起请求
-  		2)nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
-  	3、具体实现配置过程
-  		1)配置server,如下图所示
+ 	1、说明————多台服务器中放相同的内容（集群效果），多台服务器平均分摊压力
+  	1)分摊规则
+  		1-轮询
+  		2-根据请求时间
+	2、示例
+  	1)客户端浏览器发起请求
+  	2)nginx得到用户的请求（9001），根据请求转发到具体服务器（路径匹配）
+ 	3、具体实现配置过程
+  	1)配置server,如下图所示
 ```
 
 <img src="image/img2_1_3_1_4.png" style="zoom:50%;" />
 
 ```markdown
-  		2)配置http,如下图所示
+		2)配置http,如下图所示
 ```
 
 <img src="image/img2_1_3_1_5.png" style="zoom:50%;" />
 
 ```markdown
-  		3)网关配置(放到配置最后),如下图所示
+		3)网关配置(放到配置最后),如下图所示
 ```
 
 <img src="image/img2_1_3_1_6.png" style="zoom:50%;" />
 
 ```markdown
-  		4)解决nginx代理给网关时,会丢失请求的host信息————配置文件中添加如下配置
-  			#设置代理时加上Header中加上Host(解决nginx反向代理时丢失相关请求头数据问题)     
-        #proxy_set_header Host $host;
+		4)解决nginx代理给网关时,会丢失请求的host信息————nginx.conf配置文件中添加如下配置
+  		#设置代理时加上Header中加上Host(解决nginx反向代理时丢失相关请求头数据问题)     
+      #proxy_set_header Host $host;
 
-  -- 动静分离
-  	1、说明————将java代码和普通页面分开进行部署，每个请求分开访问————如图所示
+-- 动静分离
+	1、说明————将java代码和普通页面分开进行部署，每个请求分开访问————如图所示
 ```
 
 <img src="image/img2_1_3_1_7.png" style="zoom:50%;" />
 
 ```markdown
-  	2、使用示例
-  		1)将所有项目静态资源,放在nginx中————/mydata/nginx/html/下
-  		2)指定规则:/static/**所有请求都由ngixn直接返回————将html静态资源请求路径进行如下规则设定
-  			-- href="替换成href="/static/
-  			-- <script src="替换成<script src="/static/
-  			-- <img src="替换成<img src="/static/
-  			-- src="index替换成src="/static/index
-			3)修改nginx配置文件,针对server的配置
-				server{
-					#设置静态请求去nginx中的静态资源文件中找    
-					location /static/ {   
-          	root   /usr/share/nginx/html;   
-          }
+	2、使用示例
+    1)将所有项目静态资源,放在nginx中————/mydata/nginx/html/下
+    2)指定规则:/static/**所有请求都由ngixn直接返回————将html静态资源请求路径进行如下规则设定
+      -- href="替换成href="/static/
+      -- <script src="替换成<script src="/static/
+      -- <img src="替换成<img src="/static/
+      -- src="index替换成src="/static/index
+		3)修改nginx配置文件,针对server的配置
+      server{
+        #设置静态请求去nginx中的静态资源文件中找    
+        location /static/ {   
+        	root   /usr/share/nginx/html;   
         }
+      }
 
 # 安装/启动
-	-- 1、官网下载————http://nginx.org/en/download.html
-	-- 2、使用cmd启动（niginx.exe所在目录，执行niginx.exe）
-	-- 3、使用命令停止运行（niginx.exe所在目录，执行niginx.exe -s stop）
-	-- 注：cmd启动的niginx.exe直接关闭不会被退出
+-- 1、官网下载————http://nginx.org/en/download.html
+-- 2、使用cmd启动（niginx.exe所在目录，执行niginx.exe）
+-- 3、使用命令停止运行（niginx.exe所在目录，执行niginx.exe -s stop）
+-- 注：cmd启动的niginx.exe直接关闭不会被退出
 
 # 记录
-	-- 查看Nginx的运行日志
-		1、进入nginx的日志目录————cd nginx/logs/
-		2、查看日志信息,并查找指定的内容————cat access.log |grep 'xxx'
-	-- 查看Nginx的错误日志
-		1、进入nginx的日志目录————cd nginx/logs/
-		2、查看日志信息,并查找指定的内容————cat error.log |grep 'xxx'
+-- 查看Nginx的运行日志
+	1、进入nginx的日志目录————cd nginx/logs/
+	2、查看日志信息,并查找指定的内容————cat access.log |grep 'xxx'
+
+-- 查看Nginx的错误日志
+	1、进入nginx的日志目录————cd nginx/logs/
+	2、查看日志信息,并查找指定的内容————cat error.log |grep 'xxx'
 ```
-
-
 
 ## 4、Tomcat
 
@@ -915,9 +927,9 @@ return interceptor;
 # 说明
 	Tomcat是Apache 软件基金会（Apache Software Foundation）的Jakarta 项目中的一个核心项目，由Apache、Sun 和其他一些公司及个人共同开发而成。由于有了Sun 的参与和支持，最新的Servlet 和JSP 规范总是能在Tomcat 中得到体现，Tomcat 5支持最新的Servlet 2.4 和JSP 2.0 规范。因为Tomcat 技术先进、性能稳定，而且免费，因而深受Java 爱好者的喜爱并得到了部分软件开发商的认可，成为比较流行的Web 应用服务器。
 
+# 安装与配置
+	详见————1、Java开发之工具环境篇-4-7、Tomcat 安装与配置
 ```
-
-
 
 ## 5、EasyExcel
 
@@ -926,12 +938,12 @@ return interceptor;
 	EasyExcel是一个基于Java的简单、省内存的读写Excel的开源项目。在尽可能节约内存的情况下支持读写百M的Excel。GitHub地址:https://github.com/alibaba/easyexcel
 
 # 主要功能
-	-- 数据导入：减轻录入工作量
-	-- 数据导出：统计信息归档
-	-- 数据传输：异构系统之间数据传输
+-- 数据导入：减轻录入工作量
+-- 数据导出：统计信息归档
+-- 数据传输：异构系统之间数据传输
 	
 # 使用步骤
-	-- 1、POM引入EasyExcel相关依赖
+--POM引入EasyExcel相关依赖
 		<dependencies>     
     	<!--easyexcel相关依赖，本质对poi的封装，父工程已经引入poi,此版本easyexcel对应poi3.17--> 
       <dependency>
@@ -946,379 +958,1255 @@ return interceptor;
       </dependency> 
     </dependencies>
     
-	-- 2、实现Excel写操作,步骤如下:
-		-- 1、创建实体类和Excel对应
-			@Datapublic class ExcelDemo {   
-        /**
-        * 设置表头名称 
-        */
-        @ExcelProperty("学生编号")
-        private Integer sno;    
-        /**
-        * 设置表头名称  
-        */
-        @ExcelProperty("学生姓名")  
-        private String sname;
+-- 实现Excel写操作,步骤如下:
+	1、创建实体类和Excel对应
+    @Datapublic class ExcelDemo {   
+      /**
+      * 设置表头名称 
+      */
+      @ExcelProperty("学生编号")
+      private Integer sno;    
+      /**
+      * 设置表头名称  
+      */
+      @ExcelProperty("学生姓名")  
+      private String sname;
+    }
+	2、最终实现写操作
+    public class TestEasyExcel {  
+      public static void main(String[] args) {     
+        //实现excel写操作      
+        //1、设置写入文件夹地址和Excel文件名称      
+        String fileName = "E:\\课程分类.xlsx";   
+        //2、调用easyexcel中的方法实现写操作(文件路径名称，实体类class)   
+        EasyExcel.write(fileName, ExcelDemo.class)              
+        .sheet("学生列表")              
+        .doWrite(getData());  
+      }  
+      /**    
+      * 返回list集合   
+      *  
+      * @return    
+      */    
+      private static List<ExcelDemo> getData() {  
+        ArrayList<ExcelDemo> excelDemos = new ArrayList<>();     
+        for (int i = 0; i < 10; i++) {       
+          ExcelDemo excelDemo = new ExcelDemo();          
+          excelDemo.setSno(i);           
+          excelDemo.setSname("lucy" + i);   
+          excelDemos.add(excelDemo);     
+        }       
+        return excelDemos;  
       }
-		-- 2、最终实现写操作
-			public class TestEasyExcel {  
-      	public static void main(String[] args) {     
-        	//实现excel写操作      
-          //1、设置写入文件夹地址和Excel文件名称      
-          String fileName = "E:\\课程分类.xlsx";   
-          //2、调用easyexcel中的方法实现写操作(文件路径名称，实体类class)   
-          EasyExcel.write(fileName, ExcelDemo.class)              
-          	.sheet("学生列表")              
-          	.doWrite(getData());  
-        }  
-        /**    
-        * 返回list集合   
-        *  
-        * @return    
-        */    
-        private static List<ExcelDemo> getData() {  
-        	ArrayList<ExcelDemo> excelDemos = new ArrayList<>();     
-          for (int i = 0; i < 10; i++) {       
-          	ExcelDemo excelDemo = new ExcelDemo();          
-            excelDemo.setSno(i);           
-            excelDemo.setSname("lucy" + i);   
-            excelDemos.add(excelDemo);     
-          }       
-          return excelDemos;  
-        }
-      }
+    }
 		
-	-- 3、实现Excel读操作————步骤如下:
-		-- 1、创建实体类和Excel对应
-			package com.pigskin.code_generator.excel;
-			
-			import com.alibaba.excel.annotation.ExcelProperty;
-			import lombok.Data;
-			
-			/** 
-			* EasyExcel测试类 
-			*/
-			@Data
-			public class ExcelDemo {    
-				/**
-        * 设置表头名称，index表示对应excel的列 
-        */
-        @ExcelProperty(value = "学生编号",index = 0)   
-        private Integer sno;  
-        /**
-        * 设置表头名称 
-        */
-        @ExcelProperty(value = "学生姓名",index = 1)  
-        private String sname;
+-- 实现Excel读操作————步骤如下:
+	1、创建实体类和Excel对应
+    package com.pigskin.code_generator.excel;
+
+    import com.alibaba.excel.annotation.ExcelProperty;
+    import lombok.Data;
+
+    /** 
+    * EasyExcel测试类 
+    */
+    @Data
+    public class ExcelDemo {    
+      /**
+      * 设置表头名称，index表示对应excel的列 
+      */
+      @ExcelProperty(value = "学生编号",index = 0)   
+      private Integer sno;  
+      /**
+      * 设置表头名称 
+      */
+      @ExcelProperty(value = "学生姓名",index = 1)  
+      private String sname;
+    }
+	2、创建读取excel监听器
+    package com.pigskin.code_generator.excel;
+
+    import com.alibaba.excel.context.AnalysisContext;
+    import com.alibaba.excel.event.AnalysisEventListener;
+    import java.util.Map;
+
+    public class ExcelLister extends AnalysisEventListener<ExcelDemo> {  
+      /**    
+      * 一行一行读取excel内容   
+      * 
+      * @param excelDemo  
+      * @param analysisContext    
+      */ 
+      @Override   
+      public void invoke(ExcelDemo excelDemo, AnalysisContext analysisContext) {  
+      	System.out.println("****" + excelDemo);  
+      }   
+
+      /**   
+      * 读取表头内容   
+      *   
+      * @param headMap 
+      * @param context  
+      */   
+      @Override   
+      public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {   
+      	System.out.println("表头" + headMap);   
       }
-		-- 2、创建读取excel监听器
-			package com.pigskin.code_generator.excel;
-			
-			import com.alibaba.excel.context.AnalysisContext;
-			import com.alibaba.excel.event.AnalysisEventListener;
-			import java.util.Map;
-			
-			public class ExcelLister extends AnalysisEventListener<ExcelDemo> {  
-      	/**    
-        * 一行一行读取excel内容   
-        * 
-        * @param excelDemo  
-        * @param analysisContext    
-        */ 
-        @Override   
-        public void invoke(ExcelDemo excelDemo, AnalysisContext analysisContext) {  
-        	System.out.println("****" + excelDemo);  
-        }   
-        
-        /**   
-        * 读取表头内容   
-        *   
-        * @param headMap 
-        * @param context  
-        */   
-        @Override   
-        public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {   
-        	System.out.println("表头" + headMap);   
-        }
-        
-        /**   
-        * 读完之后执行的方法  
-        *   
-        * @param analysisContext   
-        */    
-        @Override
-        public void doAfterAllAnalysed(AnalysisContext analysisContext) {   
-        	//TODO:
-        }
+
+      /**   
+      * 读完之后执行的方法  
+      *   
+      * @param analysisContext   
+      */    
+      @Override
+      public void doAfterAllAnalysed(AnalysisContext analysisContext) {   
+      	//TODO:
       }
-		-- 3、最终实现读取
-			 //实现excel读操作       
-       String fileName2 = "E:\\课程分类.xlsx";    
-       EasyExcel.read(fileName2,ExcelDemo.class,new ExcelLister()).sheet().doRead();
+    }
+	3、最终实现读取
+		public class TestEasyExcel {  
+      public static void main(String[] args) { 
+        //实现excel读操作       
+        String fileName2 = "E:\\课程分类.xlsx";    
+        EasyExcel.read(fileName2,ExcelDemo.class,new ExcelLister()).sheet().doRead();
+    	}
+    }
 ```
-
-
 
 ## 6、Spring
 
+### 1、SpringSession——解决分布式系统Session不一致问题
+
 ```markdown
+# 说明
+	解决分布式系统Session不一致问题
+
+# 核心原理————装饰者模式
+-- 1、@EnableRedisHttpSession导入了RedisHttpSessionConfiguration配置    
+  	1)给容器中添加了一个组件      
+    	sessionRedisOperationsSessionRepository:redis操作session.即session的增删改查封装类   
+    2)设置了一个Session存储的过滤器         
+    	SessionRepositoryFilter:每一个请求都要经过这个过滤器.   
+        -- 创建时,就自动从容器中获取到了SessionRepository    
+        -- 原始的request,response都被包装了SessionRepositoryRequestWrapper、SessionRepositoryResponseWrapper        
+        -- 以后获取Session都会调用request.getSession()    
+        -- 由于被包装,放行的是SessionRepositoryRequestWrapper.所以调用的getSession其实是Wrapper的getSession,则是从SessionRepository中获取的,因为SessionRepository真正添加的其实是sessionRedisOperationsSessionRepository,所以就是使用的redis操作session
+
+# SpringBoot整合步骤
+-- 1、添加依赖
+		<dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-data-redis</artifactId>
+      <exclusions>
+        <!--排除lettuce使用jedis解决内存泄漏问题-->
+        <exclusion>
+          <groupId>io.lettuce</groupId>
+          <artifactId>lettuce-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+    </dependency>
+    <!--redis依赖-->   
+    <dependency>           
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-data-redis</artifactId>   
+    </dependency>
+
+-- 2、配置文件添加配置
+		#redis相关配置
+		spring.redis.host=192.168.56.101
+		spring.redis.port=6379
+		#设置session保存位置
+		spring.session.store-type=redis
+		#设置session超时时间
+		spring.session.timeout=30m
+
+-- 3、开启SpringSession配置功能
+		@EnableRedisHttpSession 
+		public class Config { 
+			@Bean 
+			public LettuceConnectionFactory connectionFactory() { 
+      	return new LettuceConnectionFactory();
+      }
+    }
+
+-- 4、存在问题及解决方案
+	1、默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题
+			package com.pigskin.mall.auth.config;
+			import org.springframework.context.annotation.Bean;
+			import org.springframework.context.annotation.Configuration;
+			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+			import org.springframework.data.redis.serializer.RedisSerializer;
+			import org.springframework.session.web.http.CookieSerializer;
+			import org.springframework.session.web.http.DefaultCookieSerializer;
+			
+			/** 
+			* session配置类
+      */
+      @Configuration
+      public class MallSessionConfig {   
+      	/**  
+        * 设置Cookie序列化器组件     
+        * 解决问题（默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题）   
+        *   
+        * @return  
+        */    
+        @Bean   
+        public CookieSerializer cookieSerializer() {  
+        	DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();  
+          /*指定Session作用域（放大）*/        
+          cookieSerializer.setDomainName("pigskinmall.com");   
+          cookieSerializer.setCookieName("PIGSKINSESSION");    
+          return cookieSerializer; 
+        }
+      }
+	2、使用json序列化方式来序列化对象数据到redis中
+			package com.pigskin.mall.auth.config;
+			
+			import org.springframework.context.annotation.Bean;
+			import org.springframework.context.annotation.Configuration;
+			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+			import org.springframework.data.redis.serializer.RedisSerializer;
+			import org.springframework.session.web.http.CookieSerializer;
+			import org.springframework.session.web.http.DefaultCookieSerializer;
+			
+			/**
+      * session配置类 
+      */
+      @Configuration
+      public class MallSessionConfig {  
+      	/**   
+        * 设置redis序列化器组件   
+        * 解决问题（使用json序列化方式来序列化对象数据到redis中）   
+        *    
+        * @return    
+        */   
+        @Bean   
+        public RedisSerializer<Object> springSessionDefaultRedisSerializer() {  
+        	return new GenericJackson2JsonRedisSerializer();   
+        }
+      }
 ```
 
+### 2、SpringCache——解决分布式缓存不一致性问题	
 
+```markdown
+# 说明
+	解决分布式缓存不一致性问题	
+
+# 链接
+	https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache
+
+# 简介
+-- Spring从3.1开始定义了org.springframework.cache.Cache和org.srpingframework.cache.CacheManger接口来统一不同的缓存技术,并支持使用JCache(JSR-107)注解简化我们的开发
+
+-- Cache接口为缓存的组件规范定义,包含缓存的各种操作集合;Cache接口下,Spring提供了各种xxxCache的实现:如RedisCache、EhCacheCache、ConcurrentMapCache等
+
+-- 每次调用需要缓存功能的方法时,Spring会检查指定参数的指定目标方法是否已经被调用过.如果有就直接从缓存中获取方法调用后的结果,如果没有就调用方法并缓存结果后返回给用户
+
+-- Spring缓存抽象时,需要关注以下两点:
+		1)确定方法需要被缓存,以及他们的缓存策略
+		2)从缓存中读取之前缓存存储的数据
+
+# 原理
+-- 1、缓存自动配置类CacheAutoConfiguration帮我们导入redis缓存自动配置类RedisCacheConfiguration,
+
+-- 2、redis缓存自动配置类帮我们自动配置了缓存管理器RedisCacheManger,
+
+-- 3、缓存管理器初始化所有缓存,决定使用那种缓存到的配置(如果RedisCacheConfiguration有,就用已有的配置,否则创建一个默认的).
+
+-- 4、所有想改缓存的配置,只需要给容器中加入一个RedisCacheConfiguration,就会应用到当前缓存管理器管理的所有缓存分区中
+
+# 图示————如下图所示
+```
+
+<img src="image/img2_1_23_1_9.png" style="zoom:50%;" />
+
+```markdown
+# SpringBoot整合SpringCache简化缓存开发
+-- 引入依赖
+	<!--引入spring缓存场景，和spring-boot-starter-data-redis依赖-->       
+  <dependency>   
+    <groupId>org.springframework.boot</groupId>    
+    <artifactId>spring-boot-starter-cache</artifactId>  
+  </dependency><!--redis作为缓存依赖-->       
+  <dependency>  
+    <groupId>org.springframework.boot</groupId> 
+    <artifactId>spring-boot-starter-data-redis</artifactId>        
+    <exclusions>            
+      <!--排除使用lettuce，因为其没有好的方案解决堆外内存溢出问题-->      
+      <exclusion>    
+        <groupId>io.lettuce</groupId>    
+        <artifactId>lettuce-core</artifactId>       
+      </exclusion>         
+    </exclusions>     
+  </dependency>     
+  <!--引入jedis解决lettuce导致的堆外内存溢出问题-->   
+  <dependency>           
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>     
+  </dependency>
+
+-- 添加配置
+	1、自动配置了那些[CacheAutoConfiguration]————会导入redisCacheConfiguration————自动配好了缓存管理器RedisCacheManger
+	2、需要手动配置那些
+		#配置缓存类型
+		spring.cache.type=redis
+		#缓存名（配置了之后，就会按照配置的写，而不在创建）
+		#spring.cache.cache-names=productCache
+		#指定混存数据存活时间(毫秒为单位)
+		spring.cache.redis.time-to-live=600000
+		#添加前缀(指定了使用该前缀，没指定默认使用缓存名作为前缀)
+		#spring.cache.redis.key-prefix=CACHE_
+		#设置是否启用前缀
+		spring.cache.redis.use-key-prefix=true
+		#是否缓存空值（解决缓存穿透问题）
+		spring.cache.redis.cache-null-values=true
+	3、测试使用————启动类使用注解@EnableCaching开启缓存功能————使用对应注解,详见注解说明
+
+-- 注解说明
+	1、@Cacheable: Triggers cache population.(触发将数据保存到缓存的操作)
+		1)说明————代表当前方法的结果需要缓存,如果缓存中有,方法不用调用,如果缓存中没有,调用方法,将最后的结果放入缓存.
+		2)注意————每一个需要缓存的数据都来指定要放入那个名字的缓存@Cacheable({缓存名}),建议缓存的分区按照业务类型区分
+		3)默认行为
+			1-如果缓存中有,方法不用调用
+			2-key默认自动生成:缓存名::自主生产的key值
+			3-value默认使用jdk序列化机制,将序列化后的数据存入redis
+			4-默认过期时间[-1]
+		4)需要自定义操作
+			1-指定生成的缓存使用的key————key属性指定,接收一个spEL表达式,字符串需要使用''再次包裹
+				SPEL表达式更多参考————https://www.jianshu.com/p/e0b50053b5d3
+			2-指定过期时间
+				#指定混存数据存活时间(毫秒为单位)
+				spring.cache.redis.time-to-live=60000
+			3-指定JSON序列化机制
+				#添加配置类,从而修改缓存管理器
+        package com.pigskin.mall.product.config;
+
+        import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+        import org.springframework.boot.autoconfigure.cache.CacheProperties;
+        import org.springframework.boot.context.properties.EnableConfigurationProperties;
+        import org.springframework.cache.annotation.EnableCaching;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Configuration;
+        import org.springframework.data.redis.cache.RedisCacheConfiguration;
+        import org.springframework.data.redis.serializer.RedisSerializationContext;
+        import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+        /**
+        * 自定义缓存配置类 
+        */
+        @EnableConfigurationProperties(CacheProperties.class)
+        @Configuration
+        @EnableCaching
+        public class MyCacheConfig {  
+          /**  
+          * @param cacheProperties 自动从容器中获取  
+          * @return   
+          */   
+          @Bean    
+          RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) { 
+            /*1、获取默认配置*/   
+            RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig(); 
+            /*2、设置自定义的要求*/       
+            /*设置主键序列机制*/   
+            config = config.serializeKeysWith(
+              RedisSerializationContext
+              .SerializationPair
+              .fromSerializer(new StringRedisSerializer())
+            );   
+            /*设置值序列化机制*/   
+            config = config.serializeValuesWith(
+              RedisSerializationContext
+              .SerializationPair
+              .fromSerializer(new GenericFastJsonRedisSerializer())
+            );    
+            /*3、将配置文件中的配置生效*/      
+            /*获取所有redis配置*/   
+            CacheProperties.Redis redisProperties = cacheProperties.getRedis();  
+            /*进行配置生效*/       
+            if (redisProperties.getTimeToLive() != null) {   
+            	config = config.entryTtl(redisProperties.getTimeToLive());      
+            }       
+            if (redisProperties.getKeyPrefix() != null) {  
+            	config = config.prefixKeysWith(redisProperties.getKeyPrefix());    
+            }    
+            if (!redisProperties.isCacheNullValues()) {        
+            	config = config.disableCachingNullValues();      
+            }    
+            if (!redisProperties.isUseKeyPrefix()) {          
+            	config = config.disableKeyPrefix();   
+            }     
+            return config;  
+          }
+        }
+        #自定义配置类后,配置文件未生效
+        //原始配置文件绑定为
+        @ConfigurationProperties(prefix = "spring.cache")public class CacheProperties {
+        	//TODO:
+        }
+        //要让他生效之需要在自定义的配置类上添加注解
+        @EnableConfigurationProperties(CacheProperties.class)————用来使指定类绑定生效
+	2、@CacheEvict: Triggers cache eviction.(触发将数据从缓存移除的操作)
+		1)使用
+			1-@CacheEvict(value = "category", key = "'getLevelOneCategorys'")//失效模式
+			2-@CacheEvict(value = "category", allEntries = true),//失效模式,删除某个分区下的所有数据
+	3、@CachePut: Updates the cache without interfering with the method execution.(不影响方法执行去更新缓存)
+		1)说明————双写模式使用,如果返回的结果是最新的结果,使用该注解可以讲结果重新写入缓存
+	4、@Caching: Regroups multiple cache operations to be applied on a method.(组合以上多个操作)
+		1)使用
+			@Caching(evict = {//同时进行多种缓存操作          
+      	@CacheEvict(value = "category", key = "'getLevelOneCategorys'"),//失效模式        
+      	@CacheEvict(value = "category", key = "'getCatalogJson'")//失效模式  
+      })
+	5、@CacheConfig: Shares some common cache-related settings at class-level.(在类级别共享缓存的相同配置)
+
+-- 不足之处
+	1、读模式
+		1)缓存穿透:查询一个null数据.解决:缓存null.spring.cache.redis.cache-null-values=true
+		2)缓存雪崩:大量key同时过期.解决:加随机时间.spring.cache.redis.time-to-live=600000
+		3)缓存击穿:大量并发进来同时查询一个正好过期数据.解决方案:加锁.默认无加锁,Cacheable使用sync属性启用
+	2、写模式(缓存数据一致性)
+		1)读写加锁.适用于读多写少
+		2)引入中间件,Canal,感知到mysql数据库的更新去更新数据库
+	3、读多写多————直接去数据库
+
+-- 使用总结
+	常规数据(读多写少,及时性、一致性不高的):完全可以使用SpringCache,写模式,只要缓存的数据有过期时间就足够了特殊数据——特殊设计
+```
+
+### 3、SpringSecurity权限框架
+
+```markdown
+# 说明
+	Spring 是一个非常流行和成功的 Java 应用开发框架。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。一般来说，Web 应用的安全性包括用户认证（Authentication）和用户授权（Authorization）两个部分。
+
+# 主要部分
+-- 用户认证【Authentication】————验证某个用户是否为系统中的合法主体，也就是说用户能否访问该系统。用户认证一般要求用户提供用户名和密码。系统通过校验用户名和密码来完成认证过程。
+
+-- 用户授权【Authorization】————验证某个用户是否有权限执行某个操作。在一个系统中，不同用户所具有的权限是不同的。比如对一个文件来说，有的用户只能进行读取，而有的用户可以进行修改。一般来说，系统会为不同的用户分配不同的角色，而每个角色则对应一系列的权限。
+
+# 本质————Spring Security其实就是用filter，对请求的路径进行过滤。
+-- 如果是基于Session，那么Spring-security会对cookie里的sessionid进行解析，找到服务器存储的sesion信息，然后判断当前用户是否符合请求的要求。
+
+-- 如果是token，则是解析出token，然后将当前请求加入到Spring-security管理的权限信息中去
+
+# 实现过程
+-- 说明
+	1、如果系统的模块众多，每个模块都需要就行授权与认证，所以我们选择基于token的形式进行授权与认证
+	2、用户根据用户名密码认证成功，然后获取当前用户角色的一系列权限值，并以用户名为key，权限列表为value的形式存入redis缓存中
+	3、根据用户名相关信息生成token返回，浏览器将token记录到cookie中
+	4、每次调用api接口都默认将token携带到header请求头中
+	5、Spring-security解析header头获取token信息
+	6、解析token获取当前用户名，根据用户名就可以从redis中获取权限列表，这样Spring-security就能够判断当前请求是否有权限访问
+
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_14_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 代码整合
+-- 1、创建对应模块————权限管理模块目录结构,如下图所示:
+```
+
+<img src="image/img2_1_14_1_2.png" style="zoom:50%;" />
+
+```markdown
+-- 2、引入依赖
+	<dependencies>   
+  	<!--自定义公共组件-->      
+    <dependency>   
+      <groupId>com.pigskin</groupId>    
+      <artifactId>common_utils</artifactId>    
+      <version>0.0.1-SNAPSHOT</version>     
+    </dependency>     
+    <!-- Spring Security权限控制依赖 -->     
+    <dependency>      
+      <groupId>org.springframework.boot</groupId>   
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>       
+    <!--jwt依赖用于生成token-->       
+    <dependency>     
+      <groupId>io.jsonwebtoken</groupId>  
+      <artifactId>jjwt</artifactId>     
+    </dependency>   
+  </dependencies>
+
+-- 3、编写核心代码
+	1、核心配置类代码
+		package com.pigskin.serurity.config;
+
+		import com.pigskin.serurity.filter.TokenAuthenticationFilter;
+		import com.pigskin.serurity.filter.TokenLoginFilter;
+		import com.pigskin.serurity.security.DefaultPasswordEncoder;
+		import com.pigskin.serurity.security.TokenLogoutHandler;
+		import com.pigskin.serurity.security.TokenManager;
+		import com.pigskin.serurity.security.UnauthorizedEntryPoint;
+		import org.springframework.beans.factory.annotation.Autowired;
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.data.redis.core.RedisTemplate;
+		import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+		import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+		import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+		import org.springframework.security.config.annotation.web.builders.WebSecurity;
+		import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+		import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+		import org.springframework.security.core.userdetails.UserDetailsService;
+
+		/**
+    * Security配置类 
+    */
+    @Configuration
+    @EnableWebSecurity
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
+    public class TokenWebSecurityConfig extends WebSecurityConfigurerAdapter {  
+    	/**   
+      * 自定义查询数据库类     
+      */   
+      private UserDetailsService userDetailsService;   
+      /**   
+      * Token操作工具类   
+      */  
+      private TokenManager tokenManager; 
+      /**    
+      * 密码处理工具类  
+      */   
+      private DefaultPasswordEncoder defaultPasswordEncoder;  
+      /**     
+      * redis操作类  
+      */   
+      private RedisTemplate redisTemplate; 
+
+      @Autowired  
+      public TokenWebSecurityConfig(UserDetailsService userDetailsService, 
+      		DefaultPasswordEncoder defaultPasswordEncoder,                            
+      		TokenManager tokenManager, RedisTemplate redisTemplate) {    
+        this.userDetailsService = userDetailsService;  
+        this.defaultPasswordEncoder = defaultPasswordEncoder; 
+        this.tokenManager = tokenManager;      
+        this.redisTemplate = redisTemplate;  
+      }   
+
+      /** 
+      * 配置设置    
+      *    
+      * @param http   
+      * @throws Exception  
+      */   
+      @Override  
+      protected void configure(HttpSecurity http) throws Exception {  
+      	http.exceptionHandling()          
+        .authenticationEntryPoint(new UnauthorizedEntryPoint())     
+        .and().csrf().disable()   
+        .authorizeRequests()    
+        .anyRequest().authenticated()      
+        //设置退出请求地址（可以不用改）          
+        .and().logout().logoutUrl("/admin/acl/index/logout")   
+        .addLogoutHandler(new TokenLogoutHandler(tokenManager, redisTemplate)).and()   
+        .addFilter(new TokenLoginFilter(authenticationManager(), tokenManager, redisTemplate))    
+        .addFilter(new TokenAuthenticationFilter(authenticationManager(), tokenManager, redisTemplate))
+        .httpBasic();  
+      }   
+
+      /**   
+      * 密码处理   
+      *    
+      * @param auth   
+      * @throws Exception     
+      */   
+      @Override   
+      public void configure(AuthenticationManagerBuilder auth) throws Exception {   
+      	auth.userDetailsService(userDetailsService).passwordEncoder(defaultPasswordEncoder);   
+      }   
+
+      /**   
+      * 配置哪些请求不拦截  
+      *   
+      * @param web   
+      * @throws Exception     
+      */  
+      @Override  
+      public void configure(WebSecurity web) throws Exception {    
+      	web.ignoring()
+      	.antMatchers("/api/**", "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");       
+        //web.ignoring().antMatchers("/*/**");   
+      }
+    }
+	2、相关实体类
+		1)安全认证用户详情信息类
+			package com.pigskin.serurity.entity;
+
+			import lombok.Data;
+			import lombok.extern.slf4j.Slf4j;
+			import org.springframework.security.core.GrantedAuthority;
+			import org.springframework.security.core.authority.SimpleGrantedAuthority;
+			import org.springframework.security.core.userdetails.UserDetails;
+			import org.springframework.util.StringUtils;
+			import java.util.ArrayList;
+			import java.util.Collection;
+			import java.util.List;
+
+			/**
+      * 安全认证用户详情信息,需实现SpringSecurity提供的UserDetails接口 
+      */
+      @Data
+      @Slf4j
+      public class SecurityUser implements UserDetails { 
+      	/**    
+        * 当前登录用户   
+        */   
+        private transient User currentUserInfo;  
+        /**    
+        * 当前权限  
+        */   
+        private List<String> permissionValueList;
+
+        public SecurityUser(User user) {   
+        	if (user != null) {    
+          	this.currentUserInfo = user;      
+          }  
+        }    
+
+        @Override   
+        public Collection<? extends GrantedAuthority> getAuthorities() {  
+        	Collection<GrantedAuthority> authorities = new ArrayList<>();  
+          permissionValueList.stream().forEach(permissionValue -> {   
+          	if (!StringUtils.isEmpty(permissionValue)) {    
+            	SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue); 
+              authorities.add(authority);          
+            }     
+          });   
+          return authorities; 
+        }   
+
+        @Override  
+        public String getPassword() {  
+        	return currentUserInfo.getPassword();    
+        }
+
+        @Override
+        public String getUsername() {
+        	return currentUserInfo.getUsername();
+        }
+
+        @Override  
+        public boolean isAccountNonExpired() {
+        	return true;
+        }  
+
+        @Override  
+        public boolean isAccountNonLocked() {   
+        	return true;  
+        }   
+
+        @Override   
+        public boolean isCredentialsNonExpired() {    
+        	return true; 
+        }   
+
+        @Override   
+        public boolean isEnabled() {  
+      	  return true;  
+        }
+      }
+		2)用户实体类
+			package com.pigskin.serurity.entity;
+
+			import io.swagger.annotations.ApiModel;
+			import io.swagger.annotations.ApiModelProperty;
+			import lombok.Data;import java.io.Serializable;
+
+			/** 
+			* 用户实体类
+      */
+      @Data
+      @ApiModel(description = "用户实体类")
+      public class User implements Serializable { 
+      	private static final long serialVersionUID = 1L; 
+
+        @ApiModelProperty(value = "微信openid")  
+        private String username;   
+
+        @ApiModelProperty(value = "密码")  
+        private String password;   
+
+        @ApiModelProperty(value = "昵称") 
+        private String nickName;   
+
+        @ApiModelProperty(value = "用户头像")  
+        private String salt;   
+
+        @ApiModelProperty(value = "用户签名")  
+        private String token;
+      }
+	3、核心过滤器
+		1)授权过滤器
+			package com.pigskin.serurity.filter;
+
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import com.pigskin.serurity.security.TokenManager;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.authentication.AuthenticationManager;
+			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+			import org.springframework.security.core.GrantedAuthority;
+			import org.springframework.security.core.authority.SimpleGrantedAuthority;
+			import org.springframework.security.core.context.SecurityContextHolder;
+			import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+			import org.springframework.util.StringUtils;
+			import javax.servlet.FilterChain;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+			import java.util.ArrayList;
+			import java.util.Collection;
+			import java.util.List;
+
+			/**
+      * 访问(授权)过滤器 
+      */
+      public class TokenAuthenticationFilter extends BasicAuthenticationFilter { 
+      	private TokenManager tokenManager;   
+        private RedisTemplate redisTemplate;    
+        public TokenAuthenticationFilter(AuthenticationManager authManager,
+        		TokenManager tokenManager, RedisTemplate redisTemplate) {    
+        	super(authManager);     
+          this.tokenManager = tokenManager;  
+          this.redisTemplate = redisTemplate;  
+        }    
+
+        @Override  
+        protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)  
+        		throws IOException, ServletException {     
+        	logger.info("=================" + req.getRequestURI());    
+          if (req.getRequestURI().indexOf("admin") == -1) {   
+          	chain.doFilter(req, res);           
+            return;      
+          }    
+          UsernamePasswordAuthenticationToken authentication = null;      
+          try {       
+          	authentication = getAuthentication(req); 
+          } catch (Exception e) {          
+          	ResponseUtil.out(res, R.error());      
+          }
+          if (authentication != null) {            
+          	SecurityContextHolder.getContext().setAuthentication(authentication);  
+          } else {          
+            ResponseUtil.out(res, R.error());   
+          }       
+          chain.doFilter(req, res);   
+        } 
+
+        private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {   
+        	// token置于header里    
+          String token = request.getHeader("token");   
+          if (token != null && !"".equals(token.trim())) {    
+          	String userName = tokenManager.getUserFromToken(token); 
+            List<String> permissionValueList = (List<String>) redisTemplate.opsForValue().get(userName);  
+            Collection<GrantedAuthority> authorities = new ArrayList<>();         
+            for (String permissionValue : permissionValueList) {              
+            	if (StringUtils.isEmpty(permissionValue)) continue;           
+              SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue);  
+              authorities.add(authority);         
+            }       
+            if (!StringUtils.isEmpty(userName)) {   
+            	return new UsernamePasswordAuthenticationToken(userName, token, authorities);      
+            }          
+            return null; 
+          }     
+          return null;
+        }
+      }
+		2)认证过滤器
+			package com.pigskin.serurity.filter;
+
+			import com.fasterxml.jackson.databind.ObjectMapper;
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import com.pigskin.serurity.entity.SecurityUser;
+			import com.pigskin.serurity.entity.User;
+			import com.pigskin.serurity.security.TokenManager;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.authentication.AuthenticationManager;
+			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+			import org.springframework.security.core.Authentication;
+			import org.springframework.security.core.AuthenticationException;
+			import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+			import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+			import javax.servlet.FilterChain;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;import java.util.ArrayList;
+
+			/**
+      * 登录过滤器，继承UsernamePasswordAuthenticationFilter，对用户名密码进行登录校验 
+      */
+      public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter { 
+      	private AuthenticationManager authenticationManager; 
+        private TokenManager tokenManager;   
+        private RedisTemplate redisTemplate; 
+
+        /**   
+        * 构造，传递参数  
+        *   
+        * @param authenticationManager  
+        * @param tokenManager    
+        * @param redisTemplate    
+        */   
+        public TokenLoginFilter(AuthenticationManager authenticationManager, TokenManager tokenManager, 
+        		RedisTemplate redisTemplate) {     
+        	this.authenticationManager = authenticationManager;     
+          this.tokenManager = tokenManager;      
+          this.redisTemplate = redisTemplate;     
+          this.setPostOnly(false);      
+          //设置登录请求地址      
+          this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/acl/login", "POST")); 
+        }   
+
+        /**   
+        * 得到用户名和密码  
+        *    
+        * @param req  
+        * @param res  
+        * @return  
+        * @throws AuthenticationException   
+        */  
+        @Override  
+        public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)  
+        		throws AuthenticationException {     
+        	try {        
+          	User user = new ObjectMapper().readValue(req.getInputStream(), User.class);      
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+            	user.getUsername(), user.getPassword(), new ArrayList<>()));    
+          } catch (IOException e) {      
+          	throw new RuntimeException(e);    
+          }  
+        }   
+
+        /**  
+        * 登录认证成功  
+        *   
+        * @param req   
+        * @param res   
+        * @param chain    
+        * @param auth    
+        * @throws IOException   
+        * @throws ServletException   
+        */   
+        @Override  
+        protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, 
+        		FilterChain chain,  Authentication auth) throws IOException, ServletException {    
+          SecurityUser user = (SecurityUser) auth.getPrincipal();        
+          //采用jwt方式生成token字符串        
+          String token = tokenManager.createToken(user.getCurrentUserInfo().getUsername());  
+          //将数据存到redis中   
+          redisTemplate.opsForValue().set(
+          	user.getCurrentUserInfo().getUsername(), user.getPermissionValueList());     
+          ResponseUtil.out(res, R.ok().data("token", token)); 
+        }    
+
+        /**  
+        * 登录失败  
+        *    
+        * @param request 
+        * @param response  
+        * @param e     
+        * @throws IOException    
+        * @throws ServletException  
+        */   
+        @Override   
+        protected void unsuccessfulAuthentication(HttpServletRequest request, 
+        		HttpServletResponse response,AuthenticationException e) throws IOException, ServletException {     
+        	ResponseUtil.out(response, R.error());    
+        }
+      }
+	4、相关工具类
+		1)密码处理工具类
+			package com.pigskin.serurity.security;
+
+			import com.pigskin.common_utils.MD5;
+			import org.springframework.security.crypto.password.PasswordEncoder;
+			import org.springframework.stereotype.Component;
+
+			/**
+      * 密码的处理方法类型
+      */
+      @Component
+      public class DefaultPasswordEncoder implements PasswordEncoder {  
+      	public DefaultPasswordEncoder() {    
+        	this(-1);   
+        }   
+
+        /**   
+        * @param strength 要使用的位数介于4和31之间  
+        */    
+        public DefaultPasswordEncoder(int strength) {
+        
+        }  
+
+        /**   
+        * MD5加密   
+        *   
+        * @param rawPassword 要加密的密码    
+        * @return   
+        */   
+        public String encode(CharSequence rawPassword) {   
+        	return MD5.encrypt(rawPassword.toString());  
+        }   
+
+        /**   
+        * 密码匹配验证  
+        *    
+        * @param rawPassword     要验证的密码     
+        * @param encodedPassword 已加密密码   
+        * @return   
+        */   
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {    
+        	return encodedPassword.equals(MD5.encrypt(rawPassword.toString())); 
+        }
+      }
+		2)token操作工具类
+			package com.pigskin.serurity.security;
+
+			import io.jsonwebtoken.CompressionCodecs;
+			import io.jsonwebtoken.Jwts;
+			import io.jsonwebtoken.SignatureAlgorithm;
+			import org.springframework.stereotype.Component;
+			import java.util.Date;
+
+			/**
+      * token管理 
+      */
+      @Component
+      public class TokenManager {  
+      	private long tokenExpiration = 24 * 60 * 60 * 1000;  
+        private String tokenSignKey = "123456";   
+
+        /**    
+        * 根据用户名创建token字符串    
+        *    
+        * @param username 用户名   
+        * @return 
+        */    
+        public String createToken(String username) {  
+        	return Jwts.builder().setSubject(username)    
+          	.setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))         
+            .signWith(SignatureAlgorithm.HS512, tokenSignKey).compressWith(CompressionCodecs.GZIP).compact();  
+        }  
+
+        /**  
+        * 从token中获取用户信息   
+        *    
+        * @param token   
+        * @return   
+        */   
+        public String getUserFromToken(String token) {     
+        	return Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token).getBody().getSubject();  
+        }  
+
+        /**    
+        * 移除token  
+        *     
+        * @param token
+        */   
+        public void removeToken(String token) {    
+        	//jwttoken无需删除，客户端扔掉即可。  
+        }
+      }
+		3)退出工具类
+			package com.pigskin.serurity.security;
+
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import org.springframework.data.redis.core.RedisTemplate;
+			import org.springframework.security.core.Authentication;
+			import org.springframework.security.web.authentication.logout.LogoutHandler;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+
+			/**
+      * 登出业务逻辑类 
+      */
+      public class TokenLogoutHandler implements LogoutHandler {   
+      		private TokenManager tokenManager;  
+          private RedisTemplate redisTemplate;  
+
+          public TokenLogoutHandler(TokenManager tokenManager, RedisTemplate redisTemplate) {   
+            this.tokenManager = tokenManager;  
+            this.redisTemplate = redisTemplate;   
+          }    
+
+          @Override  
+          public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {    
+          	String token = request.getHeader("token");     
+            if (token != null) {   
+              tokenManager.removeToken(token);     
+              //清空当前用户缓存中的权限数据          
+              String userName = tokenManager.getUserFromToken(token);  
+              redisTemplate.delete(userName);   
+            }     
+            ResponseUtil.out(response, R.ok());  
+          }
+        }
+		4)未授权统一处理类
+			package com.pigskin.serurity.security;
+
+			import com.pigskin.common_utils.R;
+			import com.pigskin.common_utils.ResponseUtil;
+			import org.springframework.security.core.AuthenticationException;
+			import org.springframework.security.web.AuthenticationEntryPoint;
+			import javax.servlet.ServletException;
+			import javax.servlet.http.HttpServletRequest;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+
+			/** 
+			* 未授权的统一处理方式 
+			*/
+			public class UnauthorizedEntryPoint implements AuthenticationEntryPoint { 
+      	@Override    
+      	public void commence(HttpServletRequest request, HttpServletResponse response,                         AuthenticationException authException) throws IOException, ServletException {   
+        	ResponseUtil.out(response, R.error());   
+        }
+      }
+	5、公共工具类添加
+		1)响应工具类
+			package com.pigskin.common_utils;
+
+			import com.fasterxml.jackson.databind.ObjectMapper;
+			import org.springframework.http.HttpStatus;
+			import org.springframework.http.MediaType;
+			import javax.servlet.http.HttpServletResponse;
+			import java.io.IOException;
+
+			/**
+			* 响应工具类
+      */
+      public class ResponseUtil {  
+      	public static void out(HttpServletResponse response, R r) {   
+        	ObjectMapper mapper = new ObjectMapper();   
+          response.setStatus(HttpStatus.OK.value());    
+          response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);  
+          try {          
+          	mapper.writeValue(response.getWriter(), r);   
+          } catch (IOException e) { 
+          	e.printStackTrace();    
+          }   
+        }
+      }
+		2)MD5加密工具类
+			详见————2、Java开发之后端技术篇-1-12、MD5加密
+
+-- 4、对应的需要认证服务的模块中引入该模块依赖
+
+# 代码执行过程
+-- 1、模块登录后，进入认证过滤器，获取输入的登录用户名和密码
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res){
+		...
+	}
+
+-- 2、调用自己写的类，根据用户名查询用户信息和用户具有的权限，并通过security对象返回
+	@Service("userDetailsService")
+	public class UserDetailsServiceImpl implements UserDetailsService {
+		...
+	}
+
+-- 3、认证成功后，执行认证过滤器中的认证成功后的方法，得到用户信息，并根据用户名生成token值，同时将用户名和权限信息放到redis中。返回token值
+	@Override    
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,Authentication auth) throws IOException, ServletException {
+		...
+	}
+
+-- 4、进入授权过滤器，从header中根据token信息获取用户名称，根据用户名称从redis查询数据，给用户授权
+	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {       
+		// token置于header里 
+  	String token = request.getHeader("token");
+	}
+
+# 前端代码整合
+-- 替换element-ui
+-- 替换代码
+-- 安装依赖————npm install --save vuex-persistedstate
+-- 修改
+```
 
 ## 7、SpringBoot
 
-### 1、说明
+### 1、SpringBoot简介
 
 ```markdown
+# 说明
 	spring的一套快速配置脚手架,用于快速开发单个微服务
-```
 
-
-
-### 2、SpringBoot多环境配置
-
-```markdown
-# 作用
+# SpringBoot多环境配置
+-- 作用
 	针对不同环境，使用不同的配置文件
 	
-# 分类
--- dev————开发环境————application-dev.properties
--- test————测试环境————application-test.properties
--- prod————生产环境————application-prod.properties
+-- 分类
+	1、dev————开发环境————application-dev.properties
+	2、test————测试环境————application-test.properties
+	3、prod————生产环境————application-prod.properties
 
-# 使用
+-- 使用
 	# 配置文档配置(代表当前配置文档是dev类型)
 	spring.profiles.active=dev
 ```
 
 ## 8、SpringCloud
 
-### 1、微服务简介
+### 0、SpringCloud简介
 
 ```markdown
-# 特点
--- 一个项目中有多个端口的服务端口进行启动的
--- 一个项目拆分成独立的多个服务，每个服务能够独立运行
+# 官方文档————https://spring.io/projects/spring-cloud
 
-# 常用微服务开发框架
--- Spring Cloud(现在比较流行的)————https://spring.io/projects/spring-cloud
+# 微服务简介
+-- 特点
+	1、一个项目中有多个端口的服务端口进行启动的
+	2、一个项目拆分成独立的多个服务，每个服务能够独立运行
 
--- Dubbo(出现的早，有些公司也在用)————https://dubbo.apache.org/zh/
+-- 常用微服务开发框架
+	1、Spring Cloud(现在比较流行的)————https://spring.io/projects/spring-cloud
+	2、Dubbo(出现的早，有些公司也在用)————https://dubbo.apache.org/zh/
+	3、DropWizard（关注单个微服务的开发）————https://www.dropwizard.io/en/latest/
+	4、Consul、etcd&etc(微服务的模块)
 
--- DropWizard（关注单个微服务的开发）————https://www.dropwizard.io/en/latest/
+-- 动静分离
+	1、静————图片,JS,CSS等静态资源(以实际文件存在的方式)
+	2、动————服务器需要处理的请求
 
--- Consul、etcd&etc(微服务的模块)
+-- 分布式
+	一个项目不同服务单独部署到不同的服务器
 
-# 动静分离
--- 静————图片,JS,CSS等静态资源(以实际文件存在的方式)
-
--- 动————服务器需要处理的请求
-```
-
-
-
-### 2、分布式简介
-
-```markdown
-# 说明
- 一个项目不同服务单独部署到不同的服务器
-```
-
-
-
-### 3、SpringCloud说明
-
-```markdown
+# SpringCloud说明
 -- 不是一种技术，而是多种技术的集合
+
 -- 包含多种框架（技术），使用这些技术实现微服务操作
+
 -- 依赖于springboot技术
+
+# SpringCloud整体依赖管理器
+-- pom文件导入依赖
+	<dependencyManagement>
+        <dependencies>
+            <!--SpringCloud依赖管理-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Greenwich.SR3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+# SpringCloud相关基础服务组件（框架）
+-- Netflix Eureka（现多用Nacos）————服务发现、注册中心
+	详见————2、Java开发之后端技术篇-1-8-1、Netflix Eureka——服务发现、注册中心
+
+-- Spring Cloud Config（现多用Nacos）————配置中心
+	详见————2、Java开发之后端技术篇-1-8-2、Spring Cloud Config——配置中心
+
+-- Netflix Feign————声明式远程调用
+	详见————2、Java开发之后端技术篇-1-8-3、Netflix Feign——声明式远程调用(调用远程服务)
+
+-- Netflix Hystrix(现多用Sentinel)————熔断器
+	详见————2、Java开发之后端技术篇-1-8-4、Netflix Hystrix——熔断器
+
+-- Spring Cloud GateWay————服务网关
+	详见————2、Java开发之后端技术篇-1-8-5、Spring Cloud GateWay——服务网关
+
+-- Spring Cloud Sleuth+Zipkin————服务链路追踪
+	详见————2、Java开发之后端技术篇-1-8-6、Spring Cloud Sleuth+Zipkin——服务链路追踪
+
+-- Spring Cloud Ribbon————负载均衡
+	详见————2、Java开发之后端技术篇-1-8-7、Spring Cloud Ribbon——负载均衡
+
+-- Spring Cloud Bus(现多用Nacos)————消息总线
+	详见————2、Java开发之后端技术篇-1-8-8、Spring Cloud Bus——消息总线
+
+# 接口调用过程
+-- 名词解释
+	1、消费者（调用者）
+		1)接口化请求调用（创建服务接口）
+    2)Feign（根据定义的服务名，找到服务接口进行调用）
+    3)Hystrix（查看被调用服务是否正常启动，如果没有正常启动，则进行熔断）
+    4)Ribbon
+    5)HttpClient/OkHttp
+	2、生产者（被调用者）
+
+-- 调用过程
+	Feign-->Hystrix-->Ribbon-->Http Client(apache http components/Okhttp),详细过程如图:
 ```
 
-### 4、SpringCloudAlibaba相关服务组件
+<img src="image/img2_1_8_4_4.png" style="zoom:50%;" />
 
 ```markdown
-# 地址
-	https://github.com/alibaba/spring-cloud-alibaba/blob/master/spring-cloud-alibaba-examples/nacos-example/nacos-discovery-example/readme-zh.md
+# 小版本划分说明
+-- SNAPSHOT————快照版本，随时可能修改
 
-# SpringCloudAlibaba整体依赖
--- 导入依赖
-	<dependencyManagement>   
-    <dependencies>          
-      <dependency>           
-        <groupId>com.alibaba.cloud</groupId>    
-        <artifactId>spring-cloud-alibaba-dependencies</artifactId>        
-        <version>2.1.0.RELEASE</version>     
-        <type>pom</type>             
-        <scope>import</scope>         
-      </dependency>      
-    </dependencies> 
-  </dependencyManagement>
+-- M(MileStone)————表示里程碑版本，一般同时标注PRE,表示预览版本
 
-
-# 服务发现【SpringCloudAlibaba-Nacos作为注册中心】————Nacos注册中心
--- 作用
-	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
-
--- 服务注册实现步骤
-  1、相关模块引入依赖
-    <!--服务注册-->
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-    </dependency>
-  2、在要注册服务的配置文件中进行Nacos地址配置
-    #nacos服务地址
-    spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
-  3、在启动类添加注解，进行nacos注册
-  	@EnableDiscoveryClient
-  4、启动测试
-  	在nacos的服务列表中就会列举出来
-
-# 分布式配置【SpringCloudAlibaba-Nacos作为配置中心】————Nacos配置中心
--- 作用
-	基于配置中心进行配置文件的统一动态配置管理
-
--- 相关依赖
-	<!--nacos配置中心依赖-->       
-  <dependency>      
-    <groupId>org.springframework.cloud</groupId>  
-    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>    
-  </dependency>
- 
--- Spring Boot配置文件加载顺序
-	1、先加载[bootstrap.yml(.properties)]
-	2、后加载[application.yml(.properties)]
-	3、如果application.yml中存在[spring.profiles.active=dev],就会接着去加载[application-dev.yml]
-
--- 实现过程
-	1、调用服务中添加依赖[spring-cloud-starter-alibaba-nacos-config]
-	2、在nacos配置管理的配置列表中添加配置————如果配置文件和本地都有对应属性,优先采用配置中心的配置
-		-- Data ID:读取的配置文件名称
-			1)名称规则
-				第一部分:服务名
-				第二部分:配置文件所使用的环境(不指定可省略)
-				第三部分:文件类型扩展名
-			2)完整格式
-				${spring.application.name}-${spring.profiles.active}.${file.exetension}
-		-- Group:默认组
-		-- 配置格式:配置文件格式
-		-- 配置内容:配置文件内容
-	3、添加配置到配置文件[bootstrap.yml]
-		#配置中心地址
-		spring.cloud.nacos.config.server-addr=127.0.0.1:8848
-		#通过这个环境去配置中心找对应配置
-		#spring.profiles.active=dev
-		#通过这个名字去配置中心找对应配置
-		spring.application.name=staService
-	4、说明
-		-- 使用@RefreshScope注解标识控制器每次自动刷新配置,并使用@Value("${配置属性名}")
-		-- @ConfigurationProperties("${配置属性名}")获取配置属性
-
--- 名称空间切换环境
-	1、实际开发包含的开发环境
-		-- dev:开发环境
-		-- test:测试环境
-		-- prod:生产环境
-	2、使用
-    -- 在nacos中创建不同的名称空间
-      public:默认名称空间
-      dev:开发名称空间
-      test:测试名称空间
-      prod:生产名称空间
-    -- 不同名称空间创建不同的配置文件
-    -- 配置文件[bootstrap.yml]中追加内容
-      #通过此设置去nacos配置中心找对应配置命名空间(值为创建出的不同名称空间对应的)
-      spring.cloud.nacos.config.namespace=aa10b21c-9642-46c2-8422-7ea095ffe3c0
-
--- 多配置文件加载
- 	1、创建不同的配置文件,用于设置不同的配置
- 	2、修改配置文件[bootstrap.yml],加载nacos中的多个配置文件
- 		#加载nacos配置中心的多个配置文件
- 		##设置加载的配置文件名称
- 		spring.cloud.nacos.config.ext-config[0].data-id=port.properties
- 		##开启动态刷新配置，否则配置文件修改，工程无法感知
- 		spring.cloud.nacos.config.ext-config[0].refresh=true
- 		...
--- 细节
-	1、命名空间__默认public,用于配置隔离
-		1)开发、测试、生产:利用命名空间来做环境隔离
-			#bootstrap.properties设置使用的命名空间
-			spring.cloud.nacos.config.namespace=2c67d4xc-217e-4e82-95f5-66d05b01c5b9
-			#设置使用的配置分组
-			spring.cloud.nacos.config.group=dev
-		2)每个微服务之间互相隔离配置,每个微服务创建自己的命名空间,只加载自己命名空间下的配置
-	2、配置集__一组相关或不相关的配置项的集合
-		1)加载多个
-			#加载多个配置文件
-			##配置加载的属性文件ID
-			spring.cloud.nacos.config.ext-config[0].data-id=datasource.yml
-			##配置对应组
-			spring.cloud.nacos.config.ext-config[0].group=dev
-			##配置是否动态刷新
-			spring.cloud.nacos.config.ext-config[0].refresh=true
-	3、配置集ID————类似于配置文件名
-	4、配置分组————默认所有的配置文件都属于DEFAULT_GROUP
-		1)通过在bootstrap.properties文件中如下配置设定使用的配置
-			#设置使用的配置分组
-			spring.cloud.nacos.config.group=DEFAULT_GROUP
-
-# 服务容错【SpringCloudAlibaba-Sentinel】————限流、降级、熔断
-	详见————2、Java开发之后段技术篇-1-38、SpringCloudAlibaba——Sentinel——限流&熔断&降级
-
-# 分布式事务解决方案【SpringCloudAlibaba-Seata】————原Fescar
-	详见————2、Java开发之后段技术篇-1-32、Seata—分布式事务解决方案——非高并发适用
+-- SR(Service Relese )————表示正式版本，一般同时标注GA
 ```
 
-
-
-### 5、SpringCloud相关基础服务组件（框架）
+### 1、Netflix Eureka——服务发现、注册中心
 
 ```markdown
-# 地址
-	https://spring.io/projects/spring-cloud
-
-# 服务发现【Netflix Eureka（现多用Nacos）】——注册中心
--- 作用
+# 作用
 	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
 
--- 常见的注册中心
+# 常见的注册中心
   Eureka(原生，2.0遇到性能瓶颈，停止维护)
   Zookeeper(支持，专业的独立产品。例如：dubbo)
   Consul(原生，Go语言开发)
-  Nacos内容详见【1.9————Nacos】
+  Nacos(详见————2、Java开发之后端技术篇-1-10、Nacos)
 
--- SpringCloudAlibaba使用Nacos作为注册中心————置中心————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
+# SpringCloudAlibaba使用Nacos作为注册中心
+	详见————2、Java开发之后端技术篇-1-9-1、Nacos作为注册中心——服务发现、注册中心
+```
 
-# 分布式配置【Spring Cloud Config（现多用Nacos）】
--- SpringCloudAlibaba使用Nacos作为配置中心————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
+### 2、Spring Cloud Config——配置中心
 
-# 负载均衡【SpringCloud-Ribbon】
+```markdown
+# SpringCloudAlibaba使用Nacos作为配置中心
+	详见————2、Java开发之后端技术篇-1-9-2、Nacos作为配置中心——分布式配置
+```
 
-# 服务调用【Netflix Feign】
--- Feign说明————声明式Http客户端(调用远程服务)
-  1、Feign是Netflix开发的声明式、模板化的HTTP客户端， Feign可以帮助我们更快捷、优雅地调用HTTP API。
-  2、Feign支持多种注解，例如Feign自带的注解或者JAX-RS注解等。
-  3、Spring Cloud对Feign进行了增强，使Feign支持了Spring MVC注解，并整合了Ribbon和Eureka，从而让Feign的使用更加方便。
-  4、Spring Cloud Feign是基于Netflix feign实现，整合了Spring Cloud Ribbon和Spring Cloud Hystrix，除了提供这两者的强大功能外，还提供了一种声明式的Web服务客户端定义的方式。
-  5、Spring Cloud Feign帮助我们定义和实现依赖服务接口的定义。在Spring Cloud feign的实现下，只需要创建一个接口并用注解方式配置它，即可完成服务提供方的接口绑定，简化了在使用Spring Cloud Ribbon时自行封装服务调用客户端的开发量。
+### 3、Netflix Feign——声明式远程调用(调用远程服务)
 
--- 远程调用逻辑————只要json数据模型兼容,双方服务无需同一个TO
+```markdown
+# 说明
+-- 1、Feign是Netflix开发的声明式、模板化的HTTP客户端， Feign可以帮助我们更快捷、优雅地调用HTTP API。
+-- 2、Feign支持多种注解，例如Feign自带的注解或者JAX-RS注解等。
+-- 3、Spring Cloud对Feign进行了增强，使Feign支持了Spring MVC注解，并整合了Ribbon和Eureka，从而让Feign的使用更加方便。
+-- 4、Spring Cloud Feign是基于Netflix feign实现，整合了Spring Cloud Ribbon和Spring Cloud Hystrix，除了提供这两者的强大功能外，还提供了一种声明式的Web服务客户端定义的方式。
+-- 5、Spring Cloud Feign帮助我们定义和实现依赖服务接口的定义。在Spring Cloud feign的实现下，只需要创建一个接口并用注解方式配置它，即可完成服务提供方的接口绑定，简化了在使用Spring Cloud Ribbon时自行封装服务调用客户端的开发量。
+
+# 远程调用逻辑————只要json数据模型兼容,双方服务无需同一个TO
 	1、本地服务调用编写的Feign服务,并传入一个对象参数
 	2、SpringCloud根据@RequestBody注解,将该对象转为json对象
 	3、SpringCloud从注册中心找到该Feign服务,并根据Mapping路径给指定路径发送请求,同时将上一步转换的json对象放入请求体中,发送请求
 	4、远端服务接收到该请求.并根据@RequestBody注解,将请求体中的json对象转换成对应的对象
 
--- 服务调用实现步骤
-  1、调用方引入相关依赖
+# 服务调用实现步骤
+-- 1、调用方引入相关依赖
     <!--服务调用-->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-openfeign</artifactId>
     </dependency>
-  2、调用端启动类添加注解
+
+-- 2、调用端启动类添加注解
   	@EnableFeignClients
-  3、创建调用服务接口【@FeignClient("被调用的服务名")】，并设置被调用的方法【要设置完全路径、PathVariable一定要指定名称】
+
+-- 3、创建调用服务接口【@FeignClient("被调用的服务名")】，并设置被调用的方法【要设置完全路径、PathVariable一定要指定名称】
     packagecom.pigskin.eduservice.client;
 
     importcom.pigskin.common_utils.R;
@@ -1341,7 +2229,8 @@ return interceptor;
       @DeleteMapping("/vod_service/video/removeVideoSourceById/{videoId}")
       R removeVideoSource(@PathVariable("videoId")StringvideoId);
     }
-  4、将创建的服务接口注入到要使用的服务类中，进行调用即可
+
+-- 4、将创建的服务接口注入到要使用的服务类中，进行调用即可
     //远端服务接口注入
     @Autowired private VodClient vodClient;
 
@@ -1356,16 +2245,20 @@ return interceptor;
       //删除小节      
       baseMapper.deleteById(videoId);  
     }
+```
 
-# 熔断器【Netflix Hystrix————可以使用SpringCloudAlibaba的Sentinel】
--- Hystrix说明
-  1、查看被调用服务是否宕机（挂掉了），如果宕机，则进行熔断，否则继续执行
-  2、一个供分布式系统使用，提供延迟和容错功能，保证复杂的分布系统在面临不可避免的失败时，仍能有其弹性。
+### 4、Netflix Hystrix——熔断器
 
--- SpringCloudAlibaba使用Sentinel实现限流&熔断&降级————详见————2、Java开发之后端技术篇-1-8-4、SpringCloudAlibaba相关服务组件
+```markdown
+# 说明
+-- 1、查看被调用服务是否宕机（挂掉了），如果宕机，则进行熔断，否则继续执行
+-- 2、一个供分布式系统使用，提供延迟和容错功能，保证复杂的分布系统在面临不可避免的失败时，仍能有其弹性。
 
--- Feign结合Hystrix使用步骤
-  1、添加依赖
+# SpringCloudAlibaba使用Sentinel实现限流&熔断&降级
+	详见————2、Java开发之后端技术篇-1-9-3、Sentinel提供服务容错——限流、降级、熔断
+
+# Feign结合Hystrix使用步骤
+-- 1、添加依赖
     <!--提供负载均衡-->  
     <dependency>
       <groupId>org.springframework.cloud</groupId> 
@@ -1376,12 +2269,14 @@ return interceptor;
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>   
     </dependency>
-  2、调用端配置文件中添加hystrix配置
+
+-- 2、调用端配置文件中添加hystrix配置
     #开启熔断机制
     feign.hystrix.enabled=true
     #设置hystrix超时时间，默认1000ms
     hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=6000
-  3、设置的服务调用接口添加实现类，用于当发生熔断时，进行的处理操作
+
+-- 3、设置的服务调用接口添加实现类，用于当发生熔断时，进行的处理操作
     /** 
     * vod服务远端接口实现类(用于实现熔断机制) 
     */
@@ -1397,39 +2292,45 @@ return interceptor;
       	return R.error().message("删除多个视频出错！");  
       }
     }
-  4、服务调用接口注解添加属性【fallback】,值为其实现类
-  	@FeignClient(name="vod",fallback=VodFileDegradeFeignClient.class)
 
-# 服务网关【Spring Cloud GateWay】
--- 地址
+-- 4、服务调用接口注解添加属性【fallback】,值为其实现类
+  	@FeignClient(name="vod",fallback=VodFileDegradeFeignClient.class)
+```
+
+### 5、Spring Cloud  Gateway——服务网关
+
+```markdown
+# 官方地址
 	https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#glossary
 
--- 说明
-	1、什么是网关?
+# 说明
+-- 什么是网关
 		API网关(webflux编程模式),在客户端和服务端中间存在的一堵墙，可以起到【请求转发】【负载均衡】【权限控制】等,替代nginx
-	2、常用功能————路由转发、权限校验,限流控制,用来替换zuul网关
 
--- Gateway图示,如下:
+-- 常用功能————路由转发、权限校验,限流控制,用来替换zuul网关
+
+# Gateway图示,如下:
 ```
 
 <img src="image/img2_1_8_4_1.png" style="zoom:50%;" />
 
 ```markdown
--- 核心概念
+# 核心概念
 	1、路由————路由是网关最基础的部分，路由信息有一个ID、一个目的URL、一组断言和一组Filter组成。如果断言路由为真，则说明请求的URL和配置匹配
 	2、断言————Java8中的断言函数。Spring Cloud Gateway中的断言函数输入类型是Spring5.0框架中的ServerWebExchange。Spring Cloud Gateway中的断言函数允许开发者去定义匹配来自于http request中的任何信息，比如请求头和参数等。
 	3、过滤器————一个标准的Spring webFilter。Spring cloud gateway中的filter分为两种类型的Filter，分别是Gateway Filter和Global Filter。过滤器Filter将会对请求和响应进行修改处理
 
--- 执行过程
+# 执行过程
 	Spring cloud Gateway发出请求。然后再由Gateway Handler Mapping中找到与请求相匹配的路由，将其发送到Gateway web handler。Handler再通过指定的过滤器链将请求发送到我们实际的服务执行业务逻辑，然后返回。如下图所示:
 ```
 
 <img src="image/img2_1_8_4_2.png" style="zoom:50%;" />
 
 ```markdown
--- 代码实现
-	1、创建对应微服务模块————api_gateway
-	2、引入相关依赖
+# 代码实现
+-- 1、创建对应微服务模块————api_gateway
+
+-- 2、引入相关依赖
 		<dependencies>      
       <dependency>      
         <groupId>com.pigskin</groupId>      
@@ -1456,7 +2357,8 @@ return interceptor;
         <artifactId>spring-cloud-starter-openfeign</artifactId>     
       </dependency>  
     </dependencies>
-	3、编写application.properties配置文件
+
+-- 编写application.properties配置文件
     # 服务端口
     server.port=8222
     # 服务名
@@ -1481,13 +2383,14 @@ return interceptor;
     spring.cloud.gateway.routes[1].id=eduService
     spring.cloud.gateway.routes[1].uri=lb://eduService
     spring.cloud.gateway.routes[1].predicates= Path=/eduService/**
-	4、创建启动类
+
+-- 4、创建启动类
 		package com.pigskin.gateway;
-		
+
 		import org.springframework.boot.SpringApplication;
 		import org.springframework.boot.autoconfigure.SpringBootApplication;
 		import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-		
+
 		@SpringBootApplication
 		@EnableDiscoveryClient
 		public class ApiGatewayApplication {   
@@ -1496,26 +2399,32 @@ return interceptor;
       }
     }
 
--- Gateway网关负载均衡
-	1、负载均衡————将请求平均分摊到多台服务器
-	2、实现负载均衡的几种方式
-		轮询————
-		权重————
-		请求时间————
-	3、实现原理
-		如下图所示,默认不需要额外配置，只要多个服务名字一样，Gateway自动实现负载均衡
+# Gateway网关负载均衡
+-- 负载均衡————将请求平均分摊到多台服务器
 
--- 相关工具类
-	1、Gateway网关跨域【就不需要给每个控制器添加@CrossOrigin】
+-- 实现负载均衡的几种方式
+	1、轮询————
+	2、权重————
+	3、请求时间————
+
+-- 实现原理
+	如下图所示,默认不需要额外配置，只要多个服务名字一样，Gateway自动实现负载均衡
+```
+
+<img src="image/img2_1_8_4_3.png" style="zoom:50%;" />
+
+```markdown
+# 相关工具类
+-- Gateway网关跨域【就不需要给每个控制器添加@CrossOrigin】
 		package com.pigskin.gateway.config;
-		
+
 		import org.springframework.context.annotation.Bean;
 		import org.springframework.context.annotation.Configuration;
 		import org.springframework.web.cors.CorsConfiguration;
 		import org.springframework.web.cors.reactive.CorsWebFilter;
 		import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 		import org.springframework.web.util.pattern.PathPatternParser;
-		
+
 		/** * 统一处理跨域 */
 		@Configuration
 		public class CorsConfig {  
@@ -1530,7 +2439,8 @@ return interceptor;
         return new CorsWebFilter(source); 
     	}
     }
-	2、Gateway访问控制过滤器
+
+-- Gateway访问控制过滤器
     package com.pigskin.gateway.filter;
 
     import com.google.gson.JsonObject;
@@ -1597,7 +2507,8 @@ return interceptor;
         return response.writeWith(Mono.just(buffer));  
       }
     }
-	3、Gateway异常处理
+
+-- Gateway异常处理类
     package com.pigskin.gateway.handler;
 
     import org.springframework.beans.factory.ObjectProvider;
@@ -1713,49 +2624,906 @@ return interceptor;
     }
 ```
 
-<img src="image/img2_1_8_4_3.png" style="zoom:50%;" />
+
+
+### 6、Spring Cloud Sleuth+Zipkin——服务链路追踪
 
 ```markdown
-# 消息总线【Spring Cloud Bus（Nacos）】
+# 作用
+	微服务架构是一个分布式架构,它按业务划分服务单元,一个分布式系统往往有很多个服务单元。由于服务单元数量众多,业务的复杂性,如果出现了错误和异常,很难去定位。主要体现在,一个请求可能需要调用很多个服务,而内部服务的调用复杂性,决定了问题难以定位。所以微服务架构中,必须实现分布式链路追踪,去跟进一个请求到底有哪些服务参与,参与的顺序又是怎样的,从而达到每个请求的步聚清晰可见,出了间題,很快定位。
 
-# 调用链监控【SpringCloud-Sleuth】
-	详见————2、Java开发之后段技术篇-1-39、SpringCloud——Sleuth+Zipkin——服务链路追踪
+	链路追踪组件有 Google 的 Dapper, Twitter 的 Zipkin,以及阿里的 Eagleeye(鹰眼)等,它们都是非常优秀的链路追踪开源组件。
+
+# 基本术语
+-- Span(跨度)————基本工作单元,发送一个远程调度任务就会产生一个Span,Span是个64位ID唯一标识的, Trace是用另一个64位ID唯一标识的,Span还有其他数据信息,比如摘要、时间戳事件、Span的ID、以及进度ID。
+
+-- Trace(跟踪)————一系列span组成的一个树状结构。请求一个微服务系统的AP接口,这个AP接口,需要调用多个微服务,调用每个微服务都会产生一个新的Span,所有由这个请求产生的Span组成了这个 Trace。
+
+-- Annotation(标注)————用来及时记录一个事件的,一些核心注解用来定义一个请求的开始和结東。这些注解包括以下:
+	1、cs-Client Sent————客户端发送一个请求,这个注解描述了这个Span的开始
+	2、sr-Server Received————服务端获得请求并准备开始处理它,如果将其sr减去cs时间戳便可得到网络传输的时间。
+	3、ss-Server Sent(服务端发送响应)————该注解表明请求处理的完成(当请求返回客户端),如果ss的时间戳减去sr时间戳,就可以得到服务器请求的时间。
+	4、cr-Client Received(客户端接收响应)————此时pan的结束,如果cr的时间戳减去cs时间戳便可以得到整个请求所消耗的时间。
+
+-- 官方文档————https://cloud.spring.io/spring-cloud-static/spring-cloud-sleuth/2.1.3.RELEASE/single/spring-cloud-sleuth.html
+
+-- 图示说明
+	1、如果服务调用顺序如下:
 ```
 
-
-
-### 6、调用接口过程
+<img src="image/img2_1_39_1_1.png" style="zoom:50%;" />
 
 ```markdown
-# 名词解释
--- 消费者（调用者）
-	1、接口化请求调用（创建服务接口）
-	2、Feign（根据定义的服务名，找到服务接口进行调用）
-	3、Hystrix（查看被调用服务是否正常启动，如果没有正常启动，则进行熔断）
-	4、Ribbon
-	5、HttpClient/OkHttp
-
--- 生产者（被调用者）
-
-# 调用过程
-	Feign-->Hystrix-->Ribbon-->Http Client(apache http components/Okhttp),详细过程如图:
+	2、概念完整表示如下:
 ```
 
-<img src="image/img2_1_8_4_4.png" style="zoom:50%;" />
-
-### 7、小版本划分
+<img src="image/img2_1_39_1_2.png" style="zoom:50%;" />
 
 ```markdown
-SNAPSHOT————快照版本，随时可能修改
-
-M(MileStone)————表示里程碑版本，一般同时标注PRE,表示预览版本
-
-SR(Service Relese )————表示正式版本，一般同时标注GA
+	3、Span之间的父子关系如下:
 ```
 
+<img src="image/img2_1_39_1_3.png" style="zoom:50%;" />
 
+```markdown
+# SpringBoot整合Sleuth
+-- 1、服务提供者与消费者导入依赖
+	<!--链路追踪依赖-->
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-sleuth</artifactId>
+  </dependency>
 
-## 9、Nacos
+-- 2、服务提供者与消费者配置文件中,设置日志等级为Debug(开发环境为了方便看)
+	# 链路追踪配置
+	## 开启Feign远程调用日志等级为debug
+	logging.level.org.springframework.cloud.openfeign=debug
+	## 开启Sleuth日志等级为debug
+	logging.level.org.springframework.cloud.sleuth=debug
+
+-- 3、发起一次远程调用,观察控制台
+	1、输出示例————[mall-product,8a0699552f23e9db,75b86e37fd484418,false] 
+	2、说明
+		1)mall-product————服务名
+		2)8a0699552f23e9db————是TranceId,一条链路中,只有一个TranceId
+		3)75b86e37fd484418————是SpanId,链路中的基本工作单元Id
+		4)false————表示是否将数据输出到其他服务,true则会把数据输出到其他可视化的服务上观察
+
+# 整合Zipkin可视化观察
+-- 说明
+	通过 Sleuth产生的调用链监控信息,可以得知微服务之间的调用链路,但监控信息只输出到控制台不方便查看。我们需要一个图开化的工具Zipkin。Zipkin是Twitter开源的分布式踪系统,主要用来收集系统的时序数据,从而追踪系统的调用问题。 
+
+-- zipkin官网地址————https://zipkin.io/
+
+-- 原理图,如下图所示
+```
+
+<img src="image/img2_1_39_1_4.png" style="zoom:50%;" />
+
+```markdown
+-- 安装
+	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
+
+-- SpringBoot整合
+	1、导入Zipkin依赖————也同时包含了Sleuth,可以省略Sleuth的引用
+		<!--链路追踪可视化操作依赖（可省略引入spring-cloud-starter-sleuth）-->
+		<dependency>
+  		<groupId>org.springframework.cloud</groupId>
+  		<artifactId>spring-cloud-starter-zipkin</artifactId>
+  	</dependency>
+	2、配置文件添加配置
+		# 链路追踪可视化工具zipkin配置信息
+    #spring.application.name=xxx
+    ## zipkin服务器的地址
+    spring.zipkin.base-url=http://虚拟机IP:9411
+    ## 关闭服务发现，否则spring cloud会把zipkin的url当作服务器名称
+    spring.zipkin.discovery-client-enabled=false
+    ## 设置使用http的方式传输数据
+    spring.zipkin.sender.type=web
+    ## 设置抽样采集率为100%，默认为0.1,即10%
+    spring.sleuth.sampler.probability=1
+  3、访问————http://虚拟机IP:9411
+  	1)可以查看服务调用链追踪信息统计
+  	2)可以查看服务依赖信息统计
+
+# Zipkin数据持久化————官方文档地址————https://github.com/openzipkin/zipkin#storage-component
+-- 说明
+	Zipkin默认是将监控数据存储在内存的,如果Zipkin挂掉或重启的话,那么监控数据就会丢失。所以如果想要搭建生产可用的Zipkin,就需要实现监控数据的持久化。而想要实现数据持久化,自然就是得将数据存储至数据库。
+
+-- zipkin支持将数据存储的位置
+	1、支持将数据存储的位置
+    1)内存(默认)
+    2)MySQL
+    3)Elasticsearch
+    4)Cassandra
+	2、Zipkin支持的这几种存储方式中,内存显然是不适用于生产的,这一点开始也说了。而使用MySQL的话,当数据量大时,查询较为缓慢,也不建议使用。Twitter官方使用的是Cassandra作为Zipkin的存储数据库,但国内大规模用Cassandra的公司较少,而且Cassandra相关文档也不多。综上,故采用 Elasticsearch是个比较好的选择,关于使用 Elasticsearch作为Zipkin的存储数据库的官方文档如下:
+		1)elasticsearch-storage————https://github.com/openzipkin/zipkin/tree/master/zipkin-server#elasticsearch-storage
+		2)zipkin-storage/elasticsearch————https://github.com/openzipkin/zipkin/tree/master/zipkin-storage/elasticsearch
+
+-- 通过docker的方式
+	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
+
+-- zipkin界面分析
+	更多参考————官方文档————https://github.com/openzipkin/zipkin#storage-component
+```
+
+### 7、Spring Cloud Ribbon——负载均衡
+
+```markdown
+//TODO:
+```
+
+### 8、Spring Cloud Bus——消息总线
+
+```markdown
+//TODO:
+```
+
+## 9、SpringCloudAlibaba
+
+### 0、SpringCloudAlibaba简介
+
+```markdown
+# 官方文档地址
+	https://github.com/alibaba/spring-cloud-alibaba/blob/master/spring-cloud-alibaba-examples/nacos-example/nacos-discovery-example/readme-zh.md
+
+# SpringCloudAlibaba整体依赖管理器
+-- pom文件导入依赖
+	<dependencyManagement>   
+    <dependencies>          
+      <dependency>           
+        <groupId>com.alibaba.cloud</groupId>    
+        <artifactId>spring-cloud-alibaba-dependencies</artifactId>        
+        <version>2.1.0.RELEASE</version>     
+        <type>pom</type>             
+        <scope>import</scope>         
+      </dependency>      
+    </dependencies> 
+  </dependencyManagement>
+
+# SpringCloudAlibaba相关服务组件
+-- Nacos作为注册中心————服务发现、注册中心
+	详见————2、Java开发之后段技术篇-1-9-1、Nacos作为注册中心————服务发现、注册中心
+
+-- Nacos作为配置中心————分布式配置
+	详见————2、Java开发之后段技术篇-1-9-2、Nacos作为配置中心————分布式配置
+
+-- Sentinel提供服务容错————限流、降级、熔断
+	详见————2、Java开发之后段技术篇-1-9-3、Sentinel提供服务容错————限流、降级、熔断
+
+-- Seata原Fescar————非高并发适用的分布式事务解决方案
+	详见————2、Java开发之后段技术篇-1-9-4、Seata原Fescar————非高并发适用的分布式事务解决方案
+```
+
+### 1、Nacos作为注册中心——服务发现、注册中心
+
+```markdown
+# 作用
+	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
+
+# 服务注册实现步骤
+-- 1、相关模块引入依赖
+    <!--服务注册-->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+
+-- 2、在要注册服务的配置文件中进行Nacos地址配置
+    #nacos服务地址
+    spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
+
+-- 3、在启动类添加注解，进行nacos注册
+  	@EnableDiscoveryClient
+
+-- 4、启动测试
+  	在nacos的服务列表中就会列举出来
+```
+
+### 2、Nacos作为配置中心——分布式配置
+
+```markdown
+-- 作用
+	基于配置中心进行配置文件的统一动态配置管理
+
+-- 相关依赖
+	<!--nacos配置中心依赖-->       
+  <dependency>      
+    <groupId>org.springframework.cloud</groupId>  
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>    
+  </dependency>
+ 
+-- Spring Boot配置文件加载顺序
+	1、先加载[bootstrap.yml(.properties)]
+	2、后加载[application.yml(.properties)]
+	3、如果application.yml中存在[spring.profiles.active=dev],就会接着去加载[application-dev.yml]
+
+-- 实现过程
+	1、调用服务中添加依赖[spring-cloud-starter-alibaba-nacos-config]
+	2、在nacos配置管理的配置列表中添加配置————如果配置文件和本地都有对应属性,优先采用配置中心的配置
+		-- Data ID:读取的配置文件名称
+			1)名称规则
+				第一部分:服务名
+				第二部分:配置文件所使用的环境(不指定可省略)
+				第三部分:文件类型扩展名
+			2)完整格式
+				${spring.application.name}-${spring.profiles.active}.${file.exetension}
+		-- Group:默认组
+		-- 配置格式:配置文件格式
+		-- 配置内容:配置文件内容
+	3、添加配置到配置文件[bootstrap.yml]
+		#配置中心地址
+		spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+		#通过这个环境去配置中心找对应配置
+		#spring.profiles.active=dev
+		#通过这个名字去配置中心找对应配置
+		spring.application.name=staService
+	4、说明
+		-- 使用@RefreshScope注解标识控制器每次自动刷新配置,并使用@Value("${配置属性名}")
+		-- @ConfigurationProperties("${配置属性名}")获取配置属性
+
+-- 名称空间切换环境
+	1、实际开发包含的开发环境
+		-- dev:开发环境
+		-- test:测试环境
+		-- prod:生产环境
+	2、使用
+    -- 在nacos中创建不同的名称空间
+      public:默认名称空间
+      dev:开发名称空间
+      test:测试名称空间
+      prod:生产名称空间
+    -- 不同名称空间创建不同的配置文件
+    -- 配置文件[bootstrap.yml]中追加内容
+      #通过此设置去nacos配置中心找对应配置命名空间(值为创建出的不同名称空间对应的)
+      spring.cloud.nacos.config.namespace=aa10b21c-9642-46c2-8422-7ea095ffe3c0
+
+-- 多配置文件加载
+ 	1、创建不同的配置文件,用于设置不同的配置
+ 	2、修改配置文件[bootstrap.yml],加载nacos中的多个配置文件
+ 		#加载nacos配置中心的多个配置文件
+ 		##设置加载的配置文件名称
+ 		spring.cloud.nacos.config.ext-config[0].data-id=port.properties
+ 		##开启动态刷新配置，否则配置文件修改，工程无法感知
+ 		spring.cloud.nacos.config.ext-config[0].refresh=true
+ 		...
+-- 细节
+	1、命名空间__默认public,用于配置隔离
+		1)开发、测试、生产:利用命名空间来做环境隔离
+			#bootstrap.properties设置使用的命名空间
+			spring.cloud.nacos.config.namespace=2c67d4xc-217e-4e82-95f5-66d05b01c5b9
+			#设置使用的配置分组
+			spring.cloud.nacos.config.group=dev
+		2)每个微服务之间互相隔离配置,每个微服务创建自己的命名空间,只加载自己命名空间下的配置
+	2、配置集__一组相关或不相关的配置项的集合
+		1)加载多个
+			#加载多个配置文件
+			##配置加载的属性文件ID
+			spring.cloud.nacos.config.ext-config[0].data-id=datasource.yml
+			##配置对应组
+			spring.cloud.nacos.config.ext-config[0].group=dev
+			##配置是否动态刷新
+			spring.cloud.nacos.config.ext-config[0].refresh=true
+	3、配置集ID————类似于配置文件名
+	4、配置分组————默认所有的配置文件都属于DEFAULT_GROUP
+		1)通过在bootstrap.properties文件中如下配置设定使用的配置
+			#设置使用的配置分组
+			spring.cloud.nacos.config.group=DEFAULT_GROUP
+```
+
+### 3、Sentinel提供服务容错——限流、降级、熔断
+
+```markdown
+# 简介
+-- 熔断、降级、限流
+	1、什么是熔断
+		A服务调用B服务的某个功能,由于网络不稳定问题,或者B服务卡机,导致功能时间超长.如果这样子的次数过多.我们就可以直接将B服务断路了(A服务不再请求B服务的接口),凡是调用B服务的直接返回降级数据,不必等待B服务的超长执行.这样B服务的故障问题,就不会级联影响到A服务.
+	2、什么事降级
+		整个网站处于流量高峰期,服务器压力剧增,根据当前业务情况及流量,对一些服务和页面进行有策略的降级(停止服务,所有的调用直接返回降级数据).以此缓解服务器资源的压力,以保证核心业务的正常运行,同时也保持了客户和大部分客户的得到正确的响应.
+	3、熔断和降级的异同
+		1)相同点
+			1]为了保证集群大部分服务的可用性和可靠性,防止崩溃,牺牲小我
+			2]用户最终都是体验到某个功能不可用
+		2)不同点
+			1]熔断是被调方故障,触发的系统主动规则
+			2]降级是基于全局考虑,停止一些正常服务,释放资源
+	4、什么是限流
+		对打入服务的请求流量进行控制,使服务能够承担不超过自己能力的流量压力
+
+-- Sentinel简介
+	1、官方文档————https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D
+	2、项目地址————https://github.com/alibaba/Sentinel/
+	3、说明————随着微服务的流行,服务和服务之间的稳定性变得越来越重要.Sentinel以流量为切入点,从流量控制,熔断降级、系统负载保护等多个维度保护服务的稳定性.
+
+-- Sentinel特征
+	1、丰富的应用场景————Sentinel承接了阿里巴巴近10年的双十一大促流量的核心场景,例如秒杀(即突发流量控制在系统容量可以承受的范围)、消息削峰填谷、集群流量控制、实时熔断下游不可用应用等;
+	2、完备的实时监控————Sentinel同时提供实时的监控功能,可以在控制台中看到接入应用的单台机器秒级数据,甚至500台以下规模的集群的汇总运行情况;
+	3、广泛的开源生态————Sentinel提供开箱即用的与其它开源框架/库的整合模块,例如与SpringCloud、Dubbo、gRPC的整合.只需要引入相应的依赖并进行简单的配置即可快速的接入Sentinel;
+	4、完善的SPI扩展点————Sentinel提供简单易用、完善的SPI扩展接口.可以通过实现扩展接口来快速的定时逻辑.例如定制规则管理、适配动态数据源等;
+
+-- Sentinel组成
+	1、核心库(Java客户端)————不依赖任何框架/库,能够运行于所有Java运行时环境,同时对Dubbo/SpringCloud等框架也有较好的支持
+	2、控制台(Dashvboard)————基于SpringBoot开发,打包后可以直接运行,不需要额外的Tomcat等应用容器
+		1)说明————要根据Sentinel版本来决定使用的控制台版本————官方文档————https://github.com/alibaba/Sentinel/wiki/%E6%8E%A7%E5%88%B6%E5%8F%B0
+      Sentinel 提供一个轻量级的开源控制台，它提供机器发现以及健康情况管理、监控（单机和集群），规则管理和推送的功能。这里，我们将会详细讲述如何通过简单的步骤就可以使用这些功能。接下来，我们将会逐一介绍如何整合 Sentinel 核心库和 Dashboard，让它发挥最大的作用。同时我们也在阿里云上提供企业级的 Sentinel 服务：AHAS Sentinel 控制台，您只需要几个简单的步骤，就能最直观地看到控制台如何实现这些功能，并体验多样化的监控及全自动托管的集群流控能力。
+    2)包含功能
+      1]查看机器列表以及健康情况：收集 Sentinel 客户端发送的心跳包，用于判断机器是否在线。
+      2]监控 (单机和集群聚合)：通过 Sentinel 客户端暴露的监控 API，定期拉取并且聚合应用监控信息，最终可以实现秒级的实时监控。
+      3]规则管理和推送：统一管理推送规则。
+      4]鉴权：生产环境中鉴权非常重要。这里每个开发者需要根据自己的实际情况进行定制。
+    3)注意————Sentinel 控制台目前仅支持单机部署。Sentinel 控制台项目提供 Sentinel 功能全集示例，不作为开箱即用的生产环境控制台，不提供安全可靠保障。若希望在生产环境使用请根据文档自行进行定制和改造。
+		4)启动控制台
+			详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
+	3、控制台使用
+		1)新增流控规则————主要配置项说明	
+```
+
+| 配置项                     | 配置项说明                                                   | 可选参数                  | 默认值  |
+| -------------------------- | :----------------------------------------------------------- | ------------------------- | ------- |
+| 资源名                     | 一般为请求的URI                                              |                           |         |
+| 针对来源                   |                                                              |                           | default |
+| 阀值类型                   |                                                              | QPS/线程数                |         |
+| 单机阀值/集群阀值/均摊阀值 | 非集群为**单机阀值**<br />集群模式且集群阀值模式为**总体阀值**时为集群阀值——集群中的多个服务总体不超过指定阀值<br />集群模式且集群阀值模式为**单机均摊**时为**均摊阈值**——每一个机器都不超过指定阀值 | 数字类型                  |         |
+| 是否集群                   |                                                              | ☑️                         |         |
+| 集群阀值模式               |                                                              | 单机均摊/总体阀值         |         |
+| 失败退化                   | 如果 Token Server 不可用是否退化到单机限流                   | ☑️                         |         |
+| 流控模式                   | 直接——直接限制该资源名的服务<br />关联——与本资源产生关联关系的资源访问时对本资源的流控生效<br />链路——从指定入口资源到本资源的请求对本资源的流控生效 | 直接/关联/链路            |         |
+| 关联资源/入口资源          | 关联资源——只有流控模式为关联时可设定<br />入口资源——只有流控模式为链路时可设定 |                           |         |
+| 流控效果                   | 只有阀值类型为QPS时可设定<br />Warm Up——预热启动,即冷启动模式 | 快速失败/Warm Up/排队等待 |         |
+| 预热时长/超时时长          | 预热时长——只有流控效果为Warm Up时可设定<br />超时时长——只有流控效果为排队等待时可设定 |                           |         |
+
+```markdown
+		2)新增降级规则————主要配置项说明(1.8.0及其以上)
+```
+
+| 配置项                     | 配置项说明                                                   | 可选参数           | 默认值 |
+| -------------------------- | ------------------------------------------------------------ | ------------------ | ------ |
+| 资源名                     | 一般为请求的URI                                              |                    |        |
+| 降级策略                   | 切换不同的降级策略                                           | RT/异常比例/异常数 |        |
+| 慢调用比例/异常比例/异常数 | 慢调用比例 (`SLOW_REQUEST_RATIO`)————选择以慢调用比例作为阈值，需要设置允许的慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且慢调用的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。 <br />异常比例 (`ERROR_RATIO`)————当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且异常的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。异常比率的阈值范围是 `[0.0, 1.0]`，代表 0% - 100%。<br /> 异常数 (`ERROR_COUNT`)————当单位统计时长内的异常数目超过阈值之后会自动进行熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。 | 依据类型不同而不同 |        |
+| 时间窗口                   | 降级时间间隔,单位秒                                          | 数值类型           |        |
+
+```markdown
+-- Hystrix与Sentinel比较
+```
+
+| 功能           | Sentinel                                                     | Hystrix                                   |
+| -------------- | ------------------------------------------------------------ | ----------------------------------------- |
+| 隔离策略       | 信号量隔离(并发线程数限流)——不用为每个请求创建专用的线程池,减少资源的消耗 | 线程池隔离/信号量隔离——线程池隔离比较彻底 |
+| 熔断降级策略   | 基于响应时间、异常比率、异常数                               | 基于异常比率                              |
+| 实时统计实现   | 滑动窗口(LzeapArray)                                         | 滑动窗口(基于RxJava)                      |
+| 动态规则配置   | 支持多种数据源                                               | 支持多种数据源                            |
+| 扩展性         | 多个扩展点                                                   | 插件形式                                  |
+| 基于注解的支持 | 支持                                                         | 支持                                      |
+| 限流           | 基于QPS,支持基于调用关系的限流                               | 有限的支持                                |
+| 流量整形       | 支持预热模式、匀速器模式、预热排队模式                       | 不支持                                    |
+| 系统自适应保护 | 支持                                                         | 不支持                                    |
+| 控制台         | 可配置规则、查看秒级监控、机器发现等                         | 简单的监控查看                            |
+
+```markdown
+# 基本概念
+-- 资源————我们说的资源，可以是任何东西，服务，服务里的方法，甚至是一段代码。先把可能需要保护的资源定义好（埋点），之后再配置规则。也可以理解为，只要有了资源，我们就可以在任何时候灵活地定义各种流量控制规则。在编码的时候，只需要考虑这个代码是否需要保护，如果需要保护，就将之定义为一个资源。对于主流的框架，我们提供适配，只需要按照适配中的说明配置，Sentinel就会默认定义提供的服务，方法等为资源。
+
+-- 规则————Sentinel的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。Sentinel支持以下几种规则：流量控制规则、熔断降级规则、系统保护规则、来源访问控制规则 和 热点参数规则。
+
+# Sentinel来进行资源保护，主要分为几个步骤:
+-- 定义资源
+	1、定义资源方式————官方文档————https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8
+		1)主流框架的默认适配————常用
+		2)抛出异常的方式定义资源————常用
+		3)返回布尔值方式定义资源
+		4)注解方式定义资源————常用
+		5)异步调用支持
+
+-- 定义规则————Sentinel 的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。
+	1、规则分类
+		1)流量控制规则(FlowRule)————同一个资源可以同时有多个限流规则，检查规则时会依次检查
+			1]重要属性
+        Field						说明																				 						 默认值
+        resource				资源名，资源名是限流规则的作用对象	
+        count						限流阈值	
+        grade						限流阈值类型，QPS 模式（1）或并发线程数模式（0）								QPS 模式
+        limitApp				流控针对的调用来源																					default，代表不区分调用来源
+        strategy				调用关系限流策略：直接、链路、关联								 						 根据资源本身（直接）
+        controlBehavior	流控效果（直接拒绝/WarmUp/匀速+排队等待），不支持按调用关系限流	直接拒绝
+        clusterMode			是否集群限流																							否
+      2]通过代码定义流量控制规则————通过调用 FlowRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+        private void initFlowQpsRule() {
+            List<FlowRule> rules = new ArrayList<>();
+            FlowRule rule = new FlowRule(resourceName);
+            // set limit qps to 20
+            rule.setCount(20);
+            rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+            rule.setLimitApp("default");
+            rules.add(rule);
+            FlowRuleManager.loadRules(rules);
+        }
+      3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6
+		2)熔断降级规则(DegradeRule)————同一个资源可以同时有多个降级规则
+			1]重要属性
+				Field								说明																																				默认值
+        resource						资源名，即规则的作用对象	
+        grade								熔断策略，支持慢调用比例/异常比例/异常数策略																			 慢调用比例
+        count								慢调用比例模式下为慢调用临界 RT（超出该值计为慢调用）；异常比例/异常数模式下为对应的阈值	
+        timeWindow					熔断时长，单位为 s	
+        minRequestAmount		熔断触发的最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断（1.7.0 引入）			5
+        statIntervalMs			统计时长（单位为 ms），如 60*1000 代表分钟级（1.8.0 引入）												1000 ms
+        slowRatioThreshold	慢调用比例阈值，仅慢调用比例模式有效（1.8.0 引入）	
+			2]通过代码定义流量控制规则————通过调用 DegradeRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+				private void initDegradeRule() {
+            List<DegradeRule> rules = new ArrayList<>();
+            DegradeRule rule = new DegradeRule();
+            rule.setResource(KEY);
+            // set threshold RT, 10 ms
+            rule.setCount(10);
+            rule.setGrade(RuleConstant.DEGRADE_GRADE_RT);
+            rule.setTimeWindow(10);
+            rules.add(rule);
+            DegradeRuleManager.loadRules(rules);
+        }
+      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
+		3)系统保护规则(SystemRule)————注意系统规则只针对入口资源（EntryType=IN）生效
+			1]说明————Sentinel 系统自适应限流从整体维度对应用入口流量进行控制，结合应用的 Load、CPU 使用率、总体平均 RT、入口 QPS 和并发线程数等几个维度的监控指标，通过自适应的流控策略，让系统的入口流量和系统的负载达到一个平衡，让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性.
+			2]重要属性
+				Field								说明																默认值
+        highestSystemLoad		load1 触发值，用于触发自适应控制阶段		 -1 (不生效)
+        avgRt								所有入口流量的平均响应时间							-1 (不生效)
+        maxThread						入口流量的最大并发数									-1 (不生效)
+        qps									所有入口资源的 QPS										-1 (不生效)
+        highestCpuUsage			当前系统的 CPU 使用率（0.0-1.0）			-1 (不生效)
+			3]通过代码定义流量控制规则————通过调用 SystemRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
+				private void initSystemRule() {
+            List<SystemRule> rules = new ArrayList<>();
+            SystemRule rule = new SystemRule();
+            rule.setHighestSystemLoad(10);
+            rules.add(rule);
+            SystemRuleManager.loadRules(rules);
+        }
+      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%B3%BB%E7%BB%9F%E8%87%AA%E9%80%82%E5%BA%94%E9%99%90%E6%B5%81
+		4)来源访问控制规则(AuthorityRule)
+			1]说明————很多时候，我们需要根据调用方来限制资源是否通过，这时候可以使用 Sentinel 的访问控制（黑白名单）的功能。黑白名单根据资源的请求来源（origin）限制资源是否通过，若配置白名单则只有请求来源位于白名单内时才可通过；若配置黑名单则请求来源位于黑名单时不通过，其余的请求通过。
+			2]授权规则，即黑白名单规则（AuthorityRule）非常简单，主要有以下配置项：
+				resource：资源名，即规则的作用对象
+				limitApp：对应的黑名单/白名单，不同 origin 用 , 分隔，如 appA,appB
+				strategy：限制模式，AUTHORITY_WHITE 为白名单模式，AUTHORITY_BLACK 为黑名单模式，默认为白名单模式
+			3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E9%BB%91%E7%99%BD%E5%90%8D%E5%8D%95%E6%8E%A7%E5%88%B6
+		5)热点参数规则(ParamFlowRule)
+			1]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%83%AD%E7%82%B9%E5%8F%82%E6%95%B0%E9%99%90%E6%B5%81
+		6)查询更改规则
+			1]说明————引入了 transport 模块后，可以通过以下的 HTTP API 来获取所有已加载的规则：http://localhost:8719/getRules?type=<XXXX>.其中，type=flow 以 JSON 格式返回现有的限流规则，degrade 返回现有生效的降级规则列表，system 则返回系统保护规则.获取所有热点规则：http://localhost:8719/getParamRules
+		7)定制自己的持久化规则
+			1]说明————上面的规则配置，都是存在内存中的。即如果应用重启，这个规则就会失效。因此我们提供了开放的接口，您可以通过实现 DataSource 接口的方式，来自定义规则的存储数据源。通常我们的建议有:
+        1、整合动态配置系统，如 ZooKeeper、Nacos、Apollo 等，动态地实时刷新配置规则
+        2、结合 RDBMS、NoSQL、VCS 等来实现该规则
+        3、配合 Sentinel Dashboard 使用
+      2]更多详情请参考————https://github.com/alibaba/Sentinel/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%99%E6%89%A9%E5%B1%95
+
+-- 检验规则是否生效
+	1、判断限流降级异常————在 Sentinel 中所有流控降级相关的异常都是异常类 BlockException 的子类：
+      流控异常：FlowException
+      熔断降级异常：DegradeException
+      系统保护异常：SystemBlockException
+      热点参数限流异常：ParamFlowException
+    我们可以通过以下函数判断是否为 Sentinel 的流控降级异常：
+    	BlockException.isBlockException(Throwable t);
+    除了在业务代码逻辑上看到规则生效，我们也可以通过下面简单的方法，来校验规则生效的效果：
+			1)暴露的 HTTP 接口：通过运行下面命令 curl http://localhost:8719/cnode?id=<资源名称>，观察返回的数据。如果规则生效，在返回的数据栏中的 block 以及 block(m) 中会有显示
+			2)日志：Sentinel 提供秒级的资源运行日志以及限流日志，详情可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%97%A5%E5%BF%97
+	2、block 事件
+		Sentinel 提供以下扩展接口，可以通过 StatisticSlotCallbackRegistry 向 StatisticSlot 注册回调函数：
+      ProcessorSlotEntryCallback: callback when resource entry passed (onPass) or blocked (onBlocked)
+      ProcessorSlotExitCallback: callback when resource entry successfully completed (onExit)
+    可以利用这些回调接口来实现报警等功能，实时的监控信息可以从 ClusterNode 中实时获取。
+
+# SpringBoot整合
+-- 流量控制————整合Sentinel测试限流
+  1、每一个微服务引入以下依赖
+    <dependency>
+      <groupId>com.alibaba.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+    </dependency>
+    <!--引入信息审计依赖-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+  2、下载并启动控制台
+		详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
+  3、每一个微服务的配置文件添加配置信息
+    # Sentinel配置信息
+    ## 每一个微服务和Sentinel中央控制服务器(Sentinel控制台)进行数据传输使用的端口（随意，只要不被占用）
+    spring.cloud.sentinel.transport.port=8719
+    ## Sentinel控制台所在的地址
+    spring.cloud.sentinel.transport.dashboard=localhost:8333
+    ## 实时监控,默认不显示问题解决————暴露endpoint,使这些审计信息可以被别人访问
+    ### Spring Boot 1.x 中添加配置如下。暴露的 endpoint 路径为 /sentinel
+    #management.security.enabled=false
+    ### Spring Boot 2.x 中添加配置如下。暴露的 endpoint 路径为 /actuator/sentinel
+    management.endpoints.web.exposure.include=*
+  4、在控制台中进行相应的调整————默认所有的流控设置保存在内存中,重启失效
+  5、自定义流控响应信息————默认为[Blocked by Sentinel (flow limiting)]————添加自定义流控响应类,设置请求被限制时的处理器
+      package com.pigskin.mall.seckill.config;
+
+      import com.alibaba.csp.sentinel.adapter.servlet.callback.UrlBlockHandler;
+      import com.alibaba.csp.sentinel.adapter.servlet.callback.WebCallbackManager;
+      import com.alibaba.csp.sentinel.slots.block.BlockException;
+      import com.alibaba.fastjson.JSON;
+      import com.pigskin.common.exception.BizCodeEnum;
+      import com.pigskin.common.utils.R;
+      import org.springframework.context.annotation.Configuration;
+
+      import javax.servlet.http.HttpServletRequest;
+      import javax.servlet.http.HttpServletResponse;
+      import java.io.IOException;
+
+      /**
+       * Sentinel流控配置类
+       *
+       * @author pigskin
+       * @date 2022年02月09日 4:11 下午
+       */
+      @Configuration
+      public class SeckillSentinelConfig {
+
+          /**
+           * 无参构造
+           */
+          public SeckillSentinelConfig() {
+              /*Spring5提供的WebFlux编程使用WebFluxCallbackManager*/
+              /*Sentinel提供的Web回调的管理器，设置请求被限制以后处理器，进行处理*/
+              WebCallbackManager.setUrlBlockHandler(new UrlBlockHandler() {
+                  /**
+                   * 自定义阻塞返回信息
+                   * @param request
+                   * @param response
+                   * @param e
+                   * @throws IOException
+                   */
+                  @Override
+                  public void blocked(HttpServletRequest request, HttpServletResponse response, BlockException e) throws IOException {
+                      R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+                      /*设置编码格式*/
+                      response.setCharacterEncoding("UTF-8");
+                      /*设置内容类型为Json*/
+                      response.setContentType("application/json");
+                      /*设置响应的内容*/
+                      response.getWriter().write(JSON.toJSONString(error));
+                  }
+              });
+          }
+      }
+  6、持久化流控规则
+
+-- 熔断降级————整合Feign+Sentinel测试熔断降级————更多内容请参考————https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel#feign-%E6%94%AF%E6%8C%81
+  1、方式一(调用方)————熔断保护
+  	1)引入依赖
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.cloud</groupId>
+          <artifactId>spring-cloud-starter-openfeign</artifactId>
+      </dependency>
+    2)调用方配置文件添加配置
+      # 打开 Sentinel 对 Feign 的支持
+      feign.sentinel.enabled=true
+    3)创建远端接口所需要回调的实现类
+    	package com.pigskin.mall.product.feign.fallback;
+
+      import com.pigskin.common.exception.BizCodeEnum;
+      import com.pigskin.common.utils.R;
+      import com.pigskin.mall.product.feign.SeckillFeignService;
+      import lombok.extern.slf4j.Slf4j;
+      import org.springframework.stereotype.Component;
+
+      /**
+       * 秒杀服务远端接口异常回调实现类
+       *
+       * @author pigskin
+       * @date 2022年02月10日 10:59 上午
+       */
+      @Slf4j
+      @Component
+      public class SeckillFeignServiceFallBack implements SeckillFeignService {
+          @Override
+          public R getSkuSeckillInfo(Long skuId) {
+              log.info("嘿嘿，我是getSkuSeckillInfo的熔断方法，我被调了。。。");
+              return R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+          }
+      }
+    4)远端接口设置创建的回调实现类
+    	package com.pigskin.mall.product.feign;
+
+      import com.pigskin.common.utils.R;
+      import com.pigskin.mall.product.feign.fallback.SeckillFeignServiceFallBack;
+      import org.springframework.cloud.openfeign.FeignClient;
+      import org.springframework.web.bind.annotation.GetMapping;
+      import org.springframework.web.bind.annotation.PathVariable;
+
+      /**
+       * 秒杀服务远端接口
+       *
+       * @author pigskin
+       * @date 2022年02月06日 1:27 下午
+       */
+      @FeignClient(value = "mall-seckill",fallback = SeckillFeignServiceFallBack.class)
+      public interface SeckillFeignService {
+
+          /**
+           * 获取指定商品秒杀信息
+           *
+           * @return
+           */
+          @GetMapping("/sku/seckill/{skuId}")
+          R getSkuSeckillInfo(@PathVariable("skuId") Long skuId);
+      }
+  2、方式二(调用方)————Sentinel控制台手动指定相应远程服务的降级策略————远程服务被降级处理后,触发方式一设置的熔断回调方法
+  	更多内容请参考————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
+  3、方式三(被远程调用方)————全局超大浏览量时,必须牺牲一些远程服务,在服务的提供方指定降级策略————提供方是在运行,但是不想运行自己的业务逻辑,返回的是默认的降级数据(限流后的数据).
+
+# 自定义受保护资源——————以下无论哪种方式都要配置被限流后的默认返回,URL通过配置可以设置统一返回,
+-- 方式一————使用 try (Entry entry = SphU.entry("自定义资源名")) { 需要保护的资源代码 }catch(BlockException exception) {//被限流后抛出异常在此处处理} 
+	1、设置被保护资源以及限流处理:
+    try (Entry entry = SphU.entry("SeckillSkus")) {//设置try包含的代码名为SeckillSkus资源
+        //获取所有场次信息
+        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+        for (String key : keys) {
+            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+            String[] s = replace.split("_");
+            long start = Long.parseLong(s[0]);
+            long end = Long.parseLong(s[1]);
+            if (time >= start && time <= end) {
+                System.out.println("key:" + key);
+                /*2、获取这个场次需要的所有商品信息*/
+                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                List<String> list = hashOperations.multiGet(range);
+                if (list != null) {
+                    return list.stream().map(item -> {
+                        // seckillSkuRedisTo.setRandomCode("");
+                        return JSON.parseObject(item.toString(), SeckillSkuRedisTo.class);
+                    }).collect(Collectors.toList());
+                }
+                break;
+            }
+        }
+    } catch (BlockException exception) {//被限流后抛出异常在此处处理
+        log.error("资源被限流异常————异常原因为{}", exception.getMessage());
+    }
+	2、Sentinel控制台进行限流和熔断设置
+
+-- 方式二————基于注解@SentinelResource
+	1、设置被保护资源,并使用blockHandler指定限流后本类中的回调处理容错方法
+		/**
+     * getCurrentSeckillSkusResource资源被限流回调方法（返回值、参数名要和原方法一致）
+     *
+     * @param exception 限流异常（可以比原方法多一个该参数）
+     * @return 返回值类型要和原方法一致
+     */
+    public List<SeckillSkuRedisTo> blockHandler(BlockException exception) {
+        log.error("原方法被限流了");
+        return null;
+    }
+
+		/**
+     * 基于注解限流设置
+     *
+     * @return
+     */
+		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler")//设置需要被保护的资源
+    @Override
+    public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+    	//TODO:业务代码
+    }
+  2、或使用fallback指定所有类型异常的回调方法,返回值、参数名要和原方法一致.如果在本类中设置不需要设置fallbackClass = XXX.class,示例如下:
+  		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler",fallback = "fallbackHandler",fallbackClass = XXX.class)//设置需要被保护的资源
+    	@Override
+    	public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+        //TODO:业务代码
+      }
+	3、Sentinel控制台进行限流和熔断设置
+
+# 网关流控————被其控制的将不会转发到指定服务————官方文档————https://github.com/alibaba/Sentinel/wiki/%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81
+-- 1、网关层引入依赖
+	 <!--引入网关流控依赖-->
+   <dependency>
+     <groupId>com.alibaba.cloud</groupId>
+     <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+     <version>2.1.0.RELEASE</version>
+   </dependency>
+
+-- 2、配置文件主要可配置信息示例如下
+	## 指定网关限流回调信息 
+	###内容类型
+	spring.cloud.sentinel.scg.fallback.content-type=application/json
+	###响应内容
+	spring.cloud.sentinel.scg.fallback.response-body="ajjasd"
+	###错误状态码
+	spring.cloud.sentinel.scg.fallback.response-status=400
+
+-- 3、Sentinel控制台进行配置
+	1、1.6.x的控制台————网关的簇点链路会显示当前请求匹配的对应路由配置,对应网关路由配置的id
+	2、1.7.x及其以上的控制台————网关相关配置会有特有的配置方式
+
+-- 4、定制网关流控返回数据
+	1、代码实现
+    package com.pigskin.mall.gateway.config;
+
+    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
+    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
+    import com.alibaba.fastjson.JSON;
+    import com.pigskin.common.exception.BizCodeEnum;
+    import com.pigskin.common.utils.R;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.web.reactive.function.server.ServerResponse;
+    import org.springframework.web.server.ServerWebExchange;
+    import reactor.core.publisher.Mono;
+
+    /**
+     * 网关Sentinel限流回调配置类
+     *
+     * @author pigskin
+     * @date 2022年02月10日 4:37 下午
+     */
+    @Configuration
+    public class SentinelGatewayConfig {
+        public SentinelGatewayConfig() {
+            GatewayCallbackManager.setBlockHandler(new BlockRequestHandler() {
+                /**
+                 * 网关限流了请求，就会调用此回调Mono Flux
+                 * @param serverWebExchange
+                 * @param throwable
+                 * @return
+                 */
+                @Override
+                public Mono<ServerResponse> handleRequest(ServerWebExchange serverWebExchange, Throwable throwable) {
+                    R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
+                    String jsonString = JSON.toJSONString(error);
+                    /*Mono——返回0个或者一个数据*/
+                    /*Flux——返回0个或者多个数据*/
+                    return ServerResponse.ok().body(Mono.just(jsonString), String.class);
+                }
+            });
+        }
+    }
+```
+
+### 4、Seata原Fescar——高并发适用的分布式事务解决方案
+
+```markdown
+# 官方文档地址————https://seata.io/zh-cn/docs/overview/what-is-seata.html
+
+# 概述
+-- Seata是什么?
+	Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。 
+
+-- Seata术语
+	1、TC (Transaction Coordinator) - 事务协调者————维护全局和分支事务的状态，驱动全局事务提交或回滚
+	2、TM (Transaction Manager) - 事务管理器————定义全局事务的范围：开始全局事务、提交或回滚全局事务
+	3、RM (Resource Manager) - 资源管理器————管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚
+
+-- 适用场景————非高并发的后台管理系统
+
+-- 工作流程,如下图所示:
+```
+
+<img src="image/img2_1_32_1_1.png" style="zoom:50%;" />
+
+```markdown
+# 整体机制————两阶段提交协议的演变：
+	一阶段：业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源。
+	二阶段：
+		提交异步化，非常快速地完成。
+		回滚通过一阶段的回滚日志进行反向补偿。
+
+# 使用步骤————Seata-AT模式————会将并发串行化,适用不要求超高的并发,成功就成功,失败就失败的场景
+-- 1、建立具有InnoDB引擎的MySQL数据库————多个微服务使用自己的数据库连接配置
+
+-- 2、每一个微服务对应的数据库中创建UNDO_LOG(回滚日志)表————SEATA_AT模式需要UNDO_LOG表————关键
+	1、注意此处0.3.0+ 增加唯一索引 ux_undo_log
+    CREATE TABLE `undo_log` (
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `branch_id` bigint(20) NOT NULL,
+      `xid` varchar(100) NOT NULL,
+      `context` varchar(128) NOT NULL,
+      `rollback_info` longblob NOT NULL,
+      `log_status` int(11) NOT NULL,
+      `log_created` datetime NOT NULL,
+      `log_modified` datetime NOT NULL,
+      `ext` varchar(100) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- 3、代码整合seata
+  1、引入依赖————单独只导入依赖不进行后续操作,将会无法启动服务,或者通用服务一起引用,不需要的服务再单独排除
+  	1)每个微服务单独导入seata依赖,如果是通用配置已经导入,就不用再导入
+      <!--SpringCloud-alibaba-Seata分布式事务解决方案依赖-->
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        <version>2.1.0.RELEASE</version>
+      </dependency>	
+    2)如果某些微服务必须导入通用配置依赖,但是不想使用通用配置的某些依赖,可以排除指定依赖
+      <dependency>
+        <groupId>com.pigskin.mall</groupId>
+        <artifactId>mall-common</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <exclusions>
+          <!--排除seata场景-->
+          <exclusion>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+  2、安装、配置并启动seata-server(事务协调器)服务————根据依赖导入时seata-all-x.x.x.jar的版本选择对应seata版本
+  	详见————1、Java开发之工具环境篇-4-16、Seata环境搭建
+  3、所有想要使用分布式事务的微服务都应该使用Seata DataSourceProxy代理自己的数据源————因为Seata通过代理数据源实现分支事务，如果没有注入，事务无法成功回滚
+  	//spring2.0Boot之前——————之后的使用容易产生循环依赖
+  	package com.pigskin.mall.order.config;
+
+    import com.zaxxer.hikari.HikariDataSource;
+    import io.seata.rm.datasource.DataSourceProxy;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.util.StringUtils;
+
+    import javax.sql.DataSource;
+
+    /**
+     * Seata配置类
+     *
+     * @author pigskin
+     * @date 2022年01月17日 2:35 下午
+     */
+    @Configuration
+    public class MySeataConfig {
+
+        /**
+         * 获取容器中所有的数据源配置属性信息
+         */
+        @Autowired
+        DataSourceProperties dataSourceProperties;
+
+        /**
+         * 参照DataSourceConfiguration类中的方式自行创建数据源
+         *
+         * @param dataSourceProperties
+         * @return
+         */
+        @Bean
+        public DataSource dataSource(DataSourceProperties dataSourceProperties) {
+            /**/
+            HikariDataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+
+            if (StringUtils.hasText(dataSourceProperties.getName())) {
+                dataSource.setPoolName(dataSourceProperties.getName());
+            }
+            /*使用Seata对数据源代理对象进行包装，并返回*/
+            return new DataSourceProxy(dataSource);
+        }
+    }
+
+  	//springBoot2.0之后
+  4、资源文件夹下导入配置文件————必须导入,不然会导致启动服务的过程中莫名其妙的找不见其它类
+  	所有想要使用分布式事务的微服务的resource资源文件夹都应该导入seata文件包下的registry.conf、file.conf两个文件
+  5、配置文件修改
+  	1)说明————在 org.springframework.cloud:spring-cloud-starter-alibaba-seata 的org.springframework.cloud.alibaba.seata.GlobalTransactionAutoConfiguration 类中，默认会使用 ${spring.application.name}-fescar-service-group作为服务名注册到 Seata Server上，如果和file.conf 中的配置不一致，会提示 no available server to connect错误.也可以通过配置 spring.cloud.alibaba.seata.tx-service-group修改后缀，但是必须和file.conf中的配置保持一致
+  	2)设置file.conf的service.vgroup_mapping服务名配置必须使用如下结构格式
+  		vgroup_mapping.{spring.application.name}-fescar-service-group = "default"
+  	3)或在项目配置文件中通过配置修改后缀
+  		spring.cloud.alibaba.seata.tx-service-group=xxx
+  6、给分布式大事务的入口标注全局事务注解@GlobalTransactional
+  7、每一个远程的小事务(分支事务)只需添加@Transactional注解
+
+# 其它模式参照————https://github.com/seata/seata-samples
+```
+
+## 10、Nacos
 
 ```markdown
 # 说明
@@ -1797,9 +3565,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       sh startup.sh -m standalone &
 ```
 
-
-
-## 10、Redis
+## 11、Redis
 
 ```markdown
 # 说明
@@ -1809,29 +3575,29 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	对数据进行缓存，能够提高查询效率（基于内存存储）
 
 # 特点
-	-- NoSQL系统之一
-	-- 基于Key-Value存储
-	-- 读写速度很高效
-	-- 支持多种数据结构————String（字符串）、List（列表）、Hash（哈希）、Set（无须集合）、ZSet（有序集合）
-	-- 支持持久化，集群部署————通过内存对数据进行存储，也可以存储到硬盘（即持久化）
-	-- 支持过期时间（存储的数据可以设定有效时间），支持事务、消息订阅
+-- NoSQL系统之一
+-- 基于Key-Value存储
+-- 读写速度很高效
+-- 支持多种数据结构————String（字符串）、List（列表）、Hash（哈希）、Set（无须集合）、ZSet（有序集合）
+-- 支持持久化，集群部署————通过内存对数据进行存储，也可以存储到硬盘（即持久化）
+-- 支持过期时间（存储的数据可以设定有效时间），支持事务、消息订阅
 
 # 与Memcache的区别
 	Redis和Memcache数据都是缓存在计算机内存中，不同的是，后者只能将数据缓存到内存中，无法自动定期写入硬盘，所以后者适用于缓存无需持久化的数据
 
 # 适用场景
 	一般将经常进行查询并且不经常修改的，不是特别重要的数据
-	
+
 # 安装
-	-- docker中安装,详见————1-5-6、Docker中安装redis
-	-- 虚拟机中安装,详见————1-5-11、Linux虚拟机中安装Redis
-```
+-- docker中安装
+	详见————1、Java开发之工具环境篇-5-6、Docker中安装redis
 
-[ 1-5-6、Docker中安装redis](https://gitee.com/PeppaPigskin/note/blob/master/1%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%B7%A5%E5%85%B7%E7%8E%AF%E5%A2%83%E7%AF%87.md#6docker%E4%B8%AD%E5%AE%89%E8%A3%85redis)
+-- 虚拟机中安装
+	详见————1、Java开发之工具环境篇-5-11、Linux虚拟机中安装Redis
 
-[1-5-11、Linux虚拟机中安装Redis](https://gitee.com/PeppaPigskin/note/blob/master/1%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%B7%A5%E5%85%B7%E7%8E%AF%E5%A2%83%E7%AF%87.md#11linux%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%AD%E5%AE%89%E8%A3%85redis)
+-- Mac中安装
+	详见————1、Java开发之工具环境篇-4-19、Redis环境搭建
 
-```markdown
 # key生成规则
 	value::key
 
@@ -1972,31 +3738,30 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			beforeInvocation【是否在方法执行前就清空，默认为false。如果指定为true，则在方法执行前就会清空缓存】
 
 -- 相关问题
-	1)两个系统间访问可能存在的问题————详见「开发经验2-3-11、Redis相关问题解决」
+	1)两个系统间访问可能存在的问题
+		详见————2、Java开发之后端技术篇-3-11、Redis相关问题解决
 ```
 
-
-
-## 11、MD5加密
+## 12、MD5加密
 
 ```markdown
 # MD5(Message Digest algorithm 5)
-	-- 说明————信息摘要算法,	只能加密，不能解密
+-- 说明————信息摘要算法,	只能加密，不能解密
 
 # 特性
-	-- 压缩性————任意长度的数据,计算出来的MD5值长度都是固定的
-	-- 容易计算————从原数据计算MD5值很容易
-	-- 抗修改性————对原数据进行任何改动,哪怕只修改一个字节,所得到的MD5值都有很大的区别(彩虹表————暴力破解算法)
-	-- 强抗碰撞————想找到两个不相同的数据,使他们具有相同的MD5值,是非常困难的
-	-- 不可逆
+-- 压缩性————任意长度的数据,计算出来的MD5值长度都是固定的
+-- 容易计算————从原数据计算MD5值很容易
+-- 抗修改性————对原数据进行任何改动,哪怕只修改一个字节,所得到的MD5值都有很大的区别(彩虹表————暴力破解算法)
+-- 强抗碰撞————想找到两个不相同的数据,使他们具有相同的MD5值,是非常困难的
+-- 不可逆
 
 # 加密分类
-	-- 可逆————加密后,可根据加密算法得到明文
-	-- 不可逆————加密后,不可获取到明文
+-- 可逆————加密后,可根据加密算法得到明文
+-- 不可逆————加密后,不可获取到明文
 
 # MD5盐值加密
-	-- 加盐————通过生成随机数与MD5生成字符串进行组合
-		1、数据库沟通是存储MD5值与盐salt值,验证正确性时使用salt进行MD5即可
+-- 加盐————通过生成随机数与MD5生成字符串进行组合
+	1、数据库沟通是存储MD5值与盐salt值,验证正确性时使用salt进行MD5即可
 
 # 代码实现MD5加密
 	package com.pigskin.common_utils;
@@ -2042,9 +3807,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   }
 ```
 
-
-
-## 12、OAuth2
+## 13、OAuth2——权限认证解决方案
 
 ```markdown
 # 提出背景
@@ -2059,21 +3822,19 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 <img src="image/img2_1_12_1_0.png" style="zoom:30%;" />
 
 ```markdown
-
-
 # 主要解决问题
 -- 开放系统间的授权
 	1)说明————给对应需要访问某个服务授权访问权限
 	2)授权方式
-		-- 方式一：用户名密码复制
+		1-方式一：用户名密码复制
 			适用场景————适用于同一公司内部的多个系统，不适用于不受信的第三方应用
 			实现过程————如下图所示
 ```
 
-<img src="image/img2_1_12_1_1.png" style="zoom:30%;" />
+<img src="image/img2_1_12_1_1.png" style="zoom:30%;" />——
 
 ```markdown
-		-- 方式二：通用开发者key（万能钥匙）
+		2-方式二：通用开发者key（万能钥匙）
 			适用场景————适合用于合作商或者授信的不同业务部门之间（实力不对等的双方存在局限性）
 			实现过程————如下图所示,客户应用和受保护的资源双方约定好了，使用key能够打开双方
 ```
@@ -2081,7 +3842,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 <img src="image/img2_1_12_1_2.png" style="zoom:50%;" />
 
 ```markdown
-		-- 方式三：办法令牌（特殊令牌）
+		3-方式三：办法令牌（特殊令牌）
 			适用场景————接近OAuth2方式，需要考虑如何管理令牌、颁发令牌、吊销令牌，需要统一的协议，因此就有了OAuth2协议
 			实现过程————如下图所示,访问者使用受保护资源颁发的令牌（字符串），就能够访问
 ```
@@ -2090,7 +3851,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 -- 分布式访问问题（即单点登录）
-	详见1-1-1-19、登陆方式——单点登录
+	详见————2、Java开发之后端技术篇-1-19-2、服务器集群模式——SSO（Single sign on）单点登录模式
 
 # 对OAuth2误解
 -- 并没有支持HTTP以外的协议
@@ -2102,9 +3863,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- 仅是授权框架，仅用于授权代理
 ```
 
-
-
-## 13、Canal数据同步工具
+## 14、Canal——数据同步工具
 
 ```markdown
 # 说明
@@ -2118,7 +3877,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	例如：我们要统计每天注册与登录人数，只需要把会员表同步到统计库中，实现本地统计就可以了，此方式，效率高，耦合度低
 
 # Linux中Canal环境搭建
-	详见————1-5-14、Linux中Canal环境搭建
+	详见————1、Java开发之工具环境篇-5-14、Linux中Canal环境搭建
 	
 # 使用步骤
 -- 准备工作
@@ -2419,680 +4178,14 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	3、结果————本地库中也将会同步到远程库中的数据
 ```
 
-
-
-## 14、Spring Security权限框架
-
-```markdown
-# 说明
-	Spring 是一个非常流行和成功的 Java 应用开发框架。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。一般来说，Web 应用的安全性包括用户认证（Authentication）和用户授权（Authorization）两个部分。
-	
-# 主要部分
--- 用户认证【Authentication】
-	验证某个用户是否为系统中的合法主体，也就是说用户能否访问该系统。用户认证一般要求用户提供用户名和密码。系统通过校验用户名和密码来完成认证过程。
-
--- 用户授权【Authorization】
-	验证某个用户是否有权限执行某个操作。在一个系统中，不同用户所具有的权限是不同的。比如对一个文件来说，有的用户只能进行读取，而有的用户可以进行修改。一般来说，系统会为不同的用户分配不同的角色，而每个角色则对应一系列的权限。
-
-# 本质
-	Spring Security其实就是用filter，对请求的路径进行过滤。
-	-- 如果是基于Session，那么Spring-security会对cookie里的sessionid进行解析，找到服务器存储的sesion信息，然后判断当前用户是否符合请求的要求。
-	-- 如果是token，则是解析出token，然后将当前请求加入到Spring-security管理的权限信息中去
-
-# 实现过程
--- 说明
-	-- 如果系统的模块众多，每个模块都需要就行授权与认证，所以我们选择基于token的形式进行授权与认证
-	-- 用户根据用户名密码认证成功，然后获取当前用户角色的一系列权限值，并以用户名为key，权限列表为value的形式存入redis缓存中
-	-- 根据用户名相关信息生成token返回，浏览器将token记录到cookie中
-	-- 每次调用api接口都默认将token携带到header请求头中
-	-- Spring-security解析header头获取token信息
-	-- 解析token获取当前用户名，根据用户名就可以从redis中获取权限列表，这样Spring-security就能够判断当前请求是否有权限访问
-
--- 图示,如下图所示:
-```
-
-<img src="image/img2_1_14_1_1.png" style="zoom:50%;" />
-
-```markdown
-# 代码整合
--- 创建对应模块
-	权限管理模块目录结构,如下图所示:
-```
-
-<img src="image/img2_1_14_1_2.png" style="zoom:50%;" />
-
-```markdown
--- 引入依赖
-	<dependencies>   
-  	<!--自定义公共组件-->      
-    <dependency>   
-      <groupId>com.pigskin</groupId>    
-      <artifactId>common_utils</artifactId>    
-      <version>0.0.1-SNAPSHOT</version>     
-    </dependency>     
-    <!-- Spring Security权限控制依赖 -->     
-    <dependency>      
-      <groupId>org.springframework.boot</groupId>   
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>       
-    <!--jwt依赖用于生成token-->       
-    <dependency>     
-      <groupId>io.jsonwebtoken</groupId>  
-      <artifactId>jjwt</artifactId>     
-    </dependency>   
-  </dependencies>
-
--- 编写核心代码
-	1、核心配置类代码
-		package com.pigskin.serurity.config;
-		
-		import com.pigskin.serurity.filter.TokenAuthenticationFilter;
-		import com.pigskin.serurity.filter.TokenLoginFilter;
-		import com.pigskin.serurity.security.DefaultPasswordEncoder;
-		import com.pigskin.serurity.security.TokenLogoutHandler;
-		import com.pigskin.serurity.security.TokenManager;
-		import com.pigskin.serurity.security.UnauthorizedEntryPoint;
-		import org.springframework.beans.factory.annotation.Autowired;
-		import org.springframework.context.annotation.Configuration;
-		import org.springframework.data.redis.core.RedisTemplate;
-		import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-		import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-		import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-		import org.springframework.security.config.annotation.web.builders.WebSecurity;
-		import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-		import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-		import org.springframework.security.core.userdetails.UserDetailsService;
-		
-		/**
-    * Security配置类 
-    */
-    @Configuration
-    @EnableWebSecurity
-    @EnableGlobalMethodSecurity(prePostEnabled = true)
-    public class TokenWebSecurityConfig extends WebSecurityConfigurerAdapter {  
-    	/**   
-      * 自定义查询数据库类     
-      */   
-      private UserDetailsService userDetailsService;   
-      /**   
-      * Token操作工具类   
-      */  
-      private TokenManager tokenManager; 
-      /**    
-      * 密码处理工具类  
-      */   
-      private DefaultPasswordEncoder defaultPasswordEncoder;  
-      /**     
-      * redis操作类  
-      */   
-      private RedisTemplate redisTemplate; 
-      
-      @Autowired  
-      public TokenWebSecurityConfig(UserDetailsService userDetailsService, 
-      		DefaultPasswordEncoder defaultPasswordEncoder,                            
-      		TokenManager tokenManager, RedisTemplate redisTemplate) {    
-        this.userDetailsService = userDetailsService;  
-        this.defaultPasswordEncoder = defaultPasswordEncoder; 
-        this.tokenManager = tokenManager;      
-        this.redisTemplate = redisTemplate;  
-      }   
-      
-      /** 
-      * 配置设置    
-      *    
-      * @param http   
-      * @throws Exception  
-      */   
-      @Override  
-      protected void configure(HttpSecurity http) throws Exception {  
-      	http.exceptionHandling()          
-        .authenticationEntryPoint(new UnauthorizedEntryPoint())     
-        .and().csrf().disable()   
-        .authorizeRequests()    
-        .anyRequest().authenticated()      
-        //设置退出请求地址（可以不用改）          
-        .and().logout().logoutUrl("/admin/acl/index/logout")   
-        .addLogoutHandler(new TokenLogoutHandler(tokenManager, redisTemplate)).and()   
-        .addFilter(new TokenLoginFilter(authenticationManager(), tokenManager, redisTemplate))    
-        .addFilter(new TokenAuthenticationFilter(authenticationManager(), tokenManager, redisTemplate))
-        .httpBasic();  
-      }   
-      
-      /**   
-      * 密码处理   
-      *    
-      * @param auth   
-      * @throws Exception     
-      */   
-      @Override   
-      public void configure(AuthenticationManagerBuilder auth) throws Exception {   
-      	auth.userDetailsService(userDetailsService).passwordEncoder(defaultPasswordEncoder);   
-      }   
-      
-      /**   
-      * 配置哪些请求不拦截  
-      *   
-      * @param web   
-      * @throws Exception     
-      */  
-      @Override  
-      public void configure(WebSecurity web) throws Exception {    
-      	web.ignoring()
-      	.antMatchers("/api/**", "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");       
-        //web.ignoring().antMatchers("/*/**");   
-      }
-    }
-	2、相关实体类
-		-- 安全认证用户详情信息类
-			package com.pigskin.serurity.entity;
-			
-			import lombok.Data;
-			import lombok.extern.slf4j.Slf4j;
-			import org.springframework.security.core.GrantedAuthority;
-			import org.springframework.security.core.authority.SimpleGrantedAuthority;
-			import org.springframework.security.core.userdetails.UserDetails;
-			import org.springframework.util.StringUtils;
-			import java.util.ArrayList;
-			import java.util.Collection;
-			import java.util.List;
-			
-			/**
-      * 安全认证用户详情信息,需实现SpringSecurity提供的UserDetails接口 
-      */
-      @Data
-      @Slf4j
-      public class SecurityUser implements UserDetails { 
-      	/**    
-        * 当前登录用户   
-        */   
-        private transient User currentUserInfo;  
-        /**    
-        * 当前权限  
-        */   
-        private List<String> permissionValueList;
-        
-        public SecurityUser(User user) {   
-        	if (user != null) {    
-          	this.currentUserInfo = user;      
-          }  
-        }    
-        
-        @Override   
-        public Collection<? extends GrantedAuthority> getAuthorities() {  
-        	Collection<GrantedAuthority> authorities = new ArrayList<>();  
-          permissionValueList.stream().forEach(permissionValue -> {   
-          	if (!StringUtils.isEmpty(permissionValue)) {    
-            	SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue); 
-              authorities.add(authority);          
-            }     
-          });   
-          return authorities; 
-        }   
-        
-        @Override  
-        public String getPassword() {  
-        	return currentUserInfo.getPassword();    
-        }
-        
-        @Override
-        public String getUsername() {
-        	return currentUserInfo.getUsername();
-        }
-        
-        @Override  
-        public boolean isAccountNonExpired() {
-        	return true;
-        }  
-        
-        @Override  
-        public boolean isAccountNonLocked() {   
-        	return true;  
-        }   
-        
-        @Override   
-        public boolean isCredentialsNonExpired() {    
-        	return true; 
-        }   
-        
-        @Override   
-        public boolean isEnabled() {  
-      	  return true;  
-        }
-      }
-		-- 用户实体类
-			package com.pigskin.serurity.entity;
-			
-			import io.swagger.annotations.ApiModel;
-			import io.swagger.annotations.ApiModelProperty;
-			import lombok.Data;import java.io.Serializable;
-			
-			/** 
-			* 用户实体类
-      */
-      @Data
-      @ApiModel(description = "用户实体类")
-      public class User implements Serializable { 
-      	private static final long serialVersionUID = 1L; 
-        
-        @ApiModelProperty(value = "微信openid")  
-        private String username;   
-        
-        @ApiModelProperty(value = "密码")  
-        private String password;   
-        
-        @ApiModelProperty(value = "昵称") 
-        private String nickName;   
-        
-        @ApiModelProperty(value = "用户头像")  
-        private String salt;   
-        
-        @ApiModelProperty(value = "用户签名")  
-        private String token;
-      }
-	3、核心过滤器
-		-- 授权过滤器
-			package com.pigskin.serurity.filter;
-			
-			import com.pigskin.common_utils.R;
-			import com.pigskin.common_utils.ResponseUtil;
-			import com.pigskin.serurity.security.TokenManager;
-			import org.springframework.data.redis.core.RedisTemplate;
-			import org.springframework.security.authentication.AuthenticationManager;
-			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-			import org.springframework.security.core.GrantedAuthority;
-			import org.springframework.security.core.authority.SimpleGrantedAuthority;
-			import org.springframework.security.core.context.SecurityContextHolder;
-			import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-			import org.springframework.util.StringUtils;
-			import javax.servlet.FilterChain;
-			import javax.servlet.ServletException;
-			import javax.servlet.http.HttpServletRequest;
-			import javax.servlet.http.HttpServletResponse;
-			import java.io.IOException;
-			import java.util.ArrayList;
-			import java.util.Collection;
-			import java.util.List;
-			
-			/**
-      * 访问(授权)过滤器 
-      */
-      public class TokenAuthenticationFilter extends BasicAuthenticationFilter { 
-      	private TokenManager tokenManager;   
-        private RedisTemplate redisTemplate;    
-        public TokenAuthenticationFilter(AuthenticationManager authManager,
-        		TokenManager tokenManager, RedisTemplate redisTemplate) {    
-        	super(authManager);     
-          this.tokenManager = tokenManager;  
-          this.redisTemplate = redisTemplate;  
-        }    
-        
-        @Override  
-        protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)  
-        		throws IOException, ServletException {     
-        	logger.info("=================" + req.getRequestURI());    
-          if (req.getRequestURI().indexOf("admin") == -1) {   
-          	chain.doFilter(req, res);           
-            return;      
-          }    
-          UsernamePasswordAuthenticationToken authentication = null;      
-          try {       
-          	authentication = getAuthentication(req); 
-          } catch (Exception e) {          
-          	ResponseUtil.out(res, R.error());      
-          }
-          if (authentication != null) {            
-          	SecurityContextHolder.getContext().setAuthentication(authentication);  
-          } else {          
-            ResponseUtil.out(res, R.error());   
-          }       
-          chain.doFilter(req, res);   
-        } 
-        
-        private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {   
-        	// token置于header里    
-          String token = request.getHeader("token");   
-          if (token != null && !"".equals(token.trim())) {    
-          	String userName = tokenManager.getUserFromToken(token); 
-            List<String> permissionValueList = (List<String>) redisTemplate.opsForValue().get(userName);  
-            Collection<GrantedAuthority> authorities = new ArrayList<>();         
-            for (String permissionValue : permissionValueList) {              
-            	if (StringUtils.isEmpty(permissionValue)) continue;           
-              SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permissionValue);  
-              authorities.add(authority);         
-            }       
-            if (!StringUtils.isEmpty(userName)) {   
-            	return new UsernamePasswordAuthenticationToken(userName, token, authorities);      
-            }          
-            return null; 
-          }     
-          return null;
-        }
-      }
-		-- 认证过滤器
-			package com.pigskin.serurity.filter;
-			
-			import com.fasterxml.jackson.databind.ObjectMapper;
-			import com.pigskin.common_utils.R;
-			import com.pigskin.common_utils.ResponseUtil;
-			import com.pigskin.serurity.entity.SecurityUser;
-			import com.pigskin.serurity.entity.User;
-			import com.pigskin.serurity.security.TokenManager;
-			import org.springframework.data.redis.core.RedisTemplate;
-			import org.springframework.security.authentication.AuthenticationManager;
-			import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-			import org.springframework.security.core.Authentication;
-			import org.springframework.security.core.AuthenticationException;
-			import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-			import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-			import javax.servlet.FilterChain;
-			import javax.servlet.ServletException;
-			import javax.servlet.http.HttpServletRequest;
-			import javax.servlet.http.HttpServletResponse;
-			import java.io.IOException;import java.util.ArrayList;
-			
-			/**
-      * 登录过滤器，继承UsernamePasswordAuthenticationFilter，对用户名密码进行登录校验 
-      */
-      public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter { 
-      	private AuthenticationManager authenticationManager; 
-        private TokenManager tokenManager;   
-        private RedisTemplate redisTemplate; 
-        
-        /**   
-        * 构造，传递参数  
-        *   
-        * @param authenticationManager  
-        * @param tokenManager    
-        * @param redisTemplate    
-        */   
-        public TokenLoginFilter(AuthenticationManager authenticationManager, TokenManager tokenManager, 
-        		RedisTemplate redisTemplate) {     
-        	this.authenticationManager = authenticationManager;     
-          this.tokenManager = tokenManager;      
-          this.redisTemplate = redisTemplate;     
-          this.setPostOnly(false);      
-          //设置登录请求地址      
-          this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/acl/login", "POST")); 
-        }   
-        
-        /**   
-        * 得到用户名和密码  
-        *    
-        * @param req  
-        * @param res  
-        * @return  
-        * @throws AuthenticationException   
-        */  
-        @Override  
-        public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)  
-        		throws AuthenticationException {     
-        	try {        
-          	User user = new ObjectMapper().readValue(req.getInputStream(), User.class);      
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-            	user.getUsername(), user.getPassword(), new ArrayList<>()));    
-          } catch (IOException e) {      
-          	throw new RuntimeException(e);    
-          }  
-        }   
-        
-        /**  
-        * 登录认证成功  
-        *   
-        * @param req   
-        * @param res   
-        * @param chain    
-        * @param auth    
-        * @throws IOException   
-        * @throws ServletException   
-        */   
-        @Override  
-        protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, 
-        		FilterChain chain,  Authentication auth) throws IOException, ServletException {    
-          SecurityUser user = (SecurityUser) auth.getPrincipal();        
-          //采用jwt方式生成token字符串        
-          String token = tokenManager.createToken(user.getCurrentUserInfo().getUsername());  
-          //将数据存到redis中   
-          redisTemplate.opsForValue().set(
-          	user.getCurrentUserInfo().getUsername(), user.getPermissionValueList());     
-          ResponseUtil.out(res, R.ok().data("token", token)); 
-        }    
-        
-        /**  
-        * 登录失败  
-        *    
-        * @param request 
-        * @param response  
-        * @param e     
-        * @throws IOException    
-        * @throws ServletException  
-        */   
-        @Override   
-        protected void unsuccessfulAuthentication(HttpServletRequest request, 
-        		HttpServletResponse response,AuthenticationException e) throws IOException, ServletException {     
-        	ResponseUtil.out(response, R.error());    
-        }
-      }
-	4、相关工具类
-		-- 密码处理工具类
-			package com.pigskin.serurity.security;
-			
-			import com.pigskin.common_utils.MD5;
-			import org.springframework.security.crypto.password.PasswordEncoder;
-			import org.springframework.stereotype.Component;
-			
-			/**
-      * 密码的处理方法类型
-      */
-      @Component
-      public class DefaultPasswordEncoder implements PasswordEncoder {  
-      	public DefaultPasswordEncoder() {    
-        	this(-1);   
-        }   
-        
-        /**   
-        * @param strength 要使用的位数介于4和31之间  
-        */    
-        public DefaultPasswordEncoder(int strength) {
-        
-        }  
-        
-        /**   
-        * MD5加密   
-        *   
-        * @param rawPassword 要加密的密码    
-        * @return   
-        */   
-        public String encode(CharSequence rawPassword) {   
-        	return MD5.encrypt(rawPassword.toString());  
-        }   
-        
-        /**   
-        * 密码匹配验证  
-        *    
-        * @param rawPassword     要验证的密码     
-        * @param encodedPassword 已加密密码   
-        * @return   
-        */   
-        public boolean matches(CharSequence rawPassword, String encodedPassword) {    
-        	return encodedPassword.equals(MD5.encrypt(rawPassword.toString())); 
-        }
-      }
-		-- token操作工具类
-			package com.pigskin.serurity.security;
-			
-			import io.jsonwebtoken.CompressionCodecs;
-			import io.jsonwebtoken.Jwts;
-			import io.jsonwebtoken.SignatureAlgorithm;
-			import org.springframework.stereotype.Component;
-			import java.util.Date;
-			
-			/**
-      * token管理 
-      */
-      @Component
-      public class TokenManager {  
-      	private long tokenExpiration = 24 * 60 * 60 * 1000;  
-        private String tokenSignKey = "123456";   
-        
-        /**    
-        * 根据用户名创建token字符串    
-        *    
-        * @param username 用户名   
-        * @return 
-        */    
-        public String createToken(String username) {  
-        	return Jwts.builder().setSubject(username)    
-          	.setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))         
-            .signWith(SignatureAlgorithm.HS512, tokenSignKey).compressWith(CompressionCodecs.GZIP).compact();  
-        }  
-        
-        /**  
-        * 从token中获取用户信息   
-        *    
-        * @param token   
-        * @return   
-        */   
-        public String getUserFromToken(String token) {     
-        	return Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token).getBody().getSubject();  
-        }  
-        
-        /**    
-        * 移除token  
-        *     
-        * @param token
-        */   
-        public void removeToken(String token) {    
-        	//jwttoken无需删除，客户端扔掉即可。  
-        }
-      }
-		-- 退出工具类
-			package com.pigskin.serurity.security;
-			
-			import com.pigskin.common_utils.R;
-			import com.pigskin.common_utils.ResponseUtil;
-			import org.springframework.data.redis.core.RedisTemplate;
-			import org.springframework.security.core.Authentication;
-			import org.springframework.security.web.authentication.logout.LogoutHandler;
-			import javax.servlet.http.HttpServletRequest;
-			import javax.servlet.http.HttpServletResponse;
-			
-			/**
-      * 登出业务逻辑类 
-      */
-      public class TokenLogoutHandler implements LogoutHandler {   
-      		private TokenManager tokenManager;  
-          private RedisTemplate redisTemplate;  
-          
-          public TokenLogoutHandler(TokenManager tokenManager, RedisTemplate redisTemplate) {   
-            this.tokenManager = tokenManager;  
-            this.redisTemplate = redisTemplate;   
-          }    
-          
-          @Override  
-          public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {    
-          	String token = request.getHeader("token");     
-            if (token != null) {   
-              tokenManager.removeToken(token);     
-              //清空当前用户缓存中的权限数据          
-              String userName = tokenManager.getUserFromToken(token);  
-              redisTemplate.delete(userName);   
-            }     
-            ResponseUtil.out(response, R.ok());  
-          }
-        }
-		-- 未授权统一处理类
-			package com.pigskin.serurity.security;
-			
-			import com.pigskin.common_utils.R;
-			import com.pigskin.common_utils.ResponseUtil;
-			import org.springframework.security.core.AuthenticationException;
-			import org.springframework.security.web.AuthenticationEntryPoint;
-			import javax.servlet.ServletException;
-			import javax.servlet.http.HttpServletRequest;
-			import javax.servlet.http.HttpServletResponse;
-			import java.io.IOException;
-			
-			/** 
-			* 未授权的统一处理方式 
-			*/
-			public class UnauthorizedEntryPoint implements AuthenticationEntryPoint { 
-      	@Override    
-      	public void commence(HttpServletRequest request, HttpServletResponse response,                         AuthenticationException authException) throws IOException, ServletException {   
-        	ResponseUtil.out(response, R.error());   
-        }
-      }
-	5、公共工具类添加
-		-- 响应工具类
-			package com.pigskin.common_utils;
-			
-			import com.fasterxml.jackson.databind.ObjectMapper;
-			import org.springframework.http.HttpStatus;
-			import org.springframework.http.MediaType;
-			import javax.servlet.http.HttpServletResponse;
-			import java.io.IOException;
-			
-			/**
-			* 响应工具类
-      */
-      public class ResponseUtil {  
-      	public static void out(HttpServletResponse response, R r) {   
-        	ObjectMapper mapper = new ObjectMapper();   
-          response.setStatus(HttpStatus.OK.value());    
-          response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);  
-          try {          
-          	mapper.writeValue(response.getWriter(), r);   
-          } catch (IOException e) { 
-          	e.printStackTrace();    
-          }   
-        }
-      }
-		
-		-- MD5加密工具类————详见2-1-11、MD5加密
-
--- 对应的需要认证服务的模块中引入该模块依赖
-
-# 代码执行过程
--- 1、模块登录后，进入认证过滤器，获取输入的登录用户名和密码
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res){
-		...
-	}
-
--- 2、调用自己写的类，根据用户名查询用户信息和用户具有的权限，并通过security对象返回
-	@Service("userDetailsService")
-	public class UserDetailsServiceImpl implements UserDetailsService {
-		...
-	}
-
--- 3、认证成功后，执行认证过滤器中的认证成功后的方法，得到用户信息，并根据用户名生成token值，同时将用户名和权限信息放到redis中。返回token值
-	@Override    
-	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,Authentication auth) throws IOException, ServletException {
-		...
-	}
-
--- 4、进入授权过滤器，从header中根据token信息获取用户名称，根据用户名称从redis查询数据，给用户授权
-	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {       
-		// token置于header里 
-  	String token = request.getHeader("token");
-	}
-
-# 前端代码整合
--- 替换element-ui
--- 替换代码
--- 安装依赖————npm install --save vuex-persistedstate
--- 修改
-```
-
-
-
-## 15、Git
+## 15、Git——分布式版本控制系统
 
 ```markdown
 # 说明
 	开源的分布式版本控制系统，用以有效、高速的处理从很小到非常大的项目版本管理。
 
 # 安装及配置
--- 详见1-4-6、Git 环境配置
+	详见————1、Java开发之工具环境篇-4-6、Git 环境配置
 
 # Git 命令速查表
 -- 常用的Git命令,如下表:
@@ -3317,9 +4410,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 | git-parse-remote      | 包含于其他脚本中，提供操作远程版本库的函数          |
 | git-sh-setup          | 包含于其他脚本中，提供 shell 编程的函数库           |
 
-
-
-## 16、Jenkins
+## 16、Jenkins——持续化部署工具
 
 ```markdown
 # 说明
@@ -3336,11 +4427,17 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # 使用Jenkins实现完整过程
 -- 准备工作
-	1、安装JDK环境————详见1-5-12、Linux中JDK环境搭建
-	2、安装maven环境————详见1-5-15、Linux中Maven环境搭建
-	3、安装git环境————详见1-5-16、Linux中Git环境搭建
-	4、安装docker————详见1-5-4、Linux中Docker环境搭建
-	5、安装jenkins————详见1-5-17、Linux中Jenkins搭建
+	1、安装JDK环境
+		详见————1、Java开发之工具环境篇-5-12、Linux中JDK环境搭建
+	2、安装maven环境
+		详见————1、Java开发之工具环境篇-5-15、Linux中Maven环境搭建
+	3、安装git环境
+		详见————1、Java开发之工具环境篇-5-16、Linux中Git环境搭建
+	4、安装docker
+		详见————1、Java开发之工具环境篇-5-4、Linux中Docker环境搭建
+	5、安装jenkins
+		详见————1、Java开发之工具环境篇-5-17、Linux中Jenkins搭建
+
 -- Jekins自动化过程
 	1、项目根目录下添加DockerFile文件,内容如下:
 		#拉取JDK环境
@@ -3363,24 +4460,24 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         </plugins>  
       </build>
 	3、jenkins管理界面,创建自动化任务
-		-- 依次点击[新建任务]————>添加任务名————>选择任务类型,一般选择第一项————>点击确定
-		-- 设置源码管理————>提交代码到码云————>添加git代码存储仓库地址
-		-- 配置构建选项————>选择[执行shell]————>添加脚本,如下:
+		1)依次点击[新建任务]————>添加任务名————>选择任务类型,一般选择第一项————>点击确定
+		2)设置源码管理————>提交代码到码云————>添加git代码存储仓库地址
+		3)配置构建选项————>选择[执行shell]————>添加脚本,如下:
 			#!/bin/bash
 			# maven打包
 			mvn clean install -pl ./infrastructure/api_gateway -am -DskipTests
 			echo 'package ok!'
-			
+
 			# docker构建
 			echo 'build start!'
-			
+
 			# 进入构建目录
 			cd ./infrastructure/api_gateway
-			
+
 			# 设置服务名和端口
 			service_name="api_gateway"
 			service_port=8222
-			
+
 			# 查看镜像id
 			IID=$(docker images | grep "$service_name" | awk '{print $3}')
 			echo "IID $IID"
@@ -3415,7 +4512,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       docker run -d --name $service_name --network=bridge -p $service_port:$service_port $service_name
       # 查看启动日志
       #docker logs -f  $service_name
-		-- 执行作业
+		4)执行作业
 			1、在对应任务展开下拉菜单
 				1)需要启动docker
 				2)选择立即构建————拉取代码——>下载依赖——>BUILD SUCCESS之后,执行添加的Dockfile文件
@@ -3442,9 +4539,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	tar -zxvf myjob.tar.gz
 ```
 
-
-
-## 17、Docker
+## 17、Docker——应用容器引擎
 
 ```markdown
 # 说明
@@ -3453,8 +4548,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	容器化虚拟技术[一次封装,到处运行]
 
 # Docker安装
-	详见1-5-4、Linux中Docker环境搭建
-	
+	详见————1、Java开发之工具环境篇-5-4、Linux中Docker环境搭建
+
 # Docker常用命令
 	docker images————查看所有镜像包
 	docker ps————查看正在启动的实例
@@ -3637,8 +4732,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 # 实现原理————基于cookie实现
 ```
 
-
-
 ### 2、服务器集群模式——SSO（Single sign on）单点登录模式
 
 ```markdown
@@ -3657,35 +4750,35 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	4、全系统统一一个唯一标识的cookie,所有系统可能域名都不相同
 
 # 常见实现方式
-	-- session广播机制实现【session的复制】
-		1、实现过程
-			1)一个模块登录后，通过session.setAttribute()将session保存起来
-			2)同时将session数据复制到其他各个模块
-		2、缺点————模块太多的话。进行复制太消耗资源，同时浪费空间
-		3、过期时间————session默认失效时间30分钟（可以自定义）
+-- session广播机制实现【session的复制】
+	1、实现过程
+  	1)一个模块登录后，通过session.setAttribute()将session保存起来
+  	2)同时将session数据复制到其他各个模块
+	2、缺点————模块太多的话。进行复制太消耗资源，同时浪费空间
+	3、过期时间————session默认失效时间30分钟（可以自定义）
 
-	-- 使用cookie+redis实现
-		1、实现过程
-			1)在项目中任何一个模块进行登录，登录之后，将数据放到两个地方
-				redis————在key中放【生成唯一随机值】，ip\用户id\UUid等,在value中放【用户数据】
-				cookie————将redis中生成的key值放到cookie中
-			2)访问项目中其他模块，发送请求带着cookie进行发送，获取cookie值，拿着cookie,把cookie获取值，到redis进行查询，根据key进行查询，如果查到数据就代表已经登录
-		2、过期时间————通过配置redis的过期时间来实现
-		3、cookie————客户端技术:每次发送请求，都会带着cookie值进行发送
-		4、redis————基于key-value存储
+-- 使用cookie+redis实现
+	1、实现过程
+		1)在项目中任何一个模块进行登录，登录之后，将数据放到两个地方
+			redis————在key中放【生成唯一随机值】，ip\用户id\UUid等,在value中放【用户数据】
+			cookie————将redis中生成的key值放到cookie中
+		2)访问项目中其他模块，发送请求带着cookie进行发送，获取cookie值，拿着cookie,把cookie获取值，到redis进行查询，根据key进行查询，如果查到数据就代表已经登录
+	2、过期时间————通过配置redis的过期时间来实现
+	3、cookie————客户端技术:每次发送请求，都会带着cookie值进行发送
+	4、redis————基于key-value存储
 
-	-- 使用token实现【自包含令牌】
-		1、实现过程
-			1)在项目中某个模块登录，登录之后，按照骨子生成字符串，将登陆之后的用户信息包含到生成的字符串中，将字符串返回（1、放到cookie中；2、把字符串通过地址栏返回）
-			2)再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。能获取到就是已经登录
-		2、过期时间————可以进行设置，详见1-1-18、JWT
-		3、token————即按照一定规则（可以自己指定一定的规则）生成的字符串，生成的字符串可以包含用户信息.通用（官方）规则【JWT】，详见JWT
+-- 使用token实现【自包含令牌】
+	1、实现过程
+		1)在项目中某个模块登录，登录之后，按照骨子生成字符串，将登陆之后的用户信息包含到生成的字符串中，将字符串返回（1、放到cookie中；2、把字符串通过地址栏返回）
+		2)再去访问项目其他模块，每次访问在地址栏带着生成字符串，在访问模块里面获取地址栏字符串，根据字符串获取用户信息。能获取到就是已经登录
+	2、过期时间————可以进行设置，详见1-1-18、JWT
+	3、token————即按照一定规则（可以自己指定一定的规则）生成的字符串，生成的字符串可以包含用户信息.通用（官方）规则【JWT】，详见JWT
 
-	-- 使用OAuth2方式
-		1、实现过程
-			1)登录成功之后，【按照一定规则生成字符串】，字符串包含用户信息
-			2)将生成的字符串通过路径传递，或者放入cookie中
-			3)再发送请求时，每次带着字符串发送（从字符串中能获取到用户信息就是已经登录，否则未登录）
+-- 使用OAuth2方式
+	1、实现过程
+		1)登录成功之后，【按照一定规则生成字符串】，字符串包含用户信息
+		2)将生成的字符串通过路径传递，或者放入cookie中
+		3)再发送请求时，每次带着字符串发送（从字符串中能获取到用户信息就是已经登录，否则未登录）
 
 # 单点登陆流程图如下:
 ```
@@ -3694,64 +4787,64 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # 单点登录框架&原理演示
-	-- 源码地址
-		https://gitee.com/xuxueli0323/xxl-sso
-	-- 说明
-		XXL-SSO 是一个分布式单点登录框架。只需要登录一次就可以访问所有相互信任的应用系统。 拥有"轻量级、分布式、跨域、Cookie+Token均支持、Web+APP均支持"等特性。现已开放源代码，开箱即用。
-	-- 原理演示
-		1、xxl-sso-server域名编排
-			1)www.ssoserver.com————登录认证服务器
-			2)www.client1.com————项目1
-			3)www.client2.com————项目2
-		2、服务搭建(端口/服务)
-			1)8080/xxl-sso-server
-			2)8081/xxl-sso-web-sample-springboot
-			3)8082/xxl-sso-web-sample-springboot
-		3、打包并启动
-			1)打包————sudo mvn clean package -Dmaven.skip.test=true
-			2)启动jar包
-				java -jar xxl-sso-server-1.1.1-SNAPSHOT.jar
-				java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8081
-				java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8082
-			3)访问
-				http://ssoserver.com:8080/xxl-sso-server
-				http://client1.com:8081/xxl-sso-web-sample-springboot
-				http://client2.com:8082/xxl-sso-web-sample-springboot
+-- 源码地址
+	https://gitee.com/xuxueli0323/xxl-sso
+
+-- 说明
+	XXL-SSO 是一个分布式单点登录框架。只需要登录一次就可以访问所有相互信任的应用系统。 拥有"轻量级、分布式、跨域、Cookie+Token均支持、Web+APP均支持"等特性。现已开放源代码，开箱即用。
+
+-- 原理演示
+	1、xxl-sso-server域名编排
+		1)www.ssoserver.com————登录认证服务器
+		2)www.client1.com————项目1
+		3)www.client2.com————项目2
+	2、服务搭建(端口/服务)
+		1)8080/xxl-sso-server
+		2)8081/xxl-sso-web-sample-springboot
+		3)8082/xxl-sso-web-sample-springboot
+	3、打包并启动
+		1)打包————sudo mvn clean package -Dmaven.skip.test=true
+		2)启动jar包
+			java -jar xxl-sso-server-1.1.1-SNAPSHOT.jar
+			java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8081
+			java -jar xxl-sso-web-sample-springboot-1.1.1-SNAPSHOT.jar --server.port=8082
+		3)访问
+			http://ssoserver.com:8080/xxl-sso-server
+			http://client1.com:8081/xxl-sso-web-sample-springboot
+			http://client2.com:8082/xxl-sso-web-sample-springboot
 ```
-
-
 
 ## 20、Json格式转换
 
 ```markdown
 # fastjson
-	-- 引入依赖
-		<!--json转换工具-->       
-    <dependency>     
-      <groupId>com.alibaba</groupId>   
-      <artifactId>fastjson</artifactId>     
-    </dependency>
-	-- 具体使用
-		//将map转换成Json对象
-		JSONObject.toJSONString(hashMap)
+-- 引入依赖
+  <!--json转换工具-->       
+  <dependency>     
+    <groupId>com.alibaba</groupId>   
+    <artifactId>fastjson</artifactId>     
+  </dependency>
+-- 具体使用
+	//将map转换成Json对象
+	JSONObject.toJSONString(hashMap)
 
 # gson
-	-- 引入依赖
-    <!--gson-->    
-    <dependency>  
-      <groupId>com.google.code.gson</groupId>     
-      <artifactId>gson</artifactId>      
-    </dependency>
-	-- 具体使用
-		//将json对象转换成map集合
-		Gson gson = new Gson();
-		gson.fromJson(accessTokenInfo, HashMap.class);
+-- 引入依赖
+  <!--gson-->    
+  <dependency>  
+  	<groupId>com.google.code.gson</groupId>     
+  	<artifactId>gson</artifactId>      
+  </dependency>
+-- 具体使用
+	//将json对象转换成map集合
+	Gson gson = new Gson();
+	gson.fromJson(accessTokenInfo, HashMap.class);
 
 # jackson
 	@RestController注解，返回json数据。其底层使用的就是这种方式
 ```
 
-## 21、ElasticSearch全文检索引擎
+## 21、ElasticSearch——全文检索引擎
 
 ```markdown
 # 说明————底层是开源库Lucene,是Lucene的封装,提供了REST API(天然跨平台)的操作接口.开箱即用
@@ -3764,6 +4857,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	1、Index(索引)————相当于Mysql的Insert/相当于Mysql的Database
 	2、Type(类型)————在索引(Index)中可以定义一个或多个类型,类似于Mysql中的Table,每种类型的数据放在一起
 	3、Document(文档)————类似于Mysql中某个表中的内容,保存在某个索引(Index)下,某种类型(Type)的一个数据(Document),文档是Json格式
+
 -- 图示,如下图所示:
 ```
 
@@ -3775,6 +4869,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	1、分词————将整句拆分为单词,并维护那些单词在那些记录中存在
 	2、检索————将检索的内容拆分成单词,在单词维护表中得到包含检索内容单词的记录
 	3、相关性得分————通过单词维护表,选择命中率最高的记录
+
 --图示,如下图所示:
 ```
 
@@ -3782,7 +4877,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 #	安装
--- 详见1-5-7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
+	详见————1、Java开发之工具环境篇-5-7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
 
 # 初步检索
 -- 查看相关信息
@@ -3886,17 +4981,16 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	1、语法格式
 		{action:{metadata}}
 		{request body}
-		
 		{action:{metadata}}
 		{request body}
 	2、示例1
-		-- 简单示例
+		1)简单示例
       POST /customer/external/_bulk
       {"index":{"_id":"1"}}
       {"name":"zhangsan"}
       {"index":{"_id":"2"}}
       {"name":"lisi"}
-    -- 结果说明
+    2)结果说明
     	#! Deprecation: [types removal] Specifying types in bulk requests is deprecated.
     	{  
     		"took" : 139,#花费毫秒数  
@@ -3938,7 +5032,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }]
       }
 	3、示例2
-		-- 复杂示例
+		1)复杂示例
 			POST /_bulk
 			#删除操作
 			{"delete":{"_index":"website","_type":"blog","_id":"123"}}
@@ -3954,7 +5048,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			{"update":{"_index":"website","_type":"blog","_id":"123"}}
 			#更新内容
 			{"doc":{"title":"My updated blog post"}}
-		-- 结果说明
+		2)结果说明
 			#! Deprecation: [types removal] Specifying types in bulk requests is deprecated.
 			{  
 				"took" : 165,  
@@ -4027,8 +5121,10 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
                 "_primary_term" : 1,  
                 "status" : 200    
               }   
-            }]
-          }
+            }
+          ]
+        }
+
 -- 样本测试数据
 	1、数据地址————https://github.com/elastic/elasticsearch/blob/v7.4.2/docs/src/test/resources/accounts.json
 	2、查询数据————POST /bank/account/_bulk
@@ -4050,6 +5146,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       	{      "account_number": "asc"    } 
       ]
     }
+
 -- Query DSL(查询领域对象语言)
 	1、基本语法格式
   	1)典型结构
@@ -4072,7 +5169,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           } 
         }
       }
-    2、返回部分字段
+	2、返回部分字段
     	#返回部分字段
     	GET /bank/_search
     	{ 
@@ -4091,26 +5188,26 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         #指定返回的字段  
         "_source": [    "balance",    "account_number"  ]
       }
-    3、match匹配查询————数字类型精确查找,字符串类型模糊查询(分词+全文检索)
+	3、match匹配查询————数字类型精确查找,字符串类型模糊查询(分词+全文检索)
     	GET /bank/_search{ 
       	"query": {  
         	"match": {      "address": "mill lane"    } 
         }
       }
-    4、match_phrase短语匹配————将需要的值当作一个整体进行检索,不进行分词
+	4、match_phrase短语匹配————将需要的值当作一个整体进行检索,不进行分词
     	GET /bank/_search{ 
       	"query": {  
       		"match_phrase": {      "address": "mill Road",    }  
       	}
      	}
-    5、Field.keyword精确匹配
+	5、Field.keyword精确匹配
     	GET /bank/_search
     	{
       	"query": {   
         	"match_phrase": {      "address.keyword": "mill Road"    }  
         }
       }
-    6、multi_match多字段匹配————获取多个字段中,任意一个字段包含了检索条件的(会分词)
+	6、multi_match多字段匹配————获取多个字段中,任意一个字段包含了检索条件的(会分词)
     	GET /bank/_search
     	{ 
       	"query": {  
@@ -4120,7 +5217,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           } 
         }
       }
-		7、bool复合查询————bool复合查询(must:必须满足,must_not:必须不满足,should:应该满足)
+	7、bool复合查询————bool复合查询(must:必须满足,must_not:必须不满足,should:应该满足)
 			GET /bank/_search
 			{  
 				"query": 
@@ -4155,7 +5252,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           }  
         }
       }
-    8、filter结果过滤————filter过滤查询,不会计算相关性得分
+	8、filter结果过滤————filter过滤查询,不会计算相关性得分
     	GET /bank/_search
     	{  
     		"query": {    
@@ -4171,7 +5268,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           }  
         }
       }
-    9、term————term建议针对非文本使用,文本类型建议使用match
+	9、term————term建议针对非文本使用,文本类型建议使用match
     	GET /bank/_search
     	{ 
       	"query": 
@@ -4181,6 +5278,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           } 
         }
       }
+
 -- aggregations(执行聚合)
 	1、搜索address中包含mill的所有人的平局年龄分布以及平均年龄
 		GET /bank/_search
@@ -4276,8 +5374,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 -- Mapping(映射)
 	1、字段类型
-		1)说明
-			-- 从ES8开始为了提高ES效率,不再支持定义类型.
+		1)说明————从ES8开始为了提高ES效率,不再支持定义类型.
 		2)地址————https://www.elastic.co/guide/en/elasticsearch/reference/6.0/mapping-types.html
 		3)详细,如下图所示:
 ```
@@ -4336,7 +5433,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         } 
       }
     }
-
 	2、添加新的字段映射
 		PUT /my_index/_mapping
 		{  
@@ -4348,7 +5444,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         } 
       }
     }
-
 	3、更新字段映射————需要创建新的索引,然后进行数据迁移
 		#创建新索引
 		PUT /new——bank
@@ -4403,7 +5498,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         } 
       }
     }
-
 	4、数据迁移
 		1)不用类型迁移
 			POST _reindex
@@ -4431,11 +5525,9 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       }
 
 # 分词
-	-- 详见1-5-7、Docker中安装elasticSearch及kibana中的分词器部分
+	详见————1、Java开发之工具环境篇-5-7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
 
 # 代码整合————ElasticSearch-Rest-Client
--- 说明
-
 -- SpringBoot整合
 	1、创建ElasticSearch检索服务模块————search
 	2、引入依赖
@@ -4458,13 +5550,13 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     </properties>
 	4、添加配置类,给容器中注入一个RestHighLevelClient
 		package com.pigskin.search.config;
-		
+
 		import org.apache.http.HttpHost;
 		import org.elasticsearch.client.RestClient;
 		import org.elasticsearch.client.RestHighLevelClient;
 		import org.springframework.context.annotation.Bean;
 		import org.springframework.context.annotation.Configuration;
-		
+
 		/** 
 		* ElasticSearch配置类
     */
@@ -4627,7 +5719,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
             return b;
         }
     }
-
 	2、进行复杂检索
 		package com.pigskin.search.service.impl;
 
@@ -4778,9 +5869,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
                 catalogVos.add(catalogVo);
             }
             searchResponseVo.setCatalogs(catalogVos);
-
-
-
 
             /*5、分页信息*/
             if (hits.getTotalHits() != null) {
@@ -4993,13 +6081,13 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
             return new SearchRequest(new String[]{EsConstant.PRODUCT_INDEX}, builder);
         }
     }
-
 	3、数组扁平化
+		//TODO:
 
 # 注意说明————如果是嵌入式属性(nested),查询,聚合,分析都应该使用嵌入式
 ```
 
-## 22、Thymeleaf
+## 22、Thymeleaf——模板引擎
 
 ```markdown
 # 说明
@@ -5062,8 +6150,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     </dependency>
 	2、修改完页面,control+shift+f9重新自编译页面,如果是代码配置,建议重启服务
 ```
-
-
 
 ## 23、缓存与分布式锁
 
@@ -5209,186 +6295,17 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 <img src="image/img2_1_23_1_8.png" style="zoom:50%;" />
 
 ```markdown
-# SpringCache
--- 链接————https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache
-
--- 简介
-	1、Spring从3.1开始定义了org.springframework.cache.Cache和org.srpingframework.cache.CacheManger接口来统一不同的缓存技术,并支持使用JCache(JSR-107)注解简化我们的开发
-	2、Cache接口为缓存的组件规范定义,包含缓存的各种操作集合;Cache接口下,Spring提供了各种xxxCache的实现:如RedisCache、EhCacheCache、ConcurrentMapCache等
-	3、每次调用需要缓存功能的方法时,Spring会检查指定参数的指定目标方法是否已经被调用过.如果有就直接从缓存中获取方法调用后的结果,如果没有就调用方法并缓存结果后返回给用户
-	4、Spring缓存抽象时,需要关注以下两点:
-		1)确定方法需要被缓存,以及他们的缓存策略
-		2)从缓存中读取之前缓存存储的数据
-
--- 原理
-	1、缓存自动配置类CacheAutoConfiguration帮我们导入redis缓存自动配置类RedisCacheConfiguration,
-	2、redis缓存自动配置类帮我们自动配置了缓存管理器RedisCacheManger,
-	3、缓存管理器初始化所有缓存,决定使用那种缓存到的配置(如果RedisCacheConfiguration有,就用已有的配置,否则创建一个默认的).
-	4、所有想改缓存的配置,只需要给容器中加入一个RedisCacheConfiguration,就会应用到当前缓存管理器管理的所有缓存分区中
-
--- 图示
+# SpringCache————解决分布式缓存不一致性问题
+	详见————2、Java开发之后段技术篇-1-6-2、SpringCache——解决分布式缓存不一致性问题
 ```
-
-<img src="image/img2_1_23_1_9.png" style="zoom:50%;" />
-
-```markdown
-# SpringBoot整合SpringCache简化缓存开发
--- 引入依赖
-	<!--引入spring缓存场景，和spring-boot-starter-data-redis依赖-->       
-  <dependency>   
-    <groupId>org.springframework.boot</groupId>    
-    <artifactId>spring-boot-starter-cache</artifactId>  
-  </dependency><!--redis作为缓存依赖-->       
-  <dependency>  
-    <groupId>org.springframework.boot</groupId> 
-    <artifactId>spring-boot-starter-data-redis</artifactId>        
-    <exclusions>            
-      <!--排除使用lettuce，因为其没有好的方案解决堆外内存溢出问题-->      
-      <exclusion>    
-        <groupId>io.lettuce</groupId>    
-        <artifactId>lettuce-core</artifactId>       
-      </exclusion>         
-    </exclusions>     
-  </dependency>     
-  <!--引入jedis解决lettuce导致的堆外内存溢出问题-->   
-  <dependency>           
-    <groupId>redis.clients</groupId>
-    <artifactId>jedis</artifactId>     
-  </dependency>
-
--- 添加配置
-	1、自动配置了那些[CacheAutoConfiguration]————会导入redisCacheConfiguration————自动配好了缓存管理器RedisCacheManger
-	2、需要手动配置那些
-		#配置缓存类型
-		spring.cache.type=redis
-		#缓存名（配置了之后，就会按照配置的写，而不在创建）
-		#spring.cache.cache-names=productCache
-		#指定混存数据存活时间(毫秒为单位)
-		spring.cache.redis.time-to-live=600000
-		#添加前缀(指定了使用该前缀，没指定默认使用缓存名作为前缀)
-		#spring.cache.redis.key-prefix=CACHE_
-		#设置是否启用前缀
-		spring.cache.redis.use-key-prefix=true
-		#是否缓存空值（解决缓存穿透问题）
-		spring.cache.redis.cache-null-values=true
-	3、测试使用————启动类使用注解@EnableCaching开启缓存功能————使用对应注解,详见注解说明
-
--- 注解说明
-	1、@Cacheable: Triggers cache population.(触发将数据保存到缓存的操作)
-		1)说明————代表当前方法的结果需要缓存,如果缓存中有,方法不用调用,如果缓存中没有,调用方法,将最后的结果放入缓存.
-		2)注意————每一个需要缓存的数据都来指定要放入那个名字的缓存@Cacheable({缓存名}),建议缓存的分区按照业务类型区分
-		3)默认行为
-			-- 如果缓存中有,方法不用调用
-			-- key默认自动生成:缓存名::自主生产的key值
-			-- value默认使用jdk序列化机制,将序列化后的数据存入redis
-			-- 默认过期时间[-1]
-		4)需要自定义操作
-			-- 指定生成的缓存使用的key————key属性指定,接收一个spEL表达式,字符串需要使用''再次包裹
-				SPEL表达式详见————
-			-- 指定过期时间
-				#指定混存数据存活时间(毫秒为单位)
-				spring.cache.redis.time-to-live=60000
-			-- 指定JSON序列化机制
-				#添加配置类,从而修改缓存管理器
-					package com.pigskin.mall.product.config;
-					
-					import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
-					import org.springframework.boot.autoconfigure.cache.CacheProperties;
-					import org.springframework.boot.context.properties.EnableConfigurationProperties;
-					import org.springframework.cache.annotation.EnableCaching;
-					import org.springframework.context.annotation.Bean;
-					import org.springframework.context.annotation.Configuration;
-					import org.springframework.data.redis.cache.RedisCacheConfiguration;
-					import org.springframework.data.redis.serializer.RedisSerializationContext;
-					import org.springframework.data.redis.serializer.StringRedisSerializer;
-					
-					/**
-          * 自定义缓存配置类 
-          */
-          @EnableConfigurationProperties(CacheProperties.class)
-          @Configuration
-          @EnableCaching
-          public class MyCacheConfig {  
-          /**  
-          * @param cacheProperties 自动从容器中获取  
-          * @return   
-          */   
-          @Bean    
-          RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) { 
-          /*1、获取默认配置*/   
-          RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig(); 
-          /*2、设置自定义的要求*/       
-          /*设置主键序列机制*/   
-          config = config.serializeKeysWith(
-            RedisSerializationContext
-            .SerializationPair
-            .fromSerializer(new StringRedisSerializer())
-          );   
-          /*设置值序列化机制*/   
-          config = config.serializeValuesWith(
-          	RedisSerializationContext
-          	.SerializationPair
-          	.fromSerializer(new GenericFastJsonRedisSerializer())
-          );    
-          /*3、将配置文件中的配置生效*/      
-          /*获取所有redis配置*/   
-          CacheProperties.Redis redisProperties = cacheProperties.getRedis();  
-          /*进行配置生效*/       
-          if (redisProperties.getTimeToLive() != null) {   
-          config = config.entryTtl(redisProperties.getTimeToLive());      
-          }       
-          if (redisProperties.getKeyPrefix() != null) {  
-          config = config.prefixKeysWith(redisProperties.getKeyPrefix());    
-          }    
-          if (!redisProperties.isCacheNullValues()) {        
-          config = config.disableCachingNullValues();      
-          }    
-          if (!redisProperties.isUseKeyPrefix()) {          
-          config = config.disableKeyPrefix();   
-          }     
-          return config;  
-          }}
-				#自定义配置类后,配置文件未生效
-					//原始配置文件绑定为
-					@ConfigurationProperties(prefix = "spring.cache")public class CacheProperties {
-					//要让他生效之需要在自定义的配置类上添加注解
-					@EnableConfigurationProperties(CacheProperties.class)————用来使指定类绑定生效
-	2、@CacheEvict: Triggers cache eviction.(触发将数据从缓存移除的操作)
-		1)使用
-			-- @CacheEvict(value = "category", key = "'getLevelOneCategorys'")//失效模式
-			-- @CacheEvict(value = "category", allEntries = true),//失效模式,删除某个分区下的所有数据
-	3、@CachePut: Updates the cache without interfering with the method execution.(不影响方法执行去更新缓存)
-		1)说明————双写模式使用,如果返回的结果是最新的结果,使用该注解可以讲结果重新写入缓存
-	4、@Caching: Regroups multiple cache operations to be applied on a method.(组合以上多个操作)
-		1)使用
-			@Caching(evict = {//同时进行多种缓存操作          
-      	@CacheEvict(value = "category", key = "'getLevelOneCategorys'"),//失效模式        
-      	@CacheEvict(value = "category", key = "'getCatalogJson'")//失效模式  
-      })
-	5、@CacheConfig: Shares some common cache-related settings at class-level.(在类级别共享缓存的相同配置)
-
--- 不足之处————
-	1、读模式
-		1)缓存穿透:查询一个null数据.解决:缓存null.spring.cache.redis.cache-null-values=true
-		2)缓存雪崩:大量key同时过期.解决:加随机时间.spring.cache.redis.time-to-live=600000
-		3)缓存击穿:大量并发进来同时查询一个正好过期数据.解决方案:加锁.默认无加锁,Cacheable使用sync属性启用
-	2、写模式(缓存数据一致性)
-		1)读写加锁.适用于读多写少
-		2)引入中间件,Canal,感知到mysql数据库的更新去更新数据库
-	3、读多写多————直接去数据库
-
--- 使用总结
-	常规数据(读多写少,及时性、一致性不高的):完全可以使用SpringCache,写模式,只要缓存的数据有过期时间就足够了特殊数据——特殊设计
-```
-
-
 
 ### 2、分布式锁
 
 ```markdown
 # 说明
-	-- 本地锁(synchronized/JUC(lock))————只锁当前进程
-	-- 分布式如何加锁?————本地锁只能锁住当前进程,所以我们需要分布式锁
+-- 本地锁(synchronized/JUC(lock))————只锁当前进程
+
+-- 分布式如何加锁————本地锁只能锁住当前进程,所以我们需要分布式锁
 
 # 基本原理
 	1、我们可以同时去公共的一个地方“占坑”,如果占到,就执行逻辑.否则就必须等待,知道释放锁
@@ -5396,31 +6313,31 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	3、等待可以自旋的方式(递归调用)
 
 # 分布式锁演进
-	-- 分布式锁演进——阶段一
+-- 分布式锁演进——阶段一
 ```
 
 <img src="image/img2_1_23_2_1.png" style="zoom:50%;" />
 
 ```markdown
-	-- 分布式锁演进——阶段二
+-- 分布式锁演进——阶段二
 ```
 
 <img src="image/img2_1_23_2_2.png" style="zoom:50%;" />
 
 ```markdown
-	-- 分布式锁演进——阶段三
+-- 分布式锁演进——阶段三
 ```
 
 <img src="image/img2_1_23_2_3.png" style="zoom:50%;" />
 
 ```markdown
-	-- 分布式锁演进——阶段四
+-- 分布式锁演进——阶段四
 ```
 
 <img src="image/img2_1_23_2_4.png" style="zoom:50%;" />
 
 ```markdown
-	-- 分布式锁演进——最终形态
+-- 分布式锁演进——最终形态
 ```
 
 <img src="image/img2_1_23_2_5.png" style="zoom:50%;" />
@@ -5473,13 +6390,13 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # 分布式锁框架—Redisson
-	-- 官方地址————https://github.com/redisson/redisson/wiki
+-- 官方地址————https://github.com/redisson/redisson/wiki
 	
-	-- 说明
+-- 说明
 		Redisson是一个在Redis的基础上实现的Java驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的Java常用对象，还提供了许多分布式服务。其中包括(BitSet, Set, Multimap, SortedSet, Map, List, Queue, BlockingQueue, Deque, BlockingDeque, Semaphore, Lock, AtomicLong, CountDownLatch, Publish / Subscribe, Bloom filter, Remote service, Spring cache, Executor service, Live Object service, Scheduler service) Redisson提供了使用Redis的最简单和最便捷的方法。Redisson的宗旨是促进使用者对Redis的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。
 
-	-- 使用
-		1、引入依赖
+-- 使用
+	1、引入依赖
       <!--redisson依赖（以后使用redisson作为所有分布式锁，分布式对象等功能框架）-->   
       <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->      
       <dependency>      
@@ -5487,7 +6404,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         <artifactId>redisson</artifactId>      
         <version>3.12.0</version>       
       </dependency>
-    2、配置redisson
+	2、配置redisson
       package com.pigskin.mall.product.config;
 
       import org.redisson.Redisson;
@@ -5519,875 +6436,858 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
           return Redisson.create(config);  
         }
       }
-    3、异常问题
-      1)问题————Caused by: java.lang.IllegalArgumentException: Redis url should start with redis:// or rediss:// (for SSL connection)
-      	解决————因为地址需要加上redis://前缀.如果连接redis是受保护的ssl，则应该使用rediss://代替redis:	
+	3、异常问题
+    1)问题————Caused by: java.lang.IllegalArgumentException: Redis url should start with redis:// or rediss:// (for SSL connection)
+      解决————因为地址需要加上redis://前缀.如果连接redis是受保护的ssl，则应该使用rediss://代替redis:	
 
-# 分布式锁和同步器————https://github.com/redisson/redisson/wiki/8.-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8
-	-- 可重入锁
-		1、说明
-			基于Redis的Redisson分布式可重入锁RLock Java对象实现了java.util.concurrent.locks.Lock接口。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
-		2、功能特性
-			1)可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉
-			2)加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
-		3、使用示例
-			@ResponseBody   
-      @GetMapping("/hello")   
-      public String hello() {   
-        /*1、获取一把锁，只要名字一样，就是同一把锁*/     
-        RLock rLock = redisson.getLock("mylock");     
-        /*2、加锁*/      
-        //2.1、阻塞式等待（默认加的锁都是30s时间）   
-        //  1、可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉      
-        //  2、加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
-        //        rLock.lock();      
-        //2.2、阻塞式等待（指定锁到期时间后，在锁时间到了之后，不会自动续期），因此，自动解锁时间一定要大于业务的执行时间      
-        //  1、如若我们传递了锁的超时时间，就发送给redis执行脚本,进行占锁，默认超时时间就是指定的时间       
-        //  2、如若我们未传递锁的超时时间，就使用30*1000【lockWatchdogTimeout看门狗的默认时间】，只要占锁成功，   
-        //  就会启动一个定时任务【重新给锁设定过期时间，新的过期时间，就是看门狗的过期时间，lockWatchdogTimeout/3后进行续期】
-        //        rLock.lock(10, TimeUnit.SECONDS);     
-        //2.3、尝试加锁（最多100m）
-        //        try {
-        //            boolean b = rLock.tryLock(100, 10, TimeUnit.SECONDS);
-        //            if(b){
-        //                try {
-        //                    System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());
-        //                    Thread.sleep(30000);
-        //                } catch (Exception e) {
-        //                    e.printStackTrace();
-        //                } finally {
-        //                    /*3、解锁*/
-        //                    /*假设解锁代码没有执行，redisson会不会死锁*/
-        //                    System.out.println("释放锁。。。" + Thread.currentThread().getId());
-        //                    rLock.unlock();
-        //                }
-        //            }
-        //        } catch (InterruptedException e) {
-        //            e.printStackTrace();
-        //        }      
-        try {        
-          System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());     
-          Thread.sleep(30000);      
-        } catch (Exception e) {       
-        	e.printStackTrace();     
-        } finally {        
+# 分布式锁和同步器
+-- 官方文档————https://github.com/redisson/redisson/wiki/8.-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8
+
+-- 可重入锁
+	1、说明
+		基于Redis的Redisson分布式可重入锁RLock Java对象实现了java.util.concurrent.locks.Lock接口。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
+	2、功能特性
+    1)可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉
+    2)加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
+	3、使用示例
+    @ResponseBody   
+    @GetMapping("/hello")   
+    public String hello() {   
+      /*1、获取一把锁，只要名字一样，就是同一把锁*/     
+      RLock rLock = redisson.getLock("mylock");     
+      /*2、加锁*/      
+      //2.1、阻塞式等待（默认加的锁都是30s时间）   
+      //  1、可以对锁进行自动续期,如果业务超长,在运行期间自动给锁续上新的30s(默认).不用担心业务时间过长,锁被删掉      
+      //  2、加锁的业务只要运行完成,就不会给当前锁进行续期,即使不手动解锁,锁默认在30s之后自动删除
+      //        rLock.lock();      
+      //2.2、阻塞式等待（指定锁到期时间后，在锁时间到了之后，不会自动续期），因此，自动解锁时间一定要大于业务的执行时间      
+      //  1、如若我们传递了锁的超时时间，就发送给redis执行脚本,进行占锁，默认超时时间就是指定的时间       
+      //  2、如若我们未传递锁的超时时间，就使用30*1000【lockWatchdogTimeout看门狗的默认时间】，只要占锁成功，   
+      //  就会启动一个定时任务【重新给锁设定过期时间，新的过期时间，就是看门狗的过期时间，lockWatchdogTimeout/3后进行续期】
+      //        rLock.lock(10, TimeUnit.SECONDS);     
+      //2.3、尝试加锁（最多100m）
+      //        try {
+      //            boolean b = rLock.tryLock(100, 10, TimeUnit.SECONDS);
+      //            if(b){
+      //                try {
+      //                    System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());
+      //                    Thread.sleep(30000);
+      //                } catch (Exception e) {
+      //                    e.printStackTrace();
+      //                } finally {
+      //                    /*3、解锁*/
+      //                    /*假设解锁代码没有执行，redisson会不会死锁*/
+      //                    System.out.println("释放锁。。。" + Thread.currentThread().getId());
+      //                    rLock.unlock();
+      //                }
+      //            }
+      //        } catch (InterruptedException e) {
+      //            e.printStackTrace();
+      //        }      
+      try {        
+        System.out.println("加锁成功，执行业务。。。" + Thread.currentThread().getId());     
+        Thread.sleep(30000);      
+      } catch (Exception e) {       
+      	e.printStackTrace();     
+      } finally {        
         /*3、解锁*/     
-          /*假设解锁代码没有执行，redisson会不会死锁*/       
-          System.out.println("释放锁。。。" + Thread.currentThread().getId());    
-          rLock.unlock();     
-        }      
-        return "hello";  
-      }
+        /*假设解锁代码没有执行，redisson会不会死锁*/       
+        System.out.println("释放锁。。。" + Thread.currentThread().getId());    
+        rLock.unlock();     
+      }      
+      return "hello";  
+    }
 
-	-- 公平锁
-		1、说明
-			基于Redis的Redisson分布式可重入公平锁也是实现了java.util.concurrent.locks.Lock接口的一种RLock对象。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。它保证了当多个Redisson客户端线程同时请求加锁时，优先分配给先发出请求的线程。所有请求线程会在一个队列中排队，当某个线程出现宕机时，Redisson会等待5秒后继续下一个线程，也就是说如果前面有5个线程都处于等待状态，那么后面的线程会等待至少25秒。
-		2、使用示例
-			RLock fairLock = redisson.getFairLock("anyLock");
-			// 最常见的使用方法
-			fairLock.lock();
+-- 公平锁
+	1、说明
+		基于Redis的Redisson分布式可重入公平锁也是实现了java.util.concurrent.locks.Lock接口的一种RLock对象。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。它保证了当多个Redisson客户端线程同时请求加锁时，优先分配给先发出请求的线程。所有请求线程会在一个队列中排队，当某个线程出现宕机时，Redisson会等待5秒后继续下一个线程，也就是说如果前面有5个线程都处于等待状态，那么后面的线程会等待至少25秒。
+	2、使用示例
+		RLock fairLock = redisson.getFairLock("anyLock");
+		// 最常见的使用方法
+		fairLock.lock();
 
-	-- 可读写锁
-		1、说明
-			基于Redis的Redisson分布式可重入读写锁RReadWriteLock Java对象实现了java.util.concurrent.locks.ReadWriteLock接口。其中读锁和写锁都继承了RLock接口。
-		2、功能特征
-			1)分布式可重入读写锁允许同时有多个读锁和一个写锁处于加锁状态。
-			2)可以保证读取的数据是最新的,修改期间,写锁是一个排它锁(互斥锁、独享锁).读锁是一个共享锁
-			3)写锁未释放读锁就必须等待只要有写锁,都需要等待
-				-- 读+读————相当于无锁(并发读,只会在redis中记录好所有当前的读锁.他们都会同时加锁成功)
-				-- 写+读————等待写锁匙放
-				-- 写+写————阻塞方式
-				-- 读+写————有读锁,写也要等待
-		3、使用示例
-			/**    
-      * 测试写锁  
-      *     
-      * @return    
-      */   
-      @ResponseBody   
-      @GetMapping("/write")    
-      public String write() {   
-        /*获取读写锁*/       
-        RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock");   
-        String s = "";     
-        RLock rLock = rReadWriteLock.writeLock();     
-        try {        
-          /*改数据加写锁，读数据加读锁*/    
-          rLock.lock();    
-          s = UUID.randomUUID().toString();  
-          Thread.sleep(30000);        
-          template.opsForValue().set("writeValue", s);   
-        } catch (Exception e) {   
-        	e.printStackTrace();     
-        } finally {      
-        	rLock.unlock();      
-        }       
-        return s; 
-      }   
+-- 可读写锁
+	1、说明
+		基于Redis的Redisson分布式可重入读写锁RReadWriteLock Java对象实现了java.util.concurrent.locks.ReadWriteLock接口。其中读锁和写锁都继承了RLock接口。
+	2、功能特征
+		1)分布式可重入读写锁允许同时有多个读锁和一个写锁处于加锁状态。
+		2)可以保证读取的数据是最新的,修改期间,写锁是一个排它锁(互斥锁、独享锁).读锁是一个共享锁
+		3)写锁未释放读锁就必须等待只要有写锁,都需要等待
+			1-读+读————相当于无锁(并发读,只会在redis中记录好所有当前的读锁.他们都会同时加锁成功)
+			2-写+读————等待写锁匙放
+			3-写+写————阻塞方式
+			4-读+写————有读锁,写也要等待
+	3、使用示例
+    /**    
+    * 测试写锁  
+    *     
+    * @return    
+    */   
+    @ResponseBody   
+    @GetMapping("/write")    
+    public String write() {   
+      /*获取读写锁*/       
+      RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock");   
+      String s = "";     
+      RLock rLock = rReadWriteLock.writeLock();     
+      try {        
+        /*改数据加写锁，读数据加读锁*/    
+        rLock.lock();    
+        s = UUID.randomUUID().toString();  
+        Thread.sleep(30000);        
+        template.opsForValue().set("writeValue", s);   
+      } catch (Exception e) {   
+      	e.printStackTrace();     
+      } finally {      
+      	rLock.unlock();      
+      }       
+      return s; 
+    }   
 
-      /**    
-      * 测试读锁  
-      *     
-      * @return    
-      */ 
-      @ResponseBody   
-      @GetMapping("/read")   
-      public String read() {   
-        String s = "";       
-        RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock"); 
-        RLock rLock = rReadWriteLock.readLock();       
-        rLock.lock();       
-        try {      
-        	s = template.opsForValue().get("writeValue");    
-        } catch (Exception e) {   
-        	e.printStackTrace();       
-        } finally {      
-        	rLock.unlock();     
-        }      
-        return s;  
-      }
+    /**    
+    * 测试读锁  
+    *     
+    * @return    
+    */ 
+    @ResponseBody   
+    @GetMapping("/read")   
+    public String read() {   
+      String s = "";       
+      RReadWriteLock rReadWriteLock = redisson.getReadWriteLock("rw-lock"); 
+      RLock rLock = rReadWriteLock.readLock();       
+      rLock.lock();       
+      try {      
+      	s = template.opsForValue().get("writeValue");    
+      } catch (Exception e) {   
+      	e.printStackTrace();       
+      } finally {      
+      	rLock.unlock();     
+      }      
+      return s;  
+    }
 
-	-- 闭锁
-		1、说明
-			基于Redisson的Redisson分布式闭锁（CountDownLatch）Java对象RCountDownLatch采用了与java.util.concurrent.CountDownLatch相似的接口和用法。
-		2、使用示例
-			/**   
-      * 测试闭锁   
-      */    
-      @ResponseBody   
-      @GetMapping("/lockDoor")   
-      public String lockDoor() throws InterruptedException {   
-        RCountDownLatch door = redisson.getCountDownLatch("door"); 
-        door.trySetCount(5L);    
-        door.await();//等待闭锁都完成    
-        return "放假了";   
-      } 
+-- 闭锁
+	1、说明
+		基于Redisson的Redisson分布式闭锁（CountDownLatch）Java对象RCountDownLatch采用了与java.util.concurrent.CountDownLatch相似的接口和用法。
+	2、使用示例
+		/**   
+    * 测试闭锁   
+    */    
+    @ResponseBody   
+    @GetMapping("/lockDoor")   
+    public String lockDoor() throws InterruptedException {   
+      RCountDownLatch door = redisson.getCountDownLatch("door"); 
+      door.trySetCount(5L);    
+      door.await();//等待闭锁都完成    
+      return "放假了";   
+    } 
       
-      @ResponseBody   
-      @GetMapping("/gogogo/{id}")  
-        public String gogogo(@PathVariable("id") Long id) { 
-        // 在其他线程或其他JVM里
-        RCountDownLatch door = redisson.getCountDownLatch("door");     
-        door.countDown();//计数减一    
-        return id + "班的人都走了。。。"; 
-      }
+    @ResponseBody   
+    @GetMapping("/gogogo/{id}")  
+    public String gogogo(@PathVariable("id") Long id) { 
+      // 在其他线程或其他JVM里
+      RCountDownLatch door = redisson.getCountDownLatch("door");     
+      door.countDown();//计数减一    
+      return id + "班的人都走了。。。"; 
+    }
 
-	-- 信号量
-		1、说明
-			基于Redis的Redisson的分布式信号量（Semaphore）Java对象RSemaphore采用了与java.util.concurrent.Semaphore相似的接口和用法。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
-		2、使用示例
-			/**   
-      * 测试信号量    
-      * 模拟车库有车来了   
-      *   
-      * @return  
-      */   
-      @ResponseBody  
-      @GetMapping("/park")   
-      public String park() throws InterruptedException {     
-        RSemaphore park = redisson.getSemaphore("park");  
-        park.acquire();
-        /*获取一个信号，获取一个值,占一个车位*/   
-        park.tryAcquire();
-        /*看一下是否有(可以做限流)*/ 
-        return "ok"; 
-      }  
-      /**    
-      * 测试信号量   
-      * 模拟车库车开走了 
-      *  
-      * @return  
-      */   
-      @ResponseBody  
-      @GetMapping("/go")  
-      public String go() throws InterruptedException {     
-        RSemaphore park = redisson.getSemaphore("park");     
-        park.release();
-        /*释放一个信号，获取一个值，释放一个车位*/ 
-        return "ok";
-      }
+-- 信号量
+	1、说明
+		基于Redis的Redisson的分布式信号量（Semaphore）Java对象RSemaphore采用了与java.util.concurrent.Semaphore相似的接口和用法。同时还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
+	2、使用示例
+    /**   
+    * 测试信号量    
+    * 模拟车库有车来了   
+    *   
+    * @return  
+    */   
+    @ResponseBody  
+    @GetMapping("/park")   
+    public String park() throws InterruptedException {     
+      RSemaphore park = redisson.getSemaphore("park");  
+      park.acquire();
+      /*获取一个信号，获取一个值,占一个车位*/   
+      park.tryAcquire();
+      /*看一下是否有(可以做限流)*/ 
+      return "ok"; 
+    }  
+    /**    
+    * 测试信号量   
+    * 模拟车库车开走了 
+    *  
+    * @return  
+    */   
+    @ResponseBody  
+    @GetMapping("/go")  
+    public String go() throws InterruptedException {     
+      RSemaphore park = redisson.getSemaphore("park");     
+      park.release();
+      /*释放一个信号，获取一个值，释放一个车位*/ 
+      return "ok";
+    }
 ```
 
+## 24、异步和线程池
 
-
-## 23、异步和线程池
-
-### 1、线程和线程池
+### 1、线程
 
 ```markdown
 # 初始化线程的四种方式
-	-- 继承Thread
-		1、特征————主进程无法获取到线程的运算结果
-		2、创建
-      /**     
-      * 初始化线程方式一   
-      */  
-      public static class Thread01 extends Thread {   
-        @Override     
-        public void run() {      
+-- 继承Thread
+	1、特征————主进程无法获取到线程的运算结果
+	2、创建
+    /**     
+    * 初始化线程方式一   
+    */  
+    public static class Thread01 extends Thread {   
+      @Override     
+      public void run() {      
         System.out.println("当前线程：" + Thread.currentThread().getId());   
         int i = 10 / 2;         
         System.out.println("运行结果：" + i);   
-        }  
-      }
-		3、使用  
-      Thread01 thread01 = new Thread01();    
-      thread01.start();
+      }  
+    }
+	3、使用  
+    Thread01 thread01 = new Thread01();    
+    thread01.start();
 
-	-- 实现Runnable接口
-		1、特征————主进程无法获取到线程的运算结果
-		2、创建
-			/**   
-      * 初始化线程方式二   
-      */  
-      public static class Runnable01 implements Runnable {    
-        @Override      
-        public void run() {     
-          System.out.println("当前线程：" + Thread.currentThread().getId());   
-          int i = 10 / 2;        
-          System.out.println("运行结果：" + i);     
-        }  
-      }
-		3、使用
-			Runnable01 runnable01 = new Runnable01();      
-      new Thread(runnable01).start();
+-- 实现Runnable接口
+	1、特征————主进程无法获取到线程的运算结果
+	2、创建
+    /**   
+    * 初始化线程方式二   
+    */  
+    public static class Runnable01 implements Runnable {    
+      @Override      
+      public void run() {     
+        System.out.println("当前线程：" + Thread.currentThread().getId());   
+        int i = 10 / 2;        
+        System.out.println("运行结果：" + i);     
+      }  
+    }
+	3、使用
+    Runnable01 runnable01 = new Runnable01();      
+    new Thread(runnable01).start();
 
-	-- 实现Callable接口+FutureTask(jdk1.5以后)
-		1、特征————主线程可以获取线程的运算结果,但是不利于控制服务器中的线程资源.可以导致服务器资源耗尽
-		2、创建
-			/**     
-			* 初始化线程方式三    
-      */    
-      public static class Callable01 implements Callable<Integer> { 
-        @Override     
-        public Integer call() throws Exception {    
-          System.out.println("当前线程：" + Thread.currentThread().getId());  
-          int i = 10 / 2;         
-          System.out.println("运行结果：" + i);      
-          return i;    
-        } 
-      }
-		3、使用
-			FutureTask<Integer> futureTask = new FutureTask<>(new Callable01());    
-      new Thread(futureTask).start();       
-      /*阻塞等待整个线程执行完成，获取返回结果*/      
-      Integer integer = futureTask.get();      
-      System.out.println("main__________end____" + integer);
-
-	-- 线程池
-		1、特征
-			性能稳定,可以获取执行结果,并捕获异常,达到控制资源的效果.但是在复杂业务下,一个异步调用可能依赖于另一个异步调用的执行结果
-		2、初始化线程方式
-			1)工具类创建————Executors.newFiexedThreadPool(3);
-				/*4）线程池。给线程池直接提交任务*/     
-        //原生写法，存在问题：会耗费掉资源（所以在业务代码中不能使用前三种，应该将所有的多线程异步任务交给线程池执行）
-        //        new Thread(() -> System.out.println("hello")).start();     
-        /*需要整个系统只有一两个，每个异步任务直接提交给线程池*/
-        //        包含10个线程的线程池
-        public static ExecutorService service = Executors.newFixedThreadPool(10);   
-        service.execute(new Runnable01());
-			2)原生方式创建————参数详见[线程池的七大参数]
-        new ThreadPoolExecutor(
-          corePollSize,maximumPoolSize,keepAliveTime,
-          timeUnit,wortQueue,threadFactory,handler
-        )
-
-# 线程池的七大参数
-	-- 参数说明
-		1、int corePoolSize————the number of threads to keep in the pool, even if they are idle, unless allowCoreThreadTimeOut is set(核心线程数,线程池创建好之后就准备好的线程数量,就等待接收异步任务来执行.即当于指定new Thread()的个数.)
-    2、int maximumPoolSize————the maximum number of threads to allow in the pool(最大线程数量,控制资源)
-    3、long keepAliveTime————when the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before terminating.(存活时间.如果当前的线程数量,大于核心数量,只要线程的空闲时间大于设定的存活时间,就释放空闲的线程(最大大小-核心大小).)
-    4、TimeUnit unit————the time unit for the keepAliveTime argument(时间单位)
-    5、BlockingQueue<Runnable> workQueue————the queue to use for holding tasks before they are executed. This queue will hold only the Runnable tasks submitted by the execute method.(阻塞队列.如果任务有很多,就会将多的任务放到队列中,只要有线程空闲,就会去队列中取出新的任务继续执行.默认integer最大值)
-    6、ThreadFactory threadFactory————the factory to use when the executor creates a new thread(线程的创建工厂,可自己创建)
-    7、RejectedExecutionHandler handler————the handler to use when execution is blocked because the thread bounds and queue capacities are reached(如果队列满了,按照指定的拒绝策略拒绝执行任务)
-			1)DiscardOldestPolicy
-				-- 说明————丢弃最老的,也就是说如果队列满了，会将最早进入队列的任务删掉腾出空间，再尝试加入队列。因为队列是队尾进，队头出，所以队头元素是最老的，因此每次都是移除对头元素后再尝试入队。
-				-- 源码
-          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            if (!e.isShutdown()) {
-              //移除队头元素
-              e.getQueue().poll();
-              //再尝试入队
-              e.execute(r);
-            }
-          }
-			2)AbortPolicy
-				-- 说明————线程池的默认策略。使用该策略时，如果线程池队列满了丢掉这个任务并且抛出RejectedExecutionException异常。
-				-- 源码
-          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            //不做任何处理，直接抛出异常
-            throw new RejectedExecutionException("Task " + r.toString() +" rejected from " +e.toString());
-          }
-			3)CallerRunsPolicy
-				-- 说明————直接调用run方法的任务.此方式不抛弃,以同步方式执行.使用此策略，如果添加到线程池失败，那么主线程会自己去执行该任务，不会等待线程池中的线程去执行。
-				-- 源码
-          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            if (!e.isShutdown()) {
-              //直接执行run方法
-              r.run();
-            }
-          }
-			4)DiscardPolicy
-				-- 说明————这个策略和AbortPolicy的slient版本，如果线程池队列满了，会直接丢掉这个任务并且不会有任何异常。
-				-- 源码
-          public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-          	//就是一个空的方法
-          }	
-			5)RejectedExecutionHandler(自定义)
-				-- 说明————如果以上策略都不符合业务场景，那么可以自己定义一个拒绝策略，只要实现RejectedExecutionHandler接口，并且实现rejectedExecution方法就可以了。具体的逻辑就在rejectedExecution方法里去定义就OK了。
-				-- 自定义示例————例如：我定义了我的一个拒绝策略，叫做MyRejectPolicy，里面的逻辑就是打印处理被拒绝的任务内容
-					public class MyRejectPolicy implements RejectedExecutionHandler{
-            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-              //Sender是我的Runnable类，里面有message字段
-              if (r instanceof Sender) {
-                Sender sender = (Sender) r;
-                //直接打印
-                System.out.println(sender.getMessage());
-              }
-            }
-        }
-
-	-- 工作顺序
-  	1、线程池创建,准备好core数量的核心线程,准备接收任务
-  	2、新的任务进来了.用准备好的空闲线程执行
-  		1)core满了,就将进来的任务放到阻塞队列中.有了空闲的线程就会自己去阻塞队列获取任务执行
-  		2)阻塞队列满了,就直接开新线程执行,最大只能开到max指定的数量
-  		3)max都执行好了.max-core数量空闲的线程就会在keepAliveTime指定的时间后自动销毁,最终保持到core大小
-  		4)如果线程数开到max数量后,还有新的任务进来,就会使用handler指定的拒绝策略进行处理
-  	3、所有的线程创建都由factory创建的
-
- 	-- 示例
- 		问题————一个线程池,core 7,max 20,queue 50,100个并发进来怎么分配.
- 		说明————7个立即执行,50个进入队列,再开13个进行执行,剩余30个使用拒绝策略处理
-
-# 常见的四种线程池
-	-- Executors.newCachedThreadPool();————带缓存的线程池：核心是0，所有都可回收
-
-	-- Executors.newFixedThreadPool(10);————固定线程池大小：核心等于最大的，都不可回收
-
-	-- Executors.newScheduledThreadPool(10);————用于定时任务的线程池
-
-	-- Executors.newSingleThreadExecutor();————单线程线程池：后台从队列中获取任务，顺序执行
-
-# 开发中为什么使用线程池
-	-- 降低资源的消耗————通过重复利用已创建好的线程,降低创建和销毁线程带来的损耗
-	-- 提高响应速度————因为线程池中的线程数没有冲超过线程池的最大限度时,有的线程处于待分配任务的状态,当任务来时,无需创建新的线程就能执行
-	-- 提高线程的可管理性————线程池会根据当前系统特点对池内的线程进行优化处理,减少创建和销毁线程带来的系统开销.无限的创建和销毁线程不仅消耗系统资源,还降低系统的稳定性,使用线程池统一分配
+-- 实现Callable接口+FutureTask(jdk1.5以后)
+	1、特征————主线程可以获取线程的运算结果,但是不利于控制服务器中的线程资源.可以导致服务器资源耗尽
+	2、创建
+    /**     
+    * 初始化线程方式三    
+    */    
+    public static class Callable01 implements Callable<Integer> { 
+      @Override     
+      public Integer call() throws Exception {    
+        System.out.println("当前线程：" + Thread.currentThread().getId());  
+        int i = 10 / 2;         
+        System.out.println("运行结果：" + i);      
+        return i;    
+      } 
+    }
+	3、使用
+    FutureTask<Integer> futureTask = new FutureTask<>(new Callable01());    
+    new Thread(futureTask).start();       
+    /*阻塞等待整个线程执行完成，获取返回结果*/      
+    Integer integer = futureTask.get();      
+    System.out.println("main__________end____" + integer);
 ```
 
+### 2、线程池
 
+```markdown
+# 线程池
+-- 特征
+	性能稳定,可以获取执行结果,并捕获异常,达到控制资源的效果.但是在复杂业务下,一个异步调用可能依赖于另一个异步调用的执行结果
 
-### 2、CompletableFuture异步编排
+-- 初始化线程方式
+	1、工具类创建————Executors.newFiexedThreadPool(3);
+    /*4）线程池。给线程池直接提交任务*/     
+    //原生写法，存在问题：会耗费掉资源（所以在业务代码中不能使用前三种，应该将所有的多线程异步任务交给线程池执行）
+    //        new Thread(() -> System.out.println("hello")).start();     
+    /*需要整个系统只有一两个，每个异步任务直接提交给线程池*/
+    //        包含10个线程的线程池
+    public static ExecutorService service = Executors.newFixedThreadPool(10);   
+    service.execute(new Runnable01());
+	2、原生方式创建————参数详见[线程池的七大参数]
+    new ThreadPoolExecutor(
+      corePollSize,maximumPoolSize,keepAliveTime,
+      timeUnit,wortQueue,threadFactory,handler
+    )
+
+# 线程池的七大参数
+-- 参数说明
+	1、int corePoolSize————the number of threads to keep in the pool, even if they are idle, unless allowCoreThreadTimeOut is set(核心线程数,线程池创建好之后就准备好的线程数量,就等待接收异步任务来执行.即当于指定new Thread()的个数.)
+	2、int maximumPoolSize————the maximum number of threads to allow in the pool(最大线程数量,控制资源)
+	3、long keepAliveTime————when the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before terminating.(存活时间.如果当前的线程数量,大于核心数量,只要线程的空闲时间大于设定的存活时间,就释放空闲的线程(最大大小-核心大小).)
+	4、TimeUnit unit————the time unit for the keepAliveTime argument(时间单位)
+	5、BlockingQueue<Runnable> workQueue————the queue to use for holding tasks before they are executed. This queue will hold only the Runnable tasks submitted by the execute method.(阻塞队列.如果任务有很多,就会将多的任务放到队列中,只要有线程空闲,就会去队列中取出新的任务继续执行.默认integer最大值)
+	6、ThreadFactory threadFactory————the factory to use when the executor creates a new thread(线程的创建工厂,可自己创建)
+	7、RejectedExecutionHandler handler————the handler to use when execution is blocked because the thread bounds and queue capacities are reached(如果队列满了,按照指定的拒绝策略拒绝执行任务)
+		1)DiscardOldestPolicy
+			1- 说明————丢弃最老的,也就是说如果队列满了，会将最早进入队列的任务删掉腾出空间，再尝试加入队列。因为队列是队尾进，队头出，所以队头元素是最老的，因此每次都是移除对头元素后再尝试入队。
+			2- 源码
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+          if (!e.isShutdown()) {
+            //移除队头元素
+            e.getQueue().poll();
+            //再尝试入队
+            e.execute(r);
+          }
+        }
+		2)AbortPolicy
+			1- 说明————线程池的默认策略。使用该策略时，如果线程池队列满了丢掉这个任务并且抛出RejectedExecutionException异常。
+			2- 源码
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+          //不做任何处理，直接抛出异常
+          throw new RejectedExecutionException("Task " + r.toString() +" rejected from " +e.toString());
+        }
+		3)CallerRunsPolicy
+			1- 说明————直接调用run方法的任务.此方式不抛弃,以同步方式执行.使用此策略，如果添加到线程池失败，那么主线程会自己去执行该任务，不会等待线程池中的线程去执行。
+			2- 源码
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+          if (!e.isShutdown()) {
+            //直接执行run方法
+            r.run();
+          }
+        }
+		4)DiscardPolicy
+			1- 说明————这个策略和AbortPolicy的slient版本，如果线程池队列满了，会直接丢掉这个任务并且不会有任何异常。
+			2- 源码
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        	//就是一个空的方法
+        }	
+		5)RejectedExecutionHandler(自定义)
+			1- 说明————如果以上策略都不符合业务场景，那么可以自己定义一个拒绝策略，只要实现RejectedExecutionHandler接口，并且实现rejectedExecution方法就可以了。具体的逻辑就在rejectedExecution方法里去定义就OK了。
+			2- 自定义示例————例如：我定义了我的一个拒绝策略，叫做MyRejectPolicy，里面的逻辑就是打印处理被拒绝的任务内容
+        public class MyRejectPolicy implements RejectedExecutionHandler{
+          public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            //Sender是我的Runnable类，里面有message字段
+            if (r instanceof Sender) {
+              Sender sender = (Sender) r;
+              //直接打印
+              System.out.println(sender.getMessage());
+            }
+          }
+        }
+
+-- 工作顺序
+	1、线程池创建,准备好core数量的核心线程,准备接收任务
+	2、新的任务进来了.用准备好的空闲线程执行
+		1)core满了,就将进来的任务放到阻塞队列中.有了空闲的线程就会自己去阻塞队列获取任务执行
+  	2)阻塞队列满了,就直接开新线程执行,最大只能开到max指定的数量
+  	3)max都执行好了.max-core数量空闲的线程就会在keepAliveTime指定的时间后自动销毁,最终保持到core大小
+		4)如果线程数开到max数量后,还有新的任务进来,就会使用handler指定的拒绝策略进行处理
+	3、所有的线程创建都由factory创建的
+
+-- 示例
+ 	问题————一个线程池,core 7,max 20,queue 50,100个并发进来怎么分配.
+ 	说明————7个立即执行,50个进入队列,再开13个进行执行,剩余30个使用拒绝策略处理
+
+# 常见的四种线程池
+-- Executors.newCachedThreadPool();————带缓存的线程池：核心是0，所有都可回收
+
+-- Executors.newFixedThreadPool(10);————固定线程池大小：核心等于最大的，都不可回收
+
+-- Executors.newScheduledThreadPool(10);————用于定时任务的线程池
+
+-- Executors.newSingleThreadExecutor();————单线程线程池：后台从队列中获取任务，顺序执行
+
+# 开发中为什么使用线程池
+-- 降低资源的消耗————通过重复利用已创建好的线程,降低创建和销毁线程带来的损耗
+
+-- 提高响应速度————因为线程池中的线程数没有冲超过线程池的最大限度时,有的线程处于待分配任务的状态,当任务来时,无需创建新的线程就能执行
+
+-- 提高线程的可管理性————线程池会根据当前系统特点对池内的线程进行优化处理,减少创建和销毁线程带来的系统开销.无限的创建和销毁线程不仅消耗系统资源,还降低系统的稳定性,使用线程池统一分配
+```
+
+### 3、CompletableFuture异步编排
 
 ```markdown
 # 创建异步对象(CompletableFuture提供了四个静态方法来创建一个异步操作)
-	-- 无返回结果的，可自定义线程池
-		1、相关方法
-    	1)不可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable)
-    	2)可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable, Executor executor)
-    2、代码示例：       
-      CompletableFuture.runAsync(() -> {    
-        System.out.println("当前线程：" + Thread.currentThread().getId());   
-        int i = 10 / 2;         
-        System.out.println("运行结果：" + i);      
-      }, service); //service为自定义线程池,不指定采用默认
-    3、结果：
-      //        main方法开始。。。。。
-      //        main方法结束。。。。。
-      //        当前线程：11
-      //        运行结果：5
+-- 无返回结果的，可自定义线程池
+	1、相关方法
+    1)不可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable)
+   	2)可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable, Executor executor)
+	2、代码示例：       
+    CompletableFuture.runAsync(() -> {    
+      System.out.println("当前线程：" + Thread.currentThread().getId());   
+      int i = 10 / 2;         
+      System.out.println("运行结果：" + i);      
+    }, service); //service为自定义线程池,不指定采用默认
+	3、结果：
+    //        main方法开始。。。。。
+    //        main方法结束。。。。。
+    //        当前线程：11
+    //        运行结果：5
 
-	-- 有返回结果的，可自定义线程池
-   	1、相关方法
-   		1)不可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier)
-   		2)可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier,
+-- 有返回结果的，可自定义线程池
+	1、相关方法
+    1)不可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier)
+    2)可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier,
       	Executor executor)
-   	2、代码示例 
-    	CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {      
-        System.out.println("当前线程：" + Thread.currentThread().getId());      
-        int i = 10 / 2;         
-        System.out.println("运行结果：" + i);   
-        return i;   
-      }, service);   
-      System.out.println("main方法结束。。。。。" + supplyAsync.get());
-    3、结果
-    	//        main方法开始。。。。。
-    	//        当前线程：11
-    	//        运行结果：5
-    	//        main方法结束。。。。。5
+	2、代码示例 
+    CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {      
+      System.out.println("当前线程：" + Thread.currentThread().getId());      
+      int i = 10 / 2;         
+      System.out.println("运行结果：" + i);   
+      return i;   
+    }, service);   
+    System.out.println("main方法结束。。。。。" + supplyAsync.get());
+	3、结果
+    //        main方法开始。。。。。
+    //        当前线程：11
+    //        运行结果：5
+    //        main方法结束。。。。。5
 
 # 计算完成时回调方法(方法完成之后的感知)
-	-- 相关方法————处理正常和异常的计算结果
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-  		public CompletableFuture<T> whenComplete (BiConsumer < ? super T, ?super Throwable > action)  
-		2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, ?super Throwable > action)   
-		3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, 
+-- 相关方法————处理正常和异常的计算结果
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+  	public CompletableFuture<T> whenComplete (BiConsumer < ? super T, ?super Throwable > action)  
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, ?super Throwable > action)   
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, 
     		?super Throwable > action, Executor executor)       
-  	4、处理异常结果
-  		public CompletableFuture<T> exceptionally (Function < Throwable, ? extends T > fn)
+	4、处理异常结果
+  	public CompletableFuture<T> exceptionally (Function < Throwable, ? extends T > fn)
 
-	-- 代码示例    
-  	CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {       
-      System.out.println("当前线程：" + Thread.currentThread().getId());     
-      int i = 10 / 0;          
-      System.out.println("运行结果：" + i);     
-      return i;     
-    }, service).whenComplete((result, exception) -> {    
-      /*虽然能得到异常信息，但是没法修改返回数据*/       
-      System.out.println("异步任务成功完成了。。。,结果是：" + result + "；异常是：" + exception);    
-    }).exceptionally(throwable -> {   
-      /*可以感知异常，同时返回默认值*/      
-      return 10;      
-    });
+-- 代码示例    
+	CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {       
+    System.out.println("当前线程：" + Thread.currentThread().getId());     
+    int i = 10 / 0;          
+    System.out.println("运行结果：" + i);     
+    return i;     
+	}, service).whenComplete((result, exception) -> {    
+		/*虽然能得到异常信息，但是没法修改返回数据*/       
+ 		System.out.println("异步任务成功完成了。。。,结果是：" + result + "；异常是：" + exception);    
+	}).exceptionally(throwable -> {   
+  	/*可以感知异常，同时返回默认值*/      
+  	return 10;      
+	});
 
-	-- 结果
-		//        main方法开始。。。。。
-		//        当前线程：11
-		//        异步任务成功完成了。。。,结果是：null；异常是：java.util.concurrent.CompletionException: 
-		// java.lang.ArithmeticException: / by zero
-		//        main方法结束。。。。。10
+-- 结果
+	//        main方法开始。。。。。
+	//        当前线程：11
+	//        异步任务成功完成了。。。,结果是：null；异常是：java.util.concurrent.CompletionException: 
+	// java.lang.ArithmeticException: / by zero
+	//        main方法结束。。。。。10
 
 # handle方法(方法完成之后的处理)
-	-- 相关方法————处理正常和异常的计算结果，并返回新的结果
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public <U > CompletableFuture < U > handle(BiFunction < ? super T, Throwable, ? extends U > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, ? extends U > fn)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, 
+-- 相关方法————处理正常和异常的计算结果，并返回新的结果
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+  	public <U > CompletableFuture < U > handle(BiFunction < ? super T, Throwable, ? extends U > fn)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, ? extends U > fn)      
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+		public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, 
       	? extends U > fn, Executor executor)
 
-	-- 代码示例
-  	CompletableFuture<Integer> handle = CompletableFuture.supplyAsync(() -> {     
-      System.out.println("当前线程：" + Thread.currentThread().getId());       
-      int i = 10 / 4;         
-      System.out.println("运行结果：" + i);   
-      return i;    
-    }, service).handle((result, exception) -> {    
-      if (result != null && exception == null) {
-        //返回有结果，并且异常为空，则继续执行并返回执行后的新结果    
-        return result * 2;       
-      }          
-      /*否则证明有异常或者返回结果为空*/   
-      return 0;   
-    });
+-- 代码示例
+	CompletableFuture<Integer> handle = CompletableFuture.supplyAsync(() -> {     
+		System.out.println("当前线程：" + Thread.currentThread().getId());       
+		int i = 10 / 4;         
+		System.out.println("运行结果：" + i);   
+		return i;    
+	}, service).handle((result, exception) -> {    
+		if (result != null && exception == null) {
+			//返回有结果，并且异常为空，则继续执行并返回执行后的新结果    
+			return result * 2;       
+		}          
+		/*否则证明有异常或者返回结果为空*/   
+		return 0;   
+	});
 
-	-- 结果
-  	// main方法开始。。。。。    
-    // 当前线程：11       
-    // main方法结束。。。。。
-    // 0
+-- 结果
+	// main方法开始。。。。。    
+	// 当前线程：11       
+	// main方法结束。。。。。
+	// 0
 
 # 线程串行化方法
-	-- 相关方法————不能获取到上一步的执行结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-			public CompletableFuture<Void> thenRun(Runnable action)      
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    	public CompletableFuture<Void> thenRunAsync (Runnable action)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> thenRunAsync (Runnable action, Executor executor)
-		4、代码示例  
-      CompletableFuture.supplyAsync(() -> {         
-        System.out.println("当前线程：" + Thread.currentThread().getId());   
-        int i = 10 / 4;        
-        System.out.println("运行结果：" + i);      
-        return i;      
-      }, service).thenRunAsync(() -> {   
-        System.out.println("任务二启动了。。。");   
-      }, service);
-		5、运行结果
+-- 相关方法————不能获取到上一步的执行结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+		public CompletableFuture<Void> thenRun(Runnable action)      
+	2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    public CompletableFuture<Void> thenRunAsync (Runnable action)      
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public CompletableFuture<Void> thenRunAsync (Runnable action, Executor executor)
+	4、代码示例  
+    CompletableFuture.supplyAsync(() -> {         
+      System.out.println("当前线程：" + Thread.currentThread().getId());   
+      int i = 10 / 4;        
+      System.out.println("运行结果：" + i);      
+      return i;      
+    }, service).thenRunAsync(() -> {   
+      System.out.println("任务二启动了。。。");   
+    }, service);
+	5、运行结果
 		//        当前线程：11
 		//        运行结果：2
 		//        main方法结束。。。。。
 		//        任务二启动了。。。
 
-	-- 相关方法————能接收到上一步的执行结果,但是不能改变返回值，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public CompletableFuture<Void> thenAccept(Consumer<? super T> action)    
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action)    
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action, Executor executor)
-		4、代码示例 
-		  CompletableFuture.supplyAsync(() -> {     
-        System.out.println("当前线程：" + Thread.currentThread().getId());    
-        int i = 10 / 4;         
-        System.out.println("运行结果：" + i);  
-        return i;     
-      }, service).thenAcceptAsync((result) -> {  
-      	System.out.println("任务二启动了。。。上一次结果为：" + result);     
-      }, service);
-		5、运行结果
-		   //        当前线程：11
-		   //        运行结果：2
-		   //        main方法结束。。。。。
-		   //        任务二启动了。。。上一次结果为：2
+-- 相关方法————能接收到上一步的执行结果,但是不能改变返回值，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+   	public CompletableFuture<Void> thenAccept(Consumer<? super T> action)    
+	2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+   	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action)    
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+   	public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action, Executor executor)
+	4、代码示例 
+		CompletableFuture.supplyAsync(() -> {     
+      System.out.println("当前线程：" + Thread.currentThread().getId());    
+      int i = 10 / 4;         
+      System.out.println("运行结果：" + i);  
+      return i;     
+    }, service).thenAcceptAsync((result) -> {  
+     	System.out.println("任务二启动了。。。上一次结果为：" + result);     
+    }, service);
+	5、运行结果
+    //        当前线程：11
+    //        运行结果：2
+    //        main方法结束。。。。。
+    //        任务二启动了。。。上一次结果为：2
 
-	-- 相关方法————能接收到上一步的执行结果,并且能改变返回值，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public <U > CompletableFuture < U > thenApply(Function < ? super T, ? extends U > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    	public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, ? extends U > fn)       
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    	public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, 
+-- 相关方法————能接收到上一步的执行结果,并且能改变返回值，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+  	public <U > CompletableFuture < U > thenApply(Function < ? super T, ? extends U > fn)       
+	2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+    public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, ? extends U > fn)       
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
+  	public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, 
     		? extends U > fn, Executor executor)
-    4、代码示例
-    	CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {  
-        System.out.println("当前线程：" + Thread.currentThread().getId());      
-        int i = 10 / 4;          
-        System.out.println("运行结果：" + i);        
-        return i;      
-      }, service).thenApplyAsync((result) -> {   
-        System.out.println("任务二启动了。。。上一次结果为：" + result);  
-        return "我是返回结果" + result;  
-      }, service);    
-      System.out.println("main方法结束。。。。。最终返回结果：" + future.get());
-    5、执行结果
-    	//        当前线程：11
-    	//        运行结果：2
-    	//        任务二启动了。。。上一次结果为：2
-    	//        main方法结束。。。。。最终返回结果：我是返回结果2
+	4、代码示例
+    CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {  
+      System.out.println("当前线程：" + Thread.currentThread().getId());      
+      int i = 10 / 4;          
+      System.out.println("运行结果：" + i);        
+      return i;      
+    }, service).thenApplyAsync((result) -> {   
+      System.out.println("任务二启动了。。。上一次结果为：" + result);  
+      return "我是返回结果" + result;  
+    }, service);    
+    System.out.println("main方法结束。。。。。最终返回结果：" + future.get());
+	5、执行结果
+    //        当前线程：11
+    //        运行结果：2
+    //        任务二启动了。。。上一次结果为：2
+    //        main方法结束。。。。。最终返回结果：我是返回结果2
 
 # 两个任务组合——都要完成(两个任务都完成后触发)
-	-- 相关方法————不能获取到任务一和任务二的执行结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public CompletableFuture<Void> runAfterBoth (CompletionStage < ? > other, Runnable action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action)        
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
- 			public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, 
- 				Runnable action, Executor executor)
-		4、代码示例：       
-      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> { 
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());      
-        int i = 10 / 4;     
-        System.out.println("任务一线程结束：" + i);  
-        return i;      
-      }, service);  
-      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {        
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
-        System.out.println("任务二线程结束：");     
-        return "Hello";     
-      }, service);    
-      future01.runAfterBothAsync(future02, () -> {   
-        System.out.println("任务三开始。。。");      
-      }, service);     
-		5、运行结果：
-      //        main方法开始。。。。。
-      //        任务一线程启动：11
-      //        任务一线程结束：2
-      //        任务二线程启动：12
-      //        任务二线程结束：
-      //        main方法结束。。。。。最终返回结果：
-      //        任务三开始。。。
+-- 相关方法————不能获取到任务一和任务二的执行结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+		public CompletableFuture<Void> runAfterBoth (CompletionStage < ? > other, Runnable action)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+		public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action)        
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+		public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action, Executor executor)
+	4、代码示例：       
+    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> { 
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());      
+      int i = 10 / 4;     
+      System.out.println("任务一线程结束：" + i);  
+      return i;      
+    }, service);  
+    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {        
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
+      System.out.println("任务二线程结束：");     
+      return "Hello";     
+    }, s	ervice);    
+    future01.runAfterBothAsync(future02, () -> {   
+    	System.out.println("任务三开始。。。");      
+    }, service);     
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        main方法结束。。。。。最终返回结果：
+    //        任务三开始。。。
 
-	-- 相关方法————能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
-  	1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, 
-    		BiConsumer < ? super T, ?super U > action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,
-    		BiConsumer < ? super T, ?super U > action)       
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
-    		BiConsumer < ? super T, ?super U > action, Executor executor)
-    4、代码示例：      
-      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {   
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
-        int i = 10 / 4;        
-        System.out.println("任务一线程结束：" + i);     
-        return i;    
-      }, service);    
-      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {    
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
-        System.out.println("任务二线程结束：");     
-        return "Hello";
-      }, service);     
-      future01.thenAcceptBothAsync(future02, (f1, f2) -> {         
-        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);   
-      }, service);
-    5、运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务二线程结束：
-    	//        main方法结束。。。。。最终返回结果：
-    	//        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+-- 相关方法————能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+  	public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,BiConsumer < ? super T, ?super U > action)       
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+  	public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action, Executor executor)
+	4、代码示例：      
+    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {   
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
+      int i = 10 / 4;        
+      System.out.println("任务一线程结束：" + i);     
+      return i;    
+    }, service);    
+    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {    
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
+      System.out.println("任务二线程结束：");     
+      return "Hello";
+    }, service);     
+    future01.thenAcceptBothAsync(future02, (f1, f2) -> {         
+    	System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);   
+    }, service);
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        main方法结束。。。。。最终返回结果：
+    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
 
-	-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public <U, V > CompletableFuture < V > thenCombine(CompletionStage < ? extends U > other,
-    		BiFunction < ? super T,? super U,? extends V > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other, 
-    		BiFunction < ? super T,?super U,? extends V > fn)        
-    3、自定义线程池（将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other,
-      	BiFunction < ? super T,?super U,? extends V > fn, Executor executor)
-    4、代码示例：
-    	CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
-        int i = 10 / 4;         
-        System.out.println("任务一线程结束：" + i);   
-        return i;     
-      }, service);  
-      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {   
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());  
-        System.out.println("任务二线程结束：");      
-        return "Hello";    
-      }, service);  
-      CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {   
-        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);      
-        return "任务三返回结果：" + "任务一的结果：" + f1 + ";任务二的结果：" + f2;    
-      }, service);
-    5、运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务二线程结束：
-    	//        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
-    	//        main方法结束。。。。。最终返回结果：任务三返回结果：任务一的结果：2;任务二的结果：Hello
+-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+    public <U, V > CompletableFuture < V > thenCombine(CompletionStage < ? extends U > other,BiFunction < ? super T,? super U,? extends V > fn)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other, BiFunction < ? super T,?super U,? extends V > fn)        
+	3、自定义线程池（将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+		public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other,BiFunction < ? super T,?super U,? extends V > fn, Executor executor)
+	4、代码示例：
+    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
+      int i = 10 / 4;         
+      System.out.println("任务一线程结束：" + i);   
+    	return i;     
+    }, service);  
+    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {   
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());  
+      System.out.println("任务二线程结束：");      
+      return "Hello";    
+    }, service);  
+    CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {   
+      System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);      
+      return "任务三返回结果：" + "任务一的结果：" + f1 + ";任务二的结果：" + f2;    
+    }, service);
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+    //        main方法结束。。。。。最终返回结果：任务三返回结果：任务一的结果：2;任务二的结果：Hello
 
 # 两个任务组合——一个完成
-	-- 相关方法————不能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public CompletableFuture<Void> runAfterEither (CompletionStage < ? > other, Runnable action) 
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action)  
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行	
-    	public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action, 
-    		Executor executor)
-    4、代码示例
-    	CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {  
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());         
-        int i = 10 / 4;       
-        System.out.println("任务一线程结束：" + i);    
-        return i;     
-      }, service);      
-      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {     
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());          
-        try {              
-          Thread.sleep(3000);     
-          System.out.println("任务二线程结束：任务二的线程睡了三秒");    
-        } catch (InterruptedException e) {      
-        	e.printStackTrace();          
-        }         
-        return "Hello";     
-      }, service);  
-      future01.runAfterEitherAsync(future02, () -> {         
-      	System.out.println("任务三开始执行。。。");      
-      }, service);
-    5、运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务三开始执行。。。
-    	//        任务二线程结束：任务二的线程睡了三秒
+-- 相关方法————不能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+  	public CompletableFuture<Void> runAfterEither (CompletionStage < ? > other, Runnable action) 
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action)  
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行	
+    public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action, Executor executor)
+	4、代码示例
+    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {  
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());         
+      int i = 10 / 4;       
+      System.out.println("任务一线程结束：" + i);    
+      return i;     
+    }, service);      
+    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {     
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());          
+      try {              
+        Thread.sleep(3000);     
+        System.out.println("任务二线程结束：任务二的线程睡了三秒");    
+      } catch (InterruptedException e) {      
+      	e.printStackTrace();          
+      }         
+      return "Hello";     
+    }, service);  
+    future01.runAfterEitherAsync(future02, () -> {         
+    	System.out.println("任务三开始执行。。。");      
+    }, service);
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务三开始执行。。。
+    //        任务二线程结束：任务二的线程睡了三秒
 
-	-- 相关方法————能获取到任务一或任务二的执行结果，任务三无返回结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-      public CompletableFuture<Void> acceptEither (CompletionStage < ? extends T > other, 
-        Consumer < ? super T > action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,
-      	Consumer < ? super T > action)        
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,
-      	Consumer < ? super T > action, Executor executor)
-    4、代码示例：
-    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {       
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());  
-        int i = 10 / 4;       
-        System.out.println("任务一线程结束：" + i);    
-        return i;      
-      }, service);   
-      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
-        System.out.println("任务二线程结束：");      
-        try {               
-          Thread.sleep(3000);    
-          System.out.println("任务二线程结束：任务二的线程睡了三秒");   
-        } catch (InterruptedException e) {            
-        	e.printStackTrace();          
-        }          
-        return "Hello";    
-      }, service);     
-      future01.acceptEitherAsync(future02, (result) -> {   
-      	System.out.println("任务三开始执行。。。任务一或任务二的结果为：" + result);   
-      }, service);
-    5、运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务二线程结束：
-    	//        任务三开始执行。。。任务一或任务二的结果为：2
-    	//        任务二线程结束：任务二的线程睡了三秒
+-- 相关方法————能获取到任务一或任务二的执行结果，任务三无返回结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+    public CompletableFuture<Void> acceptEither (CompletionStage < ? extends T > other, Consumer < ? super T > action)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+   	public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,Consumer < ? super T > action)        
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,Consumer < ? super T > action, Executor executor)
+	4、代码示例：
+    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {       
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());  
+      int i = 10 / 4;       
+      System.out.println("任务一线程结束：" + i);    
+      return i;      
+    }, service);   
+    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
+      System.out.println("任务二线程结束：");      
+      try {               
+        Thread.sleep(3000);    
+        System.out.println("任务二线程结束：任务二的线程睡了三秒");   
+      } catch (InterruptedException e) {            
+      	e.printStackTrace();          
+      }          
+      return "Hello";    
+    }, service);     
+    future01.acceptEitherAsync(future02, (result) -> {   
+      System.out.println("任务三开始执行。。。任务一或任务二的结果为：" + result);   
+    }, service);
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        任务三开始执行。。。任务一或任务二的结果为：2
+    //        任务二线程结束：任务二的线程睡了三秒
 
-	-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
-		1、执行当前任务的线程继续执行任务————相同的线程执行
-    	public <U > CompletableFuture < U > applyToEither(CompletionStage < ? extends T > other, 
-    		Function < ? super T, U > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, 
-    		Function < ? super T, U > fn)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    	public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, 
-    		Function < ? super T, U > fn, Executor executor)
-    4、代码示例：    
-    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {         
-      	System.out.println("任务一线程启动：" + Thread.currentThread().getId());        
-        int i = 10 / 4;        
-        System.out.println("任务一线程结束：" + i);     
-        return i;     
-      }, service); 
-      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());      
-        try {            
-          Thread.sleep(3000);      
-          System.out.println("任务二线程结束：");    
-        } catch (InterruptedException e) {   
-        	e.printStackTrace();        
-        }          
-        return "Hello";    
-      }, service);     
-      CompletableFuture<String> stringCompletableFuture = future01.applyToEitherAsync(future02, (result) -> {  
-        System.out.println("任务三开始执行。。。");    
-        return "任务三执行完成，任务一或任务二的结果为：result:" + result;       
-      }, service);     
-      System.out.println("main方法结束。。。。。最终返回结果：" + stringCompletableFuture.get());
-   	5、运行结果：
-   		//        main方法开始。。。。。
-   		//        任务一线程启动：11
-   		//        任务一线程结束：2
-   		//        任务二线程启动：12
-   		//        任务二线程结束：
-   		//        任务三开始执行。。。
-   		//        main方法结束。。。。。最终返回结果：任务三执行完成，任务一或任务二的结果为：result:2
+-- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
+	1、执行当前任务的线程继续执行任务————相同的线程执行
+ 		public <U> CompletableFuture <U> applyToEither(CompletionStage <? extends T> other, Function <? super T,U> fn)       
+	2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, Function < ? super T, U > fn)      
+	3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
+    public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, Function < ? super T, U > fn, Executor executor)
+	4、代码示例：    
+    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {         
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());        
+      int i = 10 / 4;        
+      System.out.println("任务一线程结束：" + i);     
+      return i;     
+    }, service); 
+    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());      
+      try {            
+        Thread.sleep(3000);      
+        System.out.println("任务二线程结束：");    
+      } catch (InterruptedException e) {   
+      	e.printStackTrace();        
+      }          
+      return "Hello";    
+    }, service);     
+    CompletableFuture<String> stringCompletableFuture = future01.applyToEitherAsync(future02, (result) -> {  
+      System.out.println("任务三开始执行。。。");    
+      return "任务三执行完成，任务一或任务二的结果为：result:" + result;       
+    }, service);     
+    System.out.println("main方法结束。。。。。最终返回结果：" + stringCompletableFuture.get());
+	5、运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        任务三开始执行。。。
+    //        main方法结束。。。。。最终返回结果：任务三执行完成，任务一或任务二的结果为：result:2
 
 # 多任务组合
-	-- 相关方法 
-  	1、等待所有任务完成
-    	public static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs)     
-    2、只要有一个任务完成
-    	public static CompletableFuture<Object> anyOf(CompletableFuture<?>... cfs)
-    3、代码示例：     
-    	CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {  
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
-        int i = 10 / 4;        
-        System.out.println("任务一线程结束：" + i);     
-        return i;     
-      }, service);   
-      CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {     
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
-        try {           
-          Thread.sleep(3000);     
-          System.out.println("任务二线程结束：");       
-        } catch (InterruptedException e) {            
-        	e.printStackTrace();      
-        }          
-        return "Hello";    
-      }, service);     
-      CompletableFuture<Object> future03 = CompletableFuture.supplyAsync(() -> {   
-        System.out.println("任务三线程启动：" + Thread.currentThread().getId());  
-        try {          
-          Thread.sleep(5000);    
-          System.out.println("任务三线程结束：");   
-        } catch (InterruptedException e) { 
-        	e.printStackTrace();         
-        }           
-        return "Hello";      
-      }, service);      
-      CompletableFuture<Object> future04 = CompletableFuture.supplyAsync(() -> {     
-        System.out.println("任务四线程启动：" + Thread.currentThread().getId());    
-        try {             
-          Thread.sleep(6000);  
-          System.out.println("任务四线程结束：");   
-        } catch (InterruptedException e) {       
-        	e.printStackTrace();           
-        }           
-        return "Hello";     
-      }, service);   
-      //等待所有结果完成
-      CompletableFuture.allOf(future01, future02, future03, future04).get();
-      System.out.println("main...end..." + future01.get() + "=>" 
-      	+ future02.get() + "=>" + future03.get() + "=>" + future04.get());
-
-      //只要其中一个执行完成
-      CompletableFuture<Object> f = CompletableFuture.anyOf(future01, future02, future03, future04);      
-    	System.out.println("main...end..." + f.get());
-    4、等待所有结果完成————运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务三线程启动：13
-    	//        任务四线程启动：14
-    	//        任务二线程结束：
-    	//        任务三线程结束：
-    	//        任务四线程结束：
-    	//        main...end...2=>Hello=>Hello=>Hello       
-
-    5、只要其中一个执行完成————运行结果：
-    	//        main方法开始。。。。。
-    	//        任务一线程启动：11
-    	//        任务一线程结束：2
-    	//        任务二线程启动：12
-    	//        任务三线程启动：13
-    	//        任务四线程启动：14
-    	//        main...end...2
-    	//        任务二线程结束：
-    	//        任务三线程结束：
-    	//        任务四线程结束：
+-- 相关方法 
+	1、等待所有任务完成
+  	public static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs)     
+	2、只要有一个任务完成
+   	public static CompletableFuture<Object> anyOf(CompletableFuture<?>... cfs)
+	3、代码示例：     
+    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {  
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
+      int i = 10 / 4;        
+      System.out.println("任务一线程结束：" + i);     
+      return i;     
+    }, service);   
+    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {     
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
+      try {           
+        Thread.sleep(3000);     
+        System.out.println("任务二线程结束：");       
+      } catch (InterruptedException e) {            
+      	e.printStackTrace();      
+      }          
+      return "Hello";    
+    }, service);     
+    CompletableFuture<Object> future03 = CompletableFuture.supplyAsync(() -> {   
+      System.out.println("任务三线程启动：" + Thread.currentThread().getId());  
+      try {          
+        Thread.sleep(5000);    
+        System.out.println("任务三线程结束：");   
+      } catch (InterruptedException e) { 
+      	e.printStackTrace();         
+      }           
+      return "Hello";      
+    }, service);      
+    CompletableFuture<Object> future04 = CompletableFuture.supplyAsync(() -> {     
+      System.out.println("任务四线程启动：" + Thread.currentThread().getId());    
+      try {             
+        Thread.sleep(6000);  
+        System.out.println("任务四线程结束：");   
+      } catch (InterruptedException e) {       
+      	e.printStackTrace();           
+      }           
+      return "Hello";     
+    }, service);   
+    //等待所有结果完成
+    CompletableFuture.allOf(future01, future02, future03, future04).get();
+    System.out.println("main...end..." + future01.get() + "=>" + future02.get() + "=>" + future03.get() + "=>" + future04.get());
+		//只要其中一个执行完成
+  	CompletableFuture<Object> f = CompletableFuture.anyOf(future01, future02, future03, future04);      
+  	System.out.println("main...end..." + f.get());
+	4、等待所有结果完成————运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务三线程启动：13
+    //        任务四线程启动：14
+    //        任务二线程结束：
+    //        任务三线程结束：
+    //        任务四线程结束：
+    //        main...end...2=>Hello=>Hello=>Hello       
+	5、只要其中一个执行完成————运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务三线程启动：13
+    //        任务四线程启动：14
+    //        main...end...2
+    //        任务二线程结束：
+    //        任务三线程结束：
+    //        任务四线程结束：
 
 # 业务场景示例
-	-- 场景————假如商品详情页的每个查询,需要入校标注的时间才能完成,那么用户5.5s才能看到结果.但是使用多线程,1.5s就能看到
-	-- 说明
-		1、方法说明：  
-      /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行（执行当前任务的线程继续执行任务——相同的线程执行）*/
-      public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, 
-      	BiConsumer < ? super T, ?super U > action)     
-      /*能获取到任务一和任务二的执行结果,任务三无返回结果,继续执行（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
-      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
-      	BiConsumer < ? super T, ?super U > action)    
-      /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行，自定义线程池（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
-      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, 
-      	BiConsumer < ? super T, ?super U > action, Executor executor)
-    2、代码示例：    
-      CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
-        System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
-        int i = 10 / 4;         
-        System.out.println("任务一线程结束：" + i);    
-        return i;      
-      }, service);    
-      CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> { 
-        System.out.println("任务二线程启动：" + Thread.currentThread().getId()); 
-        System.out.println("任务二线程结束：");       
-        return "Hello";      
-      }, service);  
-      future01.thenAcceptBothAsync(future02, (f1, f2) -> {    
-      	System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);        
-      }, service);
-    3、结果展示
-      //      运行结果：
-      //        main方法开始。。。。。
-      //        任务一线程启动：11
-      //        任务一线程结束：2
-      //        任务二线程启动：12
-      //        任务二线程结束：
-      //        main方法结束。。。。。最终返回结果：
-      //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+-- 场景————假如商品详情页的每个查询,需要入校标注的时间才能完成,那么用户5.5s才能看到结果.但是使用多线程,1.5s就能看到
+-- 说明
+	1、方法说明：  
+    /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行（执行当前任务的线程继续执行任务——相同的线程执行）*/
+    public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action)     
+    /*能获取到任务一和任务二的执行结果,任务三无返回结果,继续执行（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
+    public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,BiConsumer < ? super T, ?super U > action)    
+    /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行，自定义线程池（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
+    public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action, Executor executor)
+	2、代码示例：    
+    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
+      System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
+      int i = 10 / 4;         
+      System.out.println("任务一线程结束：" + i);    
+      return i;      
+    }, service);    
+    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> { 
+      System.out.println("任务二线程启动：" + Thread.currentThread().getId()); 
+      System.out.println("任务二线程结束：");       
+      return "Hello";      
+    }, service);  
+    future01.thenAcceptBothAsync(future02, (f1, f2) -> {    
+    	System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);        
+    }, service);
+	3、结果展示
+    //      运行结果：
+    //        main方法开始。。。。。
+    //        任务一线程启动：11
+    //        任务一线程结束：2
+    //        任务二线程启动：12
+    //        任务二线程结束：
+    //        main方法结束。。。。。最终返回结果：
+    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
 ```
 
-
-
-### 3、CompletableFuture异步编排使用步骤
+### 4、CompletableFuture异步编排使用步骤
 
 ```markdown
 # 引入依赖(可以不引用),提供提示功能
@@ -6399,41 +7299,41 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
   </dependency>
 
 # 创建线程池配置类
-    package com.pigskin.mall.product.config;
+	package com.pigskin.mall.product.config;
 
-    import lombok.Data;
-    import org.springframework.boot.context.properties.ConfigurationProperties;
-    import org.springframework.stereotype.Component;
-    import java.util.concurrent.TimeUnit;
+	import lombok.Data;
+	import org.springframework.boot.context.properties.ConfigurationProperties;
+	import org.springframework.stereotype.Component;
+	import java.util.concurrent.TimeUnit;
 
-    /**
-    * 线程池属性文件配置 
-    */
-    @ConfigurationProperties(prefix = "pigskinmall.thread")
-    @Component
-    @Data
-    public class ThreadPoolConfigProperties {   
-      /**  
-      * 核心线程大小(默认20) 
-      */   
-      private Integer coreSize = 20;  
-      /**   
-      * 最大大小(默认100)   
-      */   
-      private Integer maxSize = 100;  
-      /**   
-      * 休眠时长(默认10)    
-      */  
-      private Integer keepAliveTime = 10;  
-      /**   
-      * 休眠时长单位(默认TimeUnit.SECONDS)    
-      */   
-      private TimeUnit timeUnit; 
-      /**   
-      * 队列大小(默认100000)  
-      */  
-      private Integer capacity = 100000;
-    }
+	/**
+	* 线程池属性文件配置 
+	*/
+	@ConfigurationProperties(prefix = "pigskinmall.thread")
+	@Component
+	@Data
+	public class ThreadPoolConfigProperties {   
+    /**  
+    * 核心线程大小(默认20) 
+    */   
+    private Integer coreSize = 20;  
+    /**   
+    * 最大大小(默认100)   
+    */   
+    private Integer maxSize = 100;  
+    /**   
+    * 休眠时长(默认10)    	
+    */  
+    private Integer keepAliveTime = 10;  
+    /**   
+    * 休眠时长单位(默认TimeUnit.SECONDS)    
+    */   
+    private TimeUnit timeUnit; 
+    /**   
+    * 队列大小(默认100000)  
+    */  
+    private Integer capacity = 100000;
+	}
 
 # 配置文件添加配置
 	#配置线程池相关配置
@@ -6444,35 +7344,35 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	pigskinmall.thread.time-unit=seconds
 
 # 创建线程池异步编排配置类文件
-    package com.pigskin.mall.product.config;
+	package com.pigskin.mall.product.config;
 
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import java.util.concurrent.Executors;
-    import java.util.concurrent.LinkedBlockingDeque;
-    import java.util.concurrent.ThreadPoolExecutor;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import java.util.concurrent.Executors;
+	import java.util.concurrent.LinkedBlockingDeque;
+	import java.util.concurrent.ThreadPoolExecutor;
 
-    /**
-    * 创建线程池配置 
-    */
-    /*开启指定类文件的属性配置，这样在对应类中就可以不写@Component注解*/
-    //@EnableConfigurationProperties(ThreadPoolConfigProperties.class)
-    @Configuration
-    public class MyThreadConfig {  
-      /**    
-      * @return  
-      */   
-      @Bean  
-      public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfigProperties pool) {    
-        return new ThreadPoolExecutor(pool.getCoreSize(),         
-        pool.getMaxSize(),          
-        pool.getKeepAliveTime(),            
-        pool.getTimeUnit(),         
-        new LinkedBlockingDeque<>(pool.getCapacity()),    
-        Executors.defaultThreadFactory(),      
-        new ThreadPoolExecutor.AbortPolicy());  
-      }
+	/**
+	* 创建线程池配置 
+	*/
+	/*开启指定类文件的属性配置，这样在对应类中就可以不写@Component注解*/
+	//@EnableConfigurationProperties(ThreadPoolConfigProperties.class)
+	@Configuration
+	public class MyThreadConfig {  
+    /**    
+    * @return  
+    */   
+    @Bean  
+    public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfigProperties pool) {    
+    return new ThreadPoolExecutor(pool.getCoreSize(),         
+    pool.getMaxSize(),          
+    pool.getKeepAliveTime(),            
+    pool.getTimeUnit(),         
+    new LinkedBlockingDeque<>(pool.getCapacity()),    
+    Executors.defaultThreadFactory(),      
+    new ThreadPoolExecutor.AbortPolicy());  
     }
+	}
 
 # 业务代码使用异步编排
 	/**
@@ -6522,9 +7422,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	}
 ```
 
-
-
-## 24、重定向与请求转发
+## 25、重定向与请求转发
 
 ### 1、请求转发
 
@@ -6607,12 +7505,12 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 # 分布式下session问题
-	详见————2-1-25、Session共享问题
+	详见————2、Java开发之后端技术篇-1-26、Session共享问题
 ```
 
 
 
-## 25、Session共享问题
+## 26、Session共享问题
 
 ```markdown
 # Session原理
@@ -6664,127 +7562,23 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			Cookie cookie = new Cookie("JSESSIONID", "xxx");
       cookie.setDomain("pigskinmall.com");
       servletResponse.addCookie(cookie);
-    2)使用SpringSession方式————详见——SpringSession
+    2)使用SpringSession方式
+    	详见————2、Java开发之后端技术篇-1-6-1、SpringSession——解决分布式系统Session不一致问题
 	3、图示,如图所示:
 ```
 
 <img src="image/img2_1_25_1_7.png" style="zoom:50%;" />
 
 ```markdown
-# SpringSession
--- 核心原理————装饰者模式
-	1、@EnableRedisHttpSession导入了RedisHttpSessionConfiguration配置    
-  	1)给容器中添加了一个组件      
-    	sessionRedisOperationsSessionRepository:redis操作session.即session的增删改查封装类   
-    2)设置了一个Session存储的过滤器         
-    	SessionRepositoryFilter:每一个请求都要经过这个过滤器.   
-        -- 创建时,就自动从容器中获取到了SessionRepository    
-        -- 原始的request,response都被包装了SessionRepositoryRequestWrapper、SessionRepositoryResponseWrapper             
-        -- 以后获取Session都会调用request.getSession()    
-        -- 由于被包装,放行的是SessionRepositoryRequestWrapper.所以调用的getSession其实是Wrapper的getSession,则是从SessionRepository中获取的,因为SessionRepository真正添加的其实是sessionRedisOperationsSessionRepository,所以就是使用的redis操作session
-
--- 整合
-	1、添加依赖
-		<dependency>
-      <groupId>org.springframework.session</groupId>
-      <artifactId>spring-session-data-redis</artifactId>
-      <exclusions>
-        <!--排除lettuce使用jedis解决内存泄漏问题-->
-        <exclusion>
-          <groupId>io.lettuce</groupId>
-          <artifactId>lettuce-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>redis.clients</groupId>
-      <artifactId>jedis</artifactId>
-    </dependency>
-    <!--redis依赖-->   
-    <dependency>           
-      <groupId>org.springframework.boot</groupId>  
-      <artifactId>spring-boot-starter-data-redis</artifactId>   
-    </dependency>
-	2、添加配置
-		#redis相关配置
-		spring.redis.host=192.168.56.101
-		spring.redis.port=6379
-		#设置session保存位置
-		spring.session.store-type=redis
-		#设置session超时时间
-		spring.session.timeout=30m
-	3、开启SpringSession配置功能
-		@EnableRedisHttpSession 
-		public class Config { 
-			@Bean 
-			public LettuceConnectionFactory connectionFactory() { 
-      	return new LettuceConnectionFactory();
-      }
-    }
-	4、存在问题及解决方案
-		1)默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题
-			package com.pigskin.mall.auth.config;
-			import org.springframework.context.annotation.Bean;
-			import org.springframework.context.annotation.Configuration;
-			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-			import org.springframework.data.redis.serializer.RedisSerializer;
-			import org.springframework.session.web.http.CookieSerializer;
-			import org.springframework.session.web.http.DefaultCookieSerializer;
-			
-			/** 
-			* session配置类
-      */
-      @Configuration
-      public class MallSessionConfig {   
-      	/**  
-        * 设置Cookie序列化器组件     
-        * 解决问题（默认发的令牌key为session,值为一串字符串,作用域为当前域,所以要解决子域session共享问题）   
-        *   
-        * @return  
-        */    
-        @Bean   
-        public CookieSerializer cookieSerializer() {  
-        	DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();  
-          /*指定Session作用域（放大）*/        
-          cookieSerializer.setDomainName("pigskinmall.com");   
-          cookieSerializer.setCookieName("PIGSKINSESSION");    
-          return cookieSerializer; 
-        }
-      }
-		2)使用json序列化方式来序列化对象数据到redis中
-			package com.pigskin.mall.auth.config;
-			
-			import org.springframework.context.annotation.Bean;
-			import org.springframework.context.annotation.Configuration;
-			import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-			import org.springframework.data.redis.serializer.RedisSerializer;
-			import org.springframework.session.web.http.CookieSerializer;
-			import org.springframework.session.web.http.DefaultCookieSerializer;
-			
-			/**
-      * session配置类 
-      */
-      @Configuration
-      public class MallSessionConfig {  
-      	/**   
-        * 设置redis序列化器组件   
-        * 解决问题（使用json序列化方式来序列化对象数据到redis中）   
-        *    
-        * @return    
-        */   
-        @Bean   
-        public RedisSerializer<Object> springSessionDefaultRedisSerializer() {  
-        	return new GenericJackson2JsonRedisSerializer();   
-        }
-      }
+# SpringSession——————解决分布式系统Session不一致问题
+	详见————2、Java开发之后端技术篇-1-6-1、SpringSession——解决分布式系统Session不一致问题
 ```
 
-
-
-## 26、ThredLocal
+## 27、ThredLocal
 
 ```markdown
-# 说明————JDK提供的同一线程共享数据
+# 说明
+	JDK提供的同一线程共享数据
 
 # 说明
 -- 因为每一个请求进来，tomcat都会开一个线程进行处理
@@ -6796,9 +7590,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	public static ThreadLocal<UserInfoTo> toThreadLocal = new ThreadLocal<>();
 ```
 
-
-
-## 27、消息中间件——RabbitMQ
+## 28、消息中间件——RabbitMQ
 
 ### 1、消息中间件说明
 
@@ -6912,8 +7704,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			-- 没有在 mq 核心中去实现JMS等接口，有些系统要迁移需要修改大量代码
 ```
 
-
-
 ### 2、RabbitMQ简介
 
 ```markdown
@@ -6924,30 +7714,38 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # 核心概念
-	1、Message(消息)————消息是不具名的,它是由消息头和消息体组成,消息体是不透明的,而消息头是由一系列的可选属性组成,这些属性包括routing-key(路由键)、priority(相对于其他消息的优先权)、delivery-mode(指出该消息可能需要持久性存储)等
-	2、Publisher————消息的生产者
-		也是一个向交换器发布消息的客户端应用程序
-	3、Exchange(交换器)————用来接收消息生产者发送的消息并将这些消息路由给服务器中的队列
-		1)四种类型————不同类型的Exchange转发消息的策略有所区别
-			-- direct(默认)
-			-- fanout
-			-- topic
-			-- headers
-	4、Queue(消息队列)————用来保存消息直到发送给消费者,它是消息的容器,也是消息的终点
-		1)一个消息可以投入到一个或多个队列
-		2)消息一直在队列里,等到消费者连接到这个队列将其取走
-	5、Binding(绑定)————用于消息队列和交换器之间的关联
-		1)一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则,所以可以将路由器理解成一个由绑定构成的路由表
-	6、Connection(网络连接)————比如一个TCP连接
-	7、Channel(信道)————多路复用连接中的一条独立的双向数据流通道
-		1)信道是建立在真实的TCP连接内的虚拟连接,AMPQP命令都是通过信道发出去的.不管是发布消息、订阅队列还是接收消息,这些动作都是通过信道完成的
-		2)因为对于操作系统来说,建立和销毁TCP都是非常昂贵的开销,所以引入了信道的概念,以复用一条TCP连接
-	8、Consumer(消息的消费者)————表示从消息队列中取得消息的客户端应用程序
-	9、Virtual Host(虚拟主机)————表示一批交换器、消息队列和相关对象
-		1)是共享相同的身份认证和加密环境的独立服务器域
-		2)每个vhost本质上就是一个mini版的RabbitMQ服务器,拥有自己的队列、交换器、绑定和权限机制
-		3)vhost是AMQP概念的基础,必须在连接时指定,RabbitMQ默认的vhost是/
-	10、Broker(消息队列服务器实体)
+-- 1、Message(消息)————消息是不具名的,它是由消息头和消息体组成,消息体是不透明的,而消息头是由一系列的可选属性组成,这些属性包括routing-key(路由键)、priority(相对于其他消息的优先权)、delivery-mode(指出该消息可能需要持久性存储)等
+
+-- 2、Publisher————消息的生产者————也是一个向交换器发布消息的客户端应用程序
+
+-- 3、Exchange(交换器)————用来接收消息生产者发送的消息并将这些消息路由给服务器中的队列
+	1)四种类型————不同类型的Exchange转发消息的策略有所区别
+    -- direct(默认)
+    -- fanout
+    -- topic
+    -- headers
+
+-- 4、Queue(消息队列)————用来保存消息直到发送给消费者,它是消息的容器,也是消息的终点
+	1)一个消息可以投入到一个或多个队列
+	2)消息一直在队列里,等到消费者连接到这个队列将其取走
+
+-- 5、Binding(绑定)————用于消息队列和交换器之间的关联
+	1)一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则,所以可以将路由器理解成一个由绑定构成的路由表
+
+-- 6、Connection(网络连接)————比如一个TCP连接
+
+-- 7、Channel(信道)————多路复用连接中的一条独立的双向数据流通道
+	1)信道是建立在真实的TCP连接内的虚拟连接,AMPQP命令都是通过信道发出去的.不管是发布消息、订阅队列还是接收消息,这些动作都是通过信道完成的
+	2)因为对于操作系统来说,建立和销毁TCP都是非常昂贵的开销,所以引入了信道的概念,以复用一条TCP连接
+
+-- 8、Consumer(消息的消费者)————表示从消息队列中取得消息的客户端应用程序
+
+-- 9、Virtual Host(虚拟主机)————表示一批交换器、消息队列和相关对象
+	1)是共享相同的身份认证和加密环境的独立服务器域
+	2)每个vhost本质上就是一个mini版的RabbitMQ服务器,拥有自己的队列、交换器、绑定和权限机制
+	3)vhost是AMQP概念的基础,必须在连接时指定,RabbitMQ默认的vhost是/
+
+-- 10、Broker(消息队列服务器实体)
 
 # 工作原理
 -- 图示,如下图所示
@@ -6964,8 +7762,10 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # AMQP中的消息路由
-	1、说明————AMQP中消息的路由过程和Java开发者熟悉的JMS存在一些差别,AMQP中增加了Exchange和Binding的角色.生产之把消息发送到Exchange上,消息最终到达队列被消费者接收,而Binding决定交换器的消息应该发送到那个队列
-	2、图示,如下图所示
+-- 说明
+	AMQP中消息的路由过程和Java开发者熟悉的JMS存在一些差别,AMQP中增加了Exchange和Binding的角色.生产之把消息发送到Exchange上,消息最终到达队列被消费者接收,而Binding决定交换器的消息应该发送到那个队列
+
+-- 图示,如下图所示
 ```
 
 
@@ -6974,25 +7774,25 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # Exchange类型————分发消息时根据类型的不同分发策略有所区别
-	1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
+-- 1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
 ```
 
 <img src="image/img2_1_27_3_2.png" style="zoom:50%;" />
 
 ```markdown
-	2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
+-- 2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
 ```
 
 <img src="image/img2_1_27_3_3.png" style="zoom:50%;" />
 
 ```markdown
-	3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
+-- 3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
 ```
 
 <img src="image/img2_1_27_3_4.png" style="zoom:50%;" />
 
 ```markdown
-	4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
+-- 4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
 ```
 
 ### 4、SpringBoot整合流程
@@ -7039,7 +7839,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```markdown
 # AmqpAdmin————管理组件
-	1、创建交换机
+-- 1、创建交换机
 		package com.pigskin.mall.order;
 
     import com.pigskin.mall.order.entity.OrderEntity;
@@ -7086,7 +7886,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }
     }
 
-	2、创建队列
+-- 2、创建队列
 		package com.pigskin.mall.order;
 
     import com.pigskin.mall.order.entity.OrderEntity;
@@ -7130,7 +7930,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         }
     }
 
-	3、队列和交换机绑定
+-- 3、队列和交换机绑定
 		package com.pigskin.mall.order;
 
     import com.pigskin.mall.order.entity.OrderEntity;
@@ -7355,9 +8155,10 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
     }
 
 # CachingConnectionFactory————连接工厂
+	//TODO:
 
 # RabbitMessagingTemplate
-
+	//TODO:
 ```
 
 ### 6、RabbitMQ消息确认机制——可靠性抵达
@@ -7372,285 +8173,280 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 # 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
 
 # 定制RabbitTemplate
-	1、服务器收到消息就回调————publisher发送端————confirmCallback确认模式
-  	1)基本原理
-  		在创建connectionFactory的时候设置PublisherConfirms(true)选项，从而开启confirmCallback.消息只要被broker接收到就会执行confirmCallback方法，如果是cluster(集群)模式，需要所有broker接收到才会调用confirmCallback.被broker接收到只能表示message已经到达服务器,并不能保证消息一定会被投递到queue中,所以需要用到接下来的returnCallback
-		1)实现步骤
-			[1]配置文件添加配置
-				#开启发送端确认配置
-				spring.rabbitmq.publisher-confirms=true  
-    	[2]配置类进行定制,设置确认回调ConfirmCallback,代码示例如下:
-				package com.pigskin.mall.order.config;
+-- 服务器收到消息就回调————publisher发送端————confirmCallback确认模式
+	1、基本原理
+  	在创建connectionFactory的时候设置PublisherConfirms(true)选项，从而开启confirmCallback.消息只要被broker接收到就会执行confirmCallback方法，如果是cluster(集群)模式，需要所有broker接收到才会调用confirmCallback.被broker接收到只能表示message已经到达服务器,并不能保证消息一定会被投递到queue中,所以需要用到接下来的returnCallback
+	2、实现步骤
+		1)配置文件添加配置
+      #开启发送端确认配置
+      spring.rabbitmq.publisher-confirms=true  
+    2)配置类进行定制,设置确认回调ConfirmCallback,代码示例如下:
+      package com.pigskin.mall.order.config;
 
-        import org.springframework.amqp.core.Message;
-        import org.springframework.amqp.rabbit.connection.CorrelationData;
-        import org.springframework.amqp.rabbit.core.RabbitTemplate;
-        import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-        import org.springframework.amqp.support.converter.MessageConverter;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.context.annotation.Bean;
-        import org.springframework.context.annotation.Configuration;
-        import javax.annotation.PostConstruct;
+      import org.springframework.amqp.core.Message;
+      import org.springframework.amqp.rabbit.connection.CorrelationData;
+      import org.springframework.amqp.rabbit.core.RabbitTemplate;
+      import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+      import org.springframework.amqp.support.converter.MessageConverter;
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.context.annotation.Bean;
+      import org.springframework.context.annotation.Configuration;
+      import javax.annotation.PostConstruct;
 
-        /**
-         * RabbitMQ配置类
-         */
-        @Configuration
-        public class MyRabbitConfig {
-            @Autowired
-            RabbitTemplate rabbitTemplate;
-
-            /**
-             * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
-             */
-            @Bean
-            public MessageConverter messageConverter() {
-                return new Jackson2JsonMessageConverter();
-            }
-
-            /**
-             * 定制RabbitTemplate
-             */
-            @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
-            public void initRabbitTemplate() {
-                /*1、设置服务器收到消息就回调*/
-                rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
-                    /**
-                     *  1、只要消息抵达Broker就ack为true
-                     * @param correlationData 当前消息的唯一关联数据（唯一id）
-                     * @param b 消息是否成功收到
-                     * @param s 失败的原因
-                     */
-                    @Override
-                    public void confirm(CorrelationData correlationData, boolean b, String s) {
-                        System.out.println("confirm....correlationData["
-                                + correlationData
-                                + "]==>ack["
-                                + b
-                                + "]==>s["
-                                + s
-                                + "]");
-                    }
-                });
-            }
-        }
-
-	2、消息正确抵达队列进行回调————publisher发送端————returnCallback未投递到Queue退回模式  
-  	1)基本原理
-    	confirmCallback确认模式只能保证消息到达broker,不能保证消息准确投递到目标queue中。在有些业务场景中我们就需要保证消息准确投递到目标queue中，此时就需要用到returnCallback未投递到Queue退回模式.这样如果未能投递到目标queue中，将回调returnCallback,可以记录下详细到投递数据，定期的巡检或者自动纠错都需要这些数据。
-  	2)实现步骤
-  		[1]配置文件进行配置
-  			#开启发送端消息抵达队列确认    
-    		spring.rabbitmq.publisher-returns=true     
-    		#只要抵达队列，以异步模式优先回调这个returnConfirm    
-    		spring.rabbitmq.template.mandatory=true    
-    	[2]配置类进行定制,设置消息未抵达队列退回回调ReturnCallback,代码示例如下:
-				package com.pigskin.mall.order.config;
-
-        import org.springframework.amqp.core.Message;
-        import org.springframework.amqp.rabbit.connection.CorrelationData;
-        import org.springframework.amqp.rabbit.core.RabbitTemplate;
-        import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-        import org.springframework.amqp.support.converter.MessageConverter;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.context.annotation.Bean;
-        import org.springframework.context.annotation.Configuration;
-        import javax.annotation.PostConstruct;
+      /**
+      * RabbitMQ配置类
+      */
+      @Configuration
+      public class MyRabbitConfig {
+        @Autowired
+        RabbitTemplate rabbitTemplate;
 
         /**
-         * RabbitMQ配置类
-         */
-        @Configuration
-        public class MyRabbitConfig {
-            @Autowired
-            RabbitTemplate rabbitTemplate;
-
-            /**
-             * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
-             */
-            @Bean
-            public MessageConverter messageConverter() {
-                return new Jackson2JsonMessageConverter();
-            }
-
-            /**
-             * 定制RabbitTemplate
-             */
-            @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
-            public void initRabbitTemplate() {
-                /*1、设置服务器收到消息就回调*/
-                //TODO:
-
-                /*2、设置消息正确抵达队列进行回调*/
-                rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
-                    /**
-                     *  只要消息没有投递给指定队列，就触发这个失败回调
-                     * @param message 投递失败消息的详细信息
-                     * @param i  回复的状态码
-                     * @param s 回复的文本内容
-                     * @param s1 当时这个消息发给那个交换机
-                     * @param s2 当时这个消息用那个路由键
-                     */
-                    @Override
-                    public void returnedMessage(Message message, int i, String s, String s1, String s2) {
-                        System.out.println("Fail Message["
-                                + message
-                                + "]==>i["
-                                + i
-                                + "]==>s["
-                                + s
-                                + "]==>s1["
-                                + s1
-                                + "]==>s2["
-                                + s2
-                                + "]");
-                    }
-                });
-            }
+        * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+        */
+        @Bean
+        public MessageConverter messageConverter() {
+        	return new Jackson2JsonMessageConverter();
         }
 
-	3、消费端确认（保证每一个消息被正确消费，此时才可以让broker删除这个消息）————consumer消费端  
-  	1)默认是自动确认的，只要消息接收到，客户端就会自动确认，服务端就会移除这个消息     
-    	问题：收到很多消息，自动回复给服务器ack，但是实际只有一个消息处理成功后，服务器宕机了。此时消息队列中的消息就都没有了，发生了消息丢失    
-    	解决思路：
-    		不进行自动确认——通过手动确认来解决（每处理一个消息确认一个消息）    
-      	手动确认——只要没明确告诉MQ货物已经被签收(没有ACK)消息就一直是unacked状态，即使服务器宕机，消息也不会丢失，会重新变为Ready状态.    
-    2)手动ACK
-    	[1]分类
-    		-- 消息处理成功————接收下一个消息,此消息broker就会移除
-    			basic.ack————用于肯定确认,此消息broker就会移除
-    		-- 消息处理失败————重新发送给其他人处理,或者容错处理后ack
-    			basic.nack————用于否定确认,可以指定broker是否丢弃此消息,可以批量
-    			basic.rejest————用于否定确认,可以指定broker是否丢弃此消息,不可以批量
-    		-- 消息一直没有被调用————broker认为此消息正在被处理,不会投递给别人,此时客户端断开,消息不会被broker移除,会投递给别人
-    			basic.ack
-    			basic.nack
-    	[2]实现步骤
-        -- 1、开启手动签收配置
-        	#设置消息回复模式为手工模式manual（默认auto）
-        	spring.rabbitmq.listener.simple.acknowledge-mode=manual
-        -- 2、签收方通过message获取对应消息的签收标签
-        	/*通道(channel)内按顺序自增*/
-        	long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        -- 3、签收
-        	/*签收消息————业务成功完成就应该签收(对应交货标签，是否批量签收——false代表之前收当前消息)*/
-        	channel.basicAck(deliveryTag, false);
-        -- 4、拒签————业务失败就应该拒签 
-          /*basicNack(long deliveryTag:交货标签, boolean multiple:是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeu:是否重新入队列)*/
-          channel.basicNack(deliveryTag, false, requeue);
-          /*basicReject(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
-          channel.basicReject();
-			[3]代码实现
-				package com.pigskin.mall.order.service.impl;
+      /**
+      * 定制RabbitTemplate
+      */
+      @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+      public void initRabbitTemplate() {
+        /*1、设置服务器收到消息就回调*/
+        rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+          /**
+          *  1、只要消息抵达Broker就ack为true
+          * @param correlationData 当前消息的唯一关联数据（唯一id）
+          * @param b 消息是否成功收到
+          * @param s 失败的原因
+          */
+          @Override
+          public void confirm(CorrelationData correlationData, boolean b, String s) {
+            System.out.println("confirm....correlationData["
+            + correlationData
+            + "]==>ack["
+            + b
+            + "]==>s["
+            + s
+            + "]");
+          }
+        });
+      }
+    }
 
-        import com.alibaba.fastjson.JSON;
-        import com.pigskin.mall.order.entity.OrderEntity;
-        import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
-        import com.rabbitmq.client.Channel;
-        import org.springframework.amqp.core.Message;
-        import org.springframework.amqp.core.MessageProperties;
-        import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-        import org.springframework.amqp.rabbit.annotation.RabbitListener;
-        import org.springframework.stereotype.Service;
+-- 消息正确抵达队列进行回调————publisher发送端————returnCallback未投递到Queue退回模式  
+	1、基本原理
+    confirmCallback确认模式只能保证消息到达broker,不能保证消息准确投递到目标queue中。在有些业务场景中我们就需要保证消息准确投递到目标queue中，此时就需要用到returnCallback未投递到Queue退回模式.这样如果未能投递到目标queue中，将回调returnCallback,可以记录下详细到投递数据，定期的巡检或者自动纠错都需要这些数据。
+	2、实现步骤
+  	1)配置文件进行配置
+      #开启发送端消息抵达队列确认    
+      spring.rabbitmq.publisher-returns=true     
+      #只要抵达队列，以异步模式优先回调这个returnConfirm    
+      spring.rabbitmq.template.mandatory=true    
+    2)配置类进行定制,设置消息未抵达队列退回回调ReturnCallback,代码示例如下:
+      package com.pigskin.mall.order.config;
 
-        import java.io.IOException;
-        import java.util.Map;
+      import org.springframework.amqp.core.Message;
+      import org.springframework.amqp.rabbit.connection.CorrelationData;
+      import org.springframework.amqp.rabbit.core.RabbitTemplate;
+      import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+      import org.springframework.amqp.support.converter.MessageConverter;
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.context.annotation.Bean;
+      import org.springframework.context.annotation.Configuration;
+      import javax.annotation.PostConstruct;
 
-        import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-        import com.baomidou.mybatisplus.core.metadata.IPage;
-        import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-        import com.pigskin.common.utils.PageUtils;
-        import com.pigskin.common.utils.Query;
+      /**
+      * RabbitMQ配置类
+      */
+      @Configuration
+      public class MyRabbitConfig {
+        @Autowired
+        RabbitTemplate rabbitTemplate;
 
-        import com.pigskin.mall.order.dao.OrderItemDao;
-        import com.pigskin.mall.order.entity.OrderItemEntity;
-        import com.pigskin.mall.order.service.OrderItemService;
+        /**
+        * 自行注入指定的消息转换器（指定了就会采用指定的不会使用Serializable序列化机制的）
+        */
+        @Bean
+        public MessageConverter messageConverter() {
+        	return new Jackson2JsonMessageConverter();
+        }
 
+        /**
+        * 定制RabbitTemplate
+        */
+        @PostConstruct//MyRabbitConfig对象创建完成之后执行该方法
+        public void initRabbitTemplate() {
+          /*1、设置服务器收到消息就回调*/
+          //TODO:
 
-        @Service("orderItemService")
-        @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
-        public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
-
+          /*2、设置消息正确抵达队列进行回调*/
+          rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+            /**
+            *  只要消息没有投递给指定队列，就触发这个失败回调
+            * @param message 投递失败消息的详细信息
+            * @param i  回复的状态码
+            * @param s 回复的文本内容
+            * @param s1 当时这个消息发给那个交换机
+            * @param s2 当时这个消息用那个路由键
+            */
             @Override
-            public PageUtils queryPage(Map<String, Object> params) {
-                IPage<OrderItemEntity> page = this.page(
-                        new Query<OrderItemEntity>().getPage(params),
-                        new QueryWrapper<OrderItemEntity>()
-                );
-
-                return new PageUtils(page);
+            public void returnedMessage(Message message, int i, String s, String s1, String s2) {
+              System.out.println("Fail Message["
+              + message
+              + "]==>i["
+              + i
+              + "]==>s["
+              + s
+              + "]==>s1["
+              + s1
+              + "]==>s2["
+              + s2
+              + "]");
             }
-
-
-            /**
-             * 消息监听：必须使用注解@EnableRabbit开启Rabbit相关功能支持
-             * 消息类型为：org.springframework.amqp.core.Message
-             * 参数可以设置以下类型：
-             * 1、Message————原生消息详细信息（消息头+消息体）
-             * 2、T<发送的消息的类型>————当时发送的消息是啥类型，就可以直接接收啥类型的
-             * 3、Channel[com.rabbitmq.client.Channel]————当前传输数据的通道
-             * 1）场景1：订单服务启动多个————同一个消息只能被一个客户端收到
-             * 2）场景2：只有一个消息处理完，方法运行结束，就可以接收到下一个消息
-             * <p>
-             * Queue:可以很多人都来监听，只要收到消息，队列就会删除消息，最终只能有一个收到此消息。
-             */
-        //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
-            @RabbitHandler
-            public void listenerMessage(Message message,
-                                        OrderReturnReasonEntity reasonEntity,
-                                        Channel channel) throws InterruptedException {
-                /*消息体*/
-                byte[] body = message.getBody();
-                /*消息属性（消息头信息）*/
-                MessageProperties messageProperties = message.getMessageProperties();
-                Thread.sleep(3000);
-                System.out.println("接收消息。。。" + reasonEntity);
-
-                /*消息内容*/
-                System.out.println("消息处理完成=>" + reasonEntity.getName());
-                /*通道(channel)内按顺序自增*/
-                long deliveryTag = message.getMessageProperties().getDeliveryTag();
-                System.out.println("deliveryTag:" + deliveryTag);
-
-                try {
-                    if (deliveryTag % 2 == 0) {
-                        //收货
-                        /*签收消息(对应交货标签，是否批量签收——false代表之前收当前消息)*/
-                        channel.basicAck(deliveryTag, false);
-                        System.out.println("货物被签收了：" + deliveryTag);
-                    } else {
-                        boolean requeue = false;
-                        //退货
-                        /*(long deliveryTag——交货标签, boolean multiple——是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeue——是否重新入队列)*/
-                        channel.basicNack(deliveryTag, false, requeue);
-                        /*(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
-        //                channel.basicReject();
-                        System.out.println("货物被拒收了：" + deliveryTag + "并且" + (requeue ? "被退回" : "被扔了"));
-                    }
-                } catch (IOException e) {
-                    //网络中断了
-                    e.printStackTrace();
-                }
-
-            }
-
-            //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
-        //    @RabbitHandler
-            public void listenerMessage2(Message message,
-                                         OrderEntity order,
-                                         Channel channel) throws InterruptedException {
-                /*消息体*/
-                byte[] body = message.getBody();
-                /*消息属性（消息头信息）*/
-                MessageProperties messageProperties = message.getMessageProperties();
-                Thread.sleep(3000);
-                System.out.println("接收消息。。。" + order);
-
-                /*消息内容*/
-                System.out.println("消息处理完成=>" + order.getOrderSn());
-
-            }
+          });
         }
+      }
+
+-- 消费端确认（保证每一个消息被正确消费，此时才可以让broker删除这个消息）————consumer消费端  
+	1、默认是自动确认的，只要消息接收到，客户端就会自动确认，服务端就会移除这个消息     
+    1)问题：收到很多消息，自动回复给服务器ack，但是实际只有一个消息处理成功后，服务器宕机了。此时消息队列中的消息就都没有了，发生了消息丢失    
+    2)解决思路：
+    	1-不进行自动确认——通过手动确认来解决（每处理一个消息确认一个消息）    
+      2-手动确认——只要没明确告诉MQ货物已经被签收(没有ACK)消息就一直是unacked状态，即使服务器宕机，消息也不会丢失，会重新变为Ready状态.    
+	2、手动ACK
+    1)分类
+      -- 消息处理成功————接收下一个消息,此消息broker就会移除
+      	basic.ack————用于肯定确认,此消息broker就会移除
+      -- 消息处理失败————重新发送给其他人处理,或者容错处理后ack
+      	basic.nack————用于否定确认,可以指定broker是否丢弃此消息,可以批量
+      	basic.rejest————用于否定确认,可以指定broker是否丢弃此消息,不可以批量
+      -- 消息一直没有被调用————broker认为此消息正在被处理,不会投递给别人,此时客户端断开,消息不会被broker移除,会投递给别人
+        basic.ack
+        basic.nack
+    2)实现步骤
+      -- 1、开启手动签收配置
+        #设置消息回复模式为手工模式manual（默认auto）
+        spring.rabbitmq.listener.simple.acknowledge-mode=manual
+      -- 2、签收方通过message获取对应消息的签收标签
+      	/*通道(channel)内按顺序自增*/
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+      -- 3、签收
+        /*签收消息————业务成功完成就应该签收(对应交货标签，是否批量签收——false代表之前收当前消息)*/
+        channel.basicAck(deliveryTag, false);
+      -- 4、拒签————业务失败就应该拒签 
+        /*basicNack(long deliveryTag:交货标签, boolean multiple:是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeu:是否重新入队列)*/
+        channel.basicNack(deliveryTag, false, requeue);
+        /*basicReject(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
+        channel.basicReject();
+		3)代码实现
+      package com.pigskin.mall.order.service.impl;
+
+      import com.alibaba.fastjson.JSON;
+      import com.pigskin.mall.order.entity.OrderEntity;
+      import com.pigskin.mall.order.entity.OrderReturnReasonEntity;
+      import com.rabbitmq.client.Channel;
+      import org.springframework.amqp.core.Message;
+      import org.springframework.amqp.core.MessageProperties;
+      import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+      import org.springframework.amqp.rabbit.annotation.RabbitListener;
+      import org.springframework.stereotype.Service;
+
+      import java.io.IOException;
+      import java.util.Map;
+
+      import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+      import com.baomidou.mybatisplus.core.metadata.IPage;
+      import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+      import com.pigskin.common.utils.PageUtils;
+      import com.pigskin.common.utils.Query;
+
+      import com.pigskin.mall.order.dao.OrderItemDao;
+      import com.pigskin.mall.order.entity.OrderItemEntity;
+      import com.pigskin.mall.order.service.OrderItemService;
+
+
+      @Service("orderItemService")
+      @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+      public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
+
+        @Override
+        public PageUtils queryPage(Map<String, Object> params) {
+          IPage<OrderItemEntity> page = this.page(
+          new Query<OrderItemEntity>().getPage(params),
+          new QueryWrapper<OrderItemEntity>()
+          );
+
+          return new PageUtils(page);
+        }
+
+
+        /**
+        * 消息监听：必须使用注解@EnableRabbit开启Rabbit相关功能支持
+        * 消息类型为：org.springframework.amqp.core.Message
+        * 参数可以设置以下类型：
+        * 1、Message————原生消息详细信息（消息头+消息体）
+        * 2、T<发送的消息的类型>————当时发送的消息是啥类型，就可以直接接收啥类型的
+        * 3、Channel[com.rabbitmq.client.Channel]————当前传输数据的通道
+        * 1）场景1：订单服务启动多个————同一个消息只能被一个客户端收到
+        * 2）场景2：只有一个消息处理完，方法运行结束，就可以接收到下一个消息
+        * <p>
+        * Queue:可以很多人都来监听，只要收到消息，队列就会删除消息，最终只能有一个收到此消息。
+        */
+        //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+        @RabbitHandler
+        public void listenerMessage(Message message,OrderReturnReasonEntity reasonEntity,Channel channel) throws InterruptedException {
+          /*消息体*/
+          byte[] body = message.getBody();
+          /*消息属性（消息头信息）*/
+          MessageProperties messageProperties = message.getMessageProperties();
+          Thread.sleep(3000);
+          System.out.println("接收消息。。。" + reasonEntity);
+
+          /*消息内容*/
+          System.out.println("消息处理完成=>" + reasonEntity.getName());
+          /*通道(channel)内按顺序自增*/
+          long deliveryTag = message.getMessageProperties().getDeliveryTag();
+          System.out.println("deliveryTag:" + deliveryTag);
+
+          try {
+            if (deliveryTag % 2 == 0) {
+              //收货
+              /*签收消息(对应交货标签，是否批量签收——false代表之前收当前消息)*/
+              channel.basicAck(deliveryTag, false);
+              System.out.println("货物被签收了：" + deliveryTag);
+            } else {
+              boolean requeue = false;
+              //退货
+              /*(long deliveryTag——交货标签, boolean multiple——是否可以批量拒绝（true:之前的所有都会被拒绝）, boolean requeue——是否重新入队列)*/
+              channel.basicNack(deliveryTag, false, requeue);
+              /*(long deliveryTag——交货标签, boolean requeue——是否重新入队列)*/
+              //                channel.basicReject();
+              System.out.println("货物被拒收了：" + deliveryTag + "并且" + (requeue ? "被退回" : "被扔了"));
+            }
+          } catch (IOException e) {
+            //网络中断了
+            e.printStackTrace();
+          }
+
+        }
+
+        //    @RabbitListener(queues = {"hello-java-queue"})//queues：指定要监听的所有队列
+        //    @RabbitHandler
+        public void listenerMessage2(Message message,OrderEntity order,Channel channel) throws InterruptedException {
+          /*消息体*/
+          byte[] body = message.getBody();
+          /*消息属性（消息头信息）*/
+          MessageProperties messageProperties = message.getMessageProperties();
+          Thread.sleep(3000);
+          System.out.println("接收消息。。。" + order);
+
+          /*消息内容*/
+          System.out.println("消息处理完成=>" + order.getOrderSn());
+        }
+      }
 ```
 
 ### 7、RabbitMQ延时队列——实现定时任务
@@ -7879,8 +8675,6 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
         rabbitTemplate.convertAndSend("order-event-exchange", "order.create.order", orderEntity);
         return "ok";
     }
-
-
 ```
 
 ### 8、如何保证消息可靠性
@@ -7924,7 +8718,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 # 相关处理
 -- 创建消息记录表
 	CREATE TABLE mq_message
-  (
+	(
       message_id     char(32) NOT NULL COMMENT '消息ID',
       content        text COMMENT '消息内容（需要序列化成Json）',
       to_exchange    varchar(255) DEFAULT NULL COMMENT '消息发给的交换机',
@@ -7934,7 +8728,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
       create_time    datetime     DEFAULT NULL COMMENT '创建时间',
       update_time    datetime     DEFAULT NULL COMMENT '修改时间',
       PRIMARY KEY (message_id)
-  ) ENGINE = Innodb DEFAULT CHARSET = utf8mb4
+	) ENGINE = Innodb DEFAULT CHARSET = utf8mb4
 
 -- 消息回调配置方法进行对消息记录表数据的记录、修改及消息的重新发送
     package com.pigskin.mall.order.config;
@@ -8046,9 +8840,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```
 
-
-
-## 28、JVM内存模型
+## 29、JVM内存模型
 
 ```markdown
 # JVM内存模型
@@ -8252,7 +9044,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 29、性能监控
+## 30、性能监控
 
 ```markdown
 # 监控指标
@@ -8295,7 +9087,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 30、压力测试
+## 31、压力测试
 
 ```markdown
 # 说明
@@ -8339,7 +9131,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 	3、错误率————一批请求中结果出错的请求所占比例
 
 # 压力测试工具JMeter
--- 安装————详见1-4-5、压力测试工具
+-- 安装
+	详见————1、Java开发之工具环境篇-4-5、压力测试工具
 
 -- 压力测试示例
 	1、添加线程组
@@ -8369,7 +9162,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 31、本地事务与分布式事务
+## 32、本地事务与分布式事务
 
 ### 1、本地事务
 
@@ -8426,7 +9219,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- 事务的自动配置————TransactionAutoConfiguration
 
 -- 事务的坑
-	1、本类方法互调事务失效问题————解决方式详见2、3、23、本类方法互调导致事务失效问题
+	1、本类方法互调事务失效问题————解决方式
+		详见————2、Java开发之后端技术篇-3-22、本类方法互调导致事务失效问题
 
 # 本地事务在分布式下的问题
 -- 问题
@@ -8550,143 +9344,11 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 
 
-## 32、Seata—分布式事务解决方案——非高并发适用
-
-```markdown
-# 文档地址————https://seata.io/zh-cn/docs/overview/what-is-seata.html
-
-# 概述
--- Seata是什么?
-	Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。 
-
--- Seata术语
-	1、TC (Transaction Coordinator) - 事务协调者————维护全局和分支事务的状态，驱动全局事务提交或回滚
-	2、TM (Transaction Manager) - 事务管理器————定义全局事务的范围：开始全局事务、提交或回滚全局事务
-	3、RM (Resource Manager) - 资源管理器————管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚
-
--- 工作流程,如下图所示:
-```
-
-<img src="image/img2_1_32_1_1.png" style="zoom:50%;" />
-
-```markdown
-# 整体机制————两阶段提交协议的演变：
-	一阶段：业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源。
-	二阶段：
-		提交异步化，非常快速地完成。
-		回滚通过一阶段的回滚日志进行反向补偿。
-
-# 使用步骤————Seata-AT模式————会将并发串行化,适用不要求超高的并发,成功就成功,失败就失败的场景
--- 1、建立具有InnoDB引擎的MySQL数据库————多个微服务使用自己的数据库连接配置
-
--- 2、每一个微服务对应的数据库中创建UNDO_LOG(回滚日志)表————SEATA_AT模式需要UNDO_LOG表————关键
-	1、注意此处0.3.0+ 增加唯一索引 ux_undo_log
-    CREATE TABLE `undo_log` (
-      `id` bigint(20) NOT NULL AUTO_INCREMENT,
-      `branch_id` bigint(20) NOT NULL,
-      `xid` varchar(100) NOT NULL,
-      `context` varchar(128) NOT NULL,
-      `rollback_info` longblob NOT NULL,
-      `log_status` int(11) NOT NULL,
-      `log_created` datetime NOT NULL,
-      `log_modified` datetime NOT NULL,
-      `ext` varchar(100) DEFAULT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- 3、代码整合seata
-  1、引入依赖————单独只导入依赖不进行后续操作,将会无法启动服务,或者通用服务一起引用,不需要的服务再单独排除
-  	1)每个微服务单独导入seata依赖,如果是通用配置已经导入,就不用再导入
-      <!--SpringCloud-alibaba-Seata分布式事务解决方案依赖-->
-      <dependency>
-        <groupId>com.alibaba.cloud</groupId>
-        <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-        <version>2.1.0.RELEASE</version>
-      </dependency>	
-    2)如果某些微服务必须导入通用配置依赖,但是不想使用通用配置的某些依赖,可以排除指定依赖
-      <dependency>
-        <groupId>com.pigskin.mall</groupId>
-        <artifactId>mall-common</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <exclusions>
-          <!--排除seata场景-->
-          <exclusion>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-  2、安装、配置并启动seata-server(事务协调器)服务————根据依赖导入时seata-all-x.x.x.jar的版本选择对应seata版本
-  	安装、配置并启动过程详见————1-4-16、Seata环境搭建
-  3、所有想要使用分布式事务的微服务都应该使用Seata DataSourceProxy代理自己的数据源————因为Seata通过代理数据源实现分支事务，如果没有注入，事务无法成功回滚
-  	//spring2.0Boot之前——————之后的使用容易产生循环依赖
-  	package com.pigskin.mall.order.config;
-
-    import com.zaxxer.hikari.HikariDataSource;
-    import io.seata.rm.datasource.DataSourceProxy;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.util.StringUtils;
-
-    import javax.sql.DataSource;
-
-    /**
-     * Seata配置类
-     *
-     * @author pigskin
-     * @date 2022年01月17日 2:35 下午
-     */
-    @Configuration
-    public class MySeataConfig {
-
-        /**
-         * 获取容器中所有的数据源配置属性信息
-         */
-        @Autowired
-        DataSourceProperties dataSourceProperties;
-
-        /**
-         * 参照DataSourceConfiguration类中的方式自行创建数据源
-         *
-         * @param dataSourceProperties
-         * @return
-         */
-        @Bean
-        public DataSource dataSource(DataSourceProperties dataSourceProperties) {
-            /**/
-            HikariDataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-
-            if (StringUtils.hasText(dataSourceProperties.getName())) {
-                dataSource.setPoolName(dataSourceProperties.getName());
-            }
-            /*使用Seata对数据源代理对象进行包装，并返回*/
-            return new DataSourceProxy(dataSource);
-        }
-    }
-
-  	//springBoot2.0之后
-  4、资源文件夹下导入配置文件————必须导入,不然会导致启动服务的过程中莫名其妙的找不见其它类
-  	所有想要使用分布式事务的微服务的resource资源文件夹都应该导入seata文件包下的registry.conf、file.conf两个文件
-  5、配置文件修改
-  	1)说明————在 org.springframework.cloud:spring-cloud-starter-alibaba-seata 的org.springframework.cloud.alibaba.seata.GlobalTransactionAutoConfiguration 类中，默认会使用 ${spring.application.name}-fescar-service-group作为服务名注册到 Seata Server上，如果和file.conf 中的配置不一致，会提示 no available server to connect错误.也可以通过配置 spring.cloud.alibaba.seata.tx-service-group修改后缀，但是必须和file.conf中的配置保持一致
-  	2)设置file.conf的service.vgroup_mapping服务名配置必须使用如下结构格式
-  		vgroup_mapping.{spring.application.name}-fescar-service-group = "default"
-  	3)或在项目配置文件中通过配置修改后缀
-  		spring.cloud.alibaba.seata.tx-service-group=xxx
-  6、给分布式大事务的入口标注全局事务注解@GlobalTransactional
-  7、每一个远程的小事务(分支事务)只需添加@Transactional注解
-
-# 其它模式参照————https://github.com/seata/seata-samples
-```
-
 ## 33、延迟队列——可靠消息+最终一致性方案——高并发适用
 
 ```markdown
 # 相关知识及使用示例
-	详见————2-1-27-7、RabbitMQ延时队列————实现定时任务
+	详见————2、Java开发之后端技术篇-1-28-7、RabbitMQ延时队列——实现定时任务
 
 # 案例————以下订单并锁定及解锁库存的过程为例————图示说明,如下图所示
 ```
@@ -9518,7 +10180,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
               }
           }
       }
-      ------------------------------调用详细关单代码————开始-------------------------------------------
+      --------------------------调用详细关单代码————开始---------------------------------------
         @Override
         public void closeOrder(OrderEntity order) {
             //查询当前订单的状态
@@ -9535,10 +10197,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
                 rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
             }
         }
-      ------------------------------调用详细关单代码————结束-------------------------------------------
-
-
-  		
+        --------------------------调用详细关单代码————结束------------------------------------	
 ```
 
 ## 34、加密算法
@@ -9765,6 +10424,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 			-- 启动应用后，查看控制台，打印时间是我们预期的每10秒一次
 			-- 然后打开Navicat ，将执行周期修改为每6秒执行一次
 			-- 查看控制台，发现执行周期已经改变，并且不需要我们重启应用，十分方便。
+
 -- 多线程定时任务
 	1、说明————基于注解设定多线程定时任务
 	2、注意————第一个定时任务和第二个定时任务互不影响；并且，由于开启了多线程，第一个任务的执行时间也不受其本身执行时间的限制，所以需要注意可能会出现重复操作导致数据异常。
@@ -9795,7 +10455,8 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # 分布式定时任务
 -- 定时任务问题
-	1、解决Spring定时任务阻塞问题————详见:2、Java开发之后段技术篇-2-3-25、解决Spring定时任务阻塞问题
+	1、解决Spring定时任务阻塞问题
+    详见————2、Java开发之后端技术篇-3-25、解决Spring定时任务阻塞问题
 	2、幂等性问题
 		1)图示
 ```
@@ -9803,7 +10464,9 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 <img src="image/img2_1_36_1_1.png" style="zoom:50%;" />
 
 ```markdown
-		2)解决方式————详见:2、Java开发之后段技术篇-2-3-20、接口幂等性问题——#幂等解决方案--各种锁机制3、业务层分布式锁
+		2)解决方式
+			详见————2、Java开发之后端技术篇-3-20、接口幂等性问题——#幂等解决方案--各种锁机制-3、业务层分布式锁
+
 -- 扩展——分布式调度
 	//TODO:待完善
 ```
@@ -9826,613 +10489,12 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 -- 获取日期格式————DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 ```
 
-## 38、SpringCloudAlibaba——Sentinel——限流&熔断&降级
-
-```markdown
-# 简介
--- 熔断、降级、限流
-	1、什么是熔断
-		A服务调用B服务的某个功能,由于网络不稳定问题,或者B服务卡机,导致功能时间超长.如果这样子的次数过多.我们就可以直接将B服务断路了(A服务不再请求B服务的接口),凡是调用B服务的直接返回降级数据,不必等待B服务的超长执行.这样B服务的故障问题,就不会级联影响到A服务.
-	2、什么事降级
-		整个网站处于流量高峰期,服务器压力剧增,根据当前业务情况及流量,对一些服务和页面进行有策略的降级(停止服务,所有的调用直接返回降级数据).以此缓解服务器资源的压力,以保证核心业务的正常运行,同时也保持了客户和大部分客户的得到正确的响应.
-	3、熔断和降级的异同
-		1)相同点
-			1]为了保证集群大部分服务的可用性和可靠性,防止崩溃,牺牲小我
-			2]用户最终都是体验到某个功能不可用
-		2)不同点
-			1]熔断是被调方故障,触发的系统主动规则
-			2]降级是基于全局考虑,停止一些正常服务,释放资源
-	4、什么是限流
-		对打入服务的请求流量进行控制,使服务能够承担不超过自己能力的流量压力
-
--- Sentinel简介
-	1、官方文档————https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D
-	2、项目地址————https://github.com/alibaba/Sentinel/
-	3、说明————随着微服务的流行,服务和服务之间的稳定性变得越来越重要.Sentinel以流量为切入点,从流量控制,熔断降级、系统负载保护等多个维度保护服务的稳定性.
-
--- Sentinel特征
-	1、丰富的应用场景————Sentinel承接了阿里巴巴近10年的双十一大促流量的核心场景,例如秒杀(即突发流量控制在系统容量可以承受的范围)、消息削峰填谷、集群流量控制、实时熔断下游不可用应用等;
-	2、完备的实时监控————Sentinel同时提供实时的监控功能,可以在控制台中看到接入应用的单台机器秒级数据,甚至500台以下规模的集群的汇总运行情况;
-	3、广泛的开源生态————Sentinel提供开箱即用的与其它开源框架/库的整合模块,例如与SpringCloud、Dubbo、gRPC的整合.只需要引入相应的依赖并进行简单的配置即可快速的接入Sentinel;
-	4、完善的SPI扩展点————Sentinel提供简单易用、完善的SPI扩展接口.可以通过实现扩展接口来快速的定时逻辑.例如定制规则管理、适配动态数据源等;
-
--- Sentinel组成
-	1、核心库(Java客户端)————不依赖任何框架/库,能够运行于所有Java运行时环境,同时对Dubbo/SpringCloud等框架也有较好的支持
-	2、控制台(Dashvboard)————基于SpringBoot开发,打包后可以直接运行,不需要额外的Tomcat等应用容器
-		1)说明————要根据Sentinel版本来决定使用的控制台版本————详见————https://github.com/alibaba/Sentinel/wiki/%E6%8E%A7%E5%88%B6%E5%8F%B0
-      Sentinel 提供一个轻量级的开源控制台，它提供机器发现以及健康情况管理、监控（单机和集群），规则管理和推送的功能。这里，我们将会详细讲述如何通过简单的步骤就可以使用这些功能。接下来，我们将会逐一介绍如何整合 Sentinel 核心库和 Dashboard，让它发挥最大的作用。同时我们也在阿里云上提供企业级的 Sentinel 服务：AHAS Sentinel 控制台，您只需要几个简单的步骤，就能最直观地看到控制台如何实现这些功能，并体验多样化的监控及全自动托管的集群流控能力。
-    2)包含功能
-      1]查看机器列表以及健康情况：收集 Sentinel 客户端发送的心跳包，用于判断机器是否在线。
-      2]监控 (单机和集群聚合)：通过 Sentinel 客户端暴露的监控 API，定期拉取并且聚合应用监控信息，最终可以实现秒级的实时监控。
-      3]规则管理和推送：统一管理推送规则。
-      4]鉴权：生产环境中鉴权非常重要。这里每个开发者需要根据自己的实际情况进行定制。
-    3)注意————Sentinel 控制台目前仅支持单机部署。Sentinel 控制台项目提供 Sentinel 功能全集示例，不作为开箱即用的生产环境控制台，不提供安全可靠保障。若希望在生产环境使用请根据文档自行进行定制和改造。
-		4)启动控制台
-			详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
-	3、控制台使用
-		1)新增流控规则————主要配置项说明														
-```
-
-| 配置项                     | 配置项说明                                                   | 可选参数                  | 默认值  |
-| -------------------------- | :----------------------------------------------------------- | ------------------------- | ------- |
-| 资源名                     | 一般为请求的URI                                              |                           |         |
-| 针对来源                   |                                                              |                           | default |
-| 阀值类型                   |                                                              | QPS/线程数                |         |
-| 单机阀值/集群阀值/均摊阀值 | 非集群为**单机阀值**<br />集群模式且集群阀值模式为**总体阀值**时为集群阀值——集群中的多个服务总体不超过指定阀值<br />集群模式且集群阀值模式为**单机均摊**时为**均摊阈值**——每一个机器都不超过指定阀值 | 数字类型                  |         |
-| 是否集群                   |                                                              | ☑️                         |         |
-| 集群阀值模式               |                                                              | 单机均摊/总体阀值         |         |
-| 失败退化                   | 如果 Token Server 不可用是否退化到单机限流                   | ☑️                         |         |
-| 流控模式                   | 直接——直接限制该资源名的服务<br />关联——与本资源产生关联关系的资源访问时对本资源的流控生效<br />链路——从指定入口资源到本资源的请求对本资源的流控生效 | 直接/关联/链路            |         |
-| 关联资源/入口资源          | 关联资源——只有流控模式为关联时可设定<br />入口资源——只有流控模式为链路时可设定 |                           |         |
-| 流控效果                   | 只有阀值类型为QPS时可设定<br />Warm Up——预热启动,即冷启动模式 | 快速失败/Warm Up/排队等待 |         |
-| 预热时长/超时时长          | 预热时长——只有流控效果为Warm Up时可设定<br />超时时长——只有流控效果为排队等待时可设定 |                           |         |
-
-```markdown
-		2)新增降级规则————主要配置项说明(1.8.0及其以上)
-```
-
-| 配置项                     | 配置项说明                                                   | 可选参数           | 默认值 |
-| -------------------------- | ------------------------------------------------------------ | ------------------ | ------ |
-| 资源名                     | 一般为请求的URI                                              |                    |        |
-| 降级策略                   | 切换不同的降级策略                                           | RT/异常比例/异常数 |        |
-| 慢调用比例/异常比例/异常数 | 慢调用比例 (`SLOW_REQUEST_RATIO`)————选择以慢调用比例作为阈值，需要设置允许的慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且慢调用的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。 <br />异常比例 (`ERROR_RATIO`)————当单位统计时长（`statIntervalMs`）内请求数目大于设置的最小请求数目，并且异常的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。异常比率的阈值范围是 `[0.0, 1.0]`，代表 0% - 100%。<br /> 异常数 (`ERROR_COUNT`)————当单位统计时长内的异常数目超过阈值之后会自动进行熔断。经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。 | 依据类型不同而不同 |        |
-| 时间窗口                   | 降级时间间隔,单位秒                                          | 数值类型           |        |
-
-```markdown
--- Hystrix与Sentinel比较
-```
-
-| 功能           | Sentinel                                                     | Hystrix                                   |
-| -------------- | ------------------------------------------------------------ | ----------------------------------------- |
-| 隔离策略       | 信号量隔离(并发线程数限流)——不用为每个请求创建专用的线程池,减少资源的消耗 | 线程池隔离/信号量隔离——线程池隔离比较彻底 |
-| 熔断降级策略   | 基于响应时间、异常比率、异常数                               | 基于异常比率                              |
-| 实时统计实现   | 滑动窗口(LzeapArray)                                         | 滑动窗口(基于RxJava)                      |
-| 动态规则配置   | 支持多种数据源                                               | 支持多种数据源                            |
-| 扩展性         | 多个扩展点                                                   | 插件形式                                  |
-| 基于注解的支持 | 支持                                                         | 支持                                      |
-| 限流           | 基于QPS,支持基于调用关系的限流                               | 有限的支持                                |
-| 流量整形       | 支持预热模式、匀速器模式、预热排队模式                       | 不支持                                    |
-| 系统自适应保护 | 支持                                                         | 不支持                                    |
-| 控制台         | 可配置规则、查看秒级监控、机器发现等                         | 简单的监控查看                            |
-
-```markdown
-# 基本概念
--- 资源————我们说的资源，可以是任何东西，服务，服务里的方法，甚至是一段代码。先把可能需要保护的资源定义好（埋点），之后再配置规则。也可以理解为，只要有了资源，我们就可以在任何时候灵活地定义各种流量控制规则。在编码的时候，只需要考虑这个代码是否需要保护，如果需要保护，就将之定义为一个资源。对于主流的框架，我们提供适配，只需要按照适配中的说明配置，Sentinel就会默认定义提供的服务，方法等为资源。
-
--- 规则————Sentinel的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。Sentinel支持以下几种规则：流量控制规则、熔断降级规则、系统保护规则、来源访问控制规则 和 热点参数规则。
-
-# Sentinel来进行资源保护，主要分为几个步骤:
--- 定义资源
-	1、定义资源方式————详见————https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8
-		1)主流框架的默认适配————常用————以SpringBoot为例,详见本节————# SpringBoot整合
-		2)抛出异常的方式定义资源————常用————详见本节————
-		3)返回布尔值方式定义资源
-		4)注解方式定义资源————常用
-		5)异步调用支持
-
--- 定义规则————Sentinel 的所有规则都可以在内存态中动态地查询及修改，修改之后立即生效。同时 Sentinel 也提供相关 API，供您来定制自己的规则策略。
-	1、规则分类
-		1)流量控制规则(FlowRule)————同一个资源可以同时有多个限流规则，检查规则时会依次检查
-			1]重要属性
-        Field						说明																				 						 默认值
-        resource				资源名，资源名是限流规则的作用对象	
-        count						限流阈值	
-        grade						限流阈值类型，QPS 模式（1）或并发线程数模式（0）								QPS 模式
-        limitApp				流控针对的调用来源																					default，代表不区分调用来源
-        strategy				调用关系限流策略：直接、链路、关联								 						 根据资源本身（直接）
-        controlBehavior	流控效果（直接拒绝/WarmUp/匀速+排队等待），不支持按调用关系限流	直接拒绝
-        clusterMode			是否集群限流																							否
-      2]通过代码定义流量控制规则————通过调用 FlowRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
-        private void initFlowQpsRule() {
-            List<FlowRule> rules = new ArrayList<>();
-            FlowRule rule = new FlowRule(resourceName);
-            // set limit qps to 20
-            rule.setCount(20);
-            rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
-            rule.setLimitApp("default");
-            rules.add(rule);
-            FlowRuleManager.loadRules(rules);
-        }
-      3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6
-		2)熔断降级规则(DegradeRule)————同一个资源可以同时有多个降级规则
-			1]重要属性
-				Field								说明																																				默认值
-        resource						资源名，即规则的作用对象	
-        grade								熔断策略，支持慢调用比例/异常比例/异常数策略																			 慢调用比例
-        count								慢调用比例模式下为慢调用临界 RT（超出该值计为慢调用）；异常比例/异常数模式下为对应的阈值	
-        timeWindow					熔断时长，单位为 s	
-        minRequestAmount		熔断触发的最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断（1.7.0 引入）			5
-        statIntervalMs			统计时长（单位为 ms），如 60*1000 代表分钟级（1.8.0 引入）												1000 ms
-        slowRatioThreshold	慢调用比例阈值，仅慢调用比例模式有效（1.8.0 引入）	
-			2]通过代码定义流量控制规则————通过调用 DegradeRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
-				private void initDegradeRule() {
-            List<DegradeRule> rules = new ArrayList<>();
-            DegradeRule rule = new DegradeRule();
-            rule.setResource(KEY);
-            // set threshold RT, 10 ms
-            rule.setCount(10);
-            rule.setGrade(RuleConstant.DEGRADE_GRADE_RT);
-            rule.setTimeWindow(10);
-            rules.add(rule);
-            DegradeRuleManager.loadRules(rules);
-        }
-      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
-		3)系统保护规则(SystemRule)————注意系统规则只针对入口资源（EntryType=IN）生效
-			1]说明————Sentinel 系统自适应限流从整体维度对应用入口流量进行控制，结合应用的 Load、CPU 使用率、总体平均 RT、入口 QPS 和并发线程数等几个维度的监控指标，通过自适应的流控策略，让系统的入口流量和系统的负载达到一个平衡，让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性.
-			2]重要属性
-				Field								说明																默认值
-        highestSystemLoad		load1 触发值，用于触发自适应控制阶段		 -1 (不生效)
-        avgRt								所有入口流量的平均响应时间							-1 (不生效)
-        maxThread						入口流量的最大并发数									-1 (不生效)
-        qps									所有入口资源的 QPS										-1 (不生效)
-        highestCpuUsage			当前系统的 CPU 使用率（0.0-1.0）			-1 (不生效)
-			3]通过代码定义流量控制规则————通过调用 SystemRuleManager.loadRules() 方法来用硬编码的方式定义流量控制规则.
-				private void initSystemRule() {
-            List<SystemRule> rules = new ArrayList<>();
-            SystemRule rule = new SystemRule();
-            rule.setHighestSystemLoad(10);
-            rules.add(rule);
-            SystemRuleManager.loadRules(rules);
-        }
-      4]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%B3%BB%E7%BB%9F%E8%87%AA%E9%80%82%E5%BA%94%E9%99%90%E6%B5%81
-		4)来源访问控制规则(AuthorityRule)
-			1]说明————很多时候，我们需要根据调用方来限制资源是否通过，这时候可以使用 Sentinel 的访问控制（黑白名单）的功能。黑白名单根据资源的请求来源（origin）限制资源是否通过，若配置白名单则只有请求来源位于白名单内时才可通过；若配置黑名单则请求来源位于黑名单时不通过，其余的请求通过。
-			2]授权规则，即黑白名单规则（AuthorityRule）非常简单，主要有以下配置项：
-				resource：资源名，即规则的作用对象
-				limitApp：对应的黑名单/白名单，不同 origin 用 , 分隔，如 appA,appB
-				strategy：限制模式，AUTHORITY_WHITE 为白名单模式，AUTHORITY_BLACK 为黑名单模式，默认为白名单模式
-			3]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E9%BB%91%E7%99%BD%E5%90%8D%E5%8D%95%E6%8E%A7%E5%88%B6
-		5)热点参数规则(ParamFlowRule)
-			1]更多详细内容可以参考————https://github.com/alibaba/Sentinel/wiki/%E7%83%AD%E7%82%B9%E5%8F%82%E6%95%B0%E9%99%90%E6%B5%81
-		6)查询更改规则
-			1]说明————引入了 transport 模块后，可以通过以下的 HTTP API 来获取所有已加载的规则：http://localhost:8719/getRules?type=<XXXX>.其中，type=flow 以 JSON 格式返回现有的限流规则，degrade 返回现有生效的降级规则列表，system 则返回系统保护规则.获取所有热点规则：http://localhost:8719/getParamRules
-		7)定制自己的持久化规则
-			1]说明————上面的规则配置，都是存在内存中的。即如果应用重启，这个规则就会失效。因此我们提供了开放的接口，您可以通过实现 DataSource 接口的方式，来自定义规则的存储数据源。通常我们的建议有:
-        1、整合动态配置系统，如 ZooKeeper、Nacos、Apollo 等，动态地实时刷新配置规则
-        2、结合 RDBMS、NoSQL、VCS 等来实现该规则
-        3、配合 Sentinel Dashboard 使用
-      2]更多详情请参考————https://github.com/alibaba/Sentinel/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%99%E6%89%A9%E5%B1%95
-
--- 检验规则是否生效
-	1、判断限流降级异常————在 Sentinel 中所有流控降级相关的异常都是异常类 BlockException 的子类：
-      流控异常：FlowException
-      熔断降级异常：DegradeException
-      系统保护异常：SystemBlockException
-      热点参数限流异常：ParamFlowException
-    我们可以通过以下函数判断是否为 Sentinel 的流控降级异常：
-    	BlockException.isBlockException(Throwable t);
-    除了在业务代码逻辑上看到规则生效，我们也可以通过下面简单的方法，来校验规则生效的效果：
-			1)暴露的 HTTP 接口：通过运行下面命令 curl http://localhost:8719/cnode?id=<资源名称>，观察返回的数据。如果规则生效，在返回的数据栏中的 block 以及 block(m) 中会有显示
-			2)日志：Sentinel 提供秒级的资源运行日志以及限流日志，详情可以参考————https://github.com/alibaba/Sentinel/wiki/%E6%97%A5%E5%BF%97
-	2、block 事件
-		Sentinel 提供以下扩展接口，可以通过 StatisticSlotCallbackRegistry 向 StatisticSlot 注册回调函数：
-      ProcessorSlotEntryCallback: callback when resource entry passed (onPass) or blocked (onBlocked)
-      ProcessorSlotExitCallback: callback when resource entry successfully completed (onExit)
-    可以利用这些回调接口来实现报警等功能，实时的监控信息可以从 ClusterNode 中实时获取。
-
-# SpringBoot整合
--- 流量控制————整合Sentinel测试限流
-  1、每一个微服务引入以下依赖
-    <dependency>
-      <groupId>com.alibaba.cloud</groupId>
-      <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-    </dependency>
-    <!--引入信息审计依赖-->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-  2、下载并启动控制台
-		详见————1、Java开发之工具环境篇-4-18、Sentinel控制台环境搭建
-  3、每一个微服务的配置文件添加配置信息
-    # Sentinel配置信息
-    ## 每一个微服务和Sentinel中央控制服务器(Sentinel控制台)进行数据传输使用的端口（随意，只要不被占用）
-    spring.cloud.sentinel.transport.port=8719
-    ## Sentinel控制台所在的地址
-    spring.cloud.sentinel.transport.dashboard=localhost:8333
-    ## 实时监控,默认不显示问题解决————暴露endpoint,使这些审计信息可以被别人访问
-    ### Spring Boot 1.x 中添加配置如下。暴露的 endpoint 路径为 /sentinel
-    #management.security.enabled=false
-    ### Spring Boot 2.x 中添加配置如下。暴露的 endpoint 路径为 /actuator/sentinel
-    management.endpoints.web.exposure.include=*
-  4、在控制台中进行相应的调整————默认所有的流控设置保存在内存中,重启失效
-  5、自定义流控响应信息————默认为[Blocked by Sentinel (flow limiting)]————添加自定义流控响应类,设置请求被限制时的处理器
-      package com.pigskin.mall.seckill.config;
-
-      import com.alibaba.csp.sentinel.adapter.servlet.callback.UrlBlockHandler;
-      import com.alibaba.csp.sentinel.adapter.servlet.callback.WebCallbackManager;
-      import com.alibaba.csp.sentinel.slots.block.BlockException;
-      import com.alibaba.fastjson.JSON;
-      import com.pigskin.common.exception.BizCodeEnum;
-      import com.pigskin.common.utils.R;
-      import org.springframework.context.annotation.Configuration;
-
-      import javax.servlet.http.HttpServletRequest;
-      import javax.servlet.http.HttpServletResponse;
-      import java.io.IOException;
-
-      /**
-       * Sentinel流控配置类
-       *
-       * @author pigskin
-       * @date 2022年02月09日 4:11 下午
-       */
-      @Configuration
-      public class SeckillSentinelConfig {
-
-          /**
-           * 无参构造
-           */
-          public SeckillSentinelConfig() {
-              /*Spring5提供的WebFlux编程使用WebFluxCallbackManager*/
-              /*Sentinel提供的Web回调的管理器，设置请求被限制以后处理器，进行处理*/
-              WebCallbackManager.setUrlBlockHandler(new UrlBlockHandler() {
-                  /**
-                   * 自定义阻塞返回信息
-                   * @param request
-                   * @param response
-                   * @param e
-                   * @throws IOException
-                   */
-                  @Override
-                  public void blocked(HttpServletRequest request, HttpServletResponse response, BlockException e) throws IOException {
-                      R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
-                      /*设置编码格式*/
-                      response.setCharacterEncoding("UTF-8");
-                      /*设置内容类型为Json*/
-                      response.setContentType("application/json");
-                      /*设置响应的内容*/
-                      response.getWriter().write(JSON.toJSONString(error));
-                  }
-              });
-          }
-      }
-  6、持久化流控规则
-
--- 熔断降级————整合Feign+Sentinel测试熔断降级————详见————https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel#feign-%E6%94%AF%E6%8C%81
-  1、方式一(调用方)————熔断保护
-  	1)引入依赖
-      <dependency>
-        <groupId>com.alibaba.cloud</groupId>
-        <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.springframework.cloud</groupId>
-          <artifactId>spring-cloud-starter-openfeign</artifactId>
-      </dependency>
-    2)调用方配置文件添加配置
-      # 打开 Sentinel 对 Feign 的支持
-      feign.sentinel.enabled=true
-    3)创建远端接口所需要回调的实现类
-    	package com.pigskin.mall.product.feign.fallback;
-
-      import com.pigskin.common.exception.BizCodeEnum;
-      import com.pigskin.common.utils.R;
-      import com.pigskin.mall.product.feign.SeckillFeignService;
-      import lombok.extern.slf4j.Slf4j;
-      import org.springframework.stereotype.Component;
-
-      /**
-       * 秒杀服务远端接口异常回调实现类
-       *
-       * @author pigskin
-       * @date 2022年02月10日 10:59 上午
-       */
-      @Slf4j
-      @Component
-      public class SeckillFeignServiceFallBack implements SeckillFeignService {
-          @Override
-          public R getSkuSeckillInfo(Long skuId) {
-              log.info("嘿嘿，我是getSkuSeckillInfo的熔断方法，我被调了。。。");
-              return R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
-          }
-      }
-    4)远端接口设置创建的回调实现类
-    	package com.pigskin.mall.product.feign;
-
-      import com.pigskin.common.utils.R;
-      import com.pigskin.mall.product.feign.fallback.SeckillFeignServiceFallBack;
-      import org.springframework.cloud.openfeign.FeignClient;
-      import org.springframework.web.bind.annotation.GetMapping;
-      import org.springframework.web.bind.annotation.PathVariable;
-
-      /**
-       * 秒杀服务远端接口
-       *
-       * @author pigskin
-       * @date 2022年02月06日 1:27 下午
-       */
-      @FeignClient(value = "mall-seckill",fallback = SeckillFeignServiceFallBack.class)
-      public interface SeckillFeignService {
-
-          /**
-           * 获取指定商品秒杀信息
-           *
-           * @return
-           */
-          @GetMapping("/sku/seckill/{skuId}")
-          R getSkuSeckillInfo(@PathVariable("skuId") Long skuId);
-      }
-  2、方式二(调用方)————Sentinel控制台手动指定相应远程服务的降级策略————远程服务被降级处理后,触发方式一设置的熔断回调方法
-  	详见————https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7
-  3、方式三(被远程调用方)————全局超大浏览量时,必须牺牲一些远程服务,在服务的提供方指定降级策略————提供方是在运行,但是不想运行自己的业务逻辑,返回的是默认的降级数据(限流后的数据).
-
-# 自定义受保护资源——————以下无论哪种方式都要配置被限流后的默认返回,URL通过配置可以设置统一返回,
--- 方式一————使用 try (Entry entry = SphU.entry("自定义资源名")) { 需要保护的资源代码 }catch(BlockException exception) {//被限流后抛出异常在此处处理} 
-	1、设置被保护资源以及限流处理:
-    try (Entry entry = SphU.entry("SeckillSkus")) {//设置try包含的代码名为SeckillSkus资源
-        //获取所有场次信息
-        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
-        for (String key : keys) {
-            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
-            String[] s = replace.split("_");
-            long start = Long.parseLong(s[0]);
-            long end = Long.parseLong(s[1]);
-            if (time >= start && time <= end) {
-                System.out.println("key:" + key);
-                /*2、获取这个场次需要的所有商品信息*/
-                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
-                BoundHashOperations<String, String, String> hashOperations = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
-                List<String> list = hashOperations.multiGet(range);
-                if (list != null) {
-                    return list.stream().map(item -> {
-                        // seckillSkuRedisTo.setRandomCode("");
-                        return JSON.parseObject(item.toString(), SeckillSkuRedisTo.class);
-                    }).collect(Collectors.toList());
-                }
-                break;
-            }
-        }
-    } catch (BlockException exception) {//被限流后抛出异常在此处处理
-        log.error("资源被限流异常————异常原因为{}", exception.getMessage());
-    }
-	2、Sentinel控制台进行限流和熔断设置
-
--- 方式二————基于注解@SentinelResource
-	1、设置被保护资源,并使用blockHandler指定限流后本类中的回调处理容错方法
-		/**
-     * getCurrentSeckillSkusResource资源被限流回调方法（返回值、参数名要和原方法一致）
-     *
-     * @param exception 限流异常（可以比原方法多一个该参数）
-     * @return 返回值类型要和原方法一致
-     */
-    public List<SeckillSkuRedisTo> blockHandler(BlockException exception) {
-        log.error("原方法被限流了");
-        return null;
-    }
-
-		/**
-     * 基于注解限流设置
-     *
-     * @return
-     */
-		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler")//设置需要被保护的资源
-    @Override
-    public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
-    	//TODO:业务代码
-    }
-  2、或使用fallback指定所有类型异常的回调方法,返回值、参数名要和原方法一致.如果在本类中设置不需要设置fallbackClass = XXX.class,示例如下:
-  		@SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler",fallback = "fallbackHandler",fallbackClass = XXX.class)//设置需要被保护的资源
-    	@Override
-    	public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
-        //TODO:业务代码
-      }
-	3、Sentinel控制台进行限流和熔断设置
-
-# 网关流控————被其控制的将不会转发到指定服务————详见————https://github.com/alibaba/Sentinel/wiki/%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81
--- 1、网关层引入依赖
-	 <!--引入网关流控依赖-->
-   <dependency>
-     <groupId>com.alibaba.cloud</groupId>
-     <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
-     <version>2.1.0.RELEASE</version>
-   </dependency>
-
--- 2、配置文件主要可配置信息示例如下
-	## 指定网关限流回调信息 
-	###内容类型
-	spring.cloud.sentinel.scg.fallback.content-type=application/json
-	###响应内容
-	spring.cloud.sentinel.scg.fallback.response-body="ajjasd"
-	###错误状态码
-	spring.cloud.sentinel.scg.fallback.response-status=400
-
--- 3、Sentinel控制台进行配置
-	1、1.6.x的控制台————网关的簇点链路会显示当前请求匹配的对应路由配置,对应网关路由配置的id
-	2、1.7.x及其以上的控制台————网关相关配置会有特有的配置方式
-
--- 4、定制网关流控返回数据
-	1、代码实现
-    package com.pigskin.mall.gateway.config;
-
-    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
-    import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
-    import com.alibaba.fastjson.JSON;
-    import com.pigskin.common.exception.BizCodeEnum;
-    import com.pigskin.common.utils.R;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.web.reactive.function.server.ServerResponse;
-    import org.springframework.web.server.ServerWebExchange;
-    import reactor.core.publisher.Mono;
-
-    /**
-     * 网关Sentinel限流回调配置类
-     *
-     * @author pigskin
-     * @date 2022年02月10日 4:37 下午
-     */
-    @Configuration
-    public class SentinelGatewayConfig {
-        public SentinelGatewayConfig() {
-            GatewayCallbackManager.setBlockHandler(new BlockRequestHandler() {
-                /**
-                 * 网关限流了请求，就会调用此回调Mono Flux
-                 * @param serverWebExchange
-                 * @param throwable
-                 * @return
-                 */
-                @Override
-                public Mono<ServerResponse> handleRequest(ServerWebExchange serverWebExchange, Throwable throwable) {
-                    R error = R.error(BizCodeEnum.TOO_MANY_REQUEST.getCode(), BizCodeEnum.TOO_MANY_REQUEST.getMsg());
-                    String jsonString = JSON.toJSONString(error);
-                    /*Mono——返回0个或者一个数据*/
-                    /*Flux——返回0个或者多个数据*/
-                    return ServerResponse.ok().body(Mono.just(jsonString), String.class);
-                }
-            });
-        }
-    }
-
-
-```
-
-## 39、SpringCloud——Sleuth+Zipkin——服务链路追踪
-
-```markdown
-# 作用
-	微服务架构是一个分布式架构,它按业务划分服务单元,一个分布式系统往往有很多个服务单元。由于服务单元数量众多,业务的复杂性,如果出现了错误和异常,很难去定位。主要体现在,一个请求可能需要调用很多个服务,而内部服务的调用复杂性,决定了问题难以定位。所以微服务架构中,必须实现分布式链路追踪,去跟进一个请求到底有哪些服务参与,参与的顺序又是怎样的,从而达到每个请求的步聚清晰可见,出了间題,很快定位。
-
-	链路追踪组件有 Google 的 Dapper, Twitter 的 Zipkin,以及阿里的 Eagleeye(鹰眼)等,它们都是非常优秀的链路追踪开源组件。
-
-# 基本术语
--- Span(跨度)————基本工作单元,发送一个远程调度任务就会产生一个Span,Span是个64位ID唯一标识的, Trace是用另一个64位ID唯一标识的,Span还有其他数据信息,比如摘要、时间戳事件、Span的ID、以及进度ID。
-
--- Trace(跟踪)————一系列span组成的一个树状结构。请求一个微服务系统的AP接口,这个AP接口,需要调用多个微服务,调用每个微服务都会产生一个新的Span,所有由这个请求产生的Span组成了这个 Trace。
-
--- Annotation(标注)————用来及时记录一个事件的,一些核心注解用来定义一个请求的开始和结東。这些注解包括以下:
-	1、cs-Client Sent————客户端发送一个请求,这个注解描述了这个Span的开始
-	2、sr-Server Received————服务端获得请求并准备开始处理它,如果将其sr减去cs时间戳便可得到网络传输的时间。
-	3、ss-Server Sent(服务端发送响应)————该注解表明请求处理的完成(当请求返回客户端),如果ss的时间戳减去sr时间戳,就可以得到服务器请求的时间。
-	4、cr-Client Received(客户端接收响应)————此时pan的结束,如果cr的时间戳减去cs时间戳便可以得到整个请求所消耗的时间。
-
--- 官方文档————https://cloud.spring.io/spring-cloud-static/spring-cloud-sleuth/2.1.3.RELEASE/single/spring-cloud-sleuth.html
-
--- 图示说明
-	1、如果服务调用顺序如下:
-```
-
-<img src="image/img2_1_39_1_1.png" style="zoom:50%;" />
-
-```markdown
-	2、概念完整表示如下:
-```
-
-<img src="image/img2_1_39_1_2.png" style="zoom:50%;" />
-
-```markdown
-	3、Span之间的父子关系如下:
-```
-
-<img src="image/img2_1_39_1_3.png" style="zoom:50%;" />
-
-```markdown
-# 整合Sleuth
--- 1、服务提供者与消费者导入依赖
-	<!--链路追踪依赖-->
-  <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-sleuth</artifactId>
-  </dependency>
-
--- 2、服务提供者与消费者配置文件中,设置日志等级为Debug(开发环境为了方便看)
-	# 链路追踪配置
-	## 开启Feign远程调用日志等级为debug
-	logging.level.org.springframework.cloud.openfeign=debug
-	## 开启Sleuth日志等级为debug
-	logging.level.org.springframework.cloud.sleuth=debug
-
--- 3、发起一次远程调用,观察控制台
-	1、输出示例————[mall-product,8a0699552f23e9db,75b86e37fd484418,false] 
-	2、说明
-		1)mall-product————服务名
-		2)8a0699552f23e9db————是TranceId,一条链路中,只有一个TranceId
-		3)75b86e37fd484418————是SpanId,链路中的基本工作单元Id
-		4)false————表示是否将数据输出到其他服务,true则会把数据输出到其他可视化的服务上观察
-
-# 整合Zipkin可视化观察
--- 说明
-	通过 Sleuth产生的调用链监控信息,可以得知微服务之间的调用链路,但监控信息只输出到控制台不方便查看。我们需要一个图开化的工具Zipkin。Zipkin是Twitter开源的分布式踪系统,主要用来收集系统的时序数据,从而追踪系统的调用问题。 
-
--- zipkin官网地址————https://zipkin.io/
-
--- 原理图,如下图所示
-```
-
-<img src="image/img2_1_39_1_4.png" style="zoom:50%;" />
-
-```markdown
--- 安装
-	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
-
--- SpringBoot整合
-	1、导入Zipkin依赖————也同时包含了Sleuth,可以省略Sleuth的引用
-		<!--链路追踪可视化操作依赖（可省略引入spring-cloud-starter-sleuth）-->
-		<dependency>
-  		<groupId>org.springframework.cloud</groupId>
-  		<artifactId>spring-cloud-starter-zipkin</artifactId>
-  	</dependency>
-	2、配置文件添加配置
-		# 链路追踪可视化工具zipkin配置信息
-    #spring.application.name=xxx
-    ## zipkin服务器的地址
-    spring.zipkin.base-url=http://虚拟机IP:9411
-    ## 关闭服务发现，否则spring cloud会把zipkin的url当作服务器名称
-    spring.zipkin.discovery-client-enabled=false
-    ## 设置使用http的方式传输数据
-    spring.zipkin.sender.type=web
-    ## 设置抽样采集率为100%，默认为0.1,即10%
-    spring.sleuth.sampler.probability=1
-  3、访问————http://虚拟机IP:9411
-  	1)可以查看服务调用链追踪信息统计
-  	2)可以查看服务依赖信息统计
-
-# Zipkin数据持久化————官方文档地址————https://github.com/openzipkin/zipkin#storage-component
--- 说明
-	Zipkin默认是将监控数据存储在内存的,如果Zipkin挂掉或重启的话,那么监控数据就会丢失。所以如果想要搭建生产可用的Zipkin,就需要实现监控数据的持久化。而想要实现数据持久化,自然就是得将数据存储至数据库。
-
--- zipkin支持将数据存储的位置
-	1、支持将数据存储的位置
-    1)内存(默认)
-    2)MySQL
-    3)Elasticsearch
-    4)Cassandra
-	2、Zipkin支持的这几种存储方式中,内存显然是不适用于生产的,这一点开始也说了。而使用MySQL的话,当数据量大时,查询较为缓慢,也不建议使用。Twitter官方使用的是Cassandra作为Zipkin的存储数据库,但国内大规模用Cassandra的公司较少,而且Cassandra相关文档也不多。综上,故采用 Elasticsearch是个比较好的选择,关于使用 Elasticsearch作为Zipkin的存储数据库的官方文档如下:
-		1)elasticsearch-storage————https://github.com/openzipkin/zipkin/tree/master/zipkin-server#elasticsearch-storage
-		2)zipkin-storage/elasticsearch————https://github.com/openzipkin/zipkin/tree/master/zipkin-storage/elasticsearch
-
--- 通过docker的方式
-	详见————1、Java开发之工具篇-5-19、Docker中安装Zipkin
-
--- zipkin界面分析
-
-```
-
-## 40、K8S
+## 38、K8S
 
 ```markdown
 ```
 
-## 41、Spring注入方式
+## 39、Spring注入方式
 
 ```markdown
 # 构造器注入
@@ -10446,12 +10508,12 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 ```
 
-## 42、集群
+## 40、集群
 
 ```markdown
 ```
 
-## 43、响应式编程
+## 41、Reactive&WebFlux响应式编程
 
 ```markdown
 # Reactive
@@ -10463,7 +10525,7 @@ SR(Service Relese )————表示正式版本，一般同时标注GA
 
 # 二、第三方服务技术
 
-## 1、阿里云oss
+## 1、阿里云对象存储(OOS)
 
 ### 1、说明
 
@@ -10504,7 +10566,7 @@ localhost:10000/index/catelog.json解决海量存储和弹性扩容
 
 
 
-## 2、阿里云视频点播服务
+## 2、阿里云视频点播服务(VOD)
 
 ### 1、说明
 
@@ -12159,10 +12221,10 @@ error => {   
 	1、使用沙箱账户进行测试————https://open.alipay.com/platform/appDaily.htm?tab=account
 
 -- 允许我们使用外网的地址来访问主机进行测试
-	详情请见————2、Java开发之后段技术篇-2-11、内网穿透
+	详见————2、Java开发之后端技术篇-2-11、内网穿透
 
 # 相关概念
-	详见————2、Java开发之后段技术篇-1-34、加密算法
+	详见————2、Java开发之后端技术篇-1-34、加密算法
 
 # 支付宝加密算法流程
 -- 流程图示————如下图所示
@@ -13157,13 +13219,13 @@ error => {   
 ### 3、全局异常处理
 
 ```markdown
-	详见————2-3-5、统一异常处理
+	详见————2、Java开发之后端技术篇-3-5、统一异常处理
 ```
 
 ### 4、全局统一返回
 
 ```markdown
-	详见————2-3-4、统一返回结果处理
+	详见————2、Java开发之后端技术篇-3-4、统一返回结果处理
 ```
 
 ### 5、全局跨域处理
@@ -13293,10 +13355,8 @@ error => {   
 	ajax异步请求操作，调用接口
 -- 后端
 	作用：操作数据/返回数据（json）
-	接口开发：开发controller\service\mapper过程,调用结果的返回
+	接口开发：开发controller\service\mapper过程,调用结果的返
 ```
-
-
 
 ## 2、前后端联调常见问题
 
@@ -13308,8 +13368,6 @@ error => {   
 5、空指针异常
 6、分布式ID生成器生成的ID长度过长(19位),JS无法解析(最多只能16位),需修改ID生成策略
 ```
-
-
 
 ## 3、Java开发常见异常
 
@@ -14688,7 +14746,8 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- 获取被验证的令牌(传过来的数据)
 	String orderToken = submitVo.getOrderToken();
 
--- 获取当前用户便于区分令牌,设置详见————20、接口幂等性问题
+-- 获取当前用户便于区分令牌,设置
+	详见————2、Java开发之后端技术篇-3-20、接口幂等性问题
 	MemberResponseVo memberResponseVo = LoginUserInterceptor.loginUser.get();
 
 -- 通过lua脚本,原子验证和删除令牌
@@ -14959,7 +15018,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
     }
 
 # 如果牵扯到远程调用或者页面直接请求时会出现丢失请求头问题
-	处理方式详见————2、Java开发之后段技术篇-3-18、Fegin远程调用丢失请求头问题
+	详见————2、Java开发之后端技术篇-3-18、Fegin远程调用丢失请求头问题
 
 # 如果是以Ajax方式直接发起请求,由于远影,导致Cookie信息不会被携带,可以使用如下方式解决
     /*解决Ajax请求不携带Cookie问题*/
@@ -14997,7 +15056,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	秒杀具有瞬时高并发的特点,针对这一特点,必须要做到限流+异步+缓存(页面静态化)+独立部署
 
 # 秒杀商品定时上架及秒杀展示业务
--- 1、商品定时上架————定时任务相关知识详见:2-1-36、定时任务(玩转SpringBoot之定时任务详解)
+-- 1、商品定时上架————定时任务相关知识,详见————2、Java开发之后端技术篇-1-36、定时任务(玩转SpringBoot之定时任务详解)
 	1)流程图,如下所示:
 ```
 
@@ -15570,7 +15629,8 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 <img src="image/img2_3_24_1_6.png" style="zoom:50%;" />
 
 ```markdown
-# 限流————详见——2、Java开发之后端技术-35、限流
+# 限流
+	详见————2、Java开发之后端技术-1-35、限流
 ```
 
 ## 25、解决Spring定时任务阻塞问题
@@ -15611,8 +15671,6 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
         initRabbitTemplate();
         return rabbitTemplate;
     }
-
-# 
 ```
 
 
