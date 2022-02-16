@@ -466,14 +466,14 @@ return interceptor;
 # 一般复杂查询使用QueryWrapper对象,结构图如下:
 ```
 
-<img src="image/img2_1_1_10_1.png" style="zoom:50%;" />
+<img src="image/img2_1_1_6_1.png" style="zoom:50%;" />
 
 ```markdown
 # 包含的常见操作,如图所示:
-	select                                     指定查询的列                                      
+	select                                     指定查询的列                                    
 ```
 
-<img src="image/img2_1_1_10_2.png" style="zoom:50%;" />
+<img src="image/img2_1_1_6_2.png" style="zoom:50%;" />
 
 ```markdown
 # 代码实现步骤
@@ -1223,7 +1223,7 @@ return interceptor;
 # 图示————如下图所示
 ```
 
-<img src="image/img2_1_23_1_9.png" style="zoom:50%;" />
+<img src="image/img2_1_6_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # SpringBoot整合SpringCache简化缓存开发
@@ -1406,14 +1406,14 @@ return interceptor;
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_14_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_6_3_1.png" style="zoom:50%;" />
 
 ```markdown
 # 代码整合
 -- 1、创建对应模块————权限管理模块目录结构,如下图所示:
 ```
 
-<img src="image/img2_1_14_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_6_3_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 2、引入依赖
@@ -2042,6 +2042,12 @@ return interceptor;
 ### 1、SpringBoot简介
 
 ```markdown
+# 微服务架构图,如下图所示:
+```
+
+<img src="image/img2_1_7_1_1.png" style="zoom:50%;" />
+
+```markdown
 # 说明
 	spring的一套快速配置脚手架,用于快速开发单个微服务
 
@@ -2064,7 +2070,9 @@ return interceptor;
 ### 0、SpringCloud简介
 
 ```markdown
-# 官方文档————https://spring.io/projects/spring-cloud
+# 文档
+	官方文档————https://spring.io/projects/spring-cloud
+	中文文档————https://www.springcloud.cc/spring-cloud-greenwich.html
 
 # 微服务简介
 -- 特点
@@ -2145,7 +2153,7 @@ return interceptor;
 	Feign-->Hystrix-->Ribbon-->Http Client(apache http components/Okhttp),详细过程如图:
 ```
 
-<img src="image/img2_1_8_4_4.png" style="zoom:50%;" />
+<img src="image/img2_1_8_0_1.png" style="zoom:50%;" />
 
 ```markdown
 # 小版本划分说明
@@ -2156,21 +2164,819 @@ return interceptor;
 -- SR(Service Relese )————表示正式版本，一般同时标注GA
 ```
 
-### 1、Netflix Eureka——服务发现、注册中心
+### 1、Spring Cloud Netflix Eureka——服务发现、注册中心
 
 ```markdown
 # 作用
 	将多个模块(微服务)在注册中心注册，就能实现多个模块之间的互相调用，【相当于中介】
 
-# 常见的注册中心
-  Eureka(原生，2.0遇到性能瓶颈，停止维护)
-  Zookeeper(支持，专业的独立产品。例如：dubbo)
-  Consul(原生，Go语言开发)
-  Nacos(详见————2、Java开发之后端技术篇-1-10、Nacos)
+# 什么是注册中心
+	注册中心可以说是微服务架构中的”通讯录“,它记录了服务和服务地址的映射关系.在分布式架构中,服务会注册到这里,当服务需要调用其他服务时,就到这里找到服务的地址,进行调用.即服务注册中心的作用就是服务的注册和服务的发现.
 
+# 常见的注册中心
+-- Netflix Eureka(原生，2.0遇到性能瓶颈，停止维护)
+
+-- Apache Zookeeper(支持，专业的独立产品。例如：dubbo)
+
+-- HashiCorp Consul(原生，Go语言开发)
+
+-- Alibaba Nacos(详见————2、Java开发之后端技术篇-1-10、Nacos)
+
+-- CoreOS Etcd
+
+-- CNCF CoreDNS
+
+	对比图示,如下图所示:
+```
+
+<img src="image/img2_1_8_1_1.png" style="zoom:50%;" />
+
+```markdown
 # SpringCloudAlibaba使用Nacos作为注册中心
 	详见————2、Java开发之后端技术篇-1-9-1、Nacos作为注册中心——服务发现、注册中心
+
+# 为什么要注册中心
+	在分布式系统中,我们不仅仅是需要在注册中心找到服务和服务地址的映射关系这么简单.还需要考虑更多更复杂的问题:
+	1、服务注册后,如何被及时发现
+	2、服务宕机后,如何及时下线
+	3、服务如何有效的水平扩展
+	4、服务发现时,如何进行路由
+	5、服务异常时,如何进行降级
+	6、注册中心如何实现自身的高可用
+	这些问题都依赖于注册中心.简单看,注册中心的功能有点类似于DNS服务器或者负载均衛器,而实际上,注册中心作为服务的基础组件,可能要更加复杂,也需要更多的灵活性和时效性。所以我们还需要学习更多 Spring Cloud微服务组件协同完成应用开发
+
+# 注册中心解决了什么问题
+-- 服务管理
+
+-- 服务的依赖关系管理
+
+# Eureka注册中心简介
+	Eureka是Netflix开发的服务发现组件,本身是一个基于REST的服务.Spring Cloud将它集成在其子项目Spring Cloud Netflix中,实现Spring Cloud的服务发现和注册,同时还提供了负载均衡、故障转移等功能.
+
+# Eureka注册中心的三种角色
+-- 简要图示,如下图所示:
 ```
+
+<img src="image/img2_1_8_1_2.png" style="zoom:50%;"/>
+
+```markdown
+-- 角色说明
+	1、Eureka Server————通过Register、Get、Renew等接口提供服务的注册和发现
+	2、Application Service(Service Provider)————服务提供方,把自身的服务实例注册到Eureka Server中
+	3、Application Client(Service Consummer)————服务调用方,通过Eureka Server获取服务列表,消费服务
+
+-- 详细图示,如下图所示:
+```
+
+<img src="image/img2_1_8_1_3.png" style="zoom:50%;"/>
+
+```markdown
+# Eureka Server————注册中心环境搭建
+-- Eureka入门案例
+	1、创建父工程
+		使用IDE工具创建Maven父工程项目
+	2、父工程Pom文件添加依赖
+    <!--继承spring-boot-starter-parent依赖-->
+      <!--使用继承方式，实现复用，符合继承的都可以被使用-->
+      <parent>
+          <artifactId>spring-boot-starter-parent</artifactId>
+          <groupId>org.springframework.boot</groupId>
+          <version>2.2.4.RELEASE</version>
+      </parent>
+
+      <!--
+          集中定义依赖组件版本号，但不引入
+          在子工程中用到声明的依赖时，可以不加依赖的版本号，这样就可以统一管理工程中用到的依赖版本
+      -->
+      <properties>
+          <!--spring cloud Hoxton.SR1 依赖-->
+          <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+          <!--        <maven.compiler.source>8</maven.compiler.source>-->
+          <!--        <maven.compiler.target>8</maven.compiler.target>-->
+      </properties>
+
+      <!--项目依赖管理 父项目只是声明依赖，子项目需要写明需要的依赖（可以省略版本信息）-->
+      <dependencyManagement>
+          <dependencies>
+              <dependency>
+                  <groupId>org.springframework.cloud</groupId>
+                  <artifactId>spring-cloud-dependencies</artifactId>
+                  <version>${spring-cloud.version}</version>
+                  <type>pom</type>
+                  <scope>import</scope>
+              </dependency>
+          </dependencies>
+      </dependencyManagement>
+	3、创建子工程eureka-server
+    1)右键父工程,创建Maven子工程项目
+    2)子工程继承父工程依赖————子工程pom文件,进行依赖引入
+      <!--继承父依赖-->
+      <parent>
+          <artifactId>eureka-demo</artifactId>
+          <groupId>com.pigskin</groupId>
+          <version>1.0-SNAPSHOT</version>
+      </parent>
+
+      <!--项目依赖-->
+      <dependencies>
+          <!--netflix eureka server依赖（注册中心使用）-->
+          <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+          </dependency>
+
+          <!--spring boot web依赖-->
+          <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-starter-web</artifactId>
+          </dependency>
+
+          <!--spring boot test依赖-->
+          <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-starter-test</artifactId>
+              <scope>test</scope>
+              <exclusions>
+                  <exclusion>
+                      <groupId>org.junit.vintage</groupId>
+                      <artifactId>junit-vintage-engine</artifactId>
+                  </exclusion>
+              </exclusions>
+          </dependency>
+      </dependencies>
+		3)创建eureka-server的启动类
+      package com.pigskin;
+
+      import org.springframework.boot.SpringApplication;
+      import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+      /**
+       * EurekaServer启动类
+       *
+       * @author pigskin
+       * @date 2022年02月14日 4:49 下午
+       */
+      @SpringBootApplication
+      public class EurekaServerApplication {
+          public static void main(String[] args) {
+              SpringApplication.run(EurekaServerApplication.class);
+          }
+      }
+		4)添加application.yml配置文件,并添加配置信息
+      server:
+        # 服务端口
+        port: 8761
+      spring:
+        application:
+          # 服务（应用）名称
+          name: server-eureka-wcc
+
+      # 配置Eureka注册中心
+      eureka:
+        instance:
+          # 主机名————不配置的时候根据操作系统的主机名来获取
+          hostname: localhost
+        client:
+          # 是否将自己注册到注册中心，默认为true，集群需要开启互相注册，单节点开启会出问题
+          register-with-eureka: false
+          # 是否从注册中心获取服务注册信息，默认为true，集群需要开启互相注册，单节点开启会出问题
+          fetch-registry: false
+          service-url: 
+            # 注册中心对外暴露的注册地址
+            defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+		5)启动类添加注解@EnableEurekaServer,从而以注册中心的方式启动该服务
+		6)访问————浏览器访问http://localhost:8761/
+
+-- 高可用Eureka注册中心————创建子工程eureka-server02
+	1、创建一个eureka-server02注册中心项目————参照Eureka入门案例——创建子工程eureka-server,如果是多机器部署不用修改端口,通过IP区分服务,如果在一台机器上需要修改端口区分服务
+	2、添加依赖————参照Eureka入门案例——创建子工程eureka-server
+	3、添加配置文件————参考如下配置并修改Eureka入门案例——创建子工程eureka-server,中的配置
+    server:
+    	# 服务端口
+      port: 8762
+    spring:
+      application:
+      	# 服务（应用）名称
+        name: server-eureka-wcc
+
+    # 配置Eureka注册中心
+    eureka:
+      instance:
+      	# 主机名————不配置的时候根据操作系统的主机名来获取
+        hostname: eureka-wcc-01
+      client:
+      	# 是否将自己注册到注册中心，默认为true，集群需要开启互相注册，单节点开启会出问题
+        # register-with-eureka: false
+        # 是否从注册中心获取服务注册信息，默认为true，集群需要开启互相注册，单节点开启会出问题
+        # fetch-registry: false
+        service-url: 
+        	# 注册中心对外暴露的注册地址————高可用设置服务注册中心地址，指向另一个注册中心
+          defaultZone: http://localhost:8761/eureka/
+	4、创建eureka-server的启动类————参照Eureka入门案例——创建子工程eureka-server
+	5、设置配置文件的eureka.client.register-with-eureka和eureka.client.fetch-registry配置项值为true,或不配置(默认true)
+	6、启动两个服务,并访问http://localhost:8761/或http://localhost:8762/,都会发现[UP (2) - localhost:server-eureka-wcc:8762 , 192.168.250.40:server-eureka-wcc:8761]的信息
+	7、显示IP+端口形式
+		1)一个普通的Netflix Eureka实例注册的ID等于其主机名(即,每个主机只提供一项服务).Spring Cloud Eureka提供了合理的默认值,定义如下:
+      ${spring.cloud.client.hostname}:${spring.application.name}:
+      ${spring.application.instance_id}:${server.port}.即,主机名:应用名:应用端口
+		2)也可自行定义进行修改,添加配置如下:
+			# 配置Eureka注册中心
+      eureka:
+        instance:
+          # 是否使用IP地址注册
+          prefer-ip-address: true
+          # 配置定义的IP+端口号
+          instance-id: ${spring.cloud.client.ip-address}:${server.port}
+		3)将显示结果如下:
+			UP (2) - 192.168.250.40:8761 , 192.168.250.40:8762
+
+# Service Provider————服务提供者环境搭建————创建子工程eureka-provider
+-- 1、右键父工程,创建Maven子工程项目
+
+-- 2、子工程继承父工程依赖————子工程pom文件,进行依赖引入,注意[spring-cloud-starter-netflix-eureka-client]
+		<!--继承父依赖-->
+    <parent>
+        <artifactId>eureka-demo</artifactId>
+        <groupId>com.pigskin</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--项目依赖-->
+    <dependencies>
+        <!--netflix eureka client依赖（服务提供者和消费者使用）-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!--spring boot web依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <!--lombok依赖————简化Pojo开发-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--spring boot test依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+-- 3、添加配置文件
+	server:
+    # 服务端口
+    port: 7070
+	spring:
+    application:
+      # 服务（应用）名称————集群下相同
+      name: service-provider-wcc
+
+	# 配置Eureka注册中心
+	eureka:
+    instance:
+      # 是否使用IP地址注册
+      prefer-ip-address: true
+      # 配置定义的IP+端口号
+      instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    client:
+      service-url:
+        # 设置注册中心地址(多个使用逗号分割)
+        defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+
+-- 4、创建POJO类、Service类、Controller类
+	1、POJO类————创建实体类————内容如下:
+    package com.pigskin.pojo;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    import java.io.Serializable;
+    import java.math.BigDecimal;
+
+    /**
+     * 商品类
+     *
+     * @author pigskin
+     * @date 2022年02月15日 9:46 上午
+     */
+    //Getter/Setter
+    @Data
+    //无参构造
+    @NoArgsConstructor
+    //全参构造
+    @AllArgsConstructor
+    public class Product implements Serializable {
+
+        private Integer id;
+
+        private String productName;
+
+        private Integer productNum;
+
+        private BigDecimal productPrice;
+
+    }
+	2、Service类————编写服务接口————内容如下:
+    package com.pigskin.service;
+
+    import com.pigskin.pojo.Product;
+    import java.util.List;
+
+    /**
+     * 商品服务接口
+     *
+     * @author pigskin
+     * @date 2022年02月15日 9:57 上午
+     */
+    public interface ProductService {
+        /**
+         * 查询商品列表
+         *
+         * @return
+         */
+        List<Product> selectProductList();
+    }
+	3、ServiceImpl类————编写服务接口实现类————内容如下:
+    package com.pigskin.service.impl;
+
+    import com.pigskin.pojo.Product;
+    import com.pigskin.service.ProductService;
+    import org.springframework.stereotype.Service;
+
+    import java.math.BigDecimal;
+    import java.util.Arrays;
+    import java.util.List;
+
+    /**
+     * 商品服务接口实现类
+     *
+     * @author pigskin
+     * @date 2022年02月15日 10:00 上午
+     */
+    @Service
+    public class ProductServiceImpl implements ProductService {
+        @Override
+        public List<Product> selectProductList() {
+            return Arrays.asList(
+                    new Product(1, "华为手机", 2, new BigDecimal(5000)),
+                    new Product(2, "MacBook Pro 14", 5, new BigDecimal(70000)),
+                    new Product(3, "iphone 18 plus", 7, new BigDecimal(10000))
+            );
+        }
+    }
+	4、COntroller类————编写服务控制层内容————内容如下:
+    package com.pigskin.controller;
+
+    import com.pigskin.pojo.Product;
+    import com.pigskin.service.ProductService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import java.util.List;
+
+    /**
+     * 商品服务控制层
+     *
+     * @author pigskin
+     * @date 2022年02月15日 10:08 上午
+     */
+    @RestController
+    @RequestMapping("/product")
+    public class ProductController {
+        /**
+         * 自动注入商品服务
+         */
+        @Autowired
+        private ProductService productService;
+
+        /**
+         * 查询商品列表
+         *
+         * @return
+         */
+        @GetMapping("/list")
+        public List<Product> selectProductList() {
+            return productService.selectProductList();
+        }
+    }
+
+-- 4、创建eureka-provider的启动类,并添加注解@EnableEurekaClient(某些版本可不添加)
+    package com.pigskin;
+
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+    import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
+    /**
+     * EurekaClient启动类
+     */
+    //开启EurekaClient注解，目前版本如果配置了Eureka注册中心，默认会开启该注解
+    //@EnableEurekaClient
+    @SpringBootApplication
+    public class EurekaProviderApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(EurekaProviderApplication.class);
+        }
+    }
+-- 5、启动服务,并访问http://localhost:8761/或http://localhost:8762/,注册中心就会看到该服务被注册
+
+-- 6、访问http://localhost:7070/product/list,就可以获取到商品列表数据
+
+# Service Consummer————服务消费者环境搭建————创建子工程eureka-consummer
+-- 1、创建项目————右键父工程,创建Maven子工程项目eureka-consummer
+
+-- 2、子工程继承父工程依赖————子工程pom文件,进行依赖引入,注意[spring-cloud-starter-netflix-eureka-client]
+    <!--继承父依赖-->
+    <parent>
+      <artifactId>eureka-demo</artifactId>
+      <groupId>com.pigskin</groupId>
+      <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--项目依赖-->
+    <dependencies>
+      <!--netflix eureka client依赖（服务提供者和消费者使用）-->
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      </dependency>
+
+      <!--spring boot web依赖-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+
+      <!--lombok依赖————简化Pojo开发-->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <scope>provided</scope>
+      </dependency>
+
+      <!--spring boot test依赖-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+
+-- 3、创建配置文件
+	  server:
+      # 服务端口
+      port: 9090
+    spring:
+      application:
+        # 服务（应用）名称
+        name: service-customer-wcc
+
+    # 配置Eureka注册中心
+    eureka:
+      #  instance:
+      #    # 是否使用IP地址注册
+      #    prefer-ip-address: true
+      #    # 配置定义的IP+端口号
+      #    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+      client:
+        service-url:
+          # 设置注册中心地址(多个使用逗号分割)
+          defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+        # 是否将自己注册到注册中心，默认为true————为了明显区分消费者和服务提供者，此服务不注册到注册中心，只充当消费者
+        register-with-eureka: false
+        # 表示 Eureka Client间隔多久去服务器拉取注册信息，默认为30秒
+        registry-fetch-interval-seconds: 10
+
+-- 4、创建POJO类————创建实体类————内容如下:
+	1、商品实体类
+    package com.pigskin.pojo;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import java.io.Serializable;
+    import java.math.BigDecimal;
+
+    /**
+     * 商品实体类
+     *
+     * @author pigskin
+     * @date 2022年02月15日 9:46 上午
+     */
+    //Getter/Setter
+    @Data
+    //无参构造
+    @NoArgsConstructor
+    //全参构造
+    @AllArgsConstructor
+    public class Product implements Serializable {
+
+        private Integer id;
+
+        private String productName;
+
+        private Integer productNum;
+
+        private BigDecimal productPrice;
+
+    }
+	2、订单实体类
+		package com.pigskin.pojo;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import java.math.BigDecimal;
+    import java.util.List;
+
+    /**
+     * 订单实体类
+     *
+     * @author pigskin
+     * @date 2022年02月15日 11:18 上午
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class Order {
+        private Integer id;
+        private String orderNo;
+        private String orderAddress;
+        private BigDecimal totalPrice;
+        private List<Product> productList;
+    }
+
+-- 5、创建Service类————编写服务接口————内容如下:
+    package com.pigskin.service;
+
+    import com.pigskin.pojo.Order;
+
+    /**
+     * 消费者服务接口
+     *
+     * @author pigskin
+     * @date 2022年02月15日 11:00 上午
+     */
+    public interface OrderService {
+        /**
+         * 根据订单ID查询订单信息
+         *
+         * @param id 订单ID
+         * @return
+         */
+        Order selectOrderById(Integer id);
+    }
+
+-- 6、Controller类————编写服务控制层内容
+    package com.pigskin.controller;
+
+    import com.pigskin.pojo.Order;
+    import com.pigskin.service.OrderService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    /**
+     * 消费者控制器
+     *
+     * @author pigskin
+     * @date 2022年02月15日 11:00 上午
+     */
+    @RestController
+    @RequestMapping("/order")
+    public class OrderController {
+        /**
+         * 自动注册消费者服务
+         */
+        @Autowired
+        private OrderService orderService;
+
+        @GetMapping("/{id}")
+        public Order selectOrderById(@PathVariable("id") Integer id) {
+            return orderService.selectOrderById(id);
+        }
+    }
+
+-- 7、创建ServiceImpl类————业务层接口实现类————消费服务的三种方式,内容如下:
+	1、DiscoveryClient————通过元数据获取服务信息
+		1)Spring Boot不提供任何自动配置的RestTemplate bean,所以需要在启动类中注入RestTemplate
+			/**
+       * Spring Boot不提供任何自动配置的RestTemplate bean,所以需要在启动类中注入RestTemplate
+       */
+      @Bean
+      public RestTemplate restTemplate() {
+          return new RestTemplate();
+      }
+    2)业务接口实现层————通过元数据获取服务信息,并发送远程请求获取数据
+      package com.pigskin.service.impl;
+
+      import com.pigskin.pojo.Order;
+      import com.pigskin.pojo.Product;
+      import com.pigskin.service.OrderService;
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.cloud.client.ServiceInstance;
+      import org.springframework.cloud.client.discovery.DiscoveryClient;
+      import org.springframework.core.ParameterizedTypeReference;
+      import org.springframework.http.HttpMethod;
+      import org.springframework.http.ResponseEntity;
+      import org.springframework.stereotype.Service;
+      import org.springframework.util.CollectionUtils;
+      import org.springframework.web.client.RestTemplate;
+
+      import java.math.BigDecimal;
+      import java.util.List;
+
+      /**
+       * 消费者服务接口实现类
+       *
+       * @author pigskin
+       * @date 2022年02月15日 11:01 上午
+       */
+      @Service
+      public class OrderServiceImpl implements OrderService {
+
+          @Autowired
+          private RestTemplate restTemplate;
+
+          /**
+           * 元数据对象
+           */
+          @Autowired
+          private DiscoveryClient discoveryClient;
+
+          /**
+           * 根据订单ID获取订单数据
+           *
+           * @param id 订单ID
+           * @return
+           */
+          @Override
+          public Order selectOrderById(Integer id) {
+              return new Order(id, "order-001", "中国", new BigDecimal(21342), selectProductListByDiscoveryClient());
+          }
+
+          /**
+           * 方式一————DiscoveryClient————通过元数据获取服务信息，并远程获取数据
+           *
+           * @return
+           */
+          private List<Product> selectProductListByDiscoveryClient() {
+              /*线程安全字符串*/
+              StringBuffer sb = null;
+
+              /*获取服务列表*/
+              List<String> services = discoveryClient.getServices();
+              if (CollectionUtils.isEmpty(services)) {
+                  return null;
+              }
+
+              /*根据服务名获取服务*/
+              List<ServiceInstance> instances = discoveryClient.getInstances("service-provider-wcc");
+              if (CollectionUtils.isEmpty(instances)) {
+                  return null;
+              }
+
+              /*获取服务实例*/
+              ServiceInstance serviceInstance = instances.get(0);
+
+              /*创建服务请求URL*/
+              sb = new StringBuffer();
+              sb.append("http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/product/list");
+
+              /*发送请求获取数据——————ResponseEntity————封装了返回数据*/
+              ResponseEntity<List<Product>> response = restTemplate.exchange(
+                      sb.toString(),
+                      HttpMethod.GET,
+                      null, new ParameterizedTypeReference<List<Product>>() {
+                      });
+              return response.getBody();
+          }
+      }
+	2、LoadBalancerClient————Ribbon的负载均衡器
+		1)业务接口实现层注入LoadBalancerClient依赖
+			import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+			/**
+       * Rabbit负载均衡器
+       */
+      @Autowired
+      private LoadBalancerClient loadBalancerClient;
+    2)业务接口实现层————通过Ribbon的负载均衡器获取服务信息,并发送远程请求获取数据
+      /**
+       * 方式二————LoadBalancerClient————通过Rabbit负载均衡器获取服务信息，并远程获取数据
+       *
+       * @return
+       */
+      private List<Product> selectProductListByLoadBalancerClient() {
+          /*线程安全字符串*/
+          StringBuffer sb = null;
+
+          /*根据服务名称获取服务*/
+          ServiceInstance serviceInstance = loadBalancerClient.choose("service-provider-wcc");
+          if (ObjectUtils.isEmpty(serviceInstance)) {
+              return null;
+          }
+
+          /*创建服务请求URL*/
+          sb = new StringBuffer();
+          sb.append("http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/product/list");
+
+          /*发送请求获取数据——————ResponseEntity————封装了返回数据*/
+          ResponseEntity<List<Product>> response = restTemplate.exchange(
+                  sb.toString(),
+                  HttpMethod.GET,
+                  null, new ParameterizedTypeReference<List<Product>>() {
+                  });
+          return response.getBody();
+      }
+	3、@LoadBalanced————通过注解开启Ribbon的负载均衡器
+		1)启动类注入RestTemplate时添加@LoadBalanced负载均衡注解,表示这个RestTemple在请求时拥有客户端负载均衡的能力
+			/**
+       * Spring Boot不提供任何自动配置的RestTemplate bean,所以需要在启动类中注入RestTemplate
+       */
+      @Bean
+      //负载均衡————注入RestTemplate时添加@LoadBalanced负载均衡注解,表示这个RestTemple在请求时拥有客户端负载均衡的能力
+      @LoadBalanced
+      public RestTemplate restTemplate() {
+          return new RestTemplate();
+      }
+    2)业务接口实现层————通过注解开启Ribbon的负载均衡器,获取服务信息,并发送远程请求获取数据
+    	/**
+       * 方式三————@LoadBalanced————启动类注入RestTemple对象时，通过注解开启Ribbon的负载均衡器
+       *
+       * @return
+       */
+      private List<Product> selectProductListByLoadBalancerAnnotation() {
+          /*发送请求获取数据——————ResponseEntity————封装了返回数据*/
+          ResponseEntity<List<Product>> response = restTemplate.exchange(
+                  "http://service-provider-wcc/product/list",
+                  HttpMethod.GET,
+                  null, new ParameterizedTypeReference<List<Product>>() {
+                  });
+          return response.getBody();
+      }
+
+-- 8、通过访问order服务消费product服务
+	http://127.0.0.1:9090/order/13
+
+# Eureka架构原理
+-- 官方架构原理图,如下图所示:
+```
+
+<img src="image/img2_1_8_1_4.png" style="zoom:50%;"/>
+
+```markdown
+-- 说明
+	1、Registry(服务注册)————将自己的IP和端口注册给Eureka
+	2、Renew(服务续约)————发送心跳包,每30秒发送一次,告诉Eureka自己还活着.如果90秒还未发送心跳,宕机
+	3、Cancel(服务下线)————当Provider关闭时会向Eureka发送消息,把自己从服务列表中删除.防止Consumer调用到不存在的服务
+	4、Get Registry(获取服务注册列表)————获取其他服务列表
+	5、Replicate(集群中同步数据)————Eureka集群中的数据复制与同步
+	6、Make Remote Call(远程调用)————完成服务的远程调用
+
+-- 翻译后的架构原理图,如下图所示:
+```
+
+<img src="image/img2_1_8_1_5.png" style="zoom:50%;"/>
+
+```markdown
+# CAP原则
+	详见————2、Java开发之后端技术篇-32-2、分布式事务-CAP定理与BASE理论
+
+# Eureka自我保护
+
+# Eureka优雅停服
+
+# 
+```
+
+
 
 ### 2、Spring Cloud Config——配置中心
 
@@ -2179,7 +2985,7 @@ return interceptor;
 	详见————2、Java开发之后端技术篇-1-9-2、Nacos作为配置中心——分布式配置
 ```
 
-### 3、Netflix Feign——声明式远程调用(调用远程服务)
+### 3、Spring Cloud Open Feign——声明式远程调用(调用远程服务)
 
 ```markdown
 # 说明
@@ -2247,7 +3053,7 @@ return interceptor;
     }
 ```
 
-### 4、Netflix Hystrix——熔断器
+### 4、Spring Cloud Netflix Hystrix——熔断器
 
 ```markdown
 # 说明
@@ -2312,7 +3118,7 @@ return interceptor;
 # Gateway图示,如下:
 ```
 
-<img src="image/img2_1_8_4_1.png" style="zoom:50%;" />
+<img src="image/img2_1_8_5_1.png" style="zoom:50%;" />
 
 ```markdown
 # 核心概念
@@ -2324,7 +3130,7 @@ return interceptor;
 	Spring cloud Gateway发出请求。然后再由Gateway Handler Mapping中找到与请求相匹配的路由，将其发送到Gateway web handler。Handler再通过指定的过滤器链将请求发送到我们实际的服务执行业务逻辑，然后返回。如下图所示:
 ```
 
-<img src="image/img2_1_8_4_2.png" style="zoom:50%;" />
+<img src="image/img2_1_8_5_2.png" style="zoom:50%;" />
 
 ```markdown
 # 代码实现
@@ -2411,7 +3217,7 @@ return interceptor;
 	如下图所示,默认不需要额外配置，只要多个服务名字一样，Gateway自动实现负载均衡
 ```
 
-<img src="image/img2_1_8_4_3.png" style="zoom:50%;" />
+<img src="image/img2_1_8_5_3.png" style="zoom:50%;" />
 
 ```markdown
 # 相关工具类
@@ -2651,19 +3457,19 @@ return interceptor;
 	1、如果服务调用顺序如下:
 ```
 
-<img src="image/img2_1_39_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_8_6_1.png" style="zoom:50%;" />
 
 ```markdown
 	2、概念完整表示如下:
 ```
 
-<img src="image/img2_1_39_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_8_6_2.png" style="zoom:50%;" />
 
 ```markdown
 	3、Span之间的父子关系如下:
 ```
 
-<img src="image/img2_1_39_1_3.png" style="zoom:50%;" />
+<img src="image/img2_1_8_6_3.png" style="zoom:50%;" />
 
 ```markdown
 # SpringBoot整合Sleuth
@@ -2698,7 +3504,7 @@ return interceptor;
 -- 原理图,如下图所示
 ```
 
-<img src="image/img2_1_39_1_4.png" style="zoom:50%;" />
+<img src="image/img2_1_8_6_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 安装
@@ -2747,7 +3553,7 @@ return interceptor;
 	更多参考————官方文档————https://github.com/openzipkin/zipkin#storage-component
 ```
 
-### 7、Spring Cloud Ribbon——负载均衡
+### 7、Spring Cloud Netflix Ribbon——负载均衡
 
 ```markdown
 //TODO:
@@ -2758,6 +3564,20 @@ return interceptor;
 ```markdown
 //TODO:
 ```
+
+### 9、Spring Cloud Netflix Zuul——路由和过滤器
+
+```markdown
+//TODO:
+```
+
+### 10、Spring Cloud Zookeeper——分布式应用程序协调服务软件
+
+```markdown
+//TODO:
+```
+
+
 
 ## 9、SpringCloudAlibaba
 
@@ -3408,7 +4228,7 @@ return interceptor;
 -- 工作流程,如下图所示:
 ```
 
-<img src="image/img2_1_32_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_9_4_1.png" style="zoom:50%;" />
 
 ```markdown
 # 整体机制————两阶段提交协议的演变：
@@ -3539,7 +4359,7 @@ return interceptor;
 	如下所示:
 ```
 
-<img src="image/img2_1_8_4_5.png" style="zoom:50%;" />
+<img src="image/img2_1_10_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 下载安装
@@ -3819,7 +4639,7 @@ return interceptor;
 # 图示
 ```
 
-<img src="image/img2_1_12_1_0.png" style="zoom:30%;" />
+<img src="image/img2_1_13_1_1.png" style="zoom:30%;" />
 
 ```markdown
 # 主要解决问题
@@ -3831,7 +4651,7 @@ return interceptor;
 			实现过程————如下图所示
 ```
 
-<img src="image/img2_1_12_1_1.png" style="zoom:30%;" />——
+<img src="image/img2_1_13_1_2.png" style="zoom:30%;" />——
 
 ```markdown
 		2-方式二：通用开发者key（万能钥匙）
@@ -3839,7 +4659,7 @@ return interceptor;
 			实现过程————如下图所示,客户应用和受保护的资源双方约定好了，使用key能够打开双方
 ```
 
-<img src="image/img2_1_12_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_13_1_3.png" style="zoom:50%;" />
 
 ```markdown
 		3-方式三：办法令牌（特殊令牌）
@@ -3847,7 +4667,7 @@ return interceptor;
 			实现过程————如下图所示,访问者使用受保护资源颁发的令牌（字符串），就能够访问
 ```
 
-<img src="image/img2_1_12_1_3.png" style="zoom:50%;" />
+<img src="image/img2_1_13_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式访问问题（即单点登录）
@@ -4783,7 +5603,7 @@ return interceptor;
 # 单点登陆流程图如下:
 ```
 
-<img src="image/img2_1_19_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_19_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # 单点登录框架&原理演示
@@ -7508,15 +8328,13 @@ return interceptor;
 	详见————2、Java开发之后端技术篇-1-26、Session共享问题
 ```
 
-
-
 ## 26、Session共享问题
 
 ```markdown
 # Session原理
 ```
 
-<img src="image/img2_1_25_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 存在问题
@@ -7527,32 +8345,32 @@ return interceptor;
 -- 图示,如下图所示
 ```
 
-<img src="image/img2_1_25_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 分布式session解决方案原理
 -- Session复制,如图所示:
 ```
 
-<img src="image/img2_1_25_1_3.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 客户端存储,如图所示:
 ```
 
-<img src="image/img2_1_25_1_4.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- hash一致性,如图所示:
 ```
 
-<img src="image/img2_1_25_1_5.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_5.png" style="zoom:50%;" />
 
 ```markdown
 -- 统一存储,如图所示:
 ```
 
-<img src="image/img2_1_25_1_6.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_6.png" style="zoom:50%;" />
 
 ```markdown
 -- 不同服务,子域session共享
@@ -7567,7 +8385,7 @@ return interceptor;
 	3、图示,如图所示:
 ```
 
-<img src="image/img2_1_25_1_7.png" style="zoom:50%;" />
+<img src="image/img2_1_26_1_7.png" style="zoom:50%;" />
 
 ```markdown
 # SpringSession——————解决分布式系统Session不一致问题
@@ -7599,19 +8417,19 @@ return interceptor;
 -- 异步处理
 ```
 
-<img src="image/img2_1_27_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_28_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 应用解耦
 ```
 
-<img src="image/img2_1_27_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_28_1_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 流量控制
 ```
 
-<img src="image/img2_1_27_1_3.png" style="zoom:50%;" />
+<img src="image/img2_1_28_1_3.png" style="zoom:50%;" />
 
 ```markdown
 # 消息中间件概述
@@ -7629,7 +8447,7 @@ return interceptor;
 	3、JMS与AMQP对比,如图所示:
 ```
 
-<img src="image/img2_1_27_1_4.png" style="zoom:50%;" />
+<img src="image/img2_1_28_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- Spring支持
@@ -7710,7 +8528,7 @@ return interceptor;
 # 图示————如下图所示
 ```
 
-<img src="image/img2_1_27_2_1.png" style="zoom:50%;" />
+<img src="image/img2_1_28_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # 核心概念
@@ -7751,7 +8569,7 @@ return interceptor;
 -- 图示,如下图所示
 ```
 
-<img src="image/img2_1_27_2_2.png" style="zoom:50%;" />
+<img src="image/img2_1_28_2_2.png" style="zoom:50%;" />
 
 ```markdown
 # Docker安装RabbitMQ
@@ -7770,26 +8588,26 @@ return interceptor;
 
 
 
-<img src="image/img2_1_27_3_1.png" style="zoom:50%;" />
+<img src="image/img2_1_28_3_1.png" style="zoom:50%;" />
 
 ```markdown
 # Exchange类型————分发消息时根据类型的不同分发策略有所区别
 -- 1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
 ```
 
-<img src="image/img2_1_27_3_2.png" style="zoom:50%;" />
+<img src="image/img2_1_28_3_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
 ```
 
-<img src="image/img2_1_27_3_3.png" style="zoom:50%;" />
+<img src="image/img2_1_28_3_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
 ```
 
-<img src="image/img2_1_27_3_4.png" style="zoom:50%;" />
+<img src="image/img2_1_28_3_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
@@ -8167,7 +8985,7 @@ return interceptor;
 # 可靠性抵达————图示,如下图所示
 ```
 
-<img src="image/img2_1_27_6_1.png" style="zoom:50%;" />
+<img src="image/img2_1_28_6_1.png" style="zoom:50%;" />
 
 ```markdown
 # 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
@@ -8462,14 +9280,14 @@ return interceptor;
 	定时任务每30分钟查一次,当一个订单在第一个次定时任务查询后立即产生,那么就会导致此次的任务在第三次的定时任务才能被查到,产生时效性问题.如下图所示:
 ```
 
-<img src="image/img2_1_27_7_1.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_1.png" style="zoom:50%;" />
 
 ```markdown
 # RabbitMQ延时队列实现定时任务
 	通过MQ暂缓存消息,不占用系统任何资源,实现事务最终一致性,并有效解决了定时任务产生的时效性问题,如下图所示
 ```
 
-<img src="image/img2_1_27_7_2.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_2.png" style="zoom:50%;" />
 
 ```markdown
 # 消息的存活时间--TTL————Time To Live
@@ -8491,7 +9309,7 @@ return interceptor;
 -- 实现一个延时队列————我们既可以控制消息在一段时间后变成死信,又可以控制变成死信的消息被路由到某一指定的交换机,结合二者,其实就可以实现一个延时队列,如下图所示:
 ```
 
-<img src="image/img2_1_27_7_3.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 手动ack&异常消息统一放在一个队列处理建议的两种方式
@@ -8502,26 +9320,26 @@ return interceptor;
 -- 方式一————设置队列过期时间实现延时队列————推荐使用
 ```
 
-<img src="image/img2_1_27_7_4.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 方式二————设置消息过期时间实现延时队列————使用的是懒检查(消息队列中的消息逐个检查,不会根据设置过期时间的长短优先处理)
 ```
 
-<img src="image/img2_1_27_7_5.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_5.png" style="zoom:50%;" />
 
 ```markdown
 # 代码整合————延时队列定时订单关单模拟
 -- 业务流程基本图示,如下图所示
 ```
 
-<img src="image/img2_1_27_7_6.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_6.png" style="zoom:50%;" />
 
 ```markdown
 -- 业务流程升级图示,如下图所示
 ```
 
-<img src="image/img2_1_27_7_7.png" style="zoom:50%;" />
+<img src="image/img2_1_28_7_7.png" style="zoom:50%;" />
 
 ```markdown
 -- 说明
@@ -8847,7 +9665,7 @@ return interceptor;
 -- 模型图如下
 ```
 
-<img src="image/img2_1_28_1_1.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 说明
@@ -8865,7 +9683,7 @@ return interceptor;
 -- 运行时数据区详细说明图如下
 ```
 
-<img src="image/img2_1_28_1_2.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 堆
@@ -8881,7 +9699,7 @@ return interceptor;
 	1、JDK1.8JVM图示
 ```
 
-<img src="image/img2_1_28_1_10.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_10.png" style="zoom:50%;" />
 
 ```markdown
 
@@ -8917,7 +9735,7 @@ return interceptor;
 	2、图示
 ```
 
-<img src="image/img2_1_28_1_3.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_3.png" style="zoom:50%;" />
 
 ```markdown
 	3、垃圾判断算法
@@ -8925,7 +9743,7 @@ return interceptor;
 			[0]图示
 ```
 
-<img src="image/img2_1_28_1_6.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_6.png" style="zoom:50%;" />
 
 ```markdown
 			[1]说明————它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。 这样使得每次都是对其中的一块进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。
@@ -8936,7 +9754,7 @@ return interceptor;
 			[0]图示
 ```
 
-<img src="image/img2_1_28_1_7.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_7.png" style="zoom:50%;" />
 
 ```markdown
 			[1]说明————算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。之所以说它是最基础的收集算法，是因为后续的收集算法都是基于这种思路并对其缺点进行改进而得到的。
@@ -8947,7 +9765,7 @@ return interceptor;
 			[1]图示
 ```
 
-<img src="image/img2_1_28_1_8.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_8.png" style="zoom:50%;" />
 
 ```markdown
 			[2]说明————标记整理算法主要是在标记清除算法上做了优化，标记存活对象->清除垃圾->整理存活对象。标记出所有能存活的对象，然后这些存活的对象向内存的某一端移动。
@@ -8962,7 +9780,7 @@ return interceptor;
        -- 图示
 ```
 
-<img src="image/img2_1_28_1_9.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_9.png" style="zoom:50%;" />
 
 ```markdown
       -- 说明
@@ -8978,7 +9796,7 @@ return interceptor;
 	1、如下图所示
 ```
 
-<img src="image/img2_1_28_1_4.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_4.png" style="zoom:50%;" />
 
 ```markdown
 	2、详细说明
@@ -9001,7 +9819,7 @@ return interceptor;
 	1、图示
 ```
 
-<img src="image/img2_1_28_1_5.png" style="zoom:50%;" />
+<img src="image/img2_1_29_1_5.png" style="zoom:50%;" />
 
 ```markdown
 	2、类加载完成后,接着会在Java堆中划分一块内存分配给对象。内存分配根据Java堆是否规整,有两种方式:
@@ -9253,6 +10071,13 @@ return interceptor;
 
 # CAP定理与BASE理论
 -- CAP定理
+	0、官方图示,如下图所示:
+```
+
+<img src="image/img2_1_32_2_1.png" style="zoom:50%;" />
+
+```markdown
+
 	1、CAP是什么?
 		1)CAP原则又称CAP定理,指的是在一个分布式系统中,一致性(Consistency)、可用性(Availability)、分区容错性(Partiation tolarance)三者不可同时获得,最多只能同时实现两点
 		2)一般来说,分区容错无法避免,因此可以认定CAP的P总是成立.CAP定理告诉我们,剩下的C和A无法同时满足
@@ -9262,7 +10087,7 @@ return interceptor;
 				2)心跳时间(10ms-100ms)————通过不断发送通信,重置随从自旋时间,保证领导和随从之间的关系
 			2、日志复制————所有的改变通过领导,领导以一个日志,让随从也跟着写
 				1)在心跳时间发送日志时,让其他节点同步改变日志
-  2、详细说明
+	2、详细说明
   	1)一致性(Consistency)————所有节点在同一时间的数据完全一致,越多节点,数据同步耗时越多
     	在分布式系统中的所有数据备份,在同一时刻是否具有相同值————等同与所有节点访问同一份最新的数据副本
   	2)可用性(Availability)————服务一直可以用,而且响应时间正常
@@ -9304,7 +10129,7 @@ return interceptor;
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_31_2_1.png" style="zoom:50%;" />
+<img src="image/img2_1_32_2_2.png" style="zoom:50%;" />
 
 ```markdown
 	3、注意
@@ -9322,7 +10147,7 @@ return interceptor;
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_31_2_2.png" style="zoom:50%;" />
+<img src="image/img2_1_32_2_3.png" style="zoom:50%;" />
 
 ```markdown
 	3、注意
@@ -10492,6 +11317,83 @@ return interceptor;
 ## 38、K8S
 
 ```markdown
+# 简介
+-- 说明
+	Kubernets简称K8S.是用于自动部署,扩展和管理容器化应用程序的开源系统.
+
+-- 官方文档
+	1、中文官方————https://kubernetes.io/zh/
+	2、中文社区————https://www.kubernetes.org.cn/
+	3、官方文档————https://kubernetes.io/zh/docs/home/
+	4、社区文档————http://docs.kubernetes.org.cn/
+
+-- 部署方式的进化,如下图所示:
+```
+
+<img src="image/img2_1_38_1_1.svg" style="zoom:50%;" />
+
+```markdown
+	1、传统部署时代(Traditional Deplovment)
+		早期，各个组织机构在物理服务器上运行应用程序。无法为物理服务器中的应用程序定义资源边界，这会导致资源分配问题。 例如，如果在物理服务器上运行多个应用程序，则可能会出现一个应用程序占用大部分资源的情况， 结果可能导致其他应用程序的性能下降。 一种解决方案是在不同的物理服务器上运行每个应用程序，但是由于资源利用不足而无法扩展， 并且维护许多物理服务器的成本很高。
+	2、虚拟化部署时代(Virtualized Deployment)
+		作为解决方案，引入了虚拟化。虚拟化技术允许你在单个物理服务器的 CPU 上运行多个虚拟机（VM）。虚拟化允许应用程序在 VM 之间隔离，并提供一定程度的安全，因为一个应用程序的信息 不能被另一应用程序随意访问。
+		虚拟化技术能够更好地利用物理服务器上的资源，并且因为可轻松地添加或更新应用程序 而可以实现更好的可伸缩性，降低硬件成本等等。
+		每个 VM 是一台完整的计算机，在虚拟化硬件之上运行所有组件，包括其自己的操作系统。
+	3、容器部署时代(Container Deployment)
+		容器类似于 VM，但是它们具有被放宽的隔离属性，可以在应用程序之间共享操作系统（OS）。 因此，容器被认为是轻量级的。容器与 VM 类似，具有自己的文件系统、CPU、内存、进程空间等。 由于它们与基础架构分离，因此可以跨云和 OS 发行版本进行移植。
+	4、更多请参照官方文档————https://kubernetes.io/zh/docs/concepts/overview/what-is-kubernetes/
+
+# 使用容器的好处
+-- 敏捷应用程序的创建和部署————与使用 VM 镜像相比，提高了容器镜像创建的简便性和效率。
+
+-- 持续开发、集成和部署————通过快速简单的回滚（由于镜像不可变性），支持可靠且频繁的 容器镜像构建和部署。
+
+-- 关注开发与运维的分离————在构建/发布时而不是在部署时创建应用程序容器镜像， 从而将应用程序与基础架构分离。
+
+-- 可观察性————不仅可以显示操作系统级别的信息和指标，还可以显示应用程序的运行状况和其他指标信号。
+
+-- 跨开发、测试和生产的环境一致性————在便携式计算机上与在云中相同地运行。
+
+-- 跨云和操作系统发行版本的可移植性————可在 Ubuntu、RHEL、CoreOS、本地、 Google Kubernetes Engine 和其他任何地方运行。
+
+-- 以应用程序为中心的管理————提高抽象级别，从在虚拟硬件上运行 OS 到使用逻辑资源在 OS 上运行应用程序。
+
+-- 松散耦合、分布式、弹性、解放的微服务————应用程序被分解成较小的独立部分， 并且可以动态部署和管理 - 而不是在一台大型单机上整体运行。
+
+-- 资源隔离————可预测的应用程序性能。
+
+-- 资源利用————高效率和高密度。
+
+# Docker官方Docker集群管理器————Swarm
+-- 说明
+	原生管理Docker的集群管理器,通过Docker CLR实现.功能相对简单.现实开发中的运行时容器环境很多,不止有Docker,我们需要的是一个能够管理编排我们所有的服务器、远行时环境的工具,因此出现了Kubernets.
+
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_38_1_2.png" style="zoom:50%;" />
+
+```markdown
+# K8S核心功能
+-- 服务发现和负载均衡————针对任何应用都有效,SpringCloud的服务发现和负载均衡只针对Java服务
+	Kubernetes 可以使用 DNS 名称或自己的 IP 地址公开容器，如果进入容器的流量很大， Kubernetes 可以负载均衡并分配网络流量，从而使部署稳定。
+
+-- 存储编排
+	Kubernetes 允许你自动挂载你选择的存储系统，例如本地存储、公共云提供商等。
+
+-- 自动部署和回滚
+	你可以使用 Kubernetes 描述已部署容器的所需状态，它可以以受控的速率将实际状态 更改为期望状态。例如，你可以自动化 Kubernetes 来为你的部署创建新容器， 删除现有容器并将它们的所有资源用于新容器。
+
+-- 自动完成装箱计算
+	Kubernetes 允许你指定每个容器所需 CPU 和内存（RAM）。 当容器指定了资源请求时，Kubernetes 可以做出更好的决策来管理容器的资源。
+
+-- 自我修复
+	Kubernetes 重新启动失败的容器、替换容器、杀死不响应用户定义的 运行状况检查的容器，并且在准备好服务之前不将其通告给客户端。
+
+-- 密钥与配置管理
+	Kubernetes 允许你存储和管理敏感信息，例如密码、OAuth 令牌和 ssh 密钥。 你可以在不重建容器镜像的情况下部署和更新密钥和应用程序配置，也无需在堆栈配置中暴露密钥。
+
+
 ```
 
 ## 39、Spring注入方式
@@ -10511,6 +11413,8 @@ return interceptor;
 ## 40、集群
 
 ```markdown
+# K8S+KubeSphere+DevOps
+
 ```
 
 ## 41、Reactive&WebFlux响应式编程
@@ -10519,6 +11423,11 @@ return interceptor;
 # Reactive
 
 # WebFlux
+```
+
+## 42、Docker容器化技术
+
+```markdown
 ```
 
 
@@ -13242,7 +14151,7 @@ error => {   
 		1)实现方式————添加响应头,可配置内容如图所示:
 ```
 
-<img src="image/img2_3_5_1_1.png" style="zoom:50%;" />
+<img src="image/img2_3_0_5_1.png" style="zoom:50%;" />
 
 ```markdown
 # 微服务跨域解决方案
@@ -13330,7 +14239,7 @@ error => {   
 	项目中我们并没有严格遵循这种传递关系，但这种和业务层次的关联对我们理解各实体类的作用是有帮助的。（我们没有接触到PO的原因，我理解为ORM对PO进行了封装）如下图:
 ```
 
-<img src="image/img2_3_0_1_1.png" style="zoom:50%;" />
+<img src="image/img2_3_0_8_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 模型
