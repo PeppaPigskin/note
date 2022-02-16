@@ -2970,13 +2970,135 @@ return interceptor;
 	详见————2、Java开发之后端技术篇-32-2、分布式事务-CAP定理与BASE理论
 
 # Eureka自我保护
+-- 启动自我保护的条件————一般情况下,服务在Eureka上注册后,会每30秒发送心跳包,Eureka通过心跳来判断服务是否健康,同时会定期删除超过90秒没有发送心跳的服务.导致EurekaServer收不到微服务心跳的情况有如下两种:
+	1、微服务自身原因
+	2、微服务与Eureka之间的网络故障
 
-# Eureka优雅停服
+-- 自我保护模式
+	Eureka Server在运行期间会去统计心跳失败比例在15分钟之内是否低于85%,如果低于85%.Eureka Server会将这些实例保护起来,让这些实例不会过期,同时提示一个警告.这种算法叫做Eureka Server的自我保护模式
 
-# 
+-- 为什么要启用自我保护模式
+	1、因为同时保留"好数据”与"坏数据”总比掉任何数据要更好,当网络故障恢复后,这个Eureka节点会退出"自我保护模式"。
+	2、Eureka还有客户端缓存功能(也就是微服务的缓存功能),即使 Eureka集群中所有节点都宕机失效,微服务的 Provider和Consumer都能正常通信
+	3、服务的负载均衡策略会自动剔除死亡的微服务节点
+
+-- 如何关闭自我保护(默认自动开启)————配置文件进行如下配置
+	eureka:
+    server:
+      # true————开启自我保护模式/fasle————关闭自我保护模式
+      enable-self-preservation: false
+      # 清理间隔————单位毫秒，默认60*1000
+      eviction-interval-timer-in-ms: 60000
+
+# Eureka服务提供者优雅停服
+-- 说明
+	配置优雅停服之后,将不需要Eureka Server中配置关闭自我保护.本文使用actuator实现
+
+-- 添加依赖————启动服务并访问[http://服务所在IP:端口/actuator]可看到健康检查的端点、详细信息
+	<!--spring boot actuator依赖————优雅停服-->
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+  </dependency>
+
+-- 配置文件添加配置————服务提供者配置度量指标监控与健康检查,配置信息如下:
+	# 度量指标监控与健康检查
+  management:
+    endpoints:
+      web:
+        exposure:
+          # 开启shutdown端点访问————【'*'】开启所有
+          include: shutdown
+    endpoint:
+      shutdown:
+        # 开启shutdown实现优雅停服
+        enabled: true
+
+-- 优雅停服————使用工具发送POST请求————http://服务所在IP:端口/actuator/shutdown,返回如下结果:
+	{
+    "message": "Shutting down, bye..."
+	}
+
+# Eureka安全认证
+-- 注册中心添加依赖
+	<!--spring boot security依赖————提供Eureka安全认证-->
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+  </dependency>
+
+-- 配置文件添加配置
+  spring:
+    # 注册中心配置安全认证
+    security:
+      user:
+        name: root
+        password: xxx
+
+-- 修改访问集群节点的url
+	# 配置Eureka注册中心
+	eureka:
+  	client:
+      service-url:
+        # 设置注册中心地址(多个使用逗号分割)
+        defaultZone: http://root:xxx@服务所在IP:端口/eureka/,http://root:xxx@服务所在IP:端口/eureka/
+
+-- 过滤CSRF
+	1、说明
+		Eureka会自动化配置CSRF防御机制,Spring Security认为POST,PUT,DELETE http methods都是有风险的,如果这些method发送过程中没有带上CSRF token的话,会被直接拦截并返回403 forbidden.官方给出了解决的方法,具体可以参考 spring cloud issue 2754,里面有大量的讨论,这里提供两种解决方案,方案如下:
+		1)方案一————使用CSRF忽略/eureka/**的所有请求
+			package com.pigskin.config;
+
+      import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+      import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+      import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+      /**
+       * 安全认证配置类
+       *
+       * @author pigskin
+       * @date 2022年02月16日 4:06 下午
+       */
+      @EnableWebSecurity
+      public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+          @Override
+          protected void configure(HttpSecurity http) throws Exception {
+              /*为了访问Eureka控制台和/actuator时能做安全控制*/
+              super.configure(http);
+              /*忽略/eureka/**的所有请求*/
+              http.csrf().ignoringAntMatchers("/eureka/**");
+          }
+      }
+
+		2)方案二————保持密码验证的同时禁用CSRF防御机制
+      package com.pigskin.config;
+
+      import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+      import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+      import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+      /**
+       * 安全认证配置类
+       *
+       * @author pigskin
+       * @date 2022年02月16日 4:06 下午
+       */
+      @EnableWebSecurity
+      public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+          @Override
+          protected void configure(HttpSecurity http) throws Exception {
+         		/*如果直接disable的话会把安全验证也禁用掉*/
+            http.csrf().disable().authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                    .httpBasic();
+          }
+      }
+
+
+-- 访问————便用配置好的用户名和密码登录以后可看到注册中心界面,启动服务提供者和服务消者,功能正常使用.
 ```
-
-
 
 ### 2、Spring Cloud Config——配置中心
 
