@@ -638,42 +638,62 @@ brew install VisualVM
 
 ## 13、SVN环境搭建
 
-```bash
-1、安装示例
+```markdown
+# 安装示例
 	https://www.jianshu.com/p/79116c6f8f72
-2、安装
+
+# 安装
 	brew install subversion
-3、配置
-	# 1、使用如下命令创建一个SVN的代码仓库（目录改成你想要创建的目录）
+
+# 配置
+-- 1、使用如下命令创建一个SVN的代码仓库（目录改成你想要创建的目录）
 		svnadmin create /Users/pigskin/Desktop/CTJ/Code/SVN
-	# 2、打开conf文件夹,备份[authz、password、svnserve.conf]三个文件
-	# 3、svnserve.conf文件的配置————去除如下四部分注释信息
-		anon-access = read————代表匿名访问可读，可以将其进行修改修改为anon-access = none代表不允许匿名访问。
-		auth-access = write————代表认证之后可写
-		passwd-db = passwd————代表密码数据库是passwd文件
-		authz-db = authz————代表授权数据库为authz文件
-	# 4、passwd文件的配置————[users]下添加用户名和密码,格式如下
-		username = password
-	# 5、authz文件的配置————[groups]下创建组,[路径]指定路径下的访问用户或组
-		[groups]
-		admin = wangwu # 将wangwu用户添加到admin组中
-		test = zhangsan,lisi # 将zhangsan,lisi用户添加到test组中
-		
-		[/] # 允许访问全部目录，也可以自己修改指定目录
-		@admin = rw # 给admin组的成员添加read、write权限,组前要加@
-		maliu = rw # 给maliu用户添加read、write权限,单个用户前不用添加@
-4、开启服务
+
+-- 2、打开conf文件夹,备份[authz、password、svnserve.conf]三个文件
+
+-- 3、svnserve.conf文件的配置————去除如下四部分注释信息
+	1、anon-access = read————代表匿名访问可读，可以将其进行修改修改为anon-access = none代表不允许匿名访问。
+	2、auth-access = write————代表认证之后可写
+	3、passwd-db = passwd————代表密码数据库是passwd文件
+	4、authz-db = authz————代表授权数据库为authz文件
+
+-- 4、passwd文件的配置————[users]下添加用户名和密码,格式如下
+	username = password
+
+-- 5、authz文件的配置————[groups]下创建组,[路径]指定路径下的访问用户或组
+  [groups]
+  admin = wangwu # 将wangwu用户添加到admin组中
+  test = zhangsan,lisi # 将zhangsan,lisi用户添加到test组中
+
+  [/] # 允许访问全部目录，也可以自己修改指定目录
+  @admin = rw # 给admin组的成员添加read、write权限,组前要加@
+  maliu = rw # 给maliu用户添加read、write权限,单个用户前不用添加@
+
+# 开启服务
 	svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/Code/SVN]
-5、关闭服务
+
+# 关闭服务
 	打开[活动监视器]————>搜索[svnserve]————>选中对应服务————>删除
-6、使用
-	从本地导入代码到SVN服务器————svn import [本地文件路径] svn://localhost --username=[用户名] --password=[密码] -m "提交说明"
-	从SVN服务器下载到本地————svn checkout svn://localhost [本地路径]
-	提交更新过的代码到SVN服务器————svn commit -m "提交说明"
-	更新服务器端代码到客户端————svn update
-	删除在服务器上的文件————svn delete svn://xxx.xxx.xxx.xxx/文件的路径 -m "备注"
-	查看svn服务器的信息————svn info
-	版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
+
+# 使用
+-- 从本地导入代码到SVN服务器————svn import [本地文件路径] svn://localhost --username=[用户名] --password=[密码] -m "提交说明"
+
+-- 从SVN服务器下载到本地————svn checkout svn://localhost [本地路径]
+
+-- 提交更新过的代码到SVN服务器————svn commit -m "提交说明"
+
+-- 更新服务器端代码到客户端————svn update
+
+-- 删除在服务器上的文件————svn delete svn://xxx.xxx.xxx.xxx/文件的路径 -m "备注"
+
+-- 查看svn服务器的信息————svn info
+
+-- 版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
+
+# 可视化工具安装与配置
+-- 1、执行安装命令————brew install smartsvn
+
+-- 
 ```
 
 ## 14、Go语言开发环境搭建
