@@ -3678,7 +3678,174 @@ return interceptor;
 ### 7、Spring Cloud Netflix Ribbon——负载均衡
 
 ```markdown
-//TODO:
+# 什么是Ribbon
+-- Ribbon是一个基于HTTP和TCP的客户端负载均衡工具,基于Netflix Ribbon实现的
+
+-- 它不像SpringCloud服务注册中心、配置中心、API网关那样独立部署,但是它几乎存在于每个SpringCloud微服务中.包括Feign提供的声明式服务调用也是基于Ribbon实现的
+
+-- Ribbon默认提供很多种负载均衡算法,例如轮询、随机等.甚至包含自定义的负载均衡算法
+
+# Ribbon解决了什么问题
+	Ribbon提供了一套微服务的负载均衡解决方案
+
+# 负载均衡不同方案的区别——————目前业界主流的负载均衡方案可分为两类
+-- 集中式负载均衡(服务器负载均衡)
+	1、说明————即在consumer和provider之间使用独立的负载均衡设施(可以是硬件,如F5,也可以是软件,如Nginx),由该设施负责把访问请求通过某种策略转发至provider;
+	2、图示,如下图所示:
+```
+
+<img src="image/img2_1_8_7_1.png" style="zoom:50%;" />
+
+```markdown
+-- 进程内负载均衡(客户端负载均衡)
+	1、说明————将负载均衡逻辑集成到consumer,consumer从服务注册中心获知有哪些地址可用,然后自己再从这些地址中选择一个合适的provider
+	2、图示,如下图所示:
+```
+
+<img src="image/img2_1_8_7_2.png" style="zoom:50%;" />
+
+```markdown
+	Ribbon属于后者,它只是一个类库,集成与consumer进程,consumer通过它来获取provider的地址
+
+# Ribbon负载均衡策略
+-- 轮询策略(默认)
+	1、策略对应类名————RoundRobinRule
+	2、实现原理
+		轮询策略表示每次都顺序取下一个provider.比如一共有5个provider,第1次取第1个,第2次取第2个,以此类推.
+
+-- 权重轮询策略
+	1、策略对应类名————WeightedResponseTimeRule
+	2、实现原理————根据每个provider的响应时间分配一个权重,响应时间越长,权重越小,被选中的可能性越低
+		一开始为轮询策略,并开启一个计时器,每30s收集一次每个provider的平均响应时间,当信息足够时,给每个provider附上一个权重,并按权重随机选择provider,高权重的provider会被高概率选中.
+
+-- 随机策略
+	1、策略对应类名————RandomRule
+	2、实现原理
+		从provider列表中国呢随机选择一个.
+
+-- 最少并发数策略
+	1、策略对应类名————BestAvailableRule
+	2、实现原理
+		选择正在请求中的并发数最小的provider,除非这个provider在熔断中.
+
+-- 重试策略
+	1、策略对应类名————RetryRule
+	2、实现原理
+		其实就是轮询策略的增强版,轮询策略服务不可用时不做处理,重试策略服务不可用时会重新尝试集群中的其他节点.
+
+-- 可用性敏感策略
+	1、策略对应类名————AvailabilityFilteringRule
+	2、实现原理————过滤性能差的provider
+		1)第一种————过滤掉在Eureka中处于一直连接失败的provider
+		2)第二种————过滤掉高并发(繁忙)的provider
+
+-- 区域敏感性策略
+	1、策略对应类名————ZoneAvoidanceRule
+	2、实现原理
+		1)以一个区域为单位考察可用性,对于不可用的区域整个丢弃,从剩下区域中选可用的provider
+		2)如果这个IP区域内有一个或多个实例不可达或响应变慢,都会降低该IP区域内其他实例被选中的权重.
+
+# Ribbon入门案例————Ribbon负载均衡如何配置
+-- Ribbons中对于集群的服务采用的负载均衡策略默认是轮询
+
+-- 创建项目
+	基于Eureka项目参照子项目eureka-prodvider创建新的子项目eureka-provider02
+
+-- 添加依赖
+	基于Eureka项目参照子项目eureka-prodvider创建新的子项目eureka-provider02的依赖
+
+-- 配置文件
+	基于Eureka项目参照子项目eureka-prodvider创建新的子项目eureka-provider02的配置文件
+
+-- 服务及启动类
+	基于Eureka项目参照子项目eureka-prodvider创建新的子项目eureka-provider02的服务及启动类
+
+-- 注册中心
+	启动服务,就会注册到注册中心
+
+-- 消费服务
+	1、基于Eureka项目修改子项目eureka-consumer采用LoadBalancerClient(Ribbon的负载均衡器)消费服务,并打印主机信息:
+		System.out.println("使用服务主机地址——" + serviceInstance.getHost() + ":" + serviceInstance.getPort());
+	2、多消费几次————http://服务消费者所在主机地址/order/1,控制台就会以轮询方式选择每次消费的服务提供者:
+		使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+
+# Ribbon负载均衡策略设置
+-- 全局————在启动类或配置类中注入负载均衡策略对象.所有服务请求均使用该策略
+	1、注入负载均衡策略对象————以随机策略为例
+		/**
+     * 全局——————注入使用的负载均衡策略对象————随机
+     *
+     * @return
+     */
+    @Bean
+    public RandomRule randomRule() {
+        return new RandomRule();
+    }
+	2、多次访问测试,http://服务消费者所在主机地址/order/1,结果如下:
+		使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+
+-- 局部————修改配置文件指定服务的负载均衡策略.
+	1、配置格式————服务应用名.ribbon.NFLoadBlancerRuleClassName:负载均衡策略
+		# 局部方式————指定服务的负载均衡策略
+    ## service-provider-wcc————为调用的服务的名称
+    service-provider-wcc:
+      ribbon:
+        # 设置负载聚合策略————以随策略为例
+        NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+	2、多次访问测试,http://服务消费者所在主机地址/order/1,结果如下:
+  	使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7070
+    使用服务主机地址——192.168.250.40:7071
+
+# Ribbon点对点直连————跳过注册中心,测试环境方便与服务提供者进行交互
+-- 说明
+	点对点直连是指绕过注册中心,直接连接服务提供者获取服务,一般在测试阶段使用的比较多
+
+-- 添加依赖————在Pom文件中引入Ribbon(需要注意的是如果pom中有Eureka的依赖,则需要去除)
+	<!--netflix eureka ribbon依赖-->
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+  </dependency>
+
+-- 配置文件————配置文件中关闭Eureka,添加直连的服务地址.如果不设置负载均衡策略默认使用轮询策略
+	server:
+    # 服务端口
+    port: 9090
+	spring:
+    application:
+      # 服务（应用）名称
+      name: service-customer-wcc
+
+	# 局部方式————指定服务的负载均衡策略
+	## service-provider-wcc————为调用的服务的名称
+	service-provider-wcc:
+    ribbon:
+      # 设置负载聚合策略————以随策略为例
+      NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+      # 指定具体的Provider服务列表，多个使用【，】隔开
+      listOfServers: http://localhost:7070,http://localhost:7071
+	## 关闭Eureka实现Ribbon点对点直连
+	ribbon:
+    eureka:
+      # false——关闭；true——开启
+      enabled: false
+
+-- 访问————http://127.0.0.1:9090/order/13
 ```
 
 ### 8、Spring Cloud Bus——消息总线
@@ -16885,9 +17052,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	-- 参数说明————prefix[用于指定属性键的前缀,拼接上对应属性名的属性,就是对应的配置属性键]
 ```
 
-
-
-## 3、MybatisPlus相关注解
+## 4、MybatisPlus相关注解
 
 ```markdown
 # @TableId（type=IdType.xxx）
@@ -16923,9 +17088,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	
 ```
 
-
-
-## 4、Redis相关注解
+## 5、Redis相关注解
 
 ```markdown
 # @EnableCaching
@@ -16955,7 +17118,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 		-- beforeInvocation【是否在方法执行前就清空，默认为false。如果指定为true，则在方法执行前就会清空缓存】
 ```
 
-## 5、其它注解
+## 6、其它注解
 
 ```markdown
 # @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
