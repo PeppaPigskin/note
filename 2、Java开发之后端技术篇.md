@@ -11816,7 +11816,7 @@ localhost:10000/index/catelog.json解决海量存储和弹性扩容
 ### 4、java代码实现相关功能
 
 ```markdown
-# 手册学习(https://help.aliyun.com/product/29932.html?spm=a2c4g.11186623.6.540.561c5186nBzfoC)
+# 手册学习————https://help.aliyun.com/product/29932.html?spm=a2c4g.11186623.6.540.561c5186nBzfoC
 -- 服务端的API
 	// 使用httpclient技术，调用api地址
 	// 阿里云针对相关功能提供的固定地址，只需要向其传入指定参数即可，功能就能实现。不建议使用
