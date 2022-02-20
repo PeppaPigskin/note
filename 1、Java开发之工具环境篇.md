@@ -1182,41 +1182,60 @@ brew install VisualVM
 
 # 5、Java——虚拟机环境搭建
 
-## 1、虚拟机安装
+## 1、VirtualBox虚拟机安装
 
-​		本项目使用virtualbox虚拟机.采用homebrew命令进行安装操作,具体安装命令如下:
+```markdown
+# 官方下载地址————https://www.virtualbox.org/
 
-​		`brew install virtualbox`
+# 安装
+	brew install virtualbox
 
-​		调整内存大小为3G
+# 配置
+-- 调整内存大小为3G
+	设置-->系统-->内存大小
 
-​		`设置-->系统-->内存大小`
-
-​		[下载地址](https://www.virtualbox.org/)
-
-​		注:开启CPU虚拟化步骤如下:
-
-​		`BOSS——>Advanced——>CPU Configuration ——>Intel Virtualization Technology[Enable]`
+-- 开启CPU虚拟化步骤如下
+	BOSS——>Advanced——>CPU Configuration ——>Intel Virtualization Technology[Enable]
+```
 
 ## 2、Vagrant
 
-​		Vagrant 是一个基于 Ruby 的工具，用于创建和部署虚拟化开发环境。它使用 Oracle 的开源 VirtualBox 虚拟化系统，使用 Chef 创建自动化虚拟环境.具体安装步骤如下:
+```markdown
+# 说明
+	Vagrant 是一个基于 Ruby 的工具，用于创建和部署虚拟化开发环境。它使用 Oracle 的开源 VirtualBox 虚拟化系统，使用 Chef 创建自动化虚拟环境.
 
-​		`brew install vagrant`
+# 安装
+-- 终端执行命令
+	brew install vagrant
 
-​		安装位置,通过`vagrant`命令检查安装是否成功.
+-- 安装位置,通过以下命令检查安装是否成功
+	vagrant
 
-​		[官方镜像仓库](https://app.vagrantup.com/boxes/search )       [下载地址](https://www.vagrantup.com/downloads)
+-- 官方地址
+	1、官方镜像仓库————https://app.vagrantup.com/boxes/search
+	2、下载地址————https://www.vagrantup.com/downloads
 
-​		[应急网络配置](https://blog.csdn.net/weixin_43745072/article/details/111772144)(可以用来打通两边网络,进行文件导出)
-
-​		1)第一个网卡为NAT Network
+# 应急网络配置————可以用来打通两边网络,进行文件导出
+-- 参考链接地址————https://blog.csdn.net/weixin_43745072/article/details/111772144
+	1、设置第一个网卡为NAT Network,如下图所示
+```
 
 ​		<img src="image/img1_5_2_1.png" alt="img" style="zoom: 50%;" />
 
-​		2)在网络配置中，新建一个网卡2为桥接网卡。					
+```markdown
+	2、在网络配置中，新建一个网卡2为桥接网卡,如下图所示
+```
 
 ​		<img src="image/img1_5_2_2.png" alt="img" style="zoom:50%;" />
+
+```markdown
+# Vagrant与VirtualBox兼容版本
+-- windows建议版本组合
+	vagrant_2.2.5_x86_64.msi 与 VirtualBox-6.0.10-132072-Win.exe
+
+-- mac建议版本组合
+	vagrant: 2.2.19 与 virtualbox: 6.1.32,149290
+```
 
 ## 3、Linux虚拟机安装
 
