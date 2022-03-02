@@ -8,7 +8,7 @@
 # 终端连接虚拟机
  	ssh [账户名]@[服务地址]
 # Mac显示“您没有权限来打开应用 eclipse”的问题
-	codesign -f -s - --deep 拖动软件app到终端
+	codesign -f -s - --deep <拖动软件app到终端>
 ```
 
 ## 2、linux常用命令
@@ -45,6 +45,15 @@
 
 # 查看内存使用情况
 	free -m
+
+# 显示默认网卡信息
+	ip route show
+
+# 查看当前主机名
+	hostname
+
+# 指定新主机名
+	hostnamectl set-hostname <newhostname>
 ```
 
 # 2、Windows——常用软件环境搭建
@@ -1194,8 +1203,31 @@ brew install VisualVM
 -- 调整内存大小为3G
 	设置-->系统-->内存大小
 
--- 开启CPU虚拟化步骤如下
+-- 检查CPU中是否支持Intel VT-x,终端执行以下命令,如果看到VMX条目，那么CPU支持Intel VT-x功能，但它仍然可能被禁用:
+	sysctl -a | grep machdep.cpu.features
+
+-- 检查CPU是否同时满足VT-x和VT-d,终端执行以下命令,如果为1说明就是同时支持VT-x和VT-d。
+	sysctl kern.hv_support
+-- windows开启CPU虚拟化步骤如下
 	BOSS——>Advanced——>CPU Configuration ——>Intel Virtualization Technology[Enable]
+
+# 可进行备份工作
+	备份[系统快照]————>生成/恢复备份
+
+# 网卡启用网络连接方式说明
+-- 网络地址转换(NAT)————使用同样一个IP使用端口转换
+
+-- NAT网络————使用不同的IP
+
+-- 仅主机(Host-Only)网络————便于宿主机连接虚拟机
+
+-- 桥接网络————
+
+-- 内部网络————
+
+-- 通用驱动————
+
+-- Cloud Network[EXPERIMENTAL]————
 ```
 
 ## 2、Vagrant
@@ -1235,6 +1267,29 @@ brew install VisualVM
 
 -- mac建议版本组合
 	vagrant: 2.2.19 与 virtualbox: 6.1.32,149290
+
+# 使用vagrant up命令启动报错问题解决
+-- 异常一
+	1、异常信息————原来的插件是0.30版本有问题，更换低版本插件
+    The following SSH command responded with a non-zero exit status.
+    Vagrant assumes that this means the command failed!
+
+    umount /mnt
+
+    Stdout from the command:
+
+
+    Stderr from the command:
+
+    umount: /mnt: not mounted
+	2、解决方式
+		1)查看插件列表————vagrant plugin list
+		2)卸载不兼容的插件————vagrant plugin uninstall vagrant-vbguest
+		3)安装兼容的插件版本————vagrant plugin install vagrant-vbguest --plugin-version 0.21
+		4)销毁原来的镜像————vagrant destroy -f
+		5)启动虚拟机————vagrant up --color
+	
+  
 ```
 
 ## 3、Linux虚拟机安装
@@ -1354,13 +1409,16 @@ brew install VisualVM
 -- 4、添加软件源信息(二者选其一)
 	1)阿里云安装镜像————yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 	2)本身镜像————yum-config-manager --add-repo   https://download.docker.com/linux/centos/docker-ce.repo
+	3)查看docker版本
+		yum list docker-ce.x86_64  --showduplicates |sort -r
 
 -- 5、安装docker相关[docker引擎社区版、操作docker的客户端、docker容器]
 	1)制作缓存
 		# 针对Linux6————yum makecache fast
 		# 针对Linux8————yum makecache  
 	2)执行安装
-		sudo yum install docker-ce docker-ce-cli containerd.io	
+    - 最新版本————sudo yum install -y docker-ce docker-ce-cli containerd.io	
+		- 指定版本———— sudo yum install -y docker-ce-18.06.3.ce-3.el7 docker-ce-cli-1:18.09.9-3.el7 containerd.io-1.3.9-3.1.el7
 
 -- 6、第四步采用了对应镜像就不用了,配置镜像加速(https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors)
 	1)创建目录
@@ -1378,7 +1436,10 @@ brew install VisualVM
 
 -- 7、测试是否安装成功————docker -v
 
--- 8、删除————https://blog.csdn.net/qq_18948359/article/details/102715729
+-- 8、设置docker开机启动
+	systemctl enable docker
+
+-- 9、删除————https://blog.csdn.net/qq_18948359/article/details/102715729
 	1)切换到 /etc/yum.repos.d 目录下，将所有 docker 相关的 repo全部删掉
 	2)sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
@@ -2086,3 +2147,11 @@ brew install VisualVM
 
 <img src="image/img1_5_19_1_1.png" style="zoom:50%;" />
 
+## 20、finalshell——Mac虚拟机连接工具
+
+```markdown
+# 说明
+	FinalShell 是一款免费的国产的集 SSH 工具、服务器管理、远程桌面加速的良心软件，同时支持 Windows,macOS,Linux，它不单单是一个 SSH 工具，完整的说法应该叫一体化的的服务器，网络管理软件，在很大程度上可以免费替代 XShell，是国产中不多见的良心产品，具有免费海外服务器远程桌面加速，ssh 加速，双边 tcp 加速，内网穿透等特色功能。
+
+# 安装
+	brew install finalshell
