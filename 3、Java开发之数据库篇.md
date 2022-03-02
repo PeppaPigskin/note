@@ -27,6 +27,29 @@
 
 ```
 
+## 3、利用mysqldump导出表结构或者表数据
+
+```markdown
+# 说明————加-d参数代表只导表结构，不加此参数则代表导出结构以及表数据，> 代表录入某一文件，若为>>则表示将内容追加到某文件末尾
+-- 导出数据库为dbname的表结构
+mysqldump -uuser -pdbpasswd -d dbname >db.sql; 
+ 
+-- 导出数据库为dbname某张表结构
+mysqldump -uuser -pdbpasswd -d dbname table_name>db.sql;
+ 
+-- 导出数据库为dbname所有表结构及表数据
+mysqldump -uuser -pdbpasswd  dbname >db.sql;
+ 
+-- 导出数据库为dbname某张表结构及表数据
+mysqldump -uuser -pdbpasswd dbname table_name>db.sql;
+ 
+-- 批量导出dbname数据库中多张表结构及表数据
+mysqldump -uuser -pdbpasswd dbname table_name1 table_name2 table_name3>db.sql;
+ 
+-- 批量导出dbname数据库中多张表结构
+mysqldump -uuser -pdbpasswd -d dbname table_name1 table_name2 table_name3>db.sql;
+```
+
 
 
 # 二、Oracle
@@ -143,6 +166,8 @@ COMMENT ON COLUMN [表名.列名] is ['列注释信息'];
 SELECT 'ODS_BUSI_'||A.TABLE_NAME,A.COMMENTS FROM USER_TAB_COMMENTS A WHERE A.TABLE_NAME LIKE ['模糊表名%'];
 # 根据表名查询表列注释
 SELECT * FROM USER_COL_COMMENTS A WHERE A.TABLE_NAME LIKE ['模糊表名%'];
+# 获取空数据记录的表
+select * from user_tables  where nvl(num_rows,0) = 0;
 ```
 
 
@@ -214,7 +239,9 @@ ALTER SYSTEM KILL SESSION ['sid,serial'];
 
 ## 2、相关知识点
 
-### 	
+
+
+## 3、
 
 
 
