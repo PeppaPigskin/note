@@ -2065,6 +2065,14 @@ return interceptor;
 	spring.profiles.active=dev
 ```
 
+### 2、备份mysql后发送邮件并删除备份文件,支持win和Linux
+
+```markdown
+https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-8.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-8.pc_relevant_paycolumn_v3&utm_relevant_index=12
+```
+
+
+
 ## 8、SpringCloud
 
 ### 0、SpringCloud简介
@@ -11615,34 +11623,38 @@ return interceptor;
 -- 获取日期格式————DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 ```
 
-## 38、K8S
+## 38、K8S——分布式编排系统(管理分布式集群)
+
+### 1、Kubernetes简介
 
 ```markdown
-# 简介
--- 说明
-	Kubernets简称K8S.是用于自动部署,扩展和管理容器化应用程序的开源系统.
+# 说明
+	Kubernetes简称K8S.是用于自动部署,扩展和管理容器化应用程序的开源系统.
 
--- 官方文档
+# 官方文档
 	1、中文官方————https://kubernetes.io/zh/
 	2、中文社区————https://www.kubernetes.org.cn/
 	3、官方文档————https://kubernetes.io/zh/docs/home/
 	4、社区文档————http://docs.kubernetes.org.cn/
 
--- 部署方式的进化,如下图所示:
+# 部署方式的进化,如下图所示:
 ```
 
 <img src="image/img2_1_38_1_1.svg" style="zoom:50%;" />
 
 ```markdown
-	1、传统部署时代(Traditional Deplovment)
-		早期，各个组织机构在物理服务器上运行应用程序。无法为物理服务器中的应用程序定义资源边界，这会导致资源分配问题。 例如，如果在物理服务器上运行多个应用程序，则可能会出现一个应用程序占用大部分资源的情况， 结果可能导致其他应用程序的性能下降。 一种解决方案是在不同的物理服务器上运行每个应用程序，但是由于资源利用不足而无法扩展， 并且维护许多物理服务器的成本很高。
-	2、虚拟化部署时代(Virtualized Deployment)
-		作为解决方案，引入了虚拟化。虚拟化技术允许你在单个物理服务器的 CPU 上运行多个虚拟机（VM）。虚拟化允许应用程序在 VM 之间隔离，并提供一定程度的安全，因为一个应用程序的信息 不能被另一应用程序随意访问。
-		虚拟化技术能够更好地利用物理服务器上的资源，并且因为可轻松地添加或更新应用程序 而可以实现更好的可伸缩性，降低硬件成本等等。
-		每个 VM 是一台完整的计算机，在虚拟化硬件之上运行所有组件，包括其自己的操作系统。
-	3、容器部署时代(Container Deployment)
+-- 1、传统部署时代(Traditional Deplovment)
+	早期，各个组织机构在物理服务器上运行应用程序。无法为物理服务器中的应用程序定义资源边界，这会导致资源分配问题。 例如，如果在物理服务器上运行多个应用程序，则可能会出现一个应用程序占用大部分资源的情况， 结果可能导致其他应用程序的性能下降。 一种解决方案是在不同的物理服务器上运行每个应用程序，但是由于资源利用不足而无法扩展， 并且维护许多物理服务器的成本很高。
+
+-- 2、虚拟化部署时代(Virtualized Deployment)
+	作为解决方案，引入了虚拟化。虚拟化技术允许你在单个物理服务器的 CPU 上运行多个虚拟机（VM）。虚拟化允许应用程序在 VM 之间隔离，并提供一定程度的安全，因为一个应用程序的信息 不能被另一应用程序随意访问。
+	虚拟化技术能够更好地利用物理服务器上的资源，并且因为可轻松地添加或更新应用程序 而可以实现更好的可伸缩性，降低硬件成本等等。
+	每个 VM 是一台完整的计算机，在虚拟化硬件之上运行所有组件，包括其自己的操作系统。
+
+-- 3、容器部署时代(Container Deployment)
 		容器类似于 VM，但是它们具有被放宽的隔离属性，可以在应用程序之间共享操作系统（OS）。 因此，容器被认为是轻量级的。容器与 VM 类似，具有自己的文件系统、CPU、内存、进程空间等。 由于它们与基础架构分离，因此可以跨云和 OS 发行版本进行移植。
-	4、更多请参照官方文档————https://kubernetes.io/zh/docs/concepts/overview/what-is-kubernetes/
+
+-- 4、更多请参照官方文档————https://kubernetes.io/zh/docs/concepts/overview/what-is-kubernetes/
 
 # 使用容器的好处
 -- 敏捷应用程序的创建和部署————与使用 VM 镜像相比，提高了容器镜像创建的简便性和效率。
@@ -11674,28 +11686,707 @@ return interceptor;
 
 <img src="image/img2_1_38_1_2.png" style="zoom:50%;" />
 
+### 2、Kubernetes核心功能
+
 ```markdown
-# K8S核心功能
--- 服务发现和负载均衡————针对任何应用都有效,SpringCloud的服务发现和负载均衡只针对Java服务
+# 服务发现和负载均衡————针对任何应用都有效,SpringCloud的服务发现和负载均衡只针对Java服务
 	Kubernetes 可以使用 DNS 名称或自己的 IP 地址公开容器，如果进入容器的流量很大， Kubernetes 可以负载均衡并分配网络流量，从而使部署稳定。
 
--- 存储编排
+# 存储编排
 	Kubernetes 允许你自动挂载你选择的存储系统，例如本地存储、公共云提供商等。
 
--- 自动部署和回滚
+# 自动部署和回滚
 	你可以使用 Kubernetes 描述已部署容器的所需状态，它可以以受控的速率将实际状态 更改为期望状态。例如，你可以自动化 Kubernetes 来为你的部署创建新容器， 删除现有容器并将它们的所有资源用于新容器。
 
--- 自动完成装箱计算
+# 自动完成装箱计算
 	Kubernetes 允许你指定每个容器所需 CPU 和内存（RAM）。 当容器指定了资源请求时，Kubernetes 可以做出更好的决策来管理容器的资源。
 
--- 自我修复
+# 自我修复
 	Kubernetes 重新启动失败的容器、替换容器、杀死不响应用户定义的 运行状况检查的容器，并且在准备好服务之前不将其通告给客户端。
 
--- 密钥与配置管理
+# 密钥与配置管理
 	Kubernetes 允许你存储和管理敏感信息，例如密码、OAuth 令牌和 ssh 密钥。 你可以在不重建容器镜像的情况下部署和更新密钥和应用程序配置，也无需在堆栈配置中暴露密钥。
-
-
 ```
+
+### 3、Kubernetes架构原理
+
+```markdown
+# Kubernetes组件
+-- Master(主节点)组件————用于管理多个Node
+	1、节点架构图示
+```
+
+<img src="image/img2_1_38_3_1.png" style="zoom:50%;" />
+
+```markdown
+	2、Master节点相关组件说明
+		1)kube-apiserver
+      > 对外暴露K8S的api接口,是外界进行资源操作的唯一接口
+      > 提供认证、授权、访问控制、API注册和发现等机制
+		2)etcd
+      > etcd是兼具一致性和高可用性的键值数据库,可以作为保存Kubernetes所有集群数据的后台数据库
+      > Kubernetes集群的etcd数据库通常需要有个备份计划
+		3)kube-scheduler
+      > 主节点上的组件,该组件监视那些新创建的未指定运行节点的Pod,并选择节点让Pod在上面运行
+      > 所有对K8S的集群操作,都必须经过主节点进行调度
+		4)kube-controller-manager
+      > 在主节点上运行控制器的组件,这些控制器包括:
+        + 节点控制器(Node Controller)————负责在节点出现故障时进行通知和响应
+        + 副本控制器(Replication Controller)————负责为系统中的每个副本控制器对象维护正确数量的Pod
+        + 端点控制器(Endpoints Controller)————填充端点(Endpoints)对象(即加入Service与Pod)
+        + 服务账户和令牌控制器(Service Account & Token Controllers)————为新的命名空间创建默认账户和API访问令牌
+		5)cloud-controller-manager————云控制器管理器
+      > 指嵌入特定云的控制逻辑的控制平面组件.云控制器管理器使得你可以将你的集群连接到云提供商的API之上,并将与该云平台交互的组件同与你的集群交互的组件分离开来.cloud-controller-manager仅运行特定于云平台的控制回路.如果你在自己的环境中运行Kubernetes,或者在本地计算机中运行学习环境,所部署的环境中不需要云控制器管理器
+      > 下面的控制器都包含对云平台驱动的依赖:
+        + 节点控制器(Node Controller)————用于在节点终止响应后检查云提供商以确定节点是否已被删除
+        + 路由控制器(Route Controller)————用于在底层云基础架构中设置路由
+        + 服务控制器(Service Controller)————用于创建、更新和删除云提供商负载均衡器
+
+-- Node(节点)组件————在每个节点上运行,维护运行的Pod并提供Kubernetes运行环境
+	1、节点架构图,如下图所示:
+```
+
+<img src="image/img2_1_38_3_2.png" style="zoom:50%;" />
+
+```markdown
+	2、Node节点相关组件说明
+    1)kubelet
+      > 一个在集群中每个节点上运行的代理.它保证容器都运行在Pod中
+      > 负责维护容器的生命周期,同时也负责Volume(CSI)和网络(CNI)的管理
+    2)kube-proxy
+      > 集群中每个节点上运行的网络代理
+      > 负责为Service提供cluster内部的服务发现和负载均衡
+    3)容器运行时(Container Runtime)
+      > 容器运行环境是负责运行容器的软件
+      > kubernetes支持多个容器运行环境————Docker、containerd、cri-o、rktlet以及任何实现Kubernetes CRI(容器运行环境接口)的容器运行环境
+    4)fluentd
+      >	是一个守护进程,它有助于提供集群层面日志
+
+# Kubernetes架构————整体主从方式
+-- 说明
+		一个主节点拖几个从属节点,操作主节点,由主节点调度所属的从节点
+
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_38_3_3.png" style="zoom:50%;" />
+
+### 4、Kubernetes概念
+
+```markdown
+# 概念图
+-- 整体概念图1,如下图所示:
+```
+
+<img src="image/img2_1_38_4_1.png" style="zoom:50%;" />
+
+```markdown
+-- 整体概念图2,如下图所示:
+```
+
+<img src="image/img2_1_38_4_2.png" style="zoom:50%;" />
+
+```markdown
+# 相关概念
+-- Container————容器,可以是Docker启动的一个容器
+
+-- Pod————https://kubernetes.io/zh/docs/concepts/workloads/pods/
+	1、K8S使用pod来组织一组容器
+	2、一个Pod中的所有容器共享同一网络
+	3、Pod是K8S中最小部署单元
+
+-- Volume————如下图所示
+```
+
+<img src="image/img2_1_38_4_3.png" style="zoom:50%;" />
+
+```markdown
+	1、声明在Pod容器中可访问的文件目录
+	2、可以被挂载在Pod中一个或多个容器指定路径下
+	3、支持多种后端存储抽象(本地存储、分布式存储、云存储...)
+
+-- Workload Resources(工作负载单元——更高层次对象,部署和管理Pod)————https://kubernetes.io/zh/docs/concepts/workloads/controllers/
+	1、ReolicaSet————确保预期的Pod副本数量
+	2、Deplotment————无状态应用部署
+	3、StatefulSet————有状态应用部署
+	4、DaemonSet————确保所有Node都运行一个指定Pod
+	5、Job————一次性任务
+	6、Cronjob————定时任务
+
+-- Deployment————https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/
+	0、图示,如下图所示
+```
+
+<img src="image/img2_1_38_4_5.png" style="zoom:50%;" />
+
+```markdown
+	1、定义一组Pod的副本数目、版本等
+	2、通过控制器(Controller)维持Pod数目(自动回复失败的Pod)
+	3、通过控制器以指定的策略控制版本(滚动升级、回滚等)
+
+-- Service————https://kubernetes.io/zh/docs/concepts/services-networking/service/
+	1、图示,如下图所示:
+```
+
+<img src="image/img2_1_38_4_5.png" style="zoom:50%;" />
+
+```markdown
+	2、Pod的负载均衡,提供一个或者多个Pod的稳定访问地址
+	3、支持多种方式(ClusterIP、NodePort、LoadBalance)
+	4、Service的意义
+		1)统一应用访问入口
+		2)Service管理一组Pod
+		3)防止Pod失联(服务发现)、定义一组Pod的访问策略
+
+-- Labels————标签,用于对象资源的查询,筛选————如下图所示
+	1、定义一些key-value标签,类似html标签选择器
+```
+
+<img src="image/img2_1_38_4_6.png" style="zoom:50%;" />
+
+```markdown
+-- Selectors————
+-- NameSpace————命名空间,逻辑隔离————如下图所示
+	1、一个集群内部的逻辑隔离机制(鉴权、资源)
+	2、每个资源都属于一个namespace
+	3、同一个namespace所有资源名不能重复
+	4、不同namespace可以资源名重复
+
+-- API————如下图所示
+```
+
+<img src="image/img2_1_38_4_7.png" style="zoom:50%;" />
+
+```markdown
+	1、我们通过kubernetes的API来操作整个集群
+	2、可以通过kubectl、ui、curl最终发送http+json/yaml方式的请求API Server,然后控制K8S集群.K8S里的所有的资源对象都可以采用yaml或JSON格式的文件定义或描述
+```
+
+### 5、Kubernetes快速体验
+
+```markdown
+# 官方文档,详见————https://kubernetes.io/zh/docs/tasks/tools/
+
+# 安装minikube
+-- 下载地址————https://github.com/kubernetes/minikube/releases
+
+-- 下载minikube-windows-amd64.exe/minikube-linux-amd64,并改名为minikube.exe/minikube
+
+-- 打开VirtualBox,打开CMD,并运行如下命令等待20分钟左右即可
+	minikube start --vm-driver=virtualbox --registry-mirror=https://registry.docker-cn.com
+
+# 体验nginx部署升级
+-- 提交一个nginx deployment
+	kubectl apply -f https://k8s.io/examples/application/deployment.yaml
+
+-- 升级nginx deployment
+	kubectl apply -f https://k8s.io/examples/application/deployment-update.yaml
+
+-- 扩容nginx deployment
+	kubectl apply -f https://k8s.io/examples/application/deployment-scale.yaml
+```
+
+### 6、Kubernetes流程叙述
+
+```markdown
+# 流程图示,如下图所示
+```
+
+<img src="image/img2_1_38_6_1.png" style="zoom:50%;" />
+
+```markdown
+# 流程文字叙述
+-- 1、通过Kubectl提交一个创建RC(Replication Controller)的请求,该请求通过API Server被写入etcd中
+
+-- 2、此时 Controller Manager通过API Server的监听资源变化的接口监听到此RC事件
+
+-- 3、分析之后,发现当前集群中还没有它所对应的Pod实例
+
+-- 4、于是根据RC里的Pod模板定义生成一个Pod对象,通过 API Server写入etcd
+
+-- 5、此事件被Scheduler发现,它立即执行一个复杂的调度流程,为这个新Pod选定一个落户的Node,然后通过API Server将这一结果写入到etcd中
+
+-- 6、目标Node上运行的Kubelet进程通过API Server监测到这个"新生的"Pod,并按照它的定义,启动该Pod并任劳任怨地负责它的下半生,直到Pod的生命结束
+
+-- 7、随后,我们通过Kubectl提交一个新的映射到该Pod的Service的创建请求
+
+-- 8、ControllerManager通过Label标签查询到关联的Pod实例,然后生成Service的Endpoints信息,并通过 API Server写入到etcd中
+
+-- 9、接下来,所有node上运行的Proxy进程通过API Server查询并监听Service对象与其对应的Endpoints信息,建立一个软件方式的负载均衡器来实现Service访问到后端Pod的流量转发功能
+
+-- 注————K8S里的所有的资源都可以采用yaml或JSON格式的文件定义或描述
+```
+
+### 7、Kubernetes集群安装
+
+```markdown
+# 官方文档详见————https://kubernetes.io/zh/docs/tasks/tools/
+
+# kubeadm
+-- 说明
+	kubeadm是官方社区推出的一个用于快速部署kubernetes集群的工具.这个工具能通过两条指令完成一个kubernetes集群的部署
+
+-- 集群部署执行
+	1、创建一个Master节点————$kubeadm init
+	2、将一个Node节点加入到当前集群中————$kubeadm join <Master节点的IP和端口>
+
+# 前置要求
+-- 一台或多台机器,操作系统CentOS7.x-86_x64
+	1、是用虚拟机方式
+
+-- 硬件配置————2GB或更多RAM,2个CPU或更多,硬盘30GB或更多
+
+-- 集群中所有机器之间网络互通
+
+-- 可访问外网,需要拉取镜像
+
+-- 禁止swap分区
+
+# 部署步骤————组件图示,如下图所示
+```
+
+<img src="image/img2_1_38_7_1.png" style="zoom:50%;" />
+
+```markdown
+-- 1、在所有节点上安装Docker和kubeadm
+
+-- 2、部署Kubernetes Master
+
+-- 3、部署容器网络插件
+
+-- 4、部署Kubernetes Node
+
+-- 5、部署Dashboard Web页面,可视化查看Kubernetes资源
+
+# 环境准备
+-- 1、准备工作
+	1、使用Vagrant快速创建三个虚拟机.虚拟机启动前先设置virtualbox的主机网络.现全部统一为192.168.56.1,以后所有虚拟机都是56.x的IP地址
+		1)VirtualBox的管理——>主机网络管理器——>保留一个yIPv4地址为192.168.56.1,IPv4网络掩码为255.255.255.0的Host-Only网卡,并启用
+	2、设置虚拟机存储目录,防止硬盘空间不足————由于会消耗很大的内存以及磁盘空间
+			VirtualBox全局设定——>常规——>默认虚拟电脑位置,选择一个磁盘空间较大的位置
+	3、Vagrantfile内容详见附件————[附件——Vagrantfile]
+
+-- 2、启动三个虚拟机(启动出错详见————1、Java开发之工具环境篇-5-2、Vagrant)
+	1、使用Vagrantfile文件,复制到非中文无空格目录下,运行以下命令,启动三个虚拟机
+		vagrant up
+	2、其实vagrant完全可以一键部署全部K8S集群
+		https://github.com/rootsongjc/kubernetes-vagrant-centos-cluster
+		http://github.com/davidkbainbridge/k8s-playground
+	3、进入三个虚拟机,开启root的密码访问权限
+		1)Vagrant ssh xxx————进入系统[xxx:对应虚拟机名称k8s-node1]
+		2)su root————切换到root用户,密码为vagrant
+		3)vi /etc/ssh/sshd_config————编辑sshd_config配置
+		4)PasswordAuthentication yes/no————开启/关闭账号密码访问
+		5)service sshd restart————重启服务
+		6)设置所有虚拟机为4核4G
+	4、修改网卡eth0的网卡连接方式
+		1)VirtualBox全局设定——>网络——>没有NAT网络的话,创建一个NAT网络
+		2)每个K8S虚拟机进行网络设置,设置网卡1的连接方式由原始的网络地址转换(NAT)————同样一个IP使用端口转换切换为NAT网络
+		3)高级设置中,重新生成每一个的MAC地址————不重新生成会记住之前默认网卡的地址
+	5、测试网卡配置
+		1)使用ip addr查看eth0网卡ip地址,相互ping ip,确保虚拟机之间网络可以ping的通
+		2)每个虚拟机ping baidu.com,确保能够ping通外网
+
+-- 3、设置linux环境(每个节点都执行)
+	1、关闭防火墙
+		systemctl stop firewalld
+		systemctl disable firewalld
+	2、关闭selinux————linux默认安全策略
+		cat /etc/selinux/config————查看
+		sed -i 's/enforcing/disabled/' /etc/selinux/config
+		setenforce 0————当前会话也禁用掉
+	3、关闭swap————关闭内存交换,防止kubernetes做集群的时候,性能出现很大问题,以及很多节点没法工作
+		swapoff -a————临时(关闭当前会话)
+		cat /etc/fstab————查看
+		sed -ri 's/.*swap.*/#&/' /etc/fstab————永久
+		free -g————验证,swap必须为0;
+	4、添加主机名与IP对应关系————使用hostname查看主机名
+		1)hostnamectl set-hostname <newhostname>————指定新的hostname
+		2)添加主机名与IP对应关系————vi /etc/hosts————编辑hosts文件,添加以下配置信息
+			10.0.2.15 k8s-node1
+			10.0.2.5 k8s-node2
+			10.0.2.4 k8s-node3
+	5、将桥接的IPv4流量传递到iptables的链————防止流量统计的指标消失,更精确统计流量指标
+    cat > /etc/sysctl.d/k8s.conf << EOF 
+    net.bridege.bridege-nf-call-ip6tables = 1
+    net.bridege.bridege-nf-call-iptables = 1
+    EOF
+    
+    sysctl --system————让系统应用规则
+
+# 所有节点安装Docker、kubeadm、kubelet、kubectl
+-- Kubernetes默认CRI(容器运行时)为Docker,因此先安装Docker————版本不能太高
+	详见————1、Java开发之工具环境篇-5-4、Linux中Docker环境搭建
+
+-- 添加阿里云yum源
+  $ cat > /etc/yum.repos.d/kubernetes.repo << EOF
+  [kubernetes]
+  name=Kubernetes
+  baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+  enabled=1
+  gpgcheck=0
+  repo_gpgcheck=0
+  gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+  https://mirrors.aiyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+  EOF
+
+-- 安装kubeadm、kubelet、kubectl
+	yum list|grep kube————检查yum源中是否包含kube相关的安装源
+	yum install -y kubelet-1.17.3 kubeadm-1.17.3 kubectl-1.17.3————指定版本安装命令
+	systemctl enable kubelet————设置kubelet开机自启
+	systemctl start kubelet————当前启动kubelet(目前不能启动成功)
+	systemctl status kubelet————查看kubelet状态
+
+# 部署K8S-master
+-- 直接init初始化拉取可能失败,需要先下载镜像
+	1、将master-images.sh上传到虚拟机————master-images.sh详细附件————[附件——master-images.sh]
+	2、授权master-images.sh文件的权限为可读可写可执行[-rwx]———— chmod 700 master-images.sh 
+	3、下载镜像————./master-images.sh
+
+-- master节点初始化————运行完成提前复制————加入集群的令牌
+	1、master节点初始化命令
+    $ kubeadm init \
+    --apiserver-advertise-address=10.0.2.15 \
+    --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers \
+    --kubernetes-version v1.17.3 \
+    --service-cidr=10.96.0.0/16 \
+    --pod-network-cidr=10.244.0.0/16
+	2、说明
+		1)apiserver-advertise-addres————设置master节点主机地址为k8s-node1的eth0的IP
+		2)image-repository————由于默认拉取镜像地址k8s.gcr.io国内无法访问,这里指定阿里云镜像仓库地址。可以手动按照我们的images.sh先拉取镜像,地址变为registry.aliyuncs.com/google_containers也可以。
+		3)kubernetes-version————指定kubernetes版本
+		4)service-cidr————指定service的网络(Pod之间的组合,形成一个Service)
+		5)pod-network-cidr————指定pod的网络(kubernetes最小单元)
+		6)科普————无类别域间路由(Classless Inter-Domain Routing、CIDR)是一个用于给用户分配IP地址以及在互联网上有效地路由IP数据包的对IP地址进行归类的方法。
+	3、master节点初始化出错解决
+		1)错误一————需要启用bridge-nf-call-iptables内核参数
+			- 错误信息————[ERROR FileContent--proc-sys-net-bridge-bridge-nf-call-iptables]: /proc/sys/net/bridge/bridge-nf-call-iptables contents are not set to 1
+			- 解决方式
+				1-临时解决方式(重启消失)————执行以下命令
+          echo "1">/proc/sys/net/bridge/bridge-nf-call-iptables
+          echo "1">/proc/sys/net/bridge/bridge-nf-call-ip6tables
+        2-永久解决方法————在/etc/sysctl.conf中添加以下内容后,执行sysctl -p进行刷新
+        	net.bridge.bridge-nf-call-ip6tables = 1
+					net.bridge.bridge-nf-call-iptables = 1
+	4、输出的提示信息
+		Applied essential addon: kube-proxy
+		Your Kubernetes control-plane has initialized successfully!
+		To start using your cluster, you need to run the following as a regular user:
+      mkdir -p $HOME/.kube
+      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+		You should now deploy a pod network to the cluster.
+		Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  		https://kubernetes.io/docs/concepts/cluster-administration/addons/
+		Then you can join any number of worker nodes by running the following on each as root:
+		kubeadm join 10.0.2.15:6443 --token qfi05a.t7tb03i2fqbl95b7 \
+    	--discovery-token-ca-cert-hash sha256:d2337fc6ab40e9c0e0043fc645a4ac4f2064bdbf3450f474a378a3e3679fa533 
+
+-- 根据输出的提示信息,执行命令
+	1、进行复制配置文件
+		mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+	2、部署一个Pod网络
+		1) 安装Pod网络插件(CNI)————详见——2、Java开发之后端技术篇-1-38-7-# 安装Pod网络插件(CNI)
+	3、将其他节点加入到master节点————详见——2、Java开发之后端技术篇-1-38-7-# 加入Kubernetes Node
+	4、kubectl get pod -n kube-system -o wide————继续测试执行,监控pod进度等3-10分钟,完全都是 running以后继续
+
+-- 相关命令
+	1、journalctl -u kubelet————查看kubelet日志
+	2、kubectl get nodes————获取kubernetes集群中所有的节点信息
+
+# 安装Pod网络插件(CNI)
+-- 安装命令
+	$ kubectl apply -f \
+	https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+-- 说明
+	1、以上地址可能被墙,可以获取附件中下载好的flannel.yml运行即可,同时flannel.yml中指定的Images访问不到可以去docker hub找一个wget yml的地址————详见————[附件——kube-flannel.yml]
+	2、vi修改yml所有amd64的地址都修改了即可————此处提供一个[mgao1983/flannel:v0.11.0-amd64]
+	3、ip link set cnio down————如果网络出现问题,关闭cn0,重启虚拟机
+
+-- 执行命令
+	1、kubectl apply -f kube-flannel.yml————部署一个应用(应用指定配置文件安装规则和Pod组件,等待大约3分钟,保证kube-flannel为运行状态,在进行后续事情)
+	2、kubectl delete -f kube-flannel.yml————删除一个应用(如果需要删除指定的所有资源重装)
+	3、kubectl get pods————获取当前所有节点里部署的Pod,类似docker ps
+	4、kubectl get ns————获取所有名称空间
+	5、kubectl get pods -n kube-system————查看指定名称空间的pods
+	6、kubectl get pods --all-namespaces————查看所有名称空间的pods
+
+# 加入Kubernetes Node(前提——保证master节点的运行状态为Ready)
+-- 在Node节点执行,向集群添加新节点,执行在kubeadm init时输出的kubeadm join命令,我的示例如下:
+	kubeadm join 10.0.2.15:6443 --token qfi05a.t7tb03i2fqbl95b7 \
+	--discovery-token-ca-cert-hash sha256:d2337fc6ab40e9c0e0043fc645a4ac4f2064bdbf3450f474a378a3e3679fa533
+
+-- 如果token过期,执行以下命令创建一个新的
+	kubeadm token create --print-join-command
+```
+
+[附件——Vagrantfile](attachments/Vagrantfile)
+
+[附件——master-images.sh](/attachments/k8s/master-images.sh)
+
+[附件——kube-flannel.yml](/attachments/k8s/kube-flannel.yml)
+
+### 8、kubernetes集群入门操作
+
+```markdown
+# 部署一个tomcat(系统的默认部署在kube-system名称空间中,我们部署的应用都在默认的名称空间)
+-- 部署命令
+	kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8
+
+-- 获取k8s中的所有资源[-o wide————打印更宽泛的内容]
+	kubectl get all -o wide
+
+-- 可以获取到部署的tomcat信息 
+	kubectl get pods -o wide
+
+-- 容灾恢复————保证部署的应用始终有一个副本存在
+	1、说明
+		如果某个节点宕机,k8s会在其他节点重新部署一个该节点上的应用,保证始终有一个副本存在,从而实现容灾恢复
+
+# 暴露一个部署,供nginx访问
+-- Pod的80端口映射容器的8080端口,service会代理Pod的80端口————此时就可以使用暴露的随机端口进行访问
+	kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort
+	- --port————指定Pod的端口
+	- --target-port————Pod中容器暴露的端口
+	- --type————以何种方式暴露服务(NodePort:;)
+
+-- 获取Service的详细信息
+	kubectl get svc -o wide
+
+# 动态扩容测试
+-- 获取所有部署详细信息信息
+	kubectl get deployment -o wide
+
+-- 应用升级
+	kubectl set image(--help查看帮助)
+
+-- 扩容(扩容了多份,无论访问那个node的指定端口,都可以访问到tomcat6)
+	kubectl scale --replicas=3 deployment tomcat6————扩容和缩容只需指定副本数量即可
+
+# 删除
+-- 获取所有资源信息
+	kubectl get all
+
+-- 删除对应部署应用名的资源
+	kubectl delete deploy/<tomcat6>
+
+-- 删除对应服务应用名的资源
+	kubectl delete service/<tomcat6>
+```
+
+### 9、kubernetes集群细节内容
+
+```markdown
+# kubectl官方文档————https://kubernetes.io/zh/docs/reference/kubectl/overview/
+-- 资源类型————https://kubernetes.io/zh/docs/reference/kubectl/overview/#%E8%B5%84%E6%BA%90%E7%B1%BB%E5%9E%8B
+
+-- 格式化输出————https://kubernetes.io/zh/docs/reference/kubectl/overview/#%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA
+
+-- 常用操作————https://kubernetes.io/zh/docs/reference/kubectl/overview/#%E7%A4%BA%E4%BE%8B-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C
+
+-- 命令参考————https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+
+# Kubernetes的yaml语法
+-- yaml模板,图示,如下图所示:
+```
+
+<img src="image/img2_1_38_9_1.png" style="zoom:50%;" />
+
+```markdown
+	1、apiVersion————定义版本信息
+	2、Kind————操作资源类型
+	3、Metadata————定义的源数据
+	4、Spec————操作资源规格定义
+
+-- yaml常用操作————[--help————获取帮助信息]
+	1、使用 example-service.yaml 中的定义创建服务
+		kubectl apply -f example-service.yaml
+	2、创建tomcat6部署[--dry-run -o yaml————测试运行部署并输出yaml格式部署文档到终端页面][> tomcat6.yaml————输出到指定文件]
+		kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8 --dry-run -o yaml > tomcat6.yaml
+	3、暴露一个服务[--dry-run -o yaml————测试运行部署并输出yaml格式部署文档到终端页面][> tomcat6-expose.yaml————输出到指定文件]
+		kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort --dry-run -o yaml > tomcat6-expose.yaml
+	4、获取一个pod的详细定义信息[> tomcat6-pod.yaml————输出到指定文件]
+		kubectl get pod [podName] -o yaml > tomcat6-pod.yaml
+```
+
+### 10、kubernetes集群完整部署流程
+
+```markdown
+# 1、进行一次部署工作,部署最小单元————Pod
+	1、命令行方式
+		kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8
+	2、使用yaml文件方式————文档详见附件————[附件——tomcat6-deployment.yaml]
+		kubectl apply -f tomcat6-deployment.yaml
+
+# 2、为了外部访问,进行暴露
+	1、命令行方式
+		kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort
+	2、使用yaml文件方式————文档详见附件————[附件——tomcat6-service.yaml]
+		kubectl apply -f tomcat6-deployment.yaml
+
+# 3、Ingress————https://kubernetes.io/zh/docs/concepts/services-networking/ingress/
+	1、作用
+		1)通过Service发现Pod进行关联,基于域名访问
+		2)通过Ingress Controller实现Pod负载均衡
+		3)支持TCP/UDP4层负载均衡和HTTP7层负载均衡
+	2、图示,如下图所示:
+```
+
+<img src="image/img2_1_38_10_1.png" style="zoom:50%;" />
+
+```markdown
+		步骤说明:
+		1)部署Ingress Controller————文件详见附件————[附件——ingress-controller.yaml]
+			kubectl apply -f ingress-controller.yaml
+		2)查看创建的Pod
+			kubectl get pods --all-namespaces
+		3)创建Ingress规则(等待ingress-nginx名称空间下的Pod全部创建状态为Running后,进行操作)————文件详见附件————[附件——ingress-tomcat6.yaml]
+			kubectl apply -f ingress-tomcat6.yaml
+		4)本地配置域名规则后,可使用域名访问
+			# kuberbetes域名规则配置
+			192.168.56.102 tomcat6.pigskin.com
+		5)使用如下命令查看配置的规则详情
+			 kubectl describe ingress [规则名:web]
+		6)获取全部规则信息(指定规则名,则获取指定规则信息)
+			kubectl get ingress [规则名:web]
+		7)删除规则信息
+			kubectl delete ingress [规则名:web]
+```
+
+[附件——tomcat6-deployment.yaml](/attachments/k8s/tomcat/tomcat6-deployment.yaml)
+
+[附件——tomcat6-service.yaml](/attachments/k8s/tomcat/tomcat6-service.yaml)
+
+[附件——ingress-controller.yaml](/attachments/k8s/ingress-controller.yaml)
+
+[附件——ingress-tomcat6.yaml](/attachments/k8s/tomcat/ingress-tomcat6.yaml)
+
+### 11、kubernetes集群可视化界面
+
+```markdown
+# dashboard(默认)
+-- 1、部署dashboard————墙的原因,文件参照附件————[附件——kubernetes-dashboard.yaml],自行上传文件中无法访问的镜像,自行去docker hub找
+	kubectl apply -f \ https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
+-- 2、暴露dashboard为公网访问————默认Dashboard只能集群内部访问,修改Service为NodePort类型,暴露到外部,如图所示
+```
+
+<img src="image/img2_1_38_11_1.png" style="zoom:50%;" />
+
+```markdown
+-- 3、访问地址————http://NodeIP:30001
+
+-- 4、创建授权账户
+	1)创建一个service账户
+		kubectl create serviceaccount <账户名:dashboard-admin> -n kube-system
+	2)创建角色绑定
+  	kubectl create clusterrolebinding <角色绑定名:dashboard-admin> --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin
+	3)获取登陆令牌信息,使用输出的token登陆Dashboard
+		kubectl describe secrets-n kube-system S(Kubectl-n kube-system get secret awk/dashboard-admin/print $1))
+
+# kubesphere
+-- 简介
+	KubeSphere是一款面向云原生设计的开源项目,在目前主流容器调度平台Kubernetes之上构建的分布式多租户容器管理平台,提供简单易用的操作界面以及向导式操作方式,在降低用户使用容器调度平台学习成本的同时,极大降低开发、测试、运维的日常工作的复杂度。
+	1、默认的 dashboard没啥用,我们用 kubesphere可以打通全部的 devops链路。
+	2、Kubesphere集成了很多套件,集群要求较高————https://kubesphere.io/
+	3、Kuboard也很不错,集群要求不高————https://kuboard.cn/support/
+
+# 安装
+-- 官方文档
+	1、快速安装————https://kubesphere.com.cn/docs/quick-start/
+	2、完全安装————https://v2-1.docs.kubesphere.io/docs/zh-CN/installation/install-on-k8s/#%E5%AE%8C%E6%95%B4%E5%AE%89%E8%A3%85-kubesphere
+
+-- 前提条件————https://v2-1.docs.kubesphere.io/docs/zh-CN/installation/prerequisites/
+
+-- 安装前提环境
+	1、安装helm(master节点运行)
+		0)使用参考————https://helm.sh/zh/docs/
+		1)说明
+			Helm是Kubernetes的包管理器。包管理器类似于我们在Ubuntu中使用的apt、Centos中使用的yum或者Python中的pip-样,能快速查找、下载和安装软件包。Helm由客户端组件helm和服务端组件Tiller组成,能够将一组K8S资源打包统一管理,是查找、共享和使用为Kubernetes构建的软件的最佳方式。
+		2)安装————curl -L https://git.io/get_helm.sh | bash
+		3)墙原因,其他方式获取并执行get_helm.sh方式
+			1]获取
+        方式一————curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+        方式二————上传附件中的get_helm.sh文件,详见————附件——get_helm.sh
+      2]执行
+      	chmod 700 get_helm.sh
+      	./get_helm.sh
+      3]提示结果如下
+      	Downloading https://get.helm.sh/helm-v2.17.0-linux-amd64.tar.gz
+        Preparing to install helm and tiller into /usr/local/bin
+        helm installed into /usr/local/bin/helm
+        tiller installed into /usr/local/bin/tiller
+        Run 'helm init' to configure helm.
+      3]可能有文件格式兼容性问题,用ⅵ打开该sh文件,输入以下内容:
+        :set ff————回车,显示fileformat=dos
+        :set ff=unix————重新设置下文件格式
+        :wq————保存退出
+		4)验证版本————helem version
+		5)创建权限(ma ster节点运行)————创建helm-rabc.yaml,详见————附件——helm-rabc.yaml
+		6)应用配置,提示如下信息————kubectl apply -f helm-rabc.yaml
+			serviceaccount/tiller created
+			clusterrolebinding.rbac.authorization.k8s.io/tiller created
+	2、安装Tiller(master节点运行)————安装helm会同时安装
+		1)初始化————[--tiller-image <指定镜像>,否则会被墙]等待节点上部署的tiller完成即可[kubectl get pods --all-namespaces]
+			helm init --service-account=tiller --tiller-image=sapcc/tiller:v2.16.3 --history-max 300 
+		2)初始化报错解决
+			1]错误信息————Error: error initializing: Looks like "https://kubernetes-charts.storage.googleapis.com" is not a valid chart repository or cannot be reached: Failed to fetch https://kubernetes-charts.storage.googleapis.com/index.yaml : 403 Forbidden
+			2]解决方式————因访问权限原因导致,创建丢失文件，再次执行helm init即可
+				touch /root/.helm/repository/repositories.yaml————手动创建repositories.yaml文件
+		3)卸载————https://www.cnblogs.com/jackluo/p/10345266.html
+		4)测试————helm install stable/nginx-ingress --name nginx-ingress
+	3、默认存储类型————https://v2-1.docs.kubesphere.io/docs/zh-CN/appendix/install-openebs/
+		1)前提————由于安装 OpenEBS 时它有一个初始化的 Pod 需要在 master 节点启动并创建 PV 给 KubeSphere 的有状态应用挂载。因此，若您的 master 节点存在 Taint，建议在安装 OpenEBS 之前手动取消 Taint，待 OpenEBS 与 KubeSphere 安装完成后，再对 master 打上 Taint，以下步骤供参考：
+			1]kubectl get node -o wide————例如本示例有一个 master 节点，节点名称即 master，可通过以上命令查看节点名称
+			2]kubectl describe node <master节点名称:k8s-node1> | grep Taint————确认maste节点是否有 Taint
+			3]kubectl taint nodes master <master节点名称:k8s-node1> node-role.kubernetes.io/master:NoSchedule-————去掉污点,注意结尾有一个[-]
+		2)安装OpenEBS
+			1]kubectl create ns openebs————创建OpenEBS的namespace,OpenEBS相关资源将创建在这个namespace下
+			2]安装 OpenEBS，以下列出两种方法，可参考其中任意一种进行创建:
+				1-若集群已安装了 Helm，可通过 Helm 命令来安装 OpenEBS：
+					helm init
+					helm install --namespace openebs --name openebs stable/openebs --version 1.5.0
+				2-还可以通过 kubectl 命令安装,文件详见————[附件——openebs-operator-1.5.0.yaml]:
+					kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.5.0.yaml
+				3-Helm 命令来安装 OpenEBS暗转报错
+					错误信息————[Error: failed to download "stable/openebs" (hint: running `helm repo update` may help)]
+					解决方式————修改helm repo源
+						helm repo remove stable
+            helm repo add stable https://charts.helm.sh/stable
+            helm repo update
+    3)等待openebs名称空间下的pod创建成功,查看创建的 StorageClass————kubectl get sc
+    4)设置默认的StorageClass
+    	kubectl patch storageclass openebs-hostpath -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+    5)由于在文档开头手动去掉了 master 节点的 Taint，我们可以在安装完 OpenEBS 和 KubeSphere 后，可以将 master 节点 Taint 加上，避免业务相关的工作负载调度到 master 节点抢占 master 资源
+    	kubectl taint nodes <master节点名称:k8s-node1> node-role.kubernetes.io/master=:NoSchedule
+
+-- 最小安装KubeSphere(集群可用 CPU > 1 Core 且可用内存 > 2 G)
+	1、应用安装配置文件,或使用附件文件,详见————[附件——kubesphere-minimal.yaml]
+		kubectl apply -f https://raw.githubusercontent.com/kubesphere/ks-installer/v2.1.1/kubesphere-minimal.yaml
+
+-- 完整安装KubeSphere(集群可用 CPU > 8 Core 且可用内存 > 16 G)
+	1、安装命令,或使用附件文件,详见————[附件——kubesphere-complete-setup.yaml]
+		kubectl apply -f https://raw.githubusercontent.com/kubesphere/ks-installer/v2.1.1/kubesphere-complete-setup.yaml
+	2、查看滚动刷新的安装日志————kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l app=ks-install -o jsonpath='{.items[0].metadata.name}') -f
+	3、通过 kubectl get pod --all-namespaces查看 KubeSphere 相关 namespace 下所有 Pod 状态是否为 Running。确认 Pod 都正常运行后，可使用 IP:30880访问 KubeSphere UI 界面，默认的集群管理员账号为 admin/P@88w0rd。
+	4、重启安装————若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启
+		kubectl delete pod ks-installer-xxxxxx-xxxxx -n kubesphere-system
+```
+
+[附件——kubernetes-dashboard.yaml](/attachments/k8s/kubernetes-dashboard.yaml)
+
+[附件——get_helm.sh](/attachments/k8s/get_helm.sh)
+
+[附件——helm-rabc.yaml](/attachments/k8s/helm-rabc.yaml)
+
+[附件——openebs-operator-1.5.0.yaml](/attachments/k8s/openebs-operator-1.5.0.yaml)
+
+[附件——kubesphere-minimal.yaml](/attachments/k8s/kubesphere-minimal.yaml)
+
+[附件——kubesphere-complete-setup.yaml](/attachments/k8s/kubesphere-complete-setup.yaml)
 
 ## 39、Spring注入方式
 
@@ -13347,7 +14038,7 @@ error => {   
 # 使用沙箱进行Demo测试
 -- 下载Demo地址
 	1、支付宝官方地址————https://gw.alipayobjects.com/os/bmw-prod/43bbc4ba-4d71-402f-a03b-778dfef047a8.zip
-	2、沙箱环境Demo代码详见————附件2
+	2、沙箱环境Demo代码详见————附件——alipay.trade.page.pay-JAVA-UTF-8.zip
 
 -- 配置类中配置Demo————相关信息详见————https://openhome.alipay.com/platform/appDaily.htm?tab=info
 	package com.alipay.config;
@@ -14176,7 +14867,7 @@ error => {   
 
 
 
-[附件2——alipay.trade.page.pay-JAVA-UTF-8.zip](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
+[附件——alipay.trade.page.pay-JAVA-UTF-8.zip](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
 ## 11、内网穿透
 
@@ -17358,8 +18049,3 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- 使用————属性上
 
 ```
-
-
-
-
-
