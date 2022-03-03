@@ -17,6 +17,12 @@
 # 参考链接
 	https://mp.weixin.qq.com/s/64m8VxQxTNvSLyoO13ccVA
 
+# 查看linux内核版本
+	cat /proc/version
+
+# 查看Centos版本
+	cat /etc/redhat-release
+
 # 数据传输
 -- 上传本地文件到服务器指定目录————scp [本地文件所在路径]/[文件名]  [账户名]@[服务地址]:[服务端指定目录]
 -- 从服务器下载到本地目录————scp [账户名]@[服务地址]:[服务端文件所在路径]/[文件名]  [本地目录]
@@ -54,6 +60,17 @@
 
 # 指定新主机名
 	hostnamectl set-hostname <newhostname>
+
+# 关闭防火墙
+-- 关闭firewall
+	1、firewall-cmd --state————查看默认防火墙状态（关闭后显示notrunning，开启后显示running）
+	2、systemctl disable firewalld.service————禁止firewall开机启动
+	3、systemctl stop firewalld.service————停止firewall运行
+
+-- iptables防火墙
+	1、service iptables stop————临时关闭，即时生效，重启失效
+	2、chkconfig iptables off————永久关闭，重启生效，永不失效
+		
 ```
 
 # 2、Windows——常用软件环境搭建
