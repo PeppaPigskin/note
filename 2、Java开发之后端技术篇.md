@@ -12363,16 +12363,32 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
     5)由于在文档开头手动去掉了 master 节点的 Taint，我们可以在安装完 OpenEBS 和 KubeSphere 后，可以将 master 节点 Taint 加上，避免业务相关的工作负载调度到 master 节点抢占 master 资源
     	kubectl taint nodes <master节点名称:k8s-node1> node-role.kubernetes.io/master=:NoSchedule
 
--- 最小安装KubeSphere(集群可用 CPU > 1 Core 且可用内存 > 2 G)
+-- 最小安装KubeSphere(集群可用 CPU > 1 Core 且可用内存 > 2 G)(建议有一个好的网络环境,不然总是安装失败)
 	1、应用安装配置文件,或使用附件文件,详见————[附件——kubesphere-minimal.yaml]
 		kubectl apply -f https://raw.githubusercontent.com/kubesphere/ks-installer/v2.1.1/kubesphere-minimal.yaml
 
--- 完整安装KubeSphere(集群可用 CPU > 8 Core 且可用内存 > 16 G)
+-- 完整安装KubeSphere(集群可用 CPU > 8 Core 且可用内存 > 16 G)(建议有一个好的网络环境,不然总是安装失败)
 	1、安装命令,或使用附件文件,详见————[附件——kubesphere-complete-setup.yaml]
 		kubectl apply -f https://raw.githubusercontent.com/kubesphere/ks-installer/v2.1.1/kubesphere-complete-setup.yaml
-	2、查看滚动刷新的安装日志————kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l app=ks-install -o jsonpath='{.items[0].metadata.name}') -f
-	3、通过 kubectl get pod --all-namespaces查看 KubeSphere 相关 namespace 下所有 Pod 状态是否为 Running。确认 Pod 都正常运行后，可使用 IP:30880访问 KubeSphere UI 界面，默认的集群管理员账号为 admin/P@88w0rd。
-	4、重启安装————若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启
+
+-- 安装过程
+	1、查看滚动刷新的安装日志
+		kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l app=ks-install -o jsonpath='{.items[0].metadata.name}') -f
+	2、通过如下命令,查看 KubeSphere 相关 namespace 下所有 Pod 状态是否为 Running
+		kubectl get pod --all-namespaces
+	3、确认 Pod 都正常运行后,可使用 IP:30880 访问 KubeSphere UI 界面，默认的集群管理员账号为 admin/P@88w0rd
+
+-- 安装问题解决
+	1、unable to reach redis hostdial tcp 10.96.195.119:6379: connect: connection refused
+		1)查看指定名称空间下的pod的运行日志信息
+			kubectl logs <pod的name> -n <名称空间的name>
+		2)解决方式————待解决
+			-- 进入容器内部————
+			-- -redis-6fd6c6d6f9-f9lrt
+
+
+-- 重启安装
+	1、若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启,删除命令如下,需根据实际情况设置删除的pod的名称:
 		kubectl delete pod ks-installer-xxxxxx-xxxxx -n kubesphere-system
 ```
 
