@@ -12267,25 +12267,65 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 ### 11、kubernetes集群可视化界面
 
 ```markdown
-# dashboard(默认)
--- 1、部署dashboard————墙的原因,文件参照附件————[附件——kubernetes-dashboard.yaml],自行上传文件中无法访问的镜像,自行去docker hub找
+# dashboard(默认)————参照————https://www.cnblogs.com/bigberg/p/13469736.html
+-- 项目github————https://github.com/kubernetes/dashboard
+
+-- 部署dashboard————墙的原因,文件参照附件————[附件——kubernetes-dashboard.yaml],自行上传文件中无法访问的镜像,自行去docker hub找
 	kubectl apply -f \ https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
 
--- 2、暴露dashboard为公网访问————默认Dashboard只能集群内部访问,修改Service为NodePort类型,暴露到外部,如图所示
+-- 修改配置文件————新增 type: NodePort 和 nodePort: 30001,以便能实现非本机访问,如图所示:
 ```
 
 <img src="image/img2_1_38_11_1.png" style="zoom:50%;" />
 
 ```markdown
--- 3、访问地址————http://NodeIP:30001
+-- 想查看更多信息，可以 describe 这个失败的 Pod
+	kubectl describe pod <pod的名称>
 
--- 4、创建授权账户
-	1)创建一个service账户
-		kubectl create serviceaccount <账户名:dashboard-admin> -n kube-system
-	2)创建角色绑定
-  	kubectl create clusterrolebinding <角色绑定名:dashboard-admin> --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin
-	3)获取登陆令牌信息,使用输出的token登陆Dashboard
-		kubectl describe secrets-n kube-system S(Kubectl-n kube-system get secret awk/dashboard-admin/print $1))
+-- 创建认证令牌(RBAC)
+	1、创建一个admin-user,
+		1)命令行形式
+			kubectl create serviceaccount dashboard-admin -n kube-system
+		2)配置文件形式,如下,并执行————kubectl apply -f dashboard-adminuser.yaml
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: dashboard-admin
+        namespace: kube-system
+  	3)查看serviceaccount是否创建成功
+  		kubectl get sa/dashboard-admin -n kube-system
+	2、创建一个集群角色cluster-admin
+		1)命令行形式
+			kubectl create clusterrolebinding dashboard-admin --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin
+		2)配置文件形式,如下,并执行————kubectl apply -f dashboard-ClusterRoleBinding.yaml
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: dashboard-admin
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: dashboard-admin
+        namespace: kube-system
+  	3)查看绑定信息，可以发现新创建的用户已经拥有了集群管理员权限
+  		kubectl describe clusterrolebinding/dashboard-admin
+	3、获取登陆令牌信息,使用输出的token登陆Dashboard
+		kubectl describe secrets -n kube-system $(Kubectl -n kube-system get secret | awk 'dashboard-admin/{print $1}')
+		1)查看内容含有token的secret
+			kubectl get secret -n kube-system | grep dashboard-admin
+		2)describe一下获取token值
+			kubectl describe secret dashboard-admin-token-xxxx -n kube-system
+
+-- 访问k8s集群UI————https://[yourk8sapiserver]:30001
+
+-- 出现[您的连接不是私密连接]问题,解决方式
+	1、问题一————您的连接不是私密连接————解决方式如下:
+		调整键盘为英文输入状态，刷新一下页面，鼠标点击当前页面任意位置，然后依次按键 thisisunsafe .按完上面的按键，页面会自动刷新，然后就可以正常访问了。
+	2、问题二————namespaces is forbidden: User "system:anonymous" cannot list resource "namespaces" in API group "" at the cluster scope————给匿名用户授权即可解决,测试环境可用此快速解决,执行如下命令:
+		kubectl create clusterrolebinding test:anonymous --clusterrole=cluster-admin --user=system:anonymous
 
 # kubesphere
 -- 简介
@@ -12383,9 +12423,11 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		1)查看指定名称空间下的pod的运行日志信息
 			kubectl logs <pod的name> -n <名称空间的name>
 		2)解决方式————待解决
-			-- 进入容器内部————
-			-- -redis-6fd6c6d6f9-f9lrt
-
+			0.进入容器内部————
+			1.找到redis配置文件————/etc/redis.conf
+      2.修改 protected-mode yes 改为————protected-mode no
+      3.注释掉————bin 127.0.0.1
+      4.重启redis————
 
 -- 重启安装
 	1、若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启,删除命令如下,需根据实际情况设置删除的pod的名称:

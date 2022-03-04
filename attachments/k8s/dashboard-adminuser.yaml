@@ -1,0 +1,6 @@
+# 创建一个admin-user
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard-admin
+  namespace: kube-system
