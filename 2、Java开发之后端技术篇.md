@@ -12419,15 +12419,14 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	3、确认 Pod 都正常运行后,可使用 IP:30880 访问 KubeSphere UI 界面，默认的集群管理员账号为 admin/P@88w0rd
 
 -- 安装问题解决
-	1、unable to reach redis hostdial tcp 10.96.195.119:6379: connect: connection refused
-		1)查看指定名称空间下的pod的运行日志信息
-			kubectl logs <pod的name> -n <名称空间的name>
-		2)解决方式————待解决
-			0.进入容器内部————
-			1.找到redis配置文件————/etc/redis.conf
-      2.修改 protected-mode yes 改为————protected-mode no
-      3.注释掉————bin 127.0.0.1
-      4.重启redis————
+	1、kubernetes安装KubeSphere，redis-psv等启动不了,一直是Pending状态
+		1)说明————因为 redis跟openldap一直处于pending，而account跟apigateway又都是依赖这两个的，所以会导致一直启动失败
+		2)解决方式————按照官网文档2.1.1来安装。由于官网文档中的前置条件，是要求处理完污点之后，要再打上污点。但是就是因为污点导致的redis 持久卷挂载不上，导致整个安装不成功！这里在安装kubesphere之前是需要把污点去除掉。这样redis就可以挂载上了。
+			kubectl describe node k8s-node1 | grep Taint————查看有没有污点
+			kubectl taint nodes k8s-node1 node-role.kubernetes.io/master=:NoSchedule-————移除污点
+			kubectl taint nodes k8s-node1 node-role.kubernetes.io/master=:NoSchedule————打上污点
+		3)还有一种方案就是不使用官方的OpenEBS，安装nfs存储可解决这个问题。
+		4)参考安装链接————https://blog.csdn.net/qq_37286668/article/details/115894231
 
 -- 重启安装
 	1、若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启,删除命令如下,需根据实际情况设置删除的pod的名称:
