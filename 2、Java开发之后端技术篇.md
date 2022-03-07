@@ -12431,6 +12431,42 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 重启安装
 	1、若安装过程中遇到问题，当您解决问题后，可以通过重启 ks-installer 的 Pod 来重启安装任务，将 ks-installer 的 Pod 删除即可让其自动重启,删除命令如下,需根据实际情况设置删除的pod的名称:
 		kubectl delete pod ks-installer-xxxxxx-xxxxx -n kubesphere-system
+
+-- 安装可插拔功能组件————https://v2-1.docs.kubesphere.io/docs/zh-CN/installation/pluggable-components/
+	1、组件介绍
+    1)KubeSphere DevOps————建议开启
+      1--说明————基于 Jenkins 提供了一站式 DevOps 系统，包括丰富的 CI/CD 流水线构建与插件管理功能，还提供 Binary-to-Image（B2I）、Source-to-Image（S2I），为流水线、S2I、B2I 提供代码依赖缓存支持，以及代码质量管理与流水线日志等功能。
+    2)KubeSphere 日志系统————占用内存很大q
+      1--说明————KubeSphere 提供了 强大且易用的日志查询、接收与管理功能，比如多租户日志管理、多级别日志查询 (包括项目、工作负载、容器组、容器以及关键字)、灵活方便的日志收集配置选项等。相较于 Kibana，KubeSphere 日志系统提供了 基于多租户的日志查询，不同的租户只能看到属于自己的日志信息。
+    3)微服务治理（Service Mesh）————前提必须开启日志系统
+      1--说明————KubeSphere 基于 Istio 微服务框架提供了可视化的微服务治理功能，无需代码无侵入即可实现 熔断、蓝绿发布、金丝雀发布、流量镜像、流量管控、限流、链路追踪（Tracing）等完善的微服务治理功能，从业务角度为微服务组件提供了服务治理的能力，降低了 Istio 服务网格的学习门槛。
+    4)KubeSphere 告警通知系统————建议开启
+      1--说明————KubeSphere 多租户告警系统支持灵活的告警策略和告警规则，支持邮件通知，并具备以下特性：
+        1-支持基于多租户、多维度的监控指标告警，目前告警策略支持集群管理员对节点级别和租户对工作负载级别等两个层级；
+        2-灵活的告警策略：可自定义包含多个告警规则的告警策略，并且可以指定通知规则和重复告警的规则；
+        3-丰富的监控告警指标：提供节点级别和工作负载级别的监控告警指标，包括容器组、CPU、内存、磁盘、网络等多个监控告警指标；
+        4-灵活的告警规则：可自定义某监控指标的检测周期长度、周期次数、告警等级等；目前支持邮件通知；
+        5-灵活的重复告警规则：可自定义重复告警周期、最大重复次数并和告警级别挂钩。
+    5)Metrics-server 开启 HPA————前提还需要安装其他东西
+      1--说明————KubeSphere 支持对 Deployment 设置 弹性伸缩 (HPA) ，支持根据集群的监控指标如 CPU 使用率和内存使用量来设置弹性伸缩，当业务需求增加时，KubeSphere 能够无缝地自动水平增加 Pod 数量，提高应用系统的稳定性。
+	2、定制化安装
+		1)扩充节点内存大小(>=10G)以及CPU核心数(>=6P)
+		2)通过修改 ks-installer 的 configmap 可以选装组件，执行以下命令:
+			kubectl edit cm -n kubesphere-system ks-installer
+		3)将需要开启的设置为True
+			devops:
+      	enabled: True
+      	jenkinsMemoryLim: 2Gi
+      	sonarqube:
+        	enabled: True
+      
+      notification:
+      	enabled: True
+
+    	alerting:
+      	enabled: True
+		4)保存退出,通过日志查看
+			kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l app=ks-install -o jsonpath='{.items[0].metadata.name}') -f
 ```
 
 [附件——kubernetes-dashboard.yaml](/attachments/k8s/kubernetes-dashboard.yaml)
@@ -12444,6 +12480,26 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 [附件——kubesphere-minimal.yaml](/attachments/k8s/kubesphere-minimal.yaml)
 
 [附件——kubesphere-complete-setup.yaml](/attachments/k8s/kubesphere-complete-setup.yaml)
+
+### 12、Kubernetes集群快速入门
+
+```markdown
+# KubeSphere建立多租户系统
+-- 官方文档
+	https://v2-1.docs.kubesphere.io/docs/zh-CN/quick-start/admin-quick-start/
+
+-- 用户系统架构图————图示,如下图所示:
+```
+
+<img src="image/img2_1_38_12_1.png" style="zoom:50%;" />
+
+```markdown
+-- 建立步骤
+	1、创建角色————user-manager————并授予《账户管理》和《角色管理》的权限
+	2、创建一个用户————user-hr————并设置其为user-manager角色
+```
+
+
 
 ## 39、Spring注入方式
 
