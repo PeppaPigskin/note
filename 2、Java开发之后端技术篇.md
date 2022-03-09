@@ -2037,6 +2037,21 @@ return interceptor;
 -- 修改
 ```
 
+### 4、Spring注入方式
+
+```markdown
+# 构造器注入
+
+
+# getter/setter注入
+
+
+# @Autowired注解注入
+
+
+
+```
+
 ## 7、SpringBoot
 
 ### 1、SpringBoot简介
@@ -8705,7 +8720,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	public static ThreadLocal<UserInfoTo> toThreadLocal = new ThreadLocal<>();
 ```
 
-## 28、消息中间件——RabbitMQ
+## 28、RabbitMQ——消息中间件
 
 ### 1、消息中间件说明
 
@@ -11845,7 +11860,8 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 <img src="image/img2_1_38_4_6.png" style="zoom:50%;" />
 
 ```markdown
--- Selectors————
+-- Selectors
+
 -- NameSpace————命名空间,逻辑隔离————如下图所示
 	1、一个集群内部的逻辑隔离机制(鉴权、资源)
 	2、每个资源都属于一个namespace
@@ -11860,6 +11876,11 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 ```markdown
 	1、我们通过kubernetes的API来操作整个集群
 	2、可以通过kubectl、ui、curl最终发送http+json/yaml方式的请求API Server,然后控制K8S集群.K8S里的所有的资源对象都可以采用yaml或JSON格式的文件定义或描述
+
+-- 认识PV/PVC/StorageClass
+	1、PersistentVolume（PV）是集群中由管理员配置的一段网络存储。 它是集群中的资源，就像节点是集群资源一样。 PV是容量插件，如Volumes，但其生命周期独立于使用PV的任何单个pod。 此API对象捕获存储实现的详细信息，包括NFS，iSCSI或特定于云提供程序的存储系统。
+	2、PersistentVolumeClaim（PVC）是由用户进行存储的请求。 它类似于pod。 Pod消耗节点资源，PVC消耗PV资源。Pod可以请求特定级别的资源（CPU和内存）。声明可以请求特定的大小和访问模式（例如，可以一次读/写或多次只读）。虽然PersistentVolumeClaims允许用户使用抽象存储资源，但是PersistentVolumes对于不同的问题，用户通常需要具有不同属性（例如性能）。群集管理员需要能够提供各种PersistentVolumes不同的方式，而不仅仅是大小和访问模式，而不会让用户了解这些卷的实现方式。对于这些需求，有StorageClass 资源。PVC和PV是一一对应的。
+	3、StorageClass为管理员提供了一种描述他们提供的存储的“类”的方法。 不同的类可能映射到服务质量级别，或备份策略，或者由群集管理员确定的任意策略。 Kubernetes本身对于什么类别代表是不言而喻的。 这个概念有时在其他存储系统中称为“配置文件”。
 ```
 
 ### 5、Kubernetes快速体验
@@ -12212,7 +12233,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		kubectl get pod [podName] -o yaml > tomcat6-pod.yaml
 ```
 
-### 10、kubernetes集群完整部署流程
+### 10、kubernetes集群部署流程示例
 
 ```markdown
 # 1、进行一次部署工作,部署最小单元————Pod
@@ -12449,20 +12470,21 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
         5-灵活的重复告警规则：可自定义重复告警周期、最大重复次数并和告警级别挂钩。
     5)Metrics-server 开启 HPA————前提还需要安装其他东西
       1--说明————KubeSphere 支持对 Deployment 设置 弹性伸缩 (HPA) ，支持根据集群的监控指标如 CPU 使用率和内存使用量来设置弹性伸缩，当业务需求增加时，KubeSphere 能够无缝地自动水平增加 Pod 数量，提高应用系统的稳定性。
-	2、定制化安装
+	2、定制化安装步骤
 		1)扩充节点内存大小(>=10G)以及CPU核心数(>=6P)
 		2)通过修改 ks-installer 的 configmap 可以选装组件，执行以下命令:
 			kubectl edit cm -n kubesphere-system ks-installer
 		3)将需要开启的设置为True
+			# 一站式自动化流程系统
 			devops:
       	enabled: True
       	jenkinsMemoryLim: 2Gi
-      	sonarqube:
+      	sonarqube: #代码质量检查
         	enabled: True
-      
+      # 通知系统
       notification:
       	enabled: True
-
+			# 告警系统
     	alerting:
       	enabled: True
 		4)保存退出,通过日志查看
@@ -12481,48 +12503,507 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 [附件——kubesphere-complete-setup.yaml](/attachments/k8s/kubesphere-complete-setup.yaml)
 
-### 12、Kubernetes集群快速入门
+### 12、Kubernetes集群——KubeSphere建立多租户系统
 
 ```markdown
+# 官方文档
+	https://v2-1.docs.kubesphere.io/docs/zh-CN/quick-start/quick-start-guide/
+
+# KubeSphere核心概念————https://v2-1.docs.kubesphere.io/docs/zh-CN/introduction/glossary/
+-- 企业空间
+	企业空间是一个组织您的项目和 DevOps 工程、管理资源访问权限以及在团队内部共享资源等的逻辑单元，可以作为团队工作的独立工作空间。
+
+-- 项目管理
+	KubeSphere 中的项目对应的是 Kubernetes 的 namespace，是对一组资源和对象的抽象集合，常用来将系统内部的对象划分为不同的项目组或用户组。
+
+-- 账户管理
+	系统管理员用此功能模块管理账号，如创建、更新、读取、删除账号等，同时还能关联每个账号的角色；用户用账号名称或邮件地址登录 KubeSphere 平台。
+
+-- 平台角色
+	平台角色定义了在集群范围内授权用户的访问权限。
+
+-- 主机
+	KubeSphere 集群中的计算能力由主机提供，集群中的节点是所有容器组运行所在的工作主机。
+
+-- 存储类型
+	存储类型 (StorageClass) 是由集群管理员配置存储服务端参数，并按类型提供存储给集群用户使用。
+
 # KubeSphere建立多租户系统
 -- 官方文档
 	https://v2-1.docs.kubesphere.io/docs/zh-CN/quick-start/admin-quick-start/
 
--- 用户系统架构图————图示,如下图所示:
+-- 平台资源层级关系
+	目前，平台的资源一共有三个层级，包括 集群 (Cluster)、 企业空间 (Workspace)、 项目 (Project) 和 DevOps Project (DevOps 工程)，层级关系如下图所示，即一个集群中可以创建多个企业空间，而每个企业空间，可以创建多个项目和 DevOps工程，而集群、企业空间、项目和 DevOps工程中，默认有多个不同的内置角色。
 ```
 
 <img src="image/img2_1_38_12_1.png" style="zoom:50%;" />
 
 ```markdown
--- 建立步骤
-	1、创建角色————user-manager————并授予《账户管理》和《角色管理》的权限
-	2、创建一个用户————user-hr————并设置其为user-manager角色
+-- 用户系统架构图————图示,如下图所示:
 ```
 
-
-
-## 39、Spring注入方式
+<img src="image/img2_1_38_12_2.png" style="zoom:50%;" />
 
 ```markdown
-# 构造器注入
-
-
-# getter/setter注入
-
-
-# @Autowired注解注入
-
-
+-- 基于用户系统架构图,建立多租户系统步骤
+	1、创建角色和账号
+		1)user-manager————创建角色,并授予《账户管理》和《角色管理》的权限,用于管理集群的角色和账户
+		2)user-hr————创建一个账户管理员账户,并设置其为 user-manager 角色
+		3)登陆 user-hr 账户,创建以下账户:
+			- ws-manager————创建账户,并设置其为 workespaces-manager 角色,用于管理企业空间
+			- ws-admin————创建账户,并设置其为 cluster-regular 角色,用于管理工作空间
+			- project-admin————创建账户,并设置其为 cluster-regular 角色,用于管理项目
+			- project-regular————创建账户,并设置起为 cluster-regular 角色,作为一个项目的普通用户
+		4)登陆 ws-manager 账户,创建以下企业空间:
+			- xxx-workespace————创建一个企业空间,并邀请 ws-admin 账户为该企业空间的管理员,并指定 workspace-admin 角色 
+		5)登陆 ws-admin 账户,邀请企业成员
+    	- 邀请 project-admin 作为企业空间的普通成员,可以创建项目
+    	- 邀请 project-regular 作为企业空间的观察者
+    6)登陆 project-admin 账户,创建一个项目:
+    	- xxx-project————创建一个项目,并邀请项目成员 project-regular ,并授予 operator 角色,作为项目的维护人员
+    	- xxx-devops————创建一个 DevOps 工程,用于持续、自动的构建/测试软件项目,并邀请 project-regular 作为流程的维护者,赋予 maintainer 角色
 ```
 
-## 40、集群
+### 13、Kubernetes集群——KubeSphere创建Wordpress应用并发布至Kubernetes
 
 ```markdown
-# K8S+KubeSphere+DevOps
+# 官方文档
+	https://v2-1.docs.kubesphere.io/docs/zh-CN/quick-start/wordpress-deployment/
+
+# Wordpress简介
+	WordPress 是使用 PHP 开发的博客平台，用户可以在支持 PHP 和 MySQL 数据库的环境中架设属于自己的网站。本文以创建一个 Wordpress 应用 为例，以创建 KubeSphere 应用的形式将 Wordpress 的组件（MySQL 和 Wordpress）创建后发布至 Kubernetes 中，并在集群外访问 Wordpress 服务.一个完整的 Wordpress 应用会包括以下 Kubernetes 对象，其中 MySQL 作为后端数据库，Wordpress 本身作为前端提供浏览器访问。图示如下:　
+```
+
+<img src="image/img2_1_38_13_1.png" style="zoom:50%;">
+
+```markdown
+# 创建步骤
+-- 1、创建默认类型密钥————MySQL 的环境变量 MYSQL_ROOT_PASSWORD即 root 用户的密码属于敏感信息，不适合以明文的方式表现在步骤中，因此以创建密钥的方式来代替该环境变量。创建的密钥将在创建 MySQL 的容器组设置时作为环境变量写入
+	1)创建Mysql密钥————以项目普通用户 project-regular 登录 KubeSphere,创建Mysql密钥,并设置添加Mysql运行用的环境变量 MYSQL_ROOT_PASSWORD:123456,具体查看其镜像仓库————https://hub.docker.com/_/mysql
+	2)创建WordPress密钥————以项目普通用户 project-regular 登录 KubeSphere,创建WordPress密钥,并设置添加WordPress运行用的环境变量 WORDPRESS_DB_PASSWORD:123456,具体查看其镜像仓库————https://hub.docker.com/_/wordpress
+
+-- 2、创建存储卷
+	1)创建Mysql存储卷————默认信息即可
+	2)创建WordPress存储卷————默认信息即可
+
+-- 3、创建WordPress应用
+	1)添加mysql有状态组件
+		1-设置组件容器镜像,使用默认镜像端口,并且在高级设置中确保内存限制 ≥ 1000 Mi,否则可能MySQL会因内存 Limit不够而无法启动————mysql:5.6
+		2-添加环境变量 MYSQL_ROOT_PASSWORD 关联创建的密钥
+		3-添加存储卷,关联创建的MySQL存储卷,选择读写挂载,并指定挂载容器路径———/var/lib/mysql
+	2)添加WordPress无状态组件
+		1-设置组件容器镜像,使用默认镜像端口————wordpress:4.8-apache
+		2-添加环境变量
+			-- WORDPRESS_DB_PASSWORD————关联创建的密钥
+			-- WORDPRESS_DB_HOST————值为mysql有状态组件名
+		3-添加存储卷,关联创建的WordPress存储卷,选择读写挂载,并指定挂载容器路径———/var/www/html
+	3)点击创建
+
+-- 4、设置外网访问
+	服务中,针对wordpress编辑外网访问,选择NodePort,并点击确定,就可以使用任意一个集群节点加上暴露的端口号进行访问
+```
+
+### 14、Kubernetes集群——KubeSphere流水线
+
+```markdown
+# DevOps
+	详见————2、Java开发之后端技术篇-1-39、DevOps——开发运营一体化
+
+# 流水线官方文档
+	https://v2-1.docs.kubesphere.io/docs/zh-CN/quick-start/devops-online/
+
+# 流水线完整工作过程
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_38_14_1.png" style="zoom:50%;">
+
+```markdown
+-- 流程说明:
+	1、阶段一[Checkout SCM]————拉取 GitHub 仓库代码
+	2、阶段二[Unit test]————单元测试，如果测试通过了才继续下面的任务
+	3、阶段三[SonarQube analysis]————sonarQube 代码质量检测
+	4、阶段四[Build & push snapshot image]————根据行为策略中所选择分支来构建镜像，并将 tag 为 SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER推送至 Harbor (其中 $BUILD_NUMBER为 pipeline 活动列表的运行序号)
+	5、阶段五[Push latest image]————将 master 分支打上 tag 为 latest，并推送至 DockerHub
+	6、阶段六[Deploy to dev]————将 master 分支部署到 Dev 环境，此阶段需要审核
+	7、阶段七[Push with tag]————生成 tag 并 release 到 GitHub，并推送到 DockerHub
+	8、阶段八[Deploy to production]————将发布的 tag 部署到 Production 环境
+
+
+# 流水线实现步骤
+-- Jenkins流水线官方文档
+	详见————https://www.jenkins.io/zh/doc/book/pipeline/
+
+-- 前提条件
+	1、开启安装了 DevOps 功能组件;
+	2、本示例以 GitHub 和 DockerHub 为例,参考前确保已创建了 GitHub 和 DockerHub 账号;
+	3、已创建了企业空间和 DevOps 工程并且创建了项目普通用户 project-regular 的账号;
+	4、使用项目管理员 project-admin邀请项目普通用户 project-regular 加入 DevOps 工程并授予 maintainer角色;
+	5、参考 配置 ci 节点 为流水线选择执行构建的节点
+
+-- 创建凭证————https://v2-1.docs.kubesphere.io/docs/zh-CN/devops/credential/#%E5%88%9B%E5%BB%BA%E5%87%AD%E8%AF%81
+	1、创建DockerHub凭证————私有仓库可以不使用
+		1)凭证ID————dockerhub-id
+		2)凭证类型————账户凭证
+		3)用户名/密码————username/password
+	2、创建GitHub凭证————根据个人代码所在仓库决定
+		1)凭证ID————github-id
+		2)凭证类型————账户凭证
+		3)用户名/密码————username/password
+	3、创建KubeConfig凭证————根据个人代码所在仓库决定
+		1)凭证ID————demo-kubeconfig
+		2)凭证类型————kubeconfig
+
+-- SonarQube创建的Java的Token————https://v2-1.docs.kubesphere.io/docs/zh-CN/devops/sonarqube/
+	1、获取所有名称空间的service————kubectl get svc --all-namespaces
+	2、找到kubesphere-devops-system名称空间下名为ks-sonarqube-sonarqube的Pod,查看暴露的端口进行内网访问————任意集群节点IP:对外暴露端口号,admin/admin
+	3、设置token名称,并点击生成————pigskinmall-analyze
+	4、保存生成的token值
+	5、创建SonarQube凭证
+		1)凭证ID————sonar-token
+		2)凭证类型————秘密文本
+		3)秘钥————生成的token值
+	6、点击Continue,选择项目的主语言,以及构建方式————Java/Maven
+
+-- 准备示例项目
+	1、Fork项目————登录 GitHub,将本示例用到的 GitHub 仓库 devops-java-sample Fork 至个人的 GitHub————https://github.com/kubesphere/devops-java-sample
+	2、修改Jenkinsfile
+		1)Fork 至您个人的 GitHub 后,在根目录进入 Jenkinsfile-online
+		2)修改environment {...}中的配置信息,详细如下表所示:
+```
+
+| 修改项                   | 值                     | 含义                                                         |
+| ------------------------ | ---------------------- | ------------------------------------------------------------ |
+| DOCKER_CREDENTIAL_ID     | dockerhub-id           | 填写创建凭证步骤中的 DockerHub 凭证 ID，用于登录您的 DockerHub |
+| GITHUB_CREDENTIAL_ID     | github-id              | 填写创建凭证步骤中的 GitHub 凭证 ID，用于推送 tag 到 GitHub 仓库 |
+| KUBECONFIG_CREDENTIAL_ID | demo-kubeconfig        | kubeconfig 凭证 ID，用于访问接入正在运行的 Kubernetes 集群   |
+| REGISTRY                 | docker.io              | 默认为 docker.io 域名，用于镜像的推送                        |
+| DOCKERHUB_NAMESPACE      | your-dockerhub-account | 替换为您的 DockerHub 账号名 (它也可以是账户下的 Organization 名称) |
+| GITHUB_ACCOUNT           | your-github-account    | 替换为您的 GitHub 账号名，例如 `https://github.com/kubesphere/`则填写 `kubesphere`(它也可以是账户下的 Organization 名称) |
+| APP_NAME                 | devops-java-sample     | 应用名称                                                     |
+| SONAR_CREDENTIAL_ID      | sonar-token            | 填写创建凭证步骤中的 SonarQube token凭证 ID，用于代码质量检测 |
+
+```markdown
+		3)注————master分支 Jenkinsfile 中 mvn命令的参数 -o，表示开启离线模式。本示例为适应某些环境下网络的干扰，以及避免在下载依赖时耗时太长，已事先完成相关依赖的下载，默认开启离线模式
+
+-- 创建项目
+	1、说明————CI/CD 流水线会根据示例项目的 yaml 模板文件，最终将示例分别部署到 kubesphere-sample-dev和 kubesphere-sample-prod这两个项目 (Namespace) 环境中，这两个项目需要预先在控制台依次创建
+	2、项目创建
+		1)登陆项目管理员————project-admin
+		2)创建第一个资源型项目(开发环境——不限制资源)————kubesphere-sample-dev
+		3)kubesphere-sample-dev项目,邀请项目的维护者————project-regular
+		4)创建第二个资源型项目(生产环境——不限制资源)————kubesphere-sample-prod
+		5)kubesphere-sample-prod项目,邀请项目的维护者————project-regular
+
+-- 创建流水线
+	1、进入已创建的 DevOps 工程，选择左侧菜单栏的 流水线，然后点击 创建
+	2、填写流水线基本信息————demo-cicd
+	3、选择指定的代码仓库————根据个人代码所在仓库决定
+		1)github直接点击获取,去创建一个token————https://github.com/settings/tokens
+		2)填写生成的token值,并确认
+		3)根据检索出来的项目,选择对应的流水线示例项目————devops-java-sample
+	4、下一步的高级设置中,行为策略删除“从Fork仓库中发现PR”项
+	5、修改脚本路径中的路径为我们Foke示例项目的jenkinsfile————Jenkinsfile-online
+	6、根据个人需求选择触发器(什么时候从代码仓库拉取项目)的规则
+	7、如果适用webhook,可以在复制webhook推送位置到github中设置消息推送位置————Setting中添加Webhooks信息,这样代码仓库提交代码后,就会提示Jenkins
+
+-- 运行流水线
+	1、流水线创建后，点击浏览器的 刷新 按钮，可见两条自动触发远程分支后的运行记录，分别为 master和 dependency分支的构建记录
+	2、示例项目如果使用的依赖仓库为spring仓库则会很慢,可以修改为maven仓库
+	3、手动重新生成流水线
+		1)点击右侧 运行，将根据上一步的 行为策略 自动扫描代码仓库中的分支，在弹窗选择需要构建流水线的 master分支，系统将根据输入的分支加载 Jenkinsfile-online (默认是根目录下的 Jenkinsfile)
+		2)由于仓库的 Jenkinsfile-online 中 TAG_NAME: defaultValue没有设置默认值，因此在这里的 TAG_NAME可以输入一个 tag 编号，比如输入 v0.0.2
+		3)点击 确定，将新生成一条流水线活动开始运行
+		4)说明————tag 用于在 Github 和DockerHub 中分别生成带有 tag 的 release 和镜像。 注意: 在主动运行流水线以发布 release 时，TAG_NAME不应与之前代码仓库中所存在的 tag名称重复，如果重复会导致流水线的运行失败
+	4、dockerhub推送完成后,就会在自己的docker看到指定的tag镜像,以及一个最新的
+	5、在运行状态最后一步,等待中进行选择是否部署到开发环境
+	6、上一步确认推送后,在运行状态最后一步,等待中进行选择是否将适用tag推送到github以及dockerhub,确认后,之前创建的kubesphere-sample-dev开发环境项目就会拉取镜像进行部署工作
+	7、上一步确认推送后,在运行状态最后一步,等待中进行选择是否将其部署到生产环境,确认后,之前创建的kubesphere-sample-prod生产环境项目就会拉取镜像进行部署工作
+```
+
+
+
+## 39、DevOps——开发运营一体化
+
+```markdown
+# 项目开发需要考虑的维度
+-- Dev————如何开发?
+-- Ops————如何运维?
+-- 高并发————如何承担高并发?
+-- 高可用————如何做到高可用?
+
+# 什么是DevOps
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_39_1_1.png" style="zoom:50%;">
+
+```markdown
+-- 说明
+	1、微服务,服务自制
+	2、DevOps————Development和Operations的组合
+		1)Devops看作开发(软件工程)、技术运营和质量保障(QA)三者的交集
+		2)突出重视软件开发人员和运维人员的沟通合作,通过自动化流程来使得软件构建、测试、发布更加快捷、频繁和可靠
+		3)Devops希望做到的是软件产品交付过程中IT工具链的打通,使得各个团队减少时间损耗,更加高效地协同工作。专家们总结出了下面这个 Devops能力图,良好的闭环可以大大增加整体的产出
+
+# 什么是CI&CD
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_39_1_2.png" style="zoom:50%;">
+
+```markdown
+-- 持续集成(Continuous Integration)
+	1、说明————指软件个人研发的部分向软件整体部分交付,频繁进行集成以便更快地发现其中的错误.“持续集成”源自于极限编程(XP),是XP最初的12种实践之一.
+	2、CI需要具备的特点:
+		1)全面的自动化测试————这是实践持续集成和持续部署的基础,同时,选择合适的自动化测试工具也极其重要
+		2)灵活的基础设施————容器,虚拟机的存在让开发人员和QA人员不必再大费周折
+		3)版本控制工具————如Git,SVN,CVS等
+		4)自动化构建和软件发布流程工具————如Jenkins,flow.ci
+		5)反馈机制————如构建/测试失败,可以快速地反馈到相关负责人,以尽快解决达到一个稳定的版本
+
+-- 持续交付(Continuous Delivery)
+	1、说明————持续交付在持续集成的基础上,将集成后的代码部署到更贴近真实运行环境的[类生产环境](production-like environments)中.持续交付优先于整个产品生命周期的软件部署,建立在高水平自动化持续集成之上.灰度发布
+	2、持续交付和持续集成的优点非常相似:
+		1)快速发布————能够应对业务需求,并更快的实现软件价值
+		2)编码——>测试——>上线——>交付的频繁迭代周期缩短,同时获得迅速反馈
+		3)高质量的软件发布标准————整个交付过程标准化、可重复、可靠
+		4)整个交付过程进度可视化————方便团队人员了解项目成熟度
+		5)更先进的团队协作方式————从需求分析、产品的用户体验,到交互设计、开发、测试、运维等角色密切协作,相比传统的瀑布式软件团队,更少浪费
+	3、持续交付工具链图,如下图所示:
+```
+
+<img src="image/img2_1_39_1_3.png" style="zoom:50%;">
+
+```markdown
+-- 持续部署(Continuous Development)
+	1、说明————是指当交付的代码通过评审之后,自动部署到生成环境中.持续部署是持续交付的最高阶段.这意味着,所有通过了一系列的自动化测试的改动都将自动部署到生产环境.也可以被称为“Continuous Release”
+	2、完整流程
+		1)开发人员提交代码,持续集成服务器获取代码
+		2)执行单元测试,根据测试结果决定是否部署到预演环境
+		3)如果成功部署到预演环境,进行整体验收测试
+		4)如果测试通过,自动部署到产品环境,全程自动化高效运转
+	3、好处————可以相对独立地部署新的功能,并能快速地收集真实用户的反馈
+```
+
+## 40、Cluster——集群
+
+```markdown
+# 集群的目标
+-- 高可用(High Availability)————是当一台服务器停止服务后,对于业务及用户毫无影响。停止服务的原因可能由于网卡、路由器、机房、CPU负载过高、内存溢出、自然灾害等不可预期的原因导致,在很多时候也称单点问题
+
+-- 突破数据量限制————一台服务器不能储存大量数据,需要多台分担,每个存储一部分,共同存储完整个集群数据。最好能做到互相备份,即使单节点故障,也能在其他节点找到数据。
+
+-- 数据备份容灾————单点故障后,存储的数据仍然可以在别的地方拉起
+
+-- 压力分担————由于多个服务器都能完成各自一部分工作,所以尽量的避免了单点压力的存在
+
+# 集群基础形式
+```
+
+<img src="image/img2_1_40_1_1.png" style="zoom:50%;">
+
+```markdown
+# K8s集群部署
+	详见————2、Java开发之后端技术篇-1-38、K8S——分布式编排系统(管理分布式集群)
+
+# Mysql集群
+	详见————2、Java开发之后端技术篇-1-41-3、MySQL集群
+
+# Redis集群
+
+
+# Elasticsearch集群
+
+
+# RabbitMQ集群
 
 ```
 
-## 41、Reactive&WebFlux响应式编程
+## 41、MySQL
+
+### 3、MySQL集群
+
+```markdown
+# 集群原理————常见解决方案
+-- 企业中常用的数据库解决方案
+	1、说明
+		应用服务需要操作数据库,需要连接数据库代理节点,写操作交给(master)主节点,读操作交给(slave)从节点.从节点一定是同步主节点数据的,同时可以对从节点进行角色区分,面向不同的群体访问.如果主节点出现问题,提升一开始同步主节点数据的备用主节点,从节点将从备用主节点进行数据的同步工作.如果MySQL不是使用的InnoDB Cluster的模式下,默认不提供主节点和备用主节点的存活检测机制,此时需要结合一些第三方技术,用于检测存活,进行热备份同时用于备用主节点的提升工作.但是此种方式无法提升节点的容量数据,因此更多的将MySQL进行分库分表,从而提升检索效率,解决单表数据量过大,检索特慢问题
+	2、原理图,如下图所示:
+```
+
+<img src="image/img2_1_41_3_1.png" style="zoom:50%;">
+
+```markdown
+-- MySQL-MMM(Master-Master Replication Manager for MySQL)————MySQL主主复制管理器
+	1、说明
+		MySQL-MMM是Google的开源项目(Perl脚本)。MMM基于MySQLReplication做的扩展架构,主要用来监控mysql主主复制并做失败转移。其原理是将真实数据库节点的IP(RIP)映射为虚拟IP(VIP)集。mysql-mmm的监管端会提供多个虚拟IP(VIP),包括一个可写VIP,多个可读VIP,通过监管的管理,这些IP会绑定在可用mysql之上,当某一台mysql宕机时,监管会将VIP迁移至其他mysql。在整个监管过程中,需要在mysql中添加相关授权用户,以便让mysql可以支持监理机的维护。授权的用户包括一个mmm_monitor用户和一个mmm_agent用户,如果想使用mmm的备份工具则还要添加一个mmm_tools用户。
+	2、原理图,如下图所示:
+```
+
+<img src="image/img2_1_41_3_2.png" style="zoom:50%;">
+
+```markdown
+-- MHA(Master High Availability)
+	1、说明
+		MHA目前在MySQL高可用方面是一个相对成熟的解决方案,由日本DeNA公司youshimaton(现就职于 Facebook公司)开发,是一套优秀的作为MySQL高可用性环境下故障切换和主从提升的高可用软件。在MySQL故障切换过程中,MHA能做到在0~30秒之内自动完成数据库的故障切换操作(以2019年的眼光来说太慢了),并且在进行故障切换的过程中,MHA能在最大程度上保证数据的一致性,以达到真正意义上的高可用。
+
+-- InnoDB Cluster————MySQL官方支持的集群方式
+	1、说明
+		InnoDB Cluster支持自动Failover、强一致性、读写分离、读库高可用、读请求负载均衡、横向扩展的特性,是比较完备的一套方案。但是部署起来复杂,想要解决router单点问题就需要新增组件,如没有其他更好的方案可考虑该方案。Innodb Cluster主要由MySQL Shell、MySQL Router和MySQL服务器集群组成,三者协同工作,共同为MySQL提供完整的高可用性解决方案。MySQL Shell对管理人员提供管理接口,可以很方便的对集群进行配置和管理MySQL Router可以根据部署的集群状况自动的初始化,使客户端连接实例。如果有节点宕机,集群会自动更新配置。集群包含单点写入和多点写入两种模式。在单主模式下,如果主节点down掉,从节点自动替换上来,MySQL Router会自动探测,并将客户端连接到新节点。
+	2、原理图,如下图所示:
+```
+
+<img src="image/img2_1_41_3_3.png" style="zoom:50%;">
+
+```markdown
+# Docker安装模拟MySQL主从复制集群
+-- 1、下载mysql镜像
+
+-- 2、创建Master实例并启动
+	1、创建命令
+    docker run -p 3307:3306 --name mysql-master \
+    -v /mydata/mysql/master/log:/var/log/mysql \
+    -v /mydata/mysql/master/data:/var/lib/mysql \
+    -v /mydata/mysql/master/conf:/etc/mysql \
+    -e MYSQL_ROOT_PASSWORD=root \
+    -d mysql:5.7
+	2、参数说明
+		-p 3307:3306————将容器的3306端口映射到主机的3307端口
+    -v /mydata/mysql/master/conf:/etc/mysql————将配置文件夹挂在到主机
+    -v /mydata/mysql/master/log:/var/log/mysql————将日志文件夹挂载到主机
+    -v /mydata/mysql/master/data:/var/lib/mysql————将数据文件夹挂载到主机
+    -e MYSQL_ROOT_PASSWORD=root————初始化root用户的密码    
+    -d ————以后台方式运行指定对应镜像
+	3、修改mysql-master基本配置
+		1)vim /mydata/mysql/master/conf/my.cnf————编辑配置文件
+		2)添加如下内容
+      [client]
+      default-character-set=utf8
+
+      [mysql]
+      default-character-set=utf8
+
+      [mysqld]
+      init_connect='SET collation_connection = utf8_unicode_ci'
+      init_connect='SET NAMES utf8'
+      character-set-server=utf8
+      collation-server=utf8_unicode_ci
+      skip-character-set-client-handshake
+			#必须加,不然连接很慢
+			skip-name-resolve
+	4、添加master主从复制部分配置
+		# 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
+		server_id=1
+		# 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
+		log-bin=mysql-bin
+		# 是否只读
+		read-only=0
+		# 设定要生成binlog的数据库
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+
+		# 设定复制时需要忽略的数据库
+		replicate-ignore-db=mysql
+		replicate-ignore-db=sys
+		replicate-ignore-db=information_schema
+		replicate-ignore-db=performance_schema
+	5、重启mysql-master镜像
+		docker restart mysql-master
+
+-- 3、创建Slaver实例并启动
+	1、创建命令
+		docker run -p 3317:3306 --name mysql-slaver-01 \
+    -v /mydata/mysql/slaver/log:/var/log/mysql \
+    -v /mydata/mysql/slaver/data:/var/lib/mysql \
+    -v /mydata/mysql/slaver/conf:/etc/mysql \
+    -e MYSQL_ROOT_PASSWORD=root \
+    -d mysql:5.7
+	2、修改slaver基本配置
+		1)vim /mydata/mysql/slaver/conf/my.cnf————编辑配置文件
+		2)添加如下内容
+			[client]
+      default-character-set=utf8
+
+      [mysql]
+      default-character-set=utf8
+
+      [mysqld]
+      init_connect='SET collation_connection = utf8_unicode_ci'
+      init_connect='SET NAMES utf8'
+      character-set-server=utf8
+      collation-server=utf8_unicode_ci
+      skip-character-set-client-handshake
+      skip-name-resolve
+	3、添加slaver主从复制部分配置
+		# 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
+		server_id=2
+		# 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
+		log-bin=mysql-bin
+		# 是否只读(0-否,1-是)
+		read-only=1
+		# 设定要生成binlog的数据库
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+		binlog-do-db=xxx_database_name
+
+		# 设定复制时需要忽略的数据库
+		replicate-ignore-db=mysql
+		replicate-ignore-db=sys
+		replicate-ignore-db=information_schema
+		replicate-ignore-db=performance_schema
+	4、重启mysql-slaver-01镜像
+		docker restart mysql-slaver-01
+
+-- 4、为master授权用来同步其数据的用户
+	1、进入master容器
+		docker exec -it mysql-master /bin/bash
+	2、进入mysql内部————mysql -u root -p
+		1)授权root可以远程访问————主从无关,为了方便远程连接mysql
+			GRANT ALL PRIVILEGES ON *.* to 'root'@'%' identified by 'root' with grant option;
+			FLUSH PRIVILEGES;
+		2)添加用来同步的用户
+			GRANT REPLICATION SLAVE ON *.* to 'backup'@'%' identified by '123456';
+	3、查看master状态
+		show master status;
+
+-- 5、配置slaver同步master数据
+	1、进入slaver容器
+		docker exec -it mysql-slaver-01 /bin/bash
+	2、进入mysql内部————mysql -u root -p
+		1)授权root可以远程访问————主从无关,为了方便远程连接mysql
+			GRANT ALL PRIVILEGES ON *.* to 'root'@'%'identified by 'root' with grant option;
+			FLUSH PRIVILEGES;
+		2)设置主库连接———告诉从节点同步的主节点
+			change master to master_host='192.168.56.106',master_user='backup',master_password='123456',master_log_file='mysql-bin.000001',master_log_pos=0,master_port=3307;
+		3)启动/停止从库连接
+			start/stop slave;
+		4)查看从库状态————确保Slave_IO_Running和Slave_SQL_Running运行状态都为Yes
+			show slave status;
+
+-- 6、总结
+	1、主从数据库在自己配置文件中声明需要同步哪个数据库,忽略哪个数据库等信息。并且 server-id不能一样
+	2、主库授权某个账号密码来同步自己的数据
+	3、从库使用这个账号密码连接主库来同步数据
+
+-- 7、存在问题————不能解决单表性能问题,解决方式详见下文————ShardingSphere分库分表
+
+# MyCat或ShardingSphere————分库分表
+	详见————2、Java开发之后端技术篇-1-42、ShardingSphere——分库分表
+```
+
+## 42、ShardingSphere——分库分表
+
+
+
+## 43、Reactive&WebFlux响应式编程
 
 ```markdown
 # Reactive
@@ -12530,7 +13011,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 # WebFlux
 ```
 
-## 42、Docker容器化技术
+## 44、Docker容器化技术
 
 ```markdown
 ```
@@ -18160,5 +18641,4 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 -- 说明————属性不为空集合时才包含在JSON返回对象中
 -- 使用————属性上
-
 ```
