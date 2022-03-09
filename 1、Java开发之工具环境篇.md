@@ -1489,9 +1489,9 @@ brew install VisualVM
 
 	参数说明
   -p 3306:3306————将容器的3306端口映射到主机的3306端口
-  -v /mydata/mysql/master/conf:/etc/mysql————将配置文件夹挂在到主机
-  -v /mydata/mysql/master/log:/var/log/mysql————将日志文件夹挂载到主机
-  -v /mydata/mysql/master/data:/var/lib/mysql————将数据文件夹挂载到主机
+  -v /mydata/mysql/conf:/etc/mysql————将配置文件夹挂在到主机
+  -v /mydata/mysql/log:/var/log/mysql————将日志文件夹挂载到主机
+  -v /mydata/mysql/data:/var/lib/mysql————将数据文件夹挂载到主机
   -e MYSQL_ROOT_PASSWORD=root————初始化root用户的密码    
   -d ————以后台方式运行指定对应镜像
 
