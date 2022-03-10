@@ -1,0 +1,131 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+######################################################################################################
+# 
+# Here you can configure the rules for the proxy.
+# This example is configuration of sharding rule.
+#   
+# If you want to use sharding, please refer to this file; 
+# if you want to use master-slave, please refer to the config-master_slave.yaml.
+# 
+######################################################################################################
+#
+## 数据分片配置
+#schemaName: sharding_db
+#
+#dataSources:
+#  ds_0:
+#    url: jdbc:postgresql://127.0.0.1:5432/demo_ds_0?serverTimezone=UTC&useSSL=false
+#    username: postgres
+#    password: postgres
+#    connectionTimeoutMilliseconds: 30000
+#    idleTimeoutMilliseconds: 60000
+#    maxLifetimeMilliseconds: 1800000
+#    maxPoolSize: 50
+#  ds_1:
+#    url: jdbc:postgresql://127.0.0.1:5432/demo_ds_1?serverTimezone=UTC&useSSL=false
+#    username: postgres
+#    password: postgres
+#    connectionTimeoutMilliseconds: 30000
+#    idleTimeoutMilliseconds: 60000
+#    maxLifetimeMilliseconds: 1800000
+#    maxPoolSize: 50
+#
+#shardingRule:
+#  tables:
+#    t_order:
+#      actualDataNodes: ds_${0..1}.t_order_${0..1}
+#      tableStrategy:
+#        inline:
+#          shardingColumn: order_id
+#          algorithmExpression: t_order_${order_id % 2}
+#      keyGenerator:
+#        type: SNOWFLAKE
+#        column: order_id
+#    t_order_item:
+#      actualDataNodes: ds_${0..1}.t_order_item_${0..1}
+#      tableStrategy:
+#        inline:
+#          shardingColumn: order_id
+#          algorithmExpression: t_order_item_${order_id % 2}
+#      keyGenerator:
+#        type: SNOWFLAKE
+#        column: order_item_id
+#  bindingTables:
+#    - t_order,t_order_item
+#  defaultDatabaseStrategy:
+#    inline:
+#      shardingColumn: user_id
+#      algorithmExpression: ds_${user_id % 2}
+#  defaultTableStrategy:
+#    none:
+
+######################################################################################################
+#
+# If you want to connect to MySQL, you should manually copy MySQL driver to lib directory.
+#
+######################################################################################################
+
+schemaName: sharding_db # 数据库名sharding_proxy映射的虚拟db,其去映射真正的数据库ds_0和ds_1
+#
+dataSources: # 定义两个数据源
+ ds_0:
+   url: jdbc:mysql://192.168.56.106:3307/demo_ds_0?serverTimezone=UTC&useSSL=false
+   username: root
+   password: root
+   connectionTimeoutMilliseconds: 30000
+   idleTimeoutMilliseconds: 60000
+   maxLifetimeMilliseconds: 1800000
+   maxPoolSize: 50
+ ds_1:
+   url: jdbc:mysql://192.168.56.106:3307/demo_ds_1?serverTimezone=UTC&useSSL=false
+   username: root
+   password: root
+   connectionTimeoutMilliseconds: 30000
+   idleTimeoutMilliseconds: 60000
+   maxLifetimeMilliseconds: 1800000
+   maxPoolSize: 50
+#
+shardingRule: # 定义分片规则
+ tables: #  定义需要分片的表
+   t_order: # 定义第一张需要进行分片的逻辑表
+     actualDataNodes: ds_${0..1}.t_order_${0..1} # 定义实际表,指定分到几个库几个表(ds_0和ds_1库中的t_order0和t_order1表)
+     tableStrategy: # 指定分表策略
+       inline:      
+         shardingColumn: order_id # 指定分表使用的列
+         algorithmExpression: t_order_${order_id % 2} # 指定分表算法,id对2求余,余0在0表余1在1表
+     keyGenerator:
+       type: SNOWFLAKE # 指定order_id生成的使用雪花算法
+       column: order_id
+   t_order_item:
+     actualDataNodes: ds_${0..1}.t_order_item_${0..1}
+     tableStrategy:
+       inline:
+         shardingColumn: order_id
+         algorithmExpression: t_order_item_${order_id % 2}
+     keyGenerator:
+       type: SNOWFLAKE
+       column: order_item_id
+ bindingTables: 
+   - t_order,t_order_item # 设置几张有关联关系表的绑定,有利于在同一地方查询关联数据,不用跨库查询,不用进行笛卡尔积
+ defaultDatabaseStrategy: # 指定默认的数据库分库策略
+   inline:
+     shardingColumn: user_id # 指定的分库依据列
+     algorithmExpression: ds_${user_id % 2} # 指定分库算法
+ defaultTableStrategy:
+   none: # 指定默认分表策略,没有独立指定的表可以进行指定默认

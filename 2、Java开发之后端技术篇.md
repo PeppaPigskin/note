@@ -12144,7 +12144,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	kubeadm token create --print-join-command
 ```
 
-[附件——Vagrantfile](attachments/Vagrantfile)
+[附件——Vagrantfile](attachments/k8s/Vagrantfile)
 
 [附件——master-images.sh](/attachments/k8s/master-images.sh)
 
@@ -13001,7 +13001,154 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 ## 42、ShardingSphere——分库分表
 
+```markdown
+# 官方文档
+	https://shardingsphere.apache.org/document/legacy/4.x/document/cn/overview/
 
+# 简介
+	ShardingSphere是一套开源的分布式数据库中间件解决方案组成的生态圈，它由Sharding-JDBC、Sharding-Proxy和Sharding-Sidecar（计划中）这3款相互独立的产品组成。 他们均提供标准化的数据分片、分布式事务和数据库治理功能，可适用于如Java同构、异构语言、云原生等各种多样化的应用场景。
+
+# 基于Sharding-Proxy实现分库分表读写分离配置
+-- 图示,如下图所示:
+```
+
+<img src="image/img2_1_42_1_1.png" style="zoom:50%;">
+
+```markdown
+-- 使用步骤————https://shardingsphere.apache.org/document/legacy/4.x/document/cn/quick-start/sharding-proxy-quick-start/
+	0、下载二进制压缩包或docker镜像安装
+		1)二进制压缩包下载地址————https://archive.apache.org/dist/incubator/shardingsphere/4.0.0/
+		2)本地附件,详见————[附件——apache-shardingsphere-incubating-4.0.0-sharding-proxy-bin.tar.gz]
+		2)docker镜像安装————docker pull shardingsphere/sharding-proxy
+	1、引入依赖
+		1)如果后端连接PostgreSQL数据库，不需要引入额外依赖
+		2)如果后端连接MySQL数据库，需要下载MySQL Connector/J,解压缩后,将mysql-connector-java-5.1.47.jar拷贝到${sharding-proxy}\lib目录————[下载链接——https://downloads.mysql.com/archives/c-j/]
+		3)本地文件详见————[附件——mysql-connector-java-5.1.47.jar]
+	2、配置文件进行相应配置————配置文件所在目录[二进制压缩包中的conf文件目录下]
+		1)说明
+			Sharding-Proxy支持多逻辑数据源，每个以config-前缀命名的yaml配置文件，即为一个逻辑数据源。以下是config-xxx.yaml的配置配置示例。
+		2)全局配置————认证信息及代理链接属性
+			1-说明————Sharding-Proxy使用conf/server.yaml配置注册中心、认证信息以及公用属性。
+			2-相关配置
+				[1]治理————需要使用注册中心时可配置————治理模块目前支持配置中心和注册中心，具体配置为：
+					#省略数据分片和读写分离配置
+					# 治理配置
+          orchestration:
+            orchestration_ds: 
+            	# orchestrationType: config_center #配置配置中心
+              # orchestrationType: registry_center #配置注册中心
+              orchestrationType: config_center,registry_center #同时配置配置中心和注册中心
+              instanceType: zookeeper
+              serverLists: localhost:2181
+              namespace: orchestration
+              props:
+                overwrite: true
+				[2]认证信息
+					authentication: # 代表要配置认证信息
+            users: # 代表要配置用户
+              root:
+                password: root
+              sharding:
+                password: sharding 
+                authorizedSchemas: sharding_db # sharding用户可访问的数据库
+        [3]公共属性
+        	props:
+            executor.size: 16 # 线程数大小
+            sql.show: false	# 是否展示sql
+      3-完整配置详见————[附件——server.yaml]
+		1)数据分片(即分库分表)
+		 	1-说明————Sharding-Proxy使用conf/config-sharding.yaml配置分库分表属性。
+		 	2-相关配置
+		 		schemaName: #逻辑数据源名称
+          dataSources: #数据源配置，可配置多个data_source_name
+            <data_source_name>: #与Sharding-JDBC配置不同，无需配置数据库连接池
+              url: #数据库url连接
+              username: #数据库用户名
+              password: #数据库密码
+              connectionTimeoutMilliseconds: 30000 #连接超时毫秒数
+              idleTimeoutMilliseconds: 60000 #空闲连接回收超时毫秒数
+              maxLifetimeMilliseconds: 1800000 #连接最大存活时间毫秒数
+              maxPoolSize: 65 #最大连接数
+          shardingRule: #省略数据分片配置，与Sharding-JDBC配置一致
+		 	3-完整配置详见————[附件——config-sharding.yaml]
+		2)读写分离
+			1-说明————Sharding-Proxy使用conf/config-master_slave.yaml配置读写分离属性。
+			2-相关配置
+				schemaName: #逻辑数据源名称
+        dataSources: #省略数据源配置，与数据分片一致
+        masterSlaveRule: #省略读写分离配置，与Sharding-JDBC配置一致
+      3-完整配置详见————[附件——config-master_slave.yaml]
+    3)数据脱敏
+    	1-说明————Sharding-Proxy使用conf/config-encrypt.yaml配置数据脱敏属性。
+    	2-相关配置
+    		dataSource: #省略数据源配置
+          encryptRule:
+            encryptors:
+              <encryptor-name>:
+                type: #加解密器类型，可自定义或选择内置类型：MD5/AES 
+                props: #属性配置, 注意：使用AES加密器，需要配置AES加密器的KEY属性：aes.key.value
+                  aes.key.value: 
+            tables:
+              <table-name>:
+                columns:
+                  <logic-column-name>:
+                    plainColumn: #存储明文的字段
+                    cipherColumn: #存储密文的字段
+                    assistedQueryColumn: #辅助查询字段，针对ShardingQueryAssistedEncryptor类型的加解密器进行辅助查询
+                    encryptor: #加密器名字
+          props:
+            query.with.cipher.column: true #是否使用密文列查询
+    	3-完整配置详见————[附件——config-encrypt.yaml]
+	3、修改主从库的配置文件————my.cnf
+		0)停止运行两个mysql————docker stop mysql-master mysql-slaver-01
+		1)主从mysql配置文件分别添加设定要生成binlog的数据库
+      binlog-do-db=demo_ds_0
+      binlog-do-db=demo_ds_1
+    2)保存并重启两个mysql————docker start mysql-master mysql-slaver-01
+	4、创建两个数据库，并设置字符集
+    create database `demo_ds_0` character set utf8mb4 collate utf8mb4_general_ci;
+    create database `demo_ds_1` character set utf8mb4 collate utf8mb4_general_ci;
+	5、启动测试ShardingProxy
+		1)bin目录下执行启动命令,指定端口启动ShardingProxy————sh start.sh ${port}
+		2)使用Navicat根据指定的端口进行数据库连接
+		3)查看并使用sharding_db数据库————show DATABASES;use sharding_db;
+		4)创建测试表
+      CREATE TABLE `t_order` (
+          `order_id` bigint(20) NOT NULL AUTO_INCREMENT,
+          `user_id` int(11) NOT NULL,
+          `status` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+          PRIMARY KEY (`order_id`)
+      ) ENGINE = INNODB DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
+
+      CREATE TABLE t_order_item (
+          `order_item_id` bigint(20) NOT NULL,
+          `order_id` bigint(20) NOT NULL,
+          `user_id` int(11) NOT NULL,
+          `content` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+          `status` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+          PRIMARY KEY (`order_item_id`)
+      ) ENGINE = INNODB DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
+    5)查看创建的表————show TABLES;
+    6)插入几条数据
+    	INSERT INTO t_order(user_id,status)VALUES(1,1);
+      INSERT INTO t_order(user_id,status)VALUES(2,1);
+      INSERT INTO t_order(user_id,status)VALUES(3,1);
+    7)查看插入的数据————SELECT * from t_order;
+    6)结果————在对应的分库根据制定的分库分表规则,创建好了对应的分表并添加好了数据
+    9)删除对应数据也会在对应的分库被删除————DELETE from t_order;
+```
+
+[附件——apache-shardingsphere-incubating-4.0.0-sharding-proxy-bin.tar.gz](attachments/shardingsphere/apache-shardingsphere-incubating-4.0.0-sharding-proxy-bin.tar.gz)
+
+[附件——mysql-connector-java-5.1.47.jar](attachments/shardingsphere/mysql-connector-java-5.1.47.jar)
+
+[附件——server.yaml](attachments/shardingsphere/server.yaml)
+
+[附件——config-sharding.yaml](attachments/shardingsphere/config-sharding.yaml)
+
+[附件——config-master_slave.yaml](attachments/shardingsphere/config-master_slave.yaml)
+
+[附件——config-encrypt.yaml](attachments/shardingsphere/config-encrypt.yaml)
 
 ## 43、Reactive&WebFlux响应式编程
 
@@ -15461,7 +15608,7 @@ error => {   
 
 
 
-[附件——alipay.trade.page.pay-JAVA-UTF-8.zip](attachments/alipay.trade.page.pay-JAVA-UTF-8.zip)
+[附件——alipay.trade.page.pay-JAVA-UTF-8.zip](attachments/支付宝支付沙箱Demo/alipay.trade.page.pay-JAVA-UTF-8.zip)
 
 ## 11、内网穿透
 

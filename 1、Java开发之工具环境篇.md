@@ -206,7 +206,7 @@ Exit
 	ZSH_THEME="agnoster" # 以agnoster为例，编辑【~/.zshrc】文件，修改【ZSH_THEME】配置
 5、设置字体
 	1)大部分主题用到的字体【Meslo for Powerline】
-	【字体文件,详见————附件1】
+	【字体文件,详见————[附件——Meslo LG S Regular for Powerline.ttf]】
 	2)agnoster还需要额外安装字体【Powerline Fonts】
 	【https://github.com/powerline/fonts】  
 	3)选择字体
@@ -230,7 +230,7 @@ Exit
 	3)执行【source ~/.zshrc】生效
 ```
 
-[附件1——Meslo LG S Regular for Powerline.ttf](attachments/Meslo LG S Regular for Powerline.ttf)
+[附件——Meslo LG S Regular for Powerline.ttf](attachments/iTerm2/Meslo LG S Regular for Powerline.ttf)
 
 ## 2、Brew 安装和卸载
 
@@ -394,7 +394,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 # 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
 
-# IDEA风格配置导出文件详见————附件4
+# IDEA风格配置导出文件详见————[附件——settings.zip]
 
 # 常用插件
 -- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及链式调用方法，总之就是为了简化实体类而生的插件
@@ -440,7 +440,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ```
 
-[附件4——settings.zip](attachments/settings.zip)
+[附件——settings.zip](attachments/IDEA/settings.zip)
 
 ## 3、域名访问环境
 
@@ -1146,7 +1146,7 @@ brew install VisualVM
 # 下载
 -- 方式一————下载指定版本的控制台 jar 包————https://github.com/alibaba/Sentinel/releases
 -- 方式二————下载最新版本的源码自行构建 Sentinel 控制台————https://github.com/alibaba/Sentinel/tree/master/sentinel-dashboard,并使用命令将代码打包成一个 fat jar————mvn clean package
--- 方式三————Sentinel1.6.3版本jar包,详见————附件3
+-- 方式三————Sentinel1.6.3版本jar包,详见————[附件——sentinel-dashboard-1.6.3.jar]
 
 # 启动————注意：启动 Sentinel 控制台需要 JDK 版本为 1.8 及以上版本
 -- 使用如下命令启动控制台:
@@ -1159,7 +1159,7 @@ brew install VisualVM
 -- 默认账户和密码为[sentinel]
 ```
 
-[附件3——sentinel-dashboard-1.6.3.jar](attachments/sentinel-dashboard-1.6.3.jar)
+[附件——sentinel-dashboard-1.6.3.jar](attachments/sentinel/sentinel-dashboard-1.6.3.jar)
 
 ## 19、Redis环境搭建
 
@@ -1203,7 +1203,6 @@ brew install VisualVM
 		集成了包括JSON格式化、二维码生成与解码、信息编解码、代码压缩、美化、页面取色、Markdown与HTML互转、网页滚动截屏、正则表达式、时间转换工具、编码规范检测、页面性能检测、Ajax接口调试、密码生成器、JSON比对工具、网页编码设置、便签笔记等各种功能
 	2、安装
 		依次点击:...——>更多工具——>扩展程序——>Chrome 网上应用店——>搜索[FeHelper]——>点击获取
-	
 ```
 
 # 5、Java——虚拟机环境搭建
