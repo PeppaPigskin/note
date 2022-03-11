@@ -345,10 +345,10 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 # 相关插件
 -- Chrome浏览器VPN插件————SetupVPN
-	1、详见————[附件——FeHelper.crx]
+	1、详见————[附件——SetupVPN.zip]
 ```
 
-[附件——FeHelper.crx](attachments/chrome-plugin/FeHelper.crx)
+[附件——SetupVPN.zip](attachments/chrome-plugin/SetupVPN.zip)
 
 # 4、Java——开发环境搭建
 
