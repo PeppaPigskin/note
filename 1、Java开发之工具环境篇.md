@@ -335,13 +335,20 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install tabby
 ```
 
-7、插件下载地址
+## 7、插件
 
 ```markdown
-# https://www.chajianmi.com/
+# 下载地址
+-- https://www.chajianmi.com/
+
+-- https://crxdown.com/#
+
+# 相关插件
+-- Chrome浏览器VPN插件————SetupVPN
+	1、详见————[附件——FeHelper.crx]
 ```
 
-
+[附件——FeHelper.crx](attachments/chrome-plugin/FeHelper.crx)
 
 # 4、Java——开发环境搭建
 
@@ -1210,10 +1217,10 @@ brew install VisualVM
 	2、安装
 		依次点击:...——>更多工具——>扩展程序——>Chrome 网上应用店——>搜索[FeHelper]——>点击获取
 	3、离线安装
-		打开chrome扩展程序管理页面——>点击“加载已解压的扩展程序”——>选择附件详见————[附件——extension_2020_5_2810_0.crx]
+		打开chrome扩展程序管理页面——>切换到“开发者模式”——>将.crx文件拖拽到扩展程序页——>选择附件详见————[附件——FeHelper.crx]
 ```
 
-[附件——extension_2020_5_2810_0.crx](attachments/chrome-plugin/extension_2020_5_2810_0.crx)
+[附件——FeHelper.crx](attachments/chrome-plugin/FeHelper.crx)
 
 # 5、Java——虚拟机环境搭建
 
