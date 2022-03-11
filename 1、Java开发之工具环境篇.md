@@ -335,6 +335,12 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install tabby
 ```
 
+7、插件下载地址
+
+```markdown
+# https://www.chajianmi.com/
+```
+
 
 
 # 4、Java——开发环境搭建
@@ -1203,7 +1209,11 @@ brew install VisualVM
 		集成了包括JSON格式化、二维码生成与解码、信息编解码、代码压缩、美化、页面取色、Markdown与HTML互转、网页滚动截屏、正则表达式、时间转换工具、编码规范检测、页面性能检测、Ajax接口调试、密码生成器、JSON比对工具、网页编码设置、便签笔记等各种功能
 	2、安装
 		依次点击:...——>更多工具——>扩展程序——>Chrome 网上应用店——>搜索[FeHelper]——>点击获取
+	3、离线安装
+		打开chrome扩展程序管理页面——>点击“加载已解压的扩展程序”——>选择附件详见————[附件——extension_2020_5_2810_0.crx]
 ```
+
+[附件——extension_2020_5_2810_0.crx](attachments/chrome-plugin/extension_2020_5_2810_0.crx)
 
 # 5、Java——虚拟机环境搭建
 
