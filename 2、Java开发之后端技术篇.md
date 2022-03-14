@@ -4699,6 +4699,8 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 ## 11、Redis
 
+### 1、Redis基本使用
+
 ```markdown
 # 说明
 	Redis（Remote Dictionary Server)，即远程字典服务，是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。
@@ -4872,6 +4874,12 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 相关问题
 	1)两个系统间访问可能存在的问题
 		详见————2、Java开发之后端技术篇-3-11、Redis相关问题解决
+```
+
+### 2、Redis集群
+
+```markdown
+
 ```
 
 ## 12、MD5加密
@@ -12344,7 +12352,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 -- 出现[您的连接不是私密连接]问题,解决方式
 	1、问题一————您的连接不是私密连接————解决方式如下:
-		调整键盘为英文输入状态，刷新一下页面，鼠标点击当前页面任意位置，然后依次按键 thisisunsafe .按完上面的按键，页面会自动刷新，然后就可以正常访问了。
+		详见————2、Java开发之后端技术篇-3-27、浏览器安全链接问题
 	2、问题二————namespaces is forbidden: User "system:anonymous" cannot list resource "namespaces" in API group "" at the cluster scope————给匿名用户授权即可解决,测试环境可用此快速解决,执行如下命令:
 		kubectl create clusterrolebinding test:anonymous --clusterrole=cluster-admin --user=system:anonymous
 
@@ -18545,6 +18553,16 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
         initRabbitTemplate();
         return rabbitTemplate;
     }
+```
+
+## 27、浏览器安全链接问题
+
+```markdown
+# 问题
+	访问一个地址,提示————您的连接不是私密连接
+
+# 解决方式如下:
+		调整键盘为英文输入状态，刷新一下页面，鼠标点击当前页面任意位置，然后依次按键 thisisunsafe 按完上面的按键，页面会自动刷新，然后就可以正常访问了。
 ```
 
 
