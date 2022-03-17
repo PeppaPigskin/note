@@ -1222,6 +1222,54 @@ brew install VisualVM
 
 [附件——FeHelper.crx](attachments/chrome-plugin/FeHelper.crx)
 
+## 21、Docker安装与配置
+
+```markdown
+# 安装
+	brew install --cask --appdir=/Applications docker
+
+# 查看版本
+	docker --version
+
+# 配置镜像加速
+-- 配置
+	Perferences... ->Docker Engine。在配置列表中填写加速器地址即可。修改完成之后，点击 Apply&Restart 按钮，Docker 就会重启并应用配置的镜像地址了。
+
+-- 镜像地址
+	1、网易的镜像地址————"registry-mirrors": ["http://hub-mirror.c.163.com"]
+	2、阿里云安装镜像————"registry-mirrors": ["https://fc3ohjfn.mirror.aliyuncs.com"]
+
+-- 查看docker配置信息
+	docker info
+```
+
+## 22、Oracle安装与配置
+
+```markdown
+# 前提————安装Docker环境
+	详见————1、Java开发之工具环境篇-4-21、Docker安装与配置
+
+# 拉取镜像
+	docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+
+# 安装oracle容器
+	docker run -dp 9090:8080 -p 1521:1521 registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+
+# 进入容器
+-- 查看容器ID
+	docker ps
+-- 进入容器内部
+	docker exec -it 容器id /bin/bash
+
+# 使用可视化工具连接
+-- 默认值
+	服务名：helowin
+	用户名：system
+	密码：helowin
+```
+
+
+
 # 5、Java——虚拟机环境搭建
 
 ## 1、VirtualBox虚拟机安装
