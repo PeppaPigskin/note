@@ -179,7 +179,7 @@ Exit
 
 # 3、Mac——常用软件环境搭建
 
-## 1、iTerm2 + Oh My Zsh 终端安装
+## 1、iTerm2 + Oh My Zsh 终端
 
 ```bash
 1、zsh安装
@@ -308,7 +308,7 @@ YF390-0HF8P-M81RQ-2DXQE-M2UT6
 ZF71R-DMX85-08DQY-8YMNC-PPHV8
 ```
 
-## 5、向日葵远程控制工具
+## 5、远程控制工具sunloginclient
 
 ```bash
 1、说明
@@ -335,20 +335,29 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install tabby
 ```
 
-## 7、插件
+## 7、虚拟机连接工具finalshell
 
 ```markdown
-# 下载地址
--- https://www.chajianmi.com/
+# 说明
+	FinalShell 是一款免费的国产的集 SSH 工具、服务器管理、远程桌面加速的良心软件，同时支持 Windows,macOS,Linux，它不单单是一个 SSH 工具，完整的说法应该叫一体化的的服务器，网络管理软件，在很大程度上可以免费替代 XShell，是国产中不多见的良心产品，具有免费海外服务器远程桌面加速，ssh 加速，双边 tcp 加速，内网穿透等特色功能。
 
--- https://crxdown.com/#
+# 安装
+	brew install finalshell
 
-# 相关插件
--- Chrome浏览器VPN插件————SetupVPN
-	1、详见————[附件——SetupVPN.zip]
 ```
 
-[附件——SetupVPN.zip](attachments/chrome-plugin/SetupVPN.zip)
+## 8、安卓模拟器noxappplayer
+
+```markdown
+# 说明
+	Nox App Player是一个免费的Android操作系统模拟器,可让您在PC上运行Android应用程序。也提供单独的Mac版本。
+
+# 安装
+	brew install --cask noxappplayer
+
+```
+
+
 
 # 4、Java——开发环境搭建
 
@@ -596,7 +605,7 @@ brew install VisualVM
 2、配置使用【vim ~/.bash_profile】打开，添加以下内容，使用【source ~/.bash_profile】保存
 	export PATH="/usr/local/opt/mysql@8.0/bin:$PATH"
 3、修改密码，使用命令【mysql -uroot -p】
-	brew services start mysql@5.7 # 启动 mysql
+	brew services start mysql # 启动 mysql
 	ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123';
 4、刷新修改结果
 	FLUSH PRIVILEGES;
@@ -797,7 +806,7 @@ brew install VisualVM
 	https://mvnrepository.com/
 
 # 前提条件
-	配置好JDK开发环境————详见1-4-1、jdk安装与配置
+	配置好JDK开发环境————详见1、Java开发之工具环境篇-4-1、jdk安装与配置
 
 # 下载安装maven
 -- maven安装包apache-maven-3.6.3.zip
@@ -1178,7 +1187,8 @@ brew install VisualVM
 
 ```markdown
 # 安装
--- brew install redis@3.2
+-- brew本地安装
+	brew install redis@3.2
 
 # 配置环境变量
 -- 我的安装完成提示信息,如下:
@@ -1197,7 +1207,8 @@ brew install VisualVM
 	echo 'export PATH="/usr/local/opt/redis@3.2/bin:$PATH"' >> ~/.zshrc
 
 # 启动
--- brew services restart redis@3.2————使用命令启动
+-- brew本地安装启动
+	brew services restart redis@3.2
 ```
 
 ## 20、浏览器工具相关
@@ -1218,11 +1229,16 @@ brew install VisualVM
 		依次点击:...——>更多工具——>扩展程序——>Chrome 网上应用店——>搜索[FeHelper]——>点击获取
 	3、离线安装
 		打开chrome扩展程序管理页面——>切换到“开发者模式”——>将.crx文件拖拽到扩展程序页——>选择附件详见————[附件——FeHelper.crx]
+
+-- Chrome浏览器VPN插件————SetupVPN
+	1、详见————[附件——SetupVPN.zip]
 ```
 
 [附件——FeHelper.crx](attachments/chrome-plugin/FeHelper.crx)
 
-## 21、Docker安装与配置
+[附件——SetupVPN.zip](attachments/chrome-plugin/SetupVPN.zip)
+
+## 21、DockerDesktop安装与配置
 
 ```markdown
 # 安装
@@ -1242,33 +1258,6 @@ brew install VisualVM
 -- 查看docker配置信息
 	docker info
 ```
-
-## 22、Oracle安装与配置
-
-```markdown
-# 前提————安装Docker环境
-	详见————1、Java开发之工具环境篇-4-21、Docker安装与配置
-
-# 拉取镜像
-	docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
-
-# 安装oracle容器
-	docker run -dp 9090:8080 -p 1521:1521 registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
-
-# 进入容器
--- 查看容器ID
-	docker ps
--- 进入容器内部
-	docker exec -it 容器id /bin/bash
-
-# 使用可视化工具连接
--- 默认值
-	服务名：helowin
-	用户名：system
-	密码：helowin
-```
-
-
 
 # 5、Java——虚拟机环境搭建
 
@@ -1544,12 +1533,12 @@ brew install VisualVM
 	sudo docker images
 
 -- 4、创建实例并启动
-	docker run -p 3306:3306 --name mysql \
-	-v /mydata/mysql/log:/var/log/mysql \
-	-v /mydata/mysql/data:/var/lib/mysql \
-	-v /mydata/mysql/conf:/etc/mysql \
-	-e MYSQL_ROOT_PASSWORD=root \
-	-d mysql:5.7
+  docker run -p 3306:3306 --name mysql \
+  -v /Users/pigskin/mydata/mysql/log:/var/log/mysql \
+  -v /Users/pigskin/mydata/mysql/data:/var/lib/mysql \
+  -v /Users/pigskin/mydata/mysql/conf:/etc/mysql \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -d mysql:5.7
 
 	参数说明
   -p 3306:3306————将容器的3306端口映射到主机的3306端口
@@ -1608,10 +1597,10 @@ brew install VisualVM
 		touch redis.conf
 
 -- 2、创建并启动redis实例
-	docker run -p 6379:6379 --name redis \
-	-v /mydata/redis/data:/data \
-	-v /mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
-	-d redis redis-server /etc/redis/redis.conf
+  docker run -p 6379:6379 --name redis \
+  -v /Users/pigskin/mydata/redis/data:/data \
+  -v /Users/pigskin/mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
+  -d redis redis-server /etc/redis/redis.conf
 
 	参数说明
 	-p 6379:6379：将容器的6379端口映射到主机的6379端口
@@ -2185,18 +2174,7 @@ brew install VisualVM
 
 ​		
 
-## 18、Mac安卓模拟器安装
-
-```markdown
-# 说明
-	Nox App Player是一个免费的Android操作系统模拟器,可让您在PC上运行Android应用程序。也提供单独的Mac版本。
-
-# 安装
-	brew install --cask noxappplayer
-
-```
-
-## 19、Docker中安装Zipkin
+## 18、Docker中安装Zipkin
 
 ```markdown
 # 说明
@@ -2228,11 +2206,48 @@ brew install VisualVM
 
 <img src="image/img1_5_19_1_1.png" style="zoom:50%;" />
 
-## 20、finalshell——Mac虚拟机连接工具
+## 19、Docker中Oracle环境搭建
 
 ```markdown
-# 说明
-	FinalShell 是一款免费的国产的集 SSH 工具、服务器管理、远程桌面加速的良心软件，同时支持 Windows,macOS,Linux，它不单单是一个 SSH 工具，完整的说法应该叫一体化的的服务器，网络管理软件，在很大程度上可以免费替代 XShell，是国产中不多见的良心产品，具有免费海外服务器远程桌面加速，ssh 加速，双边 tcp 加速，内网穿透等特色功能。
+# 拉取镜像
+	docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
 
-# 安装
-	brew install finalshell
+# 运行oracle容器
+	docker run -dp 9090:8080 --name oracle_11g -p 1521:1521 registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+
+# 进入容器
+-- 查看容器ID
+	docker ps
+
+-- 进入容器内部
+	docker exec -it 容器id /bin/bash
+
+# 使用可视化工具连接
+-- 默认值
+	服务名：helowin
+	用户名：system
+	密码：helowin
+```
+
+## 20、Docker中Tomcat环境搭建
+
+```markdown
+# 拉取镜像
+	docker pull tomcat:8.5
+
+# 启动镜像
+	docker run -d --name tomcat8.5 -p 8080:8080 tomcat:8.5
+
+# 配置
+-- 由于 docker 的 tomcat8.5 的镜像的 webapp 目录中没有文件，可以采取以下方式纠正，第一换版本，第二，将存放在 webapps.dist 文件夹中的内容复制出来，下面我们通过复制文件出来的方式解决这个问题:
+	1、进入 tomcat 容器中,并进入tomcat目录
+		docker exec -it 容器id /bin/bash
+		cd /usr/local/tomcat
+	2、tomcat 目录下执行如下命令
+		mv webapps webapps2
+		mv webapps.dist webapps
+
+# 浏览器访问
+	Ip:8080
+```
+
