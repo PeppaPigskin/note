@@ -1714,7 +1714,7 @@ brew install VisualVM
 # 安装ik分词器(需要和es版本同步)
 	1)github地址
 		https://github.com/medcl/elasticsearch-analysis-ik
-	2)下载指定版本ik分词器,复制要下载的版本链接地址,使用wget命令进行下载
+	2)下载指定版本ik分词器,复制要下载的版本链接地址,使用wget命令进行下载/本地下载,详见[附件——elasticsearch-analysis-ik-7.4.2.zip]
 		wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.4.2/elasticsearch-analysis-ik-7.4.2.zip
 	3)将下载的ik分词器解压到es映射的插件路径中
 		unzip elasticsearch-analysis-ik-7.4.2.zip -d /mydata/elasticsearch/plugins/ik
@@ -1762,6 +1762,8 @@ brew install VisualVM
 		http://虚拟机IP地址/es/fenci.txt
 	6)重启ES进行测试
 ```
+
+[附件——elasticsearch-analysis-ik-7.4.2.zip](/attachments/ik/elasticsearch-analysis-ik-7.4.2.zip)
 
 ## 8、Docker中安装nginx
 
