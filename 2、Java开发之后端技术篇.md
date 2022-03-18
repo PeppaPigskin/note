@@ -4879,7 +4879,162 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 ### 2、Redis集群
 
 ```markdown
+# Redis集群方式
+-- 数据分区方案
+	1、客户端分区
+		1)图示
+```
 
+<img src="/Users/pigskin/Desktop/MyFile/MyCode/note/image/img2_1_11_2_1.png" style="zoom:50%;">
+
+```markdown
+		2)说明
+    	客户端分区的代表为 Redis Sharding,Redis Sharding 是 Redis Cluster 出来之前,业界普遍使用的 Redis 多实例集群方法.Java 的 Redis客户端驱动程序 Jedis ,支持 Redis Sharding 功能,即 ShardedJedis 以及结合缓存池的 ShardedJedisPool
+    3)优点
+    	不使用第三方中间件,分区逻辑可控,配置简单,节点之间无关联,容易线性扩展,灵活性强
+    4)缺点
+    	客户端无法动态增删服务节点,客户端需自行维护分发逻辑,客户端之间无连接共享,会造成连接浪费
+	2、代理分区
+		1)图示
+```
+
+<img src="/Users/pigskin/Desktop/MyFile/MyCode/note/image/img2_1_11_2_2.png" style="zoom:50%;">
+
+```markdown
+		2)说明
+			代理分区常用方案有 Twemproxy 和 Codis
+	3、redis-cluster
+		1)说明
+			即是高可用,也能完成分片存储
+
+-- 高可用方案
+	1、Sentinel(哨兵机制)支持高可用————redis-cluster没有出现之前主要使用的方案
+		1)说明
+			前面介绍了主从机制,但是从运维角度来看,主节点出现了问题我们还需要通过人工干预的方式把从节点设为主节点,还要通知应用程序更新主节点地址,这种方式非常繁琐笨重,而且主节点的读写能力都十分有限,有没有较好的办法解决这两个问题,哨兵机制就是针对第一个问题的有效解决方案,第二个问题则有赖于集群!哨兵的作用就是监控 Redis 系统的运行状况
+		2)主要功能
+			1-监控(Monitoring)————哨兵(sentinel)会不断地检查你的 Master 和 Slave 是否运作正常
+			2-提醒(Notification)————当被监控的某个 Redis 出现问题时,哨兵(sentinel)可以通过 API 向管理员或者其他应用程序发送通知
+			3-自动故障迁移(Automatic failover)————当主数据库出现故障时自动将从数据库转换为主数据库
+		2)原理图
+```
+
+<img src="image/img2_1_11_2_3.png" style="zoom:50%;">
+
+```markdown
+		3)哨兵原理————Redis哨兵的三个定时任务,Redis哨兵判断一个Redis节点故障不可达主要就是通过三个定时任务来完成的:
+			1-每隔10秒,每个哨兵节点会向主节点和从节点发送“info replication”命令来获取罪行的拓扑结构,如下图所示:
+```
+
+<img src="image/img2_1_11_2_4.png" style="zoom:50%;">
+
+```markdown
+			2-每隔2秒,每个哨兵节点会向Redis节点的_sentinel_:hello频道发送自己对主节点是否故障的判断以及自身的节点信息,并且其他的哨兵节点也会订阅这个频道来了解其他哨兵节点的信息以及对主节点的判断,如下图所示:
+```
+
+<img src="image/img2_1_11_2_5.png" style="zoom:50%;">
+
+```markdown
+			3-每隔1秒,每个哨兵会向主节点、从节点、其他哨兵节点发送一个“ping”命令来做心跳检测,如果在定时Job3检测不到节点的心跳,会判断为“主观下线”。如下图所示:
+```
+
+<img src="image/img2_1_11_2_6.png" style="zoom:50%;">
+
+```markdown
+			客观下线————如果该节点还是主节点那么还会通知到其他的哨兵对该主节点进行心跳检测,这时主观下线的票数超过了<quorum>数时,那么这个主节点确实就可能是故障不可达了,这时就由原来的主观下线变为了“客观下线".
+			故障转移和Leader选举————如果主节点被判定为客观下线之后,就要选取一个哨兵节点来完成后面的故障转移工作,选举出一个 leader,这里面采用的选举算法为 Raft。选举出来的哨兵 leader 就要来完成故障转移工作,也就是在从节点中选出一个节点来当新的主节点
+
+	2、Redis-Cluster————redis的官方多机部署方案,目前用的最多的集群方案
+		1)官方文档————https://redis.io/topics/cluster-tutorial/
+		2)说明
+			Redis 的官方多机部署方案,一组 Redis Cluster 是由多个 Redis 实例组成,官方推荐我们使用6实例,其中3个为主节点,3个为从结点。一旦有主节点发生故障的时候 Redis cluster 可以选举出对应的从结点成为新的主节点,继续对外服务,从而保证服务的高可用性。那么对于客户端来说,知道知道对应的key是要路由到哪一个节点呢? Redis cluster 把所有的数据划分为16384个不同的槽位,可以根据机器的性能把不同的槽位分配给不同的 Redis 实例,对于 Redis 实例来说,他们只会存储部分的 Redis 数据,当然,槽的数据是可以迁移的,不同的实例之间,可以通过一定的协议,进行数据迁移。
+		3)槽
+			1-图示,如下图所示:
+```
+
+<img src="image/img2_1_11_2_7.png" style="zoom:50%;">
+
+```markdown
+			2-说明————Redis集群的功能限制(Redis集群相对单机在功能上存在一些限制,需要提前了解,在使用时做好规避)
+				-- key批量操作支持有限————类似mset、mget操作,目前只支持对具有相同slot值的key进行批量操作————对于映射为不同sot值的key由于执行mget、mget等操作可能存在于多个节点上,因此不被支持
+				-- key事务操作支持有限(一般不使用,而使用lue脚本)——————只支持多key在同一节点上的事务操作,当多个key分布在不同的节点上时无法使用事务功能。
+				-- key作为数据分区的最小粒度
+				-- 不能将一个大的键值对象如hash、list等映射到不同的节点。
+				-- 不支持多数据库空间————单机下的Reds可以支持16个数据库(dbo~db15),集群模式下只能使用个数据库空间,即db0。
+				-- 复制结构只支持一层————从节点只能复制主节点,不支持嵌套树状复制结构。
+				-- 命令大多会重定向,耗时多,图示如下图所示:
+```
+
+<img src="image/img2_1_11_2_8.png" style="zoom:50%;">
+
+```markdown
+		4)一致性hash
+			1-说明
+				一致性哈希可以很好的解决稳定性问题,可以将所有的存储节点排列在首尾相接的Hash环上,每个key在计算Hash后会顺时针找到临接的存储节点存放。而当有节点加入或退出时,仅影响该节点在Hash环上顺时针相邻的后续节点。如下图所示:
+```
+
+<img src="image/img2_1_11_2_9.png" style="zoom:50%;">
+
+```markdown
+			2-一致性Hash解决了Hash倾斜问题
+				如果节点很少,容易出现倾斜,负载不均衡问题。一致性哈希算法,引入了虚拟节点,在整个环上,均衡增加若干个节点。比如a1,a2,b1,b2,c1,c2,a1和a2都是属于A节点的。解决hash倾斜问题
+
+# 集群部署
+-- 集群架构图示,如下图所示
+
+```
+
+<img src="image/img2_1_11_2_10.png" style="zoom:50%;">
+
+```markdown
+-- 部署步骤
+	1、创建6个redis节点————3主3从方式,从节点为了同步备份,主节点进行solt数据分片,创建命令如下:
+		for port in $(seq 7001 7006);\
+    do \
+    mkdir -p /mydata/redis/node-${port}/conf 
+    touch /mydata/redis/node-${port}/conf/redis.conf 
+    cat << EOF >>/mydata/redis/node-${port}/conf/redis.conf 
+    port ${port} 
+    cluster-enabled yes 
+    cluster-config-file nodes.conf 
+    cluster-node-timeout 5000 
+    cluster-announce-ip 192.168.56.xxx
+    cluster-announce-port ${port}
+    cluster-announce-bus-port 1${port}
+    appendonly yes
+    EOF
+    docker run -p ${port}:${port} -p 1${port}:1${port} --name redis-${port} \
+    -v /mydata/redis/node-${port}/data:/data \
+    -v /mydata/redis/node-${port}/conf/redis.conf:/etc/redis/redis.conf \
+    -d redis redis-server /etc/redis/redis.conf; \
+    done
+  2、批量停止运行
+  	docker stop $(docker ps -a |grep redis-700 | awk '{print $1}')
+  3、批量移除
+   	docker rm $(docker ps -a |grep redis-700 | awk '{print $1}')
+  4、使用redis建立集群
+  	1)进入其中一个master节点
+      docker exec -it redis-7001 /bin/bash
+  	2)建立集群,运行结果如下图所示:
+  		redis-cli --cluster create 192.168.56.xxx:7001 192.168.56.xxx:7002 192.168.56.xxx:7003 192.168.56.xxx:7004 192.168.56.xxx:7005 192.168.56.xxx:7006 --cluster-replicas 1
+```
+
+<img src="image/img2_1_11_2_11.png" style="zoom:50%;">
+
+```markdown
+  	3)参数说明:
+      redis-cli————redis命令行
+      --cluster create————开始要创建一个集群
+      192.168.56.106:7001 192.168.56.106:7002 ...————指定那些服务器整个构成一个redis集群
+      --cluster-replicas 1————指定整个集群的副本数
+-- 使用
+	1、普通模式进入指定的redis命令行
+  	redis-cli -h 192.168.56.106 -p 7001
+	2、集群模式进入指定的redis命令行[-c]
+  	redis-cli -c -h 192.168.56.106 -p 7001
+	3、查看集群状态
+		cluster info
+	4、查看集群中所有节点信息
+		cluster nodes
 ```
 
 ## 12、MD5加密
@@ -15890,6 +16045,33 @@ error => {   
             </plugin>
         </plugins>
     </build>
+```
+
+## 13、H3PaaS云平台
+
+```markdown
+# H3paas搭建
+	
+# H3paas部署
+-- 0、云平台登陆————如果第一次登录，点击下面高级-允许
+	H3地址————https://192.168.xxx.xxx/platform/#/index
+	用户名————都是姓名拼音
+	密码————姓名拼音+1
+	个别情况————如果姓名拼音少于7位的，密码就是拼音+123456
+
+-- 1、创建仓库分类
+	1、说明
+		仓库分类用于存放产品jar包，每个产品组上传jar包上传至对应的‘私有仓库’分类下，便于管理。如果缺少对应的仓库分类，请联系吕超来增加分类。
+		如果PT上传的应用包，需要跨产品组使用,请平台用户把私有仓库的jar包同步到‘公有仓库’，并通知质量管理部审核审核通过后其他产品组就可以看到平台的应用包。
+	2、图示,如下图所示:
+```
+
+![image-20220318121957332](/Users/pigskin/Library/Application Support/typora-user-images/image-20220318121957332.png)
+
+```markdown
+-- 2、 注册中心获取
+	1、说明
+		进入应用组，点击微服务引擎
 ```
 
 
