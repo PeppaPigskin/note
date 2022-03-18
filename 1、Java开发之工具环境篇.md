@@ -70,8 +70,9 @@
 -- iptables防火墙
 	1、service iptables stop————临时关闭，即时生效，重启失效
 	2、chkconfig iptables off————永久关闭，重启生效，永不失效
-		
 ```
+
+
 
 # 2、Windows——常用软件环境搭建
 
@@ -176,6 +177,8 @@ Exit
 ​		`9、点击浏览,选择第二步创建的xxx.bat文件，点击下一步，然后点击完成即可:`
 
 <img src="image/img1_2_3_8.png" style="zoom:50%;" />
+
+
 
 # 3、Mac——常用软件环境搭建
 
@@ -329,7 +332,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ## 6、终端工具Tabby
 
-```
+```markdown
 1、说明
 2、安装
 	brew install tabby
@@ -344,6 +347,8 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 # 安装
 	brew install finalshell
 
+# 官方地址
+	http://www.hostbuf.com/t/988.html
 ```
 
 ## 8、安卓模拟器noxappplayer
@@ -354,7 +359,6 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 # 安装
 	brew install --cask noxappplayer
-
 ```
 
 
@@ -1259,6 +1263,8 @@ brew install VisualVM
 	docker info
 ```
 
+
+
 # 5、Java——虚拟机环境搭建
 
 ## 1、VirtualBox虚拟机安装
@@ -1626,6 +1632,9 @@ brew install VisualVM
 
 -- 6、redis可视化客户端
 	brew install another-redis-desktop-manager
+
+-- 7、清除redis缓存命令
+	flushdb
 ```
 
 ## 7、Docker中安装elasticSearch、kibana、ik分词器及自定义扩展词库
