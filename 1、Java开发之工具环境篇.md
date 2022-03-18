@@ -1263,6 +1263,18 @@ brew install VisualVM
 	docker info
 ```
 
+## 22、开发者边车dev-sidecar
+
+```markdown
+# 代码仓库
+	https://gitee.com/docmirror/dev-sidecar
+
+# 说明
+	开发者边车，命名取自service-mesh的service-sidecar，意为为开发者打辅助的边车工具（以下简称ds).通过本地代理的方式将https请求代理到一些国内的加速通道上
+```
+
+
+
 
 
 # 5、Java——虚拟机环境搭建
