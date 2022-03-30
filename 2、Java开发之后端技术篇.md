@@ -7384,9 +7384,225 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 # 注意说明————如果是嵌入式属性(nested),查询,聚合,分析都应该使用嵌入式
 ```
 
-### 2、ES集群
+### 2、ElasticSearch集群
 
+```markdown
+# 集群原理
+-- 官方文档
+	https://www.elastic.co/guide/cn/elasticsearch/guide/current/index.html
+	https://www.elastic.co/auide/cn/elasticsearch/auide/current/distributed-cluster.html
 
+-- 说明
+	elasticsearch是天生支持集群,不需要依赖其他的服务发现和注册的组件,如zookeeper这些,因为它内置了一个ZenDiscovery的模块,是elasticsearch自己实现的一套用于节点发现和选主等功能的组件,所以elasticsearch做起集群来非常简单,不需要太多额外的配置和安装额外的第三方组件
+
+-- 单节点
+	1)一个运行中的 elasticsearch 实例称为一个节点,集群是由一个或多个拥有相同 cluster.name 配置的节点组成,它们共同承担数据和负载的压力.当有节点加入集群中或者从集群中移除节点时,集群将会重新平均分布所有的数据
+	2)当一个节点被选举成为主节点时,它将负责管理集群范围内的所有变更,例如增加、删除索引,或者增加、删除节点等。而主节点并不需要涉及到文档级别的变更和搜索等操作,所以当集群只拥有一个主节点的情况下,即使流量的增加它也不会成为瓶颈。任何节点都可以成为主节点。我们的示例集群就只有一个节点,所以它同时也成为了主节点。
+	3)作为用户,我们可以将请求发送到集群中的任何节点,包括主节点。每个节点都知道任意文档所处的位置,并且能够将我们的请求直接转发到存储我们所需文档的节点。无论我们将请求发送到哪个节点,它都能负责从各个包含我们所需文档的节点收集回数据,并将最终结果返回給客户端。elasticsearch 对这一切的管理都是透明的。
+
+-- 集群健康
+	1、说明————elasticsearch的集群监控信息中包含了许多的统计数据,其中最为重要的一项就是集群健康,它在status字段中展示为green、yellow或者red.
+	2、status字段指示当前集群在总体上是否工作正常.三种颜色定义如下:
+		green————所有主分片和副本分片都能正常运行
+		yellow————所有主分片都能正常运行,但不是所有的副本分片都正常运行
+		red————有主分片没能正常运行
+	3、查看方式————GET /_cluster/health
+
+-- 分片
+	1、一个分片是一个底层的工作单元,它仅保存了全部数据中的一部分。我们的文档被存储和索引到分片内,但是应用程序是直接与索引而不是与分片进行交互。分片就认为是一个数据区
+	2、一个分片可以是主分片或者副本分片。索引内任意一个文档都归属于一个主分片,所以主分片的数目决定着索引能够保存的最大数据量。
+	3、在索引建立的时候就已经确定了主分片数,但是副本分片数可以随时修改
+	4、让我们在包含一个空节点的集群内创建名为 blogs的索引。索引在默认情况下会被分配5个主分片,但是为了演示目的,我们将分配3个主分片和1份副本(每个主分片拥有一个副本分片)
+		PUT /blogs{
+			"settings" : {
+				"number_of_shards" : 3, # 分配3个主分片
+				"number_of_replicas" : 1 # 每个主分片拥有一个副本分片
+			}
+		}
+	5、拥有一个索引的单节点集群————副本分片未被分配到任何节点,如下图所示:
+		此时集群的健康状况为 yellow 则表示全部主分片都正常运行(集群可以正常服务所有请求),但是副本分片没有全部处在正常状态。实际上,所有3个副本分片都是 unassigned————它们都没有被分配到任何节点。在同一个节点上既保存原始数据又保存副本是没有意义的,因为一旦失去了那个节点,我们也将丢失该节点上的所有副本数据。
+		当前我们的集群是正常运行的,但是在硬件故障时有丢失数据的风险。
+```
+
+<img src="image/img2_1_21_2_1.png" style="zoom:50%;">
+
+```markdown
+-- 新增节点
+	1、当你在同一台机器上启动了第二个节点时,只要它和第一个节点有同样的 cluster name 配置,它就会自动发现集群并加入到其中。但是在不同机器上启动节点的时候,为了加入到同一集群,你需要配置一个可连接到的单播主机列表。详细信息请查看最好使用单播代替组播
+	2、拥有两个节点的集群————所有主分片和副本分片都已被分配,如下图所示:
+		此时 cluster-health 现在展示的状态为 green,这表示所有6个分片(包括3个主分片和3个副本分片)都在正常运行。我们的集群现在不仅仅是正常运行的,并且还处于始终可用的状态。
+```
+
+<img src="image/img2_1_21_2_2.png" style="zoom:50%;">
+
+```markdown
+-- 水平扩容————启动第三个节点
+	1、拥有三个节点的集群————为了分散负载而对分片进行重新分配,如下图所示:
+		Node1 和 Node2上各有一个分片被迁移到了新的 Node3 节点,现在每个节点上都拥有2个分片,而不是之前的三个.这表示每个节点的硬件资源(CPU、RAM、I/O)将被更少的分片所共享,每个分片的性能将会得到提升
+```
+
+<img src="image/img2_1_21_2_3.png" style="zoom:50%;">
+
+```markdown
+	2、在运行中的集群上是可以动态调整副本分片数目的,可以按需伸缩集群.将副本数量从默认的1增加到2,blogs索引现在拥有9个分片(3个主分片和6个副本分片).这意味着我们可以将集群扩容到9个节点,每个节点上一个分片.相比原来3个节点时,集群搜索性能可以提升3倍.如下所示:
+		PUT /blogs/_settings
+		{
+			"number_of_replicas" : 2 # 每个主分片拥有2个副本分片
+		}
+```
+
+<img src="image/img2_1_21_2_4.png" style="zoom:50%;">
+
+```markdown
+-- 应对故障
+	1、关闭了一个节点后的集群,如下图所示
+```
+
+<img src="image/img2_1_21_2_5.png" style="zoom:50%;">
+
+```markdown
+	2、应对故障说明
+		1)我们关闭的节点是一个主节点。而集群必须拥有一个主节点来保证正常工作,所以发生的第一件事情就是选举一个新的主节点:Node2。
+		2)在我们关闭Node1的同时也失去了主分片1和2,并且在缺失主分片的时候索引也不能正常工作。如果此时来检查集群的状况,我们看到的状态将会为red:不是所有主分片都在正常工作。
+		3)幸运的是,在其它节点上存在着这两个主分片的完整副本,所以新的主节点立即将这些分片在Node2和Node3上对应的副本分片提升为主分片,此时集群的状态将会为 yellow。这个提升主分片的过程是瞬间发生的,如同按下一个开关一般。
+		4)为什么我们集群状态是 yellow而不是 green呢?虽然我们拥有所有的三个主分片但是同时设置了每个主分片需要对应2份副本分片,而此时只存在一份副本分片。所以集群不能为 green的状态,不过我们不必过于担心:如果我们同样关闭了Node2我们的程序依然可以保持在不丢任何数据的情况下运行,因为Node3为每一个分片都保留着一份副本。
+		5)如果我们重新启动Node1,集群可以将缺失的副本分片再次进行分配。如果Node1依然拥有着之前的分片,它将尝试去重用它们,同时仅从主分片复制发生了修改的数据文件。
+
+-- 问题与解决
+	1、主节点
+		主节点负责创建索引、删除索引、分配分片、追踪集群中的节点状态等工作。Elasticsearch 中的主节点的工作量相对较轻,用户的请求可以发往集群中任何一个节点,由该节点负责分发和返回结果,而不需要经过主节点转发。而主节点是由候选主节点通过 ZenDiscovery 机制选举出来的,所以要想成为主节点,首先要先成为候选主书点。
+	2、候选节点
+		在 Elasticsearch 集群初始化或者主节点宕机的情况下,由候选主节点中选举其中一个作为主节点。指定候选主节点的配置为: node.master:true
+		当主节点负载压力过大,或者集中环境中的网络问题,导致其他节点与主节点通讯的时候,主节点没来的及响应,这样的话,某些节点就认为主节点宕机,重新选择新的主节点,这样的话整个集群的工作就有问题了,比如我们集群中有10个节点,其中7个候选主节点,1个候选主节点成为了主节点,这种情况是正常的情况。但是如果现在出现了我们上面所说的主节点响应不及时,导致其他某些节点认为主节点宕机而重选主节点,那就有问题了,这剩下的6个候选主节点可能有3个候选主节点去重选主节点,最后集群中就出现了两个主节点的情况,这种情况官方成为“脑裂现象”
+		集群中不同的节点对于 master 的选择出现了分歧,出现了多个 master 竟争,导致主分片和副本的识别也发生了分歧,对一些分歧中的分片标识为了坏片。
+	3、数据节点
+		数据节点负责数据的存储和相关具体操作,比如CRUD、搜索、聚合。所以,数据节点对机器配置要求比较高,首先需要有足够的磁盘空间来存储数据,其次数据操作对系统CPU、Memory和IO的性能消耗都很大。通常随着集群的扩大,需要增加更多的数据节点来提高可用性。指定数据节点的配置: node.data:true
+		Elasticsearch 是允许一个节点既做候选主节点也做数据节点的,但是数据节点的负载较重,所以需要考虑将二者分离开,设置专用的候选主节点和数据节点,避免因数据节点负载重导致主节点不响应
+	4、客户端节点
+		客户端节点就是既不做候选主节点也不做数据节点的节点,只负责请求的分发、汇总等等,但是这样的工作,其实任何一个节点都可以完成,因为在 Elasticsearch 中一个集群内的节点都可以执行任何请求,其会负责将请求转发给对应的节点进行处理。所以单独增加这样的节点更多是为了负载均衡。指定该节点的配置为: 
+		node.master:false
+		node.data:false 
+	5、脑裂问题————新版ES无需考虑
+		1)导致脑裂问题原因
+			1-网络问题————集群间的网络延迟导致一些节点访问不到 master ,认为 master 挂掉了从而选举出新的 master,并对 master 上的分片和副本标红,分配新的主分片
+			2-节点负载————主节点的角色既为 master 又为 data ,访问量较大时可能会导致ES停止响应造成大面积延迟,此时其他节点得不到主节点的响应认为主节点挂掉了,会重新选取主节点。
+			3-内存回收————data节点上的ES进程占用的内存较大,引发yM的大规模内存回收,造成ES进程失去响应。
+		2)脑裂问题解决方案
+			1-角色分离————即 master节点与data节点分离,限制角色;数据节点是需要承担存储和搜索的工作的,压力会很大。所以如果该节点同时作为候选主节点和数据节点,那么一日选上它作为主节点了,这时主节点的工作压力将会非常大,出现脑裂现象的概率就增加了
+			2-减少误判————配置主节点的响应时间,在默认情况下,主节点3秒没有响应,其他节点就认为主节点宕机了,那我们可以把该时间设置的长一点,该配置是: discovery.zen.ping_timeout:5
+			3-选举触发————discovery.zen.minimum_master_nodes:1(默认是1),该属性定义的是为了形成一个集群,有主节点资格并互相连接的节点的最小数目
+				◆ 一个有10节点的集群,且每个节点都有成为主节点的资格,discovery. zen. minimum_ master_ nodes参数设置为6
+				◆ 正常情况下,10个节点,互相连接,大于6,就可以形成一个集群
+				◆ 若某个时刻,其中有3个节点断开连接。剩下7个节点,大于6,继续运行之前的集群。而断开的3个节点,小于6,不能形成一个集群
+				◆ 该参数就是为了防止脑裂的产生
+				◆ 建议设置为(候选主节点数/2)+1
+
+-- 集群结构
+	以三台物理机为例。在这三台物理机上,搭建了6个ES的节点,三个 data 节点,三个 master 节点(每台物理机分别起了一个 data 和一个 master),3个 master 节点,目的是达到(n/2)+1等于2的要求,这样挂掉一台 master后(不考虑data),n等于2,满足参数,其他两个 master 节点都认为 master 挂掉之后开始重新选举:
+	1、master节点上
+		node.master = true
+		node.data = false
+		discovery.zen.minimum_master_nodes = 2
+	2、data节点上
+		node.master = false
+		node.data = false
+	3、图示结构
+```
+
+<img src="image/img2_1_21_2_6.png" style="zoom:50%;">
+
+```markdown
+# 集群搭建
+-- 前提————防止JVM报错
+	1、所有主机搭建之前运行命令(临时修改)————sysctl -w vm.max_map_count=262144
+	2、永久修改
+		echo vm.max_map_count=262144>> /etc/sysctl.conf
+		sysctl -p
+
+-- 准备docker网络
+	1、说明
+		1)Docker创建容器时默认采用 bridge网络,自行分配p,不允许自己指定。
+		2)在实际部署中,我们需要指定容器IP.不允许其自行分配IP.尤其是搭建集群时,固定IP是必须的。
+		3)我们可以创建自己的 bridge 网络————mynet,创建容器的时候指定网络为 mynet 并指定 IP 即可。
+	2、创建Docker网络
+		1)查看网络模式————docker network ls
+		2)创建一个新的 bridge 网络————docker network create --driver bridge --subnet=172.18.12.0/16 --gateway=172.18.1.1 mynet
+		3)查看网络详情————docker network inspect [mynet:网络名]
+
+-- 创建3个Master节点
+	1、进入ES配置文件目录(根据个人实际情况决定)
+		cd /mydata/elasticsearch/
+	2、执行如下命令进行创建
+    for port in $(seq 1 3); \
+    do \
+    mkdir -p /mydata/elasticsearch/master-${port}/config
+    mkdir -p /mydata/elasticsearch/master-${port}/data
+    chmod -R 777 /mydata/elasticsearch/master-${port}
+    cat << EOF >/mydata/elasticsearch/master-${port}/config/elasticsearch.yml
+    cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+    node.name: es-master-${port} #该节点的名字
+    node.master: true #该节点有机会成为master节点
+    node.data: false #该节点可以存储数据
+    network.host: 0.0.0.0 #所有ip均可访问
+    http.host: 0.0.0.0 #所有http均可访问
+    http.port: 920${port} #默认http端口
+    transport.tcp.port: 930${port} #与集群交互端口
+    #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+    discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+    discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+    cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+    EOF
+    docker run --name elasticsearch-node-${port} \
+    -p 920${port}:920${port} -p 930${port}:930${port} \
+    --network=mynet --ip 172.18.12.2${port} \
+    -e ES_JAVA_OPTS="-Xms300m -Xmx300m" \
+    -v /mydata/elasticsearch/master-${port}/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+    -v /mydata/elasticsearch/master-${port}/data:/usr/share/elasticsearch/data \
+    -v /mydata/elasticsearch/master-${port}/plugins:/usr/share/elasticsearch/plugins \
+    -d elasticsearch:7.4.2
+    done
+	3、执行以下命令可以进行批量停止运行
+		docker stop $(docker ps -a |grep elasticsearch-node-* | awk'{print $1}')
+	4、执行以下命令可以批量进行移除
+		docker rm $(docker ps -a |grep elasticsearch-node-* | awk'{print $1}')
+
+-- 创建3个Data节点,创建命令如下:
+	for port in $(seq 4 6); \
+    do \
+    mkdir -p /mydata/elasticsearch/node-${port}/config
+    mkdir -p /mydata/elasticsearch/node-${port}/data
+    chmod -R 777 /mydata/elasticsearch/node-${port}
+    cat << EOF >/mydata/elasticsearch/node-${port}/config/elasticsearch.yml
+    cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+    node.name: es-node-${port} #该节点的名字
+    node.master: false #该节点有机会成为master节点
+    node.data: true #该节点可以存储数据
+    network.host: 0.0.0.0 #所有ip均可访问
+    #network.publish_host: 192.168.56.106 #互相通信IP,要设置为本机可被外界访问的IP,否则无法通信
+    http.host: 0.0.0.0 #所有http均可访问
+    http.port: 920${port} #默认http端口
+    transport.tcp.port: 930${port} #与集群交互端口
+    #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+    discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+    discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+    cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+    EOF
+    docker run --name elasticsearch-node-${port} \
+    -p 920${port}:920${port} -p 930${port}:930${port} \
+    --network=mynet --ip 172.18.12.2${port} \
+    -e ES_JAVA_OPTS="-Xms300m -Xmx300m" \
+    -v /mydata/elasticsearch/node-${port}/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+    -v /mydata/elasticsearch/node-${port}/data:/usr/share/elasticsearch/data \
+    -v /mydata/elasticsearch/node-${port}/plugins:/usr/share/elasticsearch/plugins \
+    -d elasticsearch:7.4.2
+    done
+
+-- 测试集群
+	1、http://192.168.56.106:920x/_nodes/process?pretty————查看集群节点状态
+	2、http://192.168.56.106:920x/_cluster/stats?pretty————查看集群状态
+	3、http://192.168.56.106:920x/_cluster/health?pretty————查看集群健康状态
+	4、http://192.168.56.106:920x/_cat/nodes————查看各个节点信息
+```
 
 ## 22、Thymeleaf——模板引擎
 
