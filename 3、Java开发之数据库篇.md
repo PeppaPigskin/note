@@ -76,6 +76,20 @@ ALTER USER [用户名：username] IDENTIFIED BY [新密码：1];
 DROP USER [用户名：username] CASCADE;
 # 查询用户SID和SERIAL
 SELECT sid,serial FROM v$session WHERE USERNAME=[用户名：'username'];
+# 解锁用户
+ALTER USER [被锁用户名：username] IDENTIFIED BY [被锁用户密码] ACCOUNT UNLOCK;
+# 当前的session连接数
+select count(*) from v$session;
+# 当前的数据库连接数
+select count(*) from v$process ;
+# 数据库允许的最大连接数
+select value from v$parameter where name ='processes';
+# 修改processes和sessions值
+alter system set processes=1000 scope=spfile;
+alter system set sessions=1105 scope=spfile;
+# 重启数据库
+shutdown immediate;
+startup;
 ```
 
 
