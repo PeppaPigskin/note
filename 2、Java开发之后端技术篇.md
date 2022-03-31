@@ -10355,9 +10355,110 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 ```
 
-### 9、RabibMQ集群
+### 9、RabbitMQ集群
 
+```markdown
+# 集群形式
+-- 说明
+	RabbitMQ是使用Erlang开发的,集群非常方便,因为Erlang天生就是一门分布式语言,但其本身并不支持负载均衡.
+	RabbitMQ集群中节点包括内存节点(RAM)、磁盘节点(Disk,消息持久化),集群中至少有一个Disk节点
 
+-- 普通模式(默认)————一般生成环境不使用
+	对于普通模式,集群中各节点有相同的队列结构,但消息只会存在于集群中的一个节点。对于消费者来说,若消息进入A节点的 Queue 中,当从B节点拉取时, RabbitMQ 会将消息从A中取出,并经过B发送给消费者
+	应用场景————该模式各适合于消息无需持久化的场合,如日志队列。当队列非持久化,且创建该队列的节点宕机,客户端才可以重连集群其他节点,并重新创建队列。若为持久化,只能等故障节点恢复
+
+-- 镜像模式————一般用于生产环境
+	与普通模式不同之处是消息实体会主动在镜像节点间同步,而不是在取数据时临时拉取,高可用;该模式下, mirror queue有一套选举算法,即1个 master、n个 slaver,生产者、消费者的请求都会转至 master
+	应用场景————可靠性要求较高场合,如下单、库存队列
+	缺点————若镜像队列过多,且消息体量大,集群內部网络带宽将会被此种同步通讯所消耗
+	注意事项
+		(1)镜像集群也是基于普通集群,即只有先搭建普通集群,然后才能设置镜像队列
+		(2)若消费过程中,master挂掉,则选举新master,若未来得及确认,则可能会重复消费
+
+# 集群搭建
+-- 创建指定文件目录用户集群搭建
+  mkdir /mydata/rabbitmq
+  cd /mydata/rabbitmq/
+  mkdir rabbitmq01 rabbitmq02 rabbitmq03
+
+-- 启动三个RabbitMQ
+	1、启动命令
+    docker run -d --hostname rabbitmq01 --name rabbitmq01 \
+    -v /mydata/rabbitmq/rabbitmq01:/var/lib/rabbitmq \
+    -p 15673:15672 -p 5673:5672 \
+    -e RABBITMQ_ERLANG_COOKIE='pigskinmqcookie' \
+    rabbitmq:management
+
+    docker run -d --hostname rabbitmq02 --name rabbitmq02 \
+    -v /mydata/rabbitmq/rabbitmq02:/var/lib/rabbitmq \
+    -p 15674:15672 -p 5674:5672 \
+    -e RABBITMQ_ERLANG_COOKIE='pigskinmqcookie' \
+    --link rabbitmq01:rabbitmq01 \
+    rabbitmq:management
+
+    docker run -d --hostname rabbitmq03 --name rabbitmq03 \
+    -v /mydata/rabbitmq/rabbitmq03:/var/lib/rabbitmq \
+    -p 15675:15672 -p 5675:5672 \
+    -e RABBITMQ_ERLANG_COOKIE='pigskinmqcookie' \
+    --link rabbitmq01:rabbitmq01 --link rabbitmq02:rabbitmq02 \
+    rabbitmq:management
+
+	2、参数说明:
+    -- hostname rabbitmq01————设置容器的主机名,使用主机名也可以进行访问
+    -e RABBITMQ_ERLANG_COOKIE————每一个mq都有一个Cookie值,便于集群中相同Cookie值的MQ进行互相信任,互相通过(节点认证作用,部署集成时,需要同步该值)
+    --link rabbitmq01:rabbitmq01————设置本MQ可以访问rabbitmq01
+
+-- 节点加入集群————(此时还是普通集群)操作完成,结果如下图所示:
+```
+
+<img src="image/img2_1_28_9_1.png" style="zoom:50%;">
+
+```markdown
+	1、第一个节点操作
+		1)进入容器内部
+			docker exec -it rabbitmq01 /bin/bash
+		2)初始化节点
+			rabbitmqctl stop_app
+			rabbitmqctl reset
+			rabbitmqctl start_app
+			exit
+	2、第二个节点操作
+		1)进入容器内部
+			docker exec -it rabbitmq02 /bin/bash
+		2)初始化节点,并加入第一个节点的集群
+			rabbitmqctl stop_app
+			rabbitmqctl reset
+			rabbitmqctl join_cluster --ram rabbit@rabbitmq01
+			rabbitmqctl start_app
+			exit
+	3、第三个节点操作
+		1)进入容器内部
+			docker exec -it rabbitmq03 /bin/bash
+		2)初始化节点,并加入第一个节点的集群
+			rabbitmqctl stop_app
+			rabbitmqctl reset
+			rabbitmqctl join_cluster --ram rabbit@rabbitmq01
+			rabbitmqctl start_app
+			exit
+
+-- 实现镜像集群
+	1、随意进入其中一个容器中
+		docker exec -it rabbitmq01 /bin/bash
+	2、设置高可用策略、并且自动同步 
+		rabbitmqctl set_policy -p / ha "^" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+		参数说明:
+			set_policy————设置策略
+			-p /————指定虚拟主机为当前虚拟主机
+			ha————指定策略名(高可用)
+			"^"————代表当前指定的虚拟主机下所有的队列,所有的设置以指定东西开头的应用该策略(^代表所有)
+	3、查看置顶虚拟主机(/)下的所有策略
+		rabbitmqctl list_policies -p /
+
+--测试使用
+	1、在任意一个RabbitMQ节点中创建队列,其他该集群中的节点也会产生对应的队列
+	2、在任意一个RabbitMQ节点中发送消息,其他该集群中的节点也会获得消息
+	3、在任意一个RabbitMQ节点中消费消息,其他该集群中的节点也的消息也将被消费	
+```
 
 ## 29、JVM内存模型
 
