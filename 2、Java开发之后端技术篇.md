@@ -13211,7 +13211,34 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	7、上一步确认推送后,在运行状态最后一步,等待中进行选择是否将其部署到生产环境,确认后,之前创建的kubesphere-sample-prod生产环境项目就会拉取镜像进行部署工作
 ```
 
+### 15、Kubernetes集群——Kubesphere服务部署
 
+```markdown
+# K8S集群搭建总结
+	1、每一个MySQL/Redis必须都是一个有状态服务
+	2、每一个MySQL/Redis必须挂载自己的配置文件
+	3、每一个MySQL/Redis必须挂载自己的PVC存储卷
+	4、IP都使用对应创建的域名(服务的DNS)
+	5、可自定义镜像后,对[docker-entrypoint.sh]文件进行配置,将我们需要运行的命令写好,这样镜像启动后就会自动配置好,就不用进入容器进行配置
+
+# Kubesphere部署应用的流程
+
+# Kubesphere搭建MySQL集群环境
+	详见————2、Java开发之后端技术篇-1-41-4、K8S有状态服务部署之MySQL环境搭建
+
+# Kubesphere搭建Redis集群环境
+
+# Kubesphere搭建ElasticSearch&Kibana集群环境
+
+# Kubesphere搭建RabbitMQ环境
+
+# Kubesphere搭建Nacos环境
+
+# Kubesphere搭建Zipkin环境
+
+# Kubesphere搭建Sentinel环境
+
+```
 
 ## 39、DevOps——开发运营一体化
 
@@ -13390,12 +13417,12 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		# 是否只读
 		read-only=0
 		# 设定要生成binlog的数据库
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
+    binlog-do-db=db_mall_oms
+    binlog-do-db=db_mall_pms
+    binlog-do-db=db_mall_sms
+    binlog-do-db=db_mall_sys
+    binlog-do-db=db_mall_ums
+    binlog-do-db=db_mall_wms
 
 		# 设定复制时需要忽略的数据库
 		replicate-ignore-db=mysql
@@ -13416,39 +13443,39 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	2、修改slaver基本配置
 		1)vim /mydata/mysql/slaver/conf/my.cnf————编辑配置文件
 		2)添加如下内容
-			[client]
-      default-character-set=utf8
+    [client]
+    default-character-set=utf8
 
-      [mysql]
-      default-character-set=utf8
+    [mysql]
+    default-character-set=utf8
 
-      [mysqld]
-      init_connect='SET collation_connection = utf8_unicode_ci'
-      init_connect='SET NAMES utf8'
-      character-set-server=utf8
-      collation-server=utf8_unicode_ci
-      skip-character-set-client-handshake
-      skip-name-resolve
+    [mysqld]
+    init_connect='SET collation_connection = utf8_unicode_ci'
+    init_connect='SET NAMES utf8'
+    character-set-server=utf8
+    collation-server=utf8_unicode_ci
+    skip-character-set-client-handshake
+    skip-name-resolve
 	3、添加slaver主从复制部分配置
-		# 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
-		server_id=2
-		# 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
-		log-bin=mysql-bin
-		# 是否只读(0-否,1-是)
-		read-only=1
-		# 设定要生成binlog的数据库
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
-		binlog-do-db=xxx_database_name
+    # 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
+    server_id=2
+    # 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
+    log-bin=mysql-bin
+    # 是否只读(0-否,1-是)
+    read-only=1
+    # 设定要生成binlog的数据库
+    binlog-do-db=db_mall_oms
+    binlog-do-db=db_mall_pms
+    binlog-do-db=db_mall_sms
+    binlog-do-db=db_mall_sys
+    binlog-do-db=db_mall_ums
+    binlog-do-db=db_mall_wms
 
-		# 设定复制时需要忽略的数据库
-		replicate-ignore-db=mysql
-		replicate-ignore-db=sys
-		replicate-ignore-db=information_schema
-		replicate-ignore-db=performance_schema
+    # 设定复制时需要忽略的数据库
+    replicate-ignore-db=mysql
+    replicate-ignore-db=sys
+    replicate-ignore-db=information_schema
+    replicate-ignore-db=performance_schema
 	4、重启mysql-slaver-01镜像
 		docker restart mysql-slaver-01
 
@@ -13487,6 +13514,206 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 # MyCat或ShardingSphere————分库分表
 	详见————2、Java开发之后端技术篇-1-42、ShardingSphere——分库分表
+```
+
+### 4、K8S有状态服务部署之MySQL环境搭建
+
+```markdown
+# 原理图如下
+```
+
+<img src="image/img2_1_41_4_1.png" style="zoom:50%;">
+
+```markdown
+# 说明————可以使用kubesphere,快速搭建MySQL环境
+	1、有状态服务抽取配置ConfigMap
+	2、有状态服务必须使用pvc持久化数据
+	3、服务集群内访问使用DNS提供的稳定域名
+
+# Master节点创建步骤(登陆K8S的————project-regular)
+-- 配置文件创建
+	1、进入指定项目——配置中心——配置——创建一个MySQL的配置,填写基本信息
+		1)名称————指定配置名称————mysql-master-cnf
+		2)别名————指定配置别名————Mysql的Master配置
+	2、进入下一步,进行配置设置
+		1)my.cnf————值内容如下:
+      [client]
+      default-character-set=utf8
+
+      [mysql]
+      default-character-set=utf8
+
+      [mysqld]
+      init_connect='SET collation_connection = utf8_unicode_ci'
+      init_connect='SET NAMES utf8'
+      character-set-server=utf8
+      collation-server=utf8_unicode_ci
+      skip-character-set-client-handshake
+      #必须加,不然连接很慢
+      skip-name-resolve
+
+      # 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
+      server_id=1
+      # 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
+      log-bin=mysql-bin
+      # 是否只读
+      read-only=0
+      # 设定要生成binlog的数据库
+      binlog-do-db=db_mall_oms
+      binlog-do-db=db_mall_pms
+      binlog-do-db=db_mall_sms
+      binlog-do-db=db_mall_sys
+      binlog-do-db=db_mall_ums
+      binlog-do-db=db_mall_wms
+
+      # 设定复制时需要忽略的数据库
+      replicate-ignore-db=mysql
+      replicate-ignore-db=sys
+      replicate-ignore-db=information_schema
+      replicate-ignore-db=performance_schema
+
+-- 创建存储卷
+	1、进入指定项目——存储卷——创建一个存储卷,填写基本信息
+		1)名称————指定存储卷名————pigskinmall-mysql-master-pvc
+		2)别名————指定存储卷别名————mysql主节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制10G
+	3、进入下一步,进行高级设置,直接点击创建
+
+-- 创建服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————pigskinmall-mysql-master
+		2)别名————指定服务别名————mysql主节点
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————mysql:5.7
+			2-设置使用默认端口
+			3-高级设置
+				1+内存————设置2000Mi
+				2+环境变量————选择之前设置的密钥,指定ROOT初始密码————mysql-secret(MySQL 密钥)/MYSQL_ROOT_PASSWORD
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/etc/mysql
+			4-选择使用特定键和路径————my.cnf/my.cnf
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/var/lib/mysql
+	4、进入下一步,进行高级设置,直接点击创建
+
+-- 点击创建的服务,可以查看到服务的DNS————pigskinmall-mysql-master.pigskinmall
+
+# Slaver节点创建步骤
+-- 配置文件创建
+	1、进入指定项目——配置中心——配置——创建一个MySQL的配置,填写基本信息
+		1)名称————指定配置名称————mysql-slaver-cnf
+		2)别名————指定配置别名————Mysql的Slaver配置
+	2、进入下一步,进行配置设置
+		1)my.cnf————值内容如下:
+      [client]
+      default-character-set=utf8
+
+      [mysql]
+      default-character-set=utf8
+
+      [mysqld]
+      init_connect='SET collation_connection = utf8_unicode_ci'
+      init_connect='SET NAMES utf8'
+      character-set-server=utf8
+      collation-server=utf8_unicode_ci
+      skip-character-set-client-handshake
+      skip-name-resolve
+
+      # 代表当前mysql服务的id,主从环境下每一个服务器的ID都应该不一样
+      server_id=2
+      # 二进制日志,主从环境下,主节点只要对mysql进行任何一条增删改,都会进行日志记录,从节点可以获取所有日记,进行执行,从而实现同步效果
+      log-bin=mysql-bin
+      # 是否只读(0-否,1-是)
+      read-only=1
+      # 设定要生成binlog的数据库
+      binlog-do-db=db_mall_oms
+      binlog-do-db=db_mall_pms
+      binlog-do-db=db_mall_sms
+      binlog-do-db=db_mall_sys
+      binlog-do-db=db_mall_ums
+      binlog-do-db=db_mall_wms
+
+      # 设定复制时需要忽略的数据库
+      replicate-ignore-db=mysql
+      replicate-ignore-db=sys
+      replicate-ignore-db=information_schema
+      replicate-ignore-db=performance_schema
+
+-- 创建存储卷
+	1、进入指定项目——存储卷——创建一个存储卷,填写基本信息
+		1)名称————指定存储卷名————pigskinmall-mysql-slaver-pvc
+		2)别名————指定存储卷别名————mysql从节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制10G
+	3、进入下一步,进行高级设置,直接点击创建
+
+-- 创建服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————pigskinmall-mysql-slaver
+		2)别名————指定服务别名————mysql从节点
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————mysql:5.7
+			2-设置使用默认端口
+			3-高级设置
+				1+内存————设置2000Mi
+				2+环境变量————选择之前设置的密钥,指定ROOT初始密码————mysql-secret(MySQL 密钥)/MYSQL_ROOT_PASSWORD
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/etc/mysql
+			4-选择使用特定键和路径————my.cnf/my.cnf
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/var/lib/mysql
+	4、进入下一步,进行高级设置,直接点击创建
+
+-- 点击创建的服务,可以查看到服务的DNS————pigskinmall-mysql-slaver.pigskinmall
+
+# 为Master授权用来同步其数据的用户
+	1、进入master容器————点击容器组,进入Master容器服务的终端
+	2、进入mysql内部————su root/mysql -u root -p/123456
+		1)授权root可以远程访问————主从无关,为了方便远程连接mysql
+			GRANT ALL PRIVILEGES ON *.* to 'root'@'%' identified by 'root' with grant option;
+			FLUSH PRIVILEGES;
+		2)添加用来同步的用户
+			GRANT REPLICATION SLAVE ON *.* to 'backup'@'%' identified by '123456';
+	3、查看master状态————获取File名
+		show master status;
+
+# 配置Slaver同步Master数据
+	1、进入Slaver容器————点击容器组,进入Slaver容器服务的终端
+	2、进入mysql内部————su root/mysql -u root -p/123456
+		1)授权root可以远程访问————主从无关,为了方便远程连接mysql
+			GRANT ALL PRIVILEGES ON *.* to 'root'@'%'identified by 'root' with grant option;
+			FLUSH PRIVILEGES;
+		2)设置主库连接———告诉从节点同步的主节点(根据个人实际情况配置master节点信息)
+			change master to master_host='pigskinmall-mysql-master.pigskinmall',master_user='backup',master_password='123456',master_log_file='mysql-bin.000005',master_log_pos=0,master_port=3306;
+		3)启动/停止从库连接
+			start/stop slave;
+		4)查看从库状态————确保Slave_IO_Running和Slave_SQL_Running运行状态都为Yes
+			show slave status\G;
+
+# 测试使用
+	1、主节点创建一个测试的数据库
+		CREATE DATABASE `db_mall_oms`;
+	2、从节点查看是否同步过来
+		SHOW DATABASES;
 ```
 
 ## 42、ShardingSphere——分库分表
