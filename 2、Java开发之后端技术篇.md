@@ -4885,7 +4885,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		1)图示
 ```
 
-<img src="/Users/pigskin/Desktop/MyFile/MyCode/note/image/img2_1_11_2_1.png" style="zoom:50%;">
+<img src="image/img2_1_11_2_1.png" style="zoom:50%;">
 
 ```markdown
 		2)说明
@@ -4898,7 +4898,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		1)图示
 ```
 
-<img src="/Users/pigskin/Desktop/MyFile/MyCode/note/image/img2_1_11_2_2.png" style="zoom:50%;">
+<img src="image/img2_1_11_2_2.png" style="zoom:50%;">
 
 ```markdown
 		2)说明
