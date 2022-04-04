@@ -3334,6 +3334,13 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
     spring.cloud.gateway.routes[1].id=eduService
     spring.cloud.gateway.routes[1].uri=lb://eduService
     spring.cloud.gateway.routes[1].predicates= Path=/eduService/**
+    
+    # 作为最终统一转发的路由规则(便于本地开发使用云服务中其他环境)
+    - id: other-request
+    	order: -2
+    	uri: http://172.xx.xx.xxx:3xxx/ #设置要转发的请求地址
+    	predicates:
+    		- Path=/**
 
 -- 4、创建启动类
 		package com.pigskin.gateway;
@@ -5035,6 +5042,159 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 		cluster info
 	4、查看集群中所有节点信息
 		cluster nodes
+```
+
+### 3、K8S有状态服务部署之Redis环境搭建
+
+```markdown
+# 创建配置文件(登陆K8S的————project-regular/P@88w0rd)
+	1、进入指定项目——配置中心——配置——创建六个Redis的配置,填写基本信息
+		1)名称————指定配置名称————pigskinmall-redis-master1-conf、pigskinmall-redis-master2-conf、pigskinmall-redis-master3-conf、pigskinmall-redis-slaver1-conf、pigskinmall-redis-slaver2-conf、pigskinmall-redis-slaver3-conf
+		2)别名————指定配置别名————Redis的配置文件
+	2、进入下一步,进行配置设置
+		1)pigskinmall-redis-master1-conf————值内容如下:
+			port 7001 
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7001
+      cluster-announce-bus-port 17001
+      appendonly yes
+		2)pigskinmall-redis-master2-conf————值内容如下:
+			port 7002
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7002
+      cluster-announce-bus-port 17002
+      appendonly yes
+		3)pigskinmall-redis-master3-conf————值内容如下:
+			port 7003 
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7003
+      cluster-announce-bus-port 17003
+      appendonly yes
+		4)pigskinmall-redis-slaver1-conf————值内容如下:
+			port 7004
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7004
+      cluster-announce-bus-port 17004
+      appendonly yes
+		5)pigskinmall-redis-slaver2-conf————值内容如下:
+			port 7005 
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7005
+      cluster-announce-bus-port 17005
+      appendonly yes
+		6)pigskinmall-redis-slaver3-conf————值内容如下:
+			port 7006 
+      cluster-enabled yes 
+      cluster-config-file nodes.conf 
+      cluster-node-timeout 5000 
+      cluster-announce-ip 192.168.56.xxx
+      cluster-announce-port 7006
+      cluster-announce-bus-port 17006
+      appendonly yes
+
+# 创建存储卷
+-- 创建三个主节点存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————pigskinmall-redis-master1-pvc、pigskinmall-redis-master2-pvc、pigskinmall-redis-master3-pvc
+		2)别名————指定存储卷别名————redis主1节点存储卷、redis主2节点存储卷、redis主3节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制5G
+	3、进入下一步,进行高级设置,直接点击创建
+
+-- 创建三个从节点存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————pigskinmall-redis-slaver1-pvc、pigskinmall-redis-slaver2-pvc、pigskinmall-redis-slaver3-pvc
+		2)别名————指定存储卷别名————redis从1节点存储卷、redis从2节点存储卷、redis从3节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制5G
+	3、进入下一步,进行高级设置,直接点击创建
+
+# 创建服务
+-- 创建三个主服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————pigskinmall-redis1-master、pigskinmall-redis2-master、pigskinmall-redis3-master
+		2)别名————指定服务别名————redis主节点1、redis主节点2、redis主节点3
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————redis:5.0.7
+			2-设置使用端口
+				容器端口(7001、7002、7003)、服务端口(7001、7002、7003)
+				容器端口(17001、17002、17003)、服务端口(17001、17002、17003)
+			3-高级设置
+				1+内存————设置500Mi
+				2+启动命令
+            运行命令(redis-server)、参数(/etc/redis/redis.conf)
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/etc/redis
+			4-选择使用特定键和路径————redis-conf/redis.conf
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/data
+	4、进入下一步,进行高级设置,直接点击创建
+
+-- 创建三个从服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————pigskinmall-redis1-slaver、pigskinmall-redis2-slaver、pigskinmall-redis3-slaver
+		2)别名————指定服务别名————redis从节点1、redis从节点2、redis从节点3
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————redis:5.0.7
+			2-设置使用端口
+				容器端口(7004、7005、7006)、服务端口(7004、7005、7006)
+				容器端口(17004、17005、17006)、服务端口(17004、17005、17006)
+			3-高级设置
+				1+内存————设置500Mi
+				2+启动命令
+					运行命令(redis-server)、参数(/etc/redis/redis.conf)
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/etc/redis
+			4-选择使用特定键和路径————redis-conf/redis.conf
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/data
+	4、进入下一步,进行高级设置,直接点击创建
+
+# 点击创建的服务,可以查看到服务的DNS
+	pigskinmall-redis1-master.pigskinmall
+	pigskinmall-redis2-master.pigskinmall
+	pigskinmall-redis3-master.pigskinmall
+	pigskinmall-redis1-slaver.pigskinmall
+	pigskinmall-redis2-slaver.pigskinmall
+	pigskinmall-redis3-slaver.pigskinmall
+
+# 设置集群配置
+	1)进入其中一个master容器————点击容器组,进入Master容器服务的终端
+ 	2)建立集群,运行结果如下图所示:
+  	redis-cli --cluster create pigskinmall-redis1-master.pigskinmall:7001 pigskinmall-redis2-master.pigskinmall:7002 pigskinmall-redis3-master.pigskinmall:7003 pigskinmall-redis1-slaver.pigskinmall:7004 pigskinmall-redis2-slaver.pigskinmall:7005 pigskinmall-redis3-slaver.pigskinmall:7006 --cluster-replicas 1
 ```
 
 ## 12、MD5加密
@@ -13227,6 +13387,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	详见————2、Java开发之后端技术篇-1-41-4、K8S有状态服务部署之MySQL环境搭建
 
 # Kubesphere搭建Redis集群环境
+	详见————2、Java开发之后端技术篇-1-11-3、K8S有状态服务部署之Redis环境搭建
 
 # Kubesphere搭建ElasticSearch&Kibana集群环境
 
@@ -13530,7 +13691,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	2、有状态服务必须使用pvc持久化数据
 	3、服务集群内访问使用DNS提供的稳定域名
 
-# Master节点创建步骤(登陆K8S的————project-regular)
+# Master节点创建步骤(登陆K8S的————project-regular/P@88w0rd)
 -- 配置文件创建
 	1、进入指定项目——配置中心——配置——创建一个MySQL的配置,填写基本信息
 		1)名称————指定配置名称————mysql-master-cnf
