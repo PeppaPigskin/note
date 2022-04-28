@@ -251,11 +251,5 @@ ALTER SYSTEM KILL SESSION ['sid,serial'];
 
 
 
-## 2、相关知识点
-
-
-
-## 3、
-
 
 
