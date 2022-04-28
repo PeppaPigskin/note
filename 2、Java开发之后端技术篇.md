@@ -3703,6 +3703,12 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 -- zipkin界面分析
 	更多参考————官方文档————https://github.com/openzipkin/zipkin#storage-component
+
+# K8S无状态服务部署之Sentinel&Zipkin环境搭建
+-- 部署Sentinel环境
+	TODO:
+-- 部署Zipkin环境
+	TODO:
 ```
 
 ### 7、Spring Cloud Netflix Ribbon——负载均衡
@@ -4664,6 +4670,8 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 ## 10、Nacos
 
+### 1、基本使用
+
 ```markdown
 # 说明
 	阿里巴巴推出的一个开源项目。Nacos=Spring Cloud Eureka + Spring Cloud Config。可与Spring、Spring Boot、Spring Cloud集成.并能替代它们两者，通过Nacos Server和spring-cloud-starter-alibaba-nacos-discovery实现服务的注册和发现.以服务为主要服务对象的中间件，支持所有主流的服务发现、配置和管理
@@ -4703,6 +4711,66 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
       #重新启动nacos服务
       sh startup.sh -m standalone &
 ```
+
+### 2、K8S有状态服务部署之Nacos环境搭建
+
+```markdown
+# Docker运行命令
+docker run --env MODE=standalone --name nacos \
+-v /mydata/nacos/conf:/home/nacos/conf -d -p 8848:8848 nacos/nacos-server:1.1.4
+
+# 服务部署
+-- 创建存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————nacos-pvc
+		2)别名————指定存储卷别名————nacos存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制1G
+	3、进入下一步,进行高级设置,直接点击创建
+
+-- 创建服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————nacos
+		2)别名————指定服务别名————nacos服务
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+		3)容器镜像
+			1-添加指定的容器镜像————nacos/nacos-server:1.1.4
+			2-设置使用端口
+				容器端口(8848)、服务端口(8848)
+			3-高级设置
+				1+内存————设置500Mi
+        2+环境变量
+        		MODE    standalone
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————添加存储卷
+			1-选择第一步添加的存储卷————nacos-pvc
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/home/nacos/data
+	4、进入下一步,进行高级设置,直接点击创建
+
+-- 有状态服务对外暴露访问端口,后边可以结合nginx方式来进行暴露,暂时先自定义访问效果
+	1、服务————>删除指定nacos服务,但是不删除关联资源
+	2、进入指定项目——应用负载——服务——自定义创建/指定工作负载,进行基本信息设置
+		1)名称————指定存储卷名————nacos-pvc
+		2)别名————指定存储卷别名————nacos存储卷
+	3、服务设置中,进行如下设置,点击下一步
+		1)指定工作负载————选择之前的nacos有状态工作副本集
+		2)访问类型————设置通过集群内部IP来访问Virtual IP
+		3)端口————协议/HTTP,名称/http-8848,容器端口/8848,服务端口/8848
+	4、高级设置中,进行如下设置,点击创建
+		1)设置外网访问————NodePort
+
+-- 访问————主机IP:暴露节点端口/nacos
+
+# 配置如下信息,指定数据库账号和密码,nacos相关信息就会进入数据库
+```
+
+<img src="image/img2_1_10_2_1.png" style="zoom:50%;">
+
+
 
 ## 11、Redis
 
@@ -7681,7 +7749,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 -- 准备docker网络
 	1、说明
-		1)Docker创建容器时默认采用 bridge网络,自行分配p,不允许自己指定。
+		1)Docker创建容器时默认采用 bridge网络,自行分配ip,不允许自己指定。
 		2)在实际部署中,我们需要指定容器IP.不允许其自行分配IP.尤其是搭建集群时,固定IP是必须的。
 		3)我们可以创建自己的 bridge 网络————mynet,创建容器的时候指定网络为 mynet 并指定 IP 即可。
 	2、创建Docker网络
@@ -7762,6 +7830,216 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	2、http://192.168.56.106:920x/_cluster/stats?pretty————查看集群状态
 	3、http://192.168.56.106:920x/_cluster/health?pretty————查看集群健康状态
 	4、http://192.168.56.106:920x/_cat/nodes————查看各个节点信息
+```
+
+### 3、K8S有状态服务部署之ElasticSearch环境搭建
+
+```markdown
+# 参考————https://blog.csdn.net/qq_31277409/article/details/120449561
+
+# 创建配置文件(登陆K8S的————project-regular/P@88w0rd)
+	1、进入指定项目——配置中心——配置——创建六个ElasticSearch的配置,填写基本信息
+		1)名称————指定配置名称————elastic-search-master1-conf.yml、elastic-search-master2-conf.yml、elastic-search-master3-conf.yml、elastic-search-node1-conf.yml、elastic-search-node2-conf.yml、elastic-search-node3-conf.yml
+		2)别名————指定配置别名————ElasticSearch的配置文件
+	2、进入下一步,进行配置设置
+		1)elastic-search-master1-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-master-1 #该节点的名字
+      node.master: true #该节点有机会成为master节点
+      node.data: false #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9201 #默认http端口
+      transport.tcp.port: 9301 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+		2)elastic-search-master2-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-master-2 #该节点的名字
+      node.master: true #该节点有机会成为master节点
+      node.data: false #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9202 #默认http端口
+      transport.tcp.port: 9302 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+		3)elastic-search-master3-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-master-3 #该节点的名字
+      node.master: true #该节点有机会成为master节点
+      node.data: false #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9203 #默认http端口
+      transport.tcp.port: 9303 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+		4)elastic-search-node1-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-node-4 #该节点的名字
+      node.master: false #该节点有机会成为master节点
+      node.data: true #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      #network.publish_host: 192.168.56.106 #互相通信IP,要设置为本机可被外界访问的IP,否则无法通信
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9204 #默认http端口
+      transport.tcp.port: 9304 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+		5)elastic-search-node2-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-node-5 #该节点的名字
+      node.master: false #该节点有机会成为master节点
+      node.data: true #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      #network.publish_host: 192.168.56.106 #互相通信IP,要设置为本机可被外界访问的IP,否则无法通信
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9205 #默认http端口
+      transport.tcp.port: 9305 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+		6)elastic-search-node3-conf.yml————值内容如下:
+			cluster.name: my-es #集群的名称,同一个集群该值必须设置成相同的
+      node.name: es-node-6 #该节点的名字
+      node.master: false #该节点有机会成为master节点
+      node.data: true #该节点可以存储数据
+      network.host: 0.0.0.0 #所有ip均可访问
+      #network.publish_host: 192.168.56.106 #互相通信IP,要设置为本机可被外界访问的IP,否则无法通信
+      http.host: 0.0.0.0 #所有http均可访问
+      http.port: 9206 #默认http端口
+      transport.tcp.port: 9306 #与集群交互端口
+      #discovery.zen.minimum_master_nodes: 2 #设置这个参数保证集群中的节点可以知道其他N个有master资格的节点,官方推荐(N/2)+2,解决脑裂问题,新版的无需配置
+      discovery.zen.ping_timeout: 10s #设置集群中自动发现其他节点时ping连接的超时时间
+      discovery.seed_hosts: ["172.18.12.21:9301","172.18.12.22:9302","172.18.12.23:9303"] #设置集群中的 Master节点的初始列表,可以通过这些节点来自动发现其他新加入集群的节点,es7的新增配置
+      cluster.initial_master_nodes: ["172.18.12.21"] #新集群初始时的侯选主节点,es7的新增配置
+
+# 创建存储卷
+-- 创建三个主节点存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————elastic-search-master1-pvc/elastic-search-master2-pvc/elastic-search-master3-pvc
+		2)别名————指定存储卷别名————es主1节点存储卷、es主2节点存储卷、es主3节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制10G
+	3、进入下一步,进行高级设置,直接点击创建
+
+-- 创建三个数据节点存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————elastic-search-node1-pvc/elastic-search-node2-pvc/elastic-search-node3-pvc
+		2)别名————指定存储卷别名————es数据1节点存储卷、es数据2节点存储卷、es数据3节点存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制10G
+	3、进入下一步,进行高级设置,直接点击创建
+
+# 创建服务
+-- 创建三个主服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————elastic-search1-master、elastic-search2-master、elastic-search3-master
+		2)别名————指定服务别名————es主节点1、es主节点2、es主节点3
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————elasticsearch:7.4.2
+			2-设置使用端口
+				容器端口(9201、9202、9203)、服务端口(9201、9202、9203)
+				容器端口(9301、9302、9303)、服务端口(9301、9302、9303)
+			3-高级设置
+				1+内存————设置1500Mi
+        2+环境变量
+        		--name elasticsearch-node-${port}
+        		--network=mynet --ip 172.18.12.29201/29202/29203 \
+    				-e ES_JAVA_OPTS="-Xms300m -Xmx300m" \
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/usr/share/elasticsearch/config
+			4-选择使用特定键和路径—————elasticsearch.yml/elasticsearch.yml
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷————elastic-search-master1-pvc/elastic-search-master2-pvc/elastic-search-master3-pvc
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/usr/share/elasticsearch/data
+	4、进入下一步,进行高级设置,直接点击创建
+
+-- 创建三个数据服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————elastic-search1-node、elastic-search2-node、elastic-search3-node
+		2)别名————指定服务别名————es数据节点1、es数据节点2、es数据节点3
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组分散部署
+		3)容器镜像
+			1-添加指定的容器镜像————elasticsearch:7.4.2
+			2-设置使用端口
+				容器端口(9204、9205、9206)、服务端口(9204、9205、9206)
+				容器端口(9304、9305、9306)、服务端口(9304、9305、9306)
+			3-高级设置
+				1+内存————设置1500Mi
+        2+环境变量
+        		--name elasticsearch-node-${port}
+        		--network=mynet --ip 172.18.12.29204/29205/29206 \
+    				-e ES_JAVA_OPTS="-Xms300m -Xmx300m" \
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————挂载配置文件或密钥
+			1-选择第一步添加的配置文件
+			2-设置为————读写
+			3-设置挂载路径————/usr/share/elasticsearch/config
+			4-选择使用特定键和路径—————elasticsearch.yml/elasticsearch.yml
+		2)存储卷————添加存储卷
+			1-选择第二步添加的存储卷————elastic-search-node1-pvc/elastic-search-node2-pvc/elastic-search-node3-pvc
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/usr/share/elasticsearch/data
+	4、进入下一步,进行高级设置,直接点击创建
+
+# 点击创建的服务,可以查看到服务的DNS
+	elastic-search1-master.pigskinmall
+	elastic-search2-master.pigskinmall
+	elastic-search3-master.pigskinmall
+	elastic-search1-node.pigskinmall
+	elastic-search2-node.pigskinmall
+	elastic-search3-node.pigskinmall
+
+# 测试集群
+	1、http://192.168.56.106:920x/_nodes/process?pretty————查看集群节点状态
+	2、http://192.168.56.106:920x/_cluster/stats?pretty————查看集群状态
+	3、http://192.168.56.106:920x/_cluster/health?pretty————查看集群健康状态
+	4、http://192.168.56.106:920x/_cat/nodes————查看各个节点信息
+```
+
+### 4、K8S无状态服务部署之Kibana环境搭建
+
+```markdown
+# 创建Kibana服务
+-- 1、进入指定项目——应用负载——服务——创建一个”无状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————elastic-search1-node、elastic-search2-node、elastic-search3-node
+		2)别名————指定服务别名————es数据节点1、es数据节点2、es数据节点3
+
+-- 2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+		3)容器镜像
+			1-添加指定的容器镜像————kibana:7.4.2
+			2-设置使用端口
+				容器端口(5601)、服务端口(5601)
+			3-高级设置
+				1+内存————设置500Mi
+        2+环境变量
+        		ELASTICSEARCH_HOSTS     http://{es服务DNS}:9200
+-- 3、进入下一步,进行高级设置
+	设置外网访问————访问方式————NodePort
 ```
 
 ## 22、Thymeleaf——模板引擎
@@ -10620,6 +10898,12 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	3、在任意一个RabbitMQ节点中消费消息,其他该集群中的节点也的消息也将被消费	
 ```
 
+### 10、K8S有状态服务部署之RabbitMQ环境搭建
+
+```markdown
+TODO:
+```
+
 ## 29、JVM内存模型
 
 ```markdown
@@ -13383,21 +13667,23 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 
 # Kubesphere部署应用的流程
 
-# Kubesphere搭建MySQL集群环境
-	详见————2、Java开发之后端技术篇-1-41-4、K8S有状态服务部署之MySQL环境搭建
+# Kubesphere搭建Sentinel&Zipkin环境
+	详见————2、Java开发之后端技术篇-1-8-6、Spring Cloud Sleuth+Zipkin——服务链路追踪----K8S无状态服务部署之Sentinel&Zipkin环境搭建
+
+# Kubesphere搭建Nacos环境
+	详见————2、Java开发之后端技术篇-1-10-2、K8S有状态服务部署之Nacos环境搭建
 
 # Kubesphere搭建Redis集群环境
 	详见————2、Java开发之后端技术篇-1-11-3、K8S有状态服务部署之Redis环境搭建
 
 # Kubesphere搭建ElasticSearch&Kibana集群环境
+	详见————2、Java开发之后端技术篇-1-21-3、K8S有状态服务部署之ElasticSearch&Kibana环境搭建
 
 # Kubesphere搭建RabbitMQ环境
+	详见————2、Java开发之后端技术篇-1-28-10、K8S有状态服务部署之RabbitMQ环境搭建
 
-# Kubesphere搭建Nacos环境
-
-# Kubesphere搭建Zipkin环境
-
-# Kubesphere搭建Sentinel环境
+# Kubesphere搭建MySQL集群环境
+	详见————2、Java开发之后端技术篇-1-41-4、K8S有状态服务部署之MySQL环境搭建
 
 ```
 
@@ -14039,6 +14325,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 ## 44、Docker容器化技术
 
 ```markdown
+# https://blog.csdn.net/hancoder/article/details/120619260
 ```
 
 
@@ -16760,33 +17047,6 @@ error => {   
             </plugin>
         </plugins>
     </build>
-```
-
-## 13、H3PaaS云平台
-
-```markdown
-# H3paas搭建
-	
-# H3paas部署
--- 0、云平台登陆————如果第一次登录，点击下面高级-允许
-	H3地址————https://192.168.xxx.xxx/platform/#/index
-	用户名————都是姓名拼音
-	密码————姓名拼音+1
-	个别情况————如果姓名拼音少于7位的，密码就是拼音+123456
-
--- 1、创建仓库分类
-	1、说明
-		仓库分类用于存放产品jar包，每个产品组上传jar包上传至对应的‘私有仓库’分类下，便于管理。如果缺少对应的仓库分类，请联系吕超来增加分类。
-		如果PT上传的应用包，需要跨产品组使用,请平台用户把私有仓库的jar包同步到‘公有仓库’，并通知质量管理部审核审核通过后其他产品组就可以看到平台的应用包。
-	2、图示,如下图所示:
-```
-
-![image-20220318121957332](/Users/pigskin/Library/Application Support/typora-user-images/image-20220318121957332.png)
-
-```markdown
--- 2、 注册中心获取
-	1、说明
-		进入应用组，点击微服务引擎
 ```
 
 
