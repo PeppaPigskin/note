@@ -2041,13 +2041,13 @@ return interceptor;
 
 ```markdown
 # 构造器注入
-
+	TODO:
 
 # getter/setter注入
-
+	TODO:
 
 # @Autowired注解注入
-
+	TODO:
 
 
 ```
@@ -2166,10 +2166,10 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 名词解释
 	1、消费者（调用者）
 		1)接口化请求调用（创建服务接口）
-    2)Feign（根据定义的服务名，找到服务接口进行调用）
-    3)Hystrix（查看被调用服务是否正常启动，如果没有正常启动，则进行熔断）
-    4)Ribbon
-    5)HttpClient/OkHttp
+		2)Feign（根据定义的服务名，找到服务接口进行调用）
+		3)Hystrix（查看被调用服务是否正常启动，如果没有正常启动，则进行熔断）
+		4)Ribbon (根据负载均很策略,对发起的请求进行负载均衡,分发到不同的服务提供端)
+		5)HttpClient/OkHttp(做真实http通信请求)
 	2、生产者（被调用者）
 
 -- 调用过程
@@ -3190,7 +3190,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
       //获取视频ID      
       EduVideo eduVideo = baseMapper.selectById(videoId);    
       if (eduVideo != null && StringUtils.isEmpty(eduVideo.getVideoSourceId())) {   
-      //TODO:根据视频ID,进行远程调用，实现对应阿里云视频删除         
+      //根据视频ID,进行远程调用，实现对应阿里云视频删除         
       vodClient.removeVideoSource(eduVideo.getVideoSourceId()); 
       }      
       //删除小节      
@@ -3705,10 +3705,51 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	更多参考————官方文档————https://github.com/openzipkin/zipkin#storage-component
 
 # K8S无状态服务部署之Sentinel&Zipkin环境搭建
--- 部署Sentinel环境
-	TODO:
 -- 部署Zipkin环境
-	TODO:
+	1、Docker启动命令
+		docker run -d -p 9411:9411 openzipkin/zipkin
+		或者
+		docker run --env STORAGE_TYPE=elasticsearch --env ES_HOSTS=192.168.56.10:9200 openzipkin/zipkin
+	2、服务部署
+		-- 1、进入指定项目——应用负载——服务——创建一个”无状态“服务,进行基本信息设置
+      1)名称————指定有状态服务名————zipkin
+      2)别名————指定服务别名————zipkin服务
+		-- 2、进入下一步,设置容器镜像
+      1)容器组副本数量————设置容器组的副本数量————1
+      2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+      3)容器镜像
+        1-添加指定的容器镜像————openzipkin/zipkin
+        2-设置使用端口
+          容器端口(9410)、服务端口(9410)
+          容器端口(9411)、服务端口(9411)
+        3-高级设置
+          1+内存————设置500Mi
+          2+环境变量
+              STORAGE_TYPE    elasticsearch
+              ES_HOSTS	ES域名地址(DNS):9200 
+    -- 3、进入下一步,进入下一步,进行高级设置,直接点击创建
+      1)设置外网访问————NodePort访问方式
+    -- 4、通过节点端口访问
+
+-- 部署Sentinel环境
+	1、Docker启动命令————测试只做一个镜像并启动它,暴露访问/使用别人做好的镜像
+		docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard:1.6.3
+	2、服务部署
+		-- 1、进入指定项目——应用负载——服务——创建一个”无状态“服务,进行基本信息设置
+      1)名称————指定有状态服务名————sentinel
+      2)别名————指定服务别名————sentinel服务
+		-- 2、进入下一步,设置容器镜像
+      1)容器组副本数量————设置容器组的副本数量————1
+      2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+      3)容器镜像
+        1-添加指定的容器镜像————bladex/sentinel-dashboard:1.6.3
+        2-设置使用端口
+          容器端口(8858)、服务端口(8333)
+        3-高级设置
+          1+内存————设置500Mi
+    -- 3、进入下一步,进入下一步,进行高级设置,直接点击创建
+      1)设置外网访问————NodePort访问方式
+    -- 4、通过节点端口访问
 ```
 
 ### 7、Spring Cloud Netflix Ribbon——负载均衡
