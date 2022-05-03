@@ -436,6 +436,16 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	AppStore安装
 ```
 
+## 11、windows远程桌面工具
+
+```markdown
+# 说明
+	Mac用于连接windows远程桌面的工具
+
+# 安装
+	brew install microsoft-remote-desktop
+```
+
 
 
 # 4、Java——开发环境搭建
