@@ -247,6 +247,20 @@ ALTER TABLE [表名：table_name] DISABLE/ENABLE ALL TRIGGERS;
 ```sql
 #	断开会话
 ALTER SYSTEM KILL SESSION ['sid,serial'];
+
+
+# 查看是否有被锁的表
+SELECT b.owner, b.object_name, a.session_id, a.locked_mode
+	FROM v$locked_object a, dba_objects b
+  WHERE b.object_id = a.object_id
+
+# 查看是哪个进程锁的
+select b.username,b.sid,b.serial#,logon_time
+	from v$locked_object a,v$session b
+	where a.session_id = b.sid order by b.logon_time
+
+# 杀掉进程 sid,serial#
+	alter system kill session '284,38112';
 ```
 
 
