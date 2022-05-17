@@ -14414,20 +14414,27 @@ docker run --env MODE=standalone --name nacos \
 <img src="image/img2_1_40_1_1.png" style="zoom:50%;">
 
 ```markdown
-# K8s集群部署
+# 集群高可用部署形式
+```
+
+<img src="image/img2_1_40_1_2.png" style="zoom:50%;">
+
+```markdown
+# 集群部署示例
+-- K8s集群部署
 	详见————2、Java开发之后端技术篇-1-38、K8S——分布式编排系统(管理分布式集群)
 
-# Mysql集群
+-- Mysql集群
 	详见————2、Java开发之后端技术篇-1-41-3、MySQL集群
 
-# Redis集群
+-- Redis集群
 	详见————2、Java开发之后端技术篇-1-11-2、Redis集群
 
-# Elasticsearch集群
+-- Elasticsearch集群
 	详见————2、Java开发之后端技术篇-1-21-2、ElasticSearch集
 
-# RabbitMQ集群
-	详见————2、Java开发之后端技术篇-1-28-9、RabbitMQ集群
+-- RabbitMQ集群
+	详见————2、Java开发之后端技术篇-1-28-9、RabbitMQ集群ji
 ```
 
 ## 41、MySQL
