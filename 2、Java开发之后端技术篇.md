@@ -785,6 +785,8 @@ return interceptor;
 
 ## 3、Nginx
 
+### 1、基本使用
+
 ```markdown
 # 说明————反向代理服务器
 -- 正向代理与反向代理
@@ -919,6 +921,33 @@ return interceptor;
 -- 查看Nginx的错误日志
 	1、进入nginx的日志目录————cd nginx/logs/
 	2、查看日志信息,并查找指定的内容————cat error.log |grep 'xxx'
+```
+
+### 2、K8S无状态服务部署之Nginx环境搭建
+
+```markdown
+# 创建Nginx服务
+-- 0、因为Nginx打包的镜像在阿里云镜像仓库,所以要先创建阿里云镜像仓库密钥
+		0)打包上传nginx镜像,详见————2、Java开发之后端技术篇-1-17-1、构建将镜像到本地仓库
+		1)名称——————指定密钥名称————aliyun-docker
+		2)类型——————镜像仓库密钥
+		3)仓库地址————registry.cn-hangzhou.aliyuncs.com
+		4)用户名————阿里云账号全名
+		5)密码————开通镜像仓储服务时设置的密码
+-- 1、进入指定项目——应用负载——服务——创建一个”无状态“服务,进行基本信息设置
+		1)名称————指定无状态服务名————mall-nginx
+		2)别名————指定服务别名————nginx代理服务
+
+-- 2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+		3)容器镜像————选择阿里云镜像
+			1-添加指定的容器镜像————/pigskin/mall-nginx:v1.0
+			2-设置使用端口
+				容器端口(443)、服务端口(443)
+				容器端口(80)、服务端口(80)
+-- 3、进入下一步,进行高级设置
+	设置外网访问————访问方式————NodePort
 ```
 
 ## 4、Tomcat
@@ -6105,6 +6134,8 @@ docker run --env MODE=standalone --name nacos \
 
 ## 17、Docker——应用容器引擎
 
+### 1、Docker简介
+
 ```markdown
 # 说明
 	Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中，然后发布到任何流行的Linux或Windows操作系统的机器上，也可以实现虚拟化。容器是完全使用沙箱机制，相互之间不会有任何接口.
@@ -6121,6 +6152,7 @@ docker run --env MODE=standalone --name nacos \
 	docker restart 实例名————重新启动指定实例
 	docker stop 实例名————停止运行指定实例
 	docker logs 实例名————查看指定实例的运行日志
+	docker exec -it 容器ID /bin/bash————进入容器内部
 
 # Dockerfile体系结构（保留字指令）
 	-- FROM————基础镜像，当前镜像是基于那个镜像的
@@ -6137,7 +6169,88 @@ docker run --env MODE=standalone --name nacos \
 	-- ONBUILD————当构建一个被继承的Dockerfile时运行命令。父镜像在被子镜像继承后，父镜像的ONBUILD触发
 ```
 
+### 2、Docker镜像操作
 
+```markdown
+# 前提————打包好要使用的jar包项目
+-- 主目录运行如下maven命令,将每一个微服务项目的包安装到本地仓库,防止微服务项目打包时找不到依赖的项目
+		mvn clean install -Dmaven.test.skip=true
+
+# 完整部署过程
+-- 创建项目Dockerfile————被打包项目根目录下
+		# 依赖的基础镜像
+    FROM java:8
+    # 服务jar启动给容器暴露的端口，容器可以将该端口对外暴露
+    EXPOSE 8080
+
+    # 挂载的目录（所有运行时临时数据）
+    VOLUME /tmp
+    # 复制打包好的jar，重命名为app.jar，并放到根目录下
+    ADD target/*.jar  /app.jar
+    RUN bash -c 'touch /app.jar'
+    # 设置启动命令
+    ENTRYPOINT ["java","-jar","/app.jar","--spring.profiles.active=prod"]
+
+-- 构建镜像到本地仓库,并推送到远程镜像仓库(以Nginx为例)
+	1、根据指定Dockerfile构建镜像包————[-f:指定使用的配置文件/-t:指定打成什么样的镜像/.:和指定配置文件同工作目录下的资源],将服务jar包制作成镜像
+		docker build -f Dockerfile -t docker.io/pigskin/mall-nginx:v1.0 .
+	2、查看镜像
+		docker images
+	3、运行指定镜像
+		docker run -d --name 容器ID pigskin/mall-nginx:v1.0
+	4、进入容器内部
+		docker exec -it 容器ID /bin/bash
+	5、提交镜像包本地仓库
+		docker commit -a "镜像提交作者" -m "提交说明" 容器ID pigskin/mall-nginx:v1.0
+	6、登陆到一个Docker镜像仓库————如果未指定镜像仓库地址,默认为官方仓库Docker Hub
+		docker login -u 用户名 -p 密码
+	7、登出一个Docker镜像仓库————如果未指定镜像仓库地址,默认为官方仓库Docker Hub
+		docker logout
+	8、标记镜像————将老的镜像重新命名
+		docker tag 旧镜像名 新镜像名
+	9、推送镜像到Dockerhub
+		docker push pigksin/mall-nginx:v1.0
+	10、保存镜像、加载镜像————可以保存镜像为tar,使用移动存储设备复制到任意docker主机,再次加载镜像
+		1)保存镜像
+			docker save [镜像名] -0 [保存路径/保存名.tar]
+		2)加载镜像
+			docker load -i [保存名.tar]
+
+# 阿里云镜像仓库
+-- 开通
+	登陆阿里云,选择[产品]——[弹性计算]——[容器镜像服务]进行开通
+
+-- 使用
+	1、登录阿里云Docker Registry————密码为开通服务时设置的密码————可以在访问凭证页面修改凭证密码
+		docker login --username=[阿里云账号全名] registry.cn-hangzhou.aliyuncs.com
+	2、从Registry中拉取镜像
+		docker pull registry.cn-hangzhou.aliyuncs.com/pigskin/nginx:[镜像版本号]
+	3、将镜像推送到Registry
+		1)登陆————docker login --username=[阿里云账号全名] registry.cn-hangzhou.aliyuncs.com
+		2)打包————docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/pigskin/nginx:[镜像版本号]
+		3)推送————docker push registry.cn-hangzhou.aliyuncs.com/pigskin/nginx:[镜像版本号]
+
+# 镜像包东西打不进去解决办法(nginx为例)
+-- 创建Dockerfile
+	# 从官方镜像拉取一个
+	FROM nginx
+	MAINTAINER pigkin
+	# 将自己的需要放入的文件爱添加到内部(会自动解压)
+	ADD html.tar.gz /usr/share/nginx/html
+	ADD conf.tar.gz /etc/nginx
+	# 暴露80端口
+	EXPOSE 80
+	ENTRYPOINT nginx -g "daemon off;"
+
+-- 将创建的Dockerfile与需要的文件(详见附件————mall-nginx静态资源)放在一起,构建
+	docker build -t mynginx:v1.2 -f Dockerfile .
+
+-- 打标签
+	docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/pigskin/nginx:[镜像版本号]
+
+-- 推送到阿里云镜像
+	docker push registry.cn-hangzhou.aliyuncs.com/pigskin/nginx:[镜像版本号]
+```
 
 ## 18、JWT
 
@@ -10942,7 +11055,41 @@ docker run --env MODE=standalone --name nacos \
 ### 10、K8S有状态服务部署之RabbitMQ环境搭建
 
 ```markdown
-TODO:
+# 创建存储卷
+	1、进入指定项目——存储卷——分别创建三个存储卷,填写基本信息
+		1)名称————指定存储卷名————rabbitmq-pvc
+		2)别名————指定存储卷别名————rabbitmq存储卷
+	2、进入下一步,进行存储卷设置
+		1)访问模式————单节点读写
+		2)存储卷容量————限制10G
+	3、进入下一步,进行高级设置,直接点击创建
+
+# 创建服务
+	1、进入指定项目——应用负载——服务——创建一个”有状态“服务,进行基本信息设置
+		1)名称————指定有状态服务名————rabbitmq-management
+		2)别名————指定服务别名————rabbitmq服务
+	2、进入下一步,设置容器镜像
+		1)容器组副本数量————设置容器组的副本数量————1
+		2)容器组部署方式————设置容器组的部署方式————容器组默认部署
+		3)容器镜像
+			1-添加指定的容器镜像————rabbitmq:management
+			2-设置使用端口
+				容器端口(15671)、服务端口(15671)
+				容器端口(15672)、服务端口(15672)
+				容器端口(25672)、服务端口(25672)
+				容器端口(4369)、服务端口(4369)
+				容器端口(5671)、服务端口(5671)
+				容器端口(5672)、服务端口(5672)
+			3-高级设置
+				1+内存————设置1000Mi
+        2+环境变量(集群部署需要配置)
+        		RABBITMQ_ERLANG_COOKIE    'pigskin'
+	3、进入下一步,进行挂载存储设置
+		1)存储卷————添加存储卷
+			1-选择第一步添加的存储卷————rabbitmq-pvc
+			2-设置为————读写
+			3-设置挂载路径(存放数据的路径)————/var/lib/rabbitmq
+	4、进入下一步,进行高级设置,直接点击创建
 ```
 
 ## 29、JVM内存模型
@@ -13696,7 +13843,7 @@ TODO:
 	7、上一步确认推送后,在运行状态最后一步,等待中进行选择是否将其部署到生产环境,确认后,之前创建的kubesphere-sample-prod生产环境项目就会拉取镜像进行部署工作
 ```
 
-### 15、Kubernetes集群——Kubesphere服务部署
+### 15、Kubernetes集群——服务部署
 
 ```markdown
 # K8S集群搭建总结
@@ -13705,11 +13852,6 @@ TODO:
 	3、每一个MySQL/Redis必须挂载自己的PVC存储卷
 	4、IP都使用对应创建的域名(服务的DNS)
 	5、可自定义镜像后,对[docker-entrypoint.sh]文件进行配置,将我们需要运行的命令写好,这样镜像启动后就会自动配置好,就不用进入容器进行配置
-
-# Kubesphere部署应用的流程
-
-# Kubesphere搭建Sentinel&Zipkin环境
-	详见————2、Java开发之后端技术篇-1-8-6、Spring Cloud Sleuth+Zipkin——服务链路追踪----K8S无状态服务部署之Sentinel&Zipkin环境搭建
 
 # Kubesphere搭建Nacos环境
 	详见————2、Java开发之后端技术篇-1-10-2、K8S有状态服务部署之Nacos环境搭建
@@ -13726,7 +13868,454 @@ TODO:
 # Kubesphere搭建MySQL集群环境
 	详见————2、Java开发之后端技术篇-1-41-4、K8S有状态服务部署之MySQL环境搭建
 
+# Kubesphere搭建Sentinel&Zipkin环境
+	详见————2、Java开发之后端技术篇-1-8-6、Spring Cloud Sleuth+Zipkin——服务链路追踪----K8S无状态服务部署之Sentinel&Zipkin环境搭建
+
+# Kubesphere搭建Nginx环境
+	详见————2、Java开发之后端技术篇-1-3-2、K8S无状态服务部署之Nginx环境搭建
+
+# Kubesphere部署应用的流程
+-- 部署流程,图示如下:
 ```
+
+<img src="image/img2_1_38_15_1.png" style="zoom:50%;">
+
+```markdown
+-- 整体详细步骤说明
+	1、为每一个项目编写一个Dockerfile,将项目自动化的打包成一个镜像,上传到镜像仓库
+
+	2、为每一个项目编写生产K8S的部署描述部署文件,用于将项目自动部署到K8S上
+
+	3、Jenkins编写好Jenkinsfile
+
+-- 生产环境配置抽取(部署)
+	1、为nacos创建一个服务————指定工作负载创建服务
+		1)设置服务名称————nacos-service
+		2)指定工作负载————有状态副本集————nacos-xxxx
+		3)端口————名称(http-nacos-8848)、容器端口(8848)、服务端口(8848)
+		4)访问类型————域名访问方式————集群内部通过服务的后端Endpoint IP直接访问服务 Headless(selector)
+	2、为sentinel创建一个服务————指定工作负载创建服务
+		1)设置服务名称————sentinel-service
+		2)指定工作负载————部署————sentinel-xxxx
+		3)端口————名称(http-sentinel)、容器端口(8858)、服务端口(8333)
+		4)访问类型————域名访问方式————集群内部通过服务的后端Endpoint IP直接访问服务 Headless(selector)
+	3、为zipkin创建一个服务————指定工作负载创建服务
+		1)设置服务名称————zipkin-service
+		2)指定工作负载————部署————zipkin-xxxx
+		3)端口————名称(http-zipkin)、容器端口(9411)、服务端口(9411)
+		4)访问类型————域名访问方式————集群内部通过服务的后端Endpoint IP直接访问服务 Headless(selector)
+
+-- 微服务使用配置(部署)
+	1、生产环境配置抽取(创建生产环境使用的配置文件)
+    # nacos注册中心地址
+    spring.cloud.nacos.discovery.server-addr=nacos-service.pigskinmall:8848
+    # Sentinel控制台所在的地址
+    spring.cloud.sentinel.transport.dashboard=sentinel-service.pigskinmall:8333
+    # zipkin服务器的地址
+    spring.zipkin.base-url=http://zipkin-service.pigskinmall:9411/
+    # redis主机地址
+    spring.redis.host=redis.pigskinmall
+    # mysql数据源地址
+    spring.datasource.url=jdbc:mysql://mysql-master.pigskinmall:3306/db_mall_xxx?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    # rabbitmq主机地址
+		spring.rabbitmq.host=rabbitmq-management.pigskinmall
+	2、创建微服务的Dockerfile(使用示例)
+		详见————2、Java开发之后端技术篇-1-17-1、构建将镜像到本地仓库
+	3、创建微服务K8S部署描述文件(每个微服务项目的根目录的deploy目录下创建pigskinmall-xxx-server-deploy.yaml文件,并添加如下内容)
+		1)部署文件示例
+			# 部署文件
+      apiVersion: apps/v1
+      # 资源类型——一次部署
+      kind: Deployment
+      metadata:
+        # 名称空间，一般根据k8s对应的项目名称
+        namespace: pigskinmall
+        # 一般和微服务名称一样
+        name: mall-ware-server
+        labels:
+          app: mall-ware-server
+      # 规格详情
+      spec:
+        # 副本数
+        replicas: 1
+        # 选择器
+        selector:
+          matchLabels:
+            app: mall-ware-server
+        # 模版
+        template:
+          # 元数据
+          metadata:
+            labels:
+              app: mall-ware-server
+          # 规格信息
+          spec:
+            # 容器信息
+            containers:
+              - name: mall-ware-server
+                # 镜像信息
+                image: $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$TAG_NAME
+                # 暴露端口信息
+                ports:
+                  - containerPort: 8080
+                    protocol: TCP
+                # 资源信息
+                resources:
+                  # 限制
+                  limits:
+                    cpu: 1000m
+                    memory: 500Mi
+                  # 初识资源申请
+                  requests:
+                    cpu: 1000m
+                    memory: 10Mi
+                # 中断消息
+                terminationMessagepath: /dev/termination-log
+                terminationMessagepolicy: File
+                # 镜像拉取策略(不存在镜像时)
+                imagePullPolicy: Ifnotpresent
+            # 是否自己启动（容器出问题，自己再启动）
+            restartPolicy: Always
+            # 优雅停机秒数
+            terminationGracePeriodSeconds: 30
+        # 策略
+        strategy:
+          # 类型（滚动更新策略）
+          type: RollingUpdate
+          rollingUpdate:
+            # 最大存活
+            maxSurge: 25%
+            # 最大不可用
+            maxUnavailable: 25%
+        # 保留历史版本数量
+        revisionHistoryLimit: 10
+        # 认为进程卡住了的最长时间
+        progressDeadlineSeconds: 600
+		2)暴露Service服务文件示例
+			---
+			# 暴露Service服务文件
+      kind: Service
+      apiVersion: v1
+      metadata:
+        name: mall-ware-server
+        namespace: pigskinmall
+        labels:
+          app: mall-ware-server
+        spec:
+          ports:
+            - name: http
+              protocol: TCP
+              # 服务端口
+              prot: 8080
+              # 容器端口
+              targetPort: 8080
+              # 节点端口
+              nodePort: 20011
+          selector:
+            app: mall-ware-server
+          type: NodePort
+          # 是否保持会话
+          sessionAffinity: None
+    3)targetPort、port、nodePort说明,如下图所示:
+```
+
+<img src="image/img2_1_38_15_2.png" style="zoom:50%;">
+
+```markdown
+-- 项目根目录定义流水线文档示例
+	// 定义流水线
+	pipeline {
+    /* 代理 */
+    agent {
+      node {
+        label 'maven'
+      }
+    }
+
+    /* 流程步骤 */
+    stages {
+      /* 第一步：拉取代码 */
+      stage('拉取代码') {
+        steps {
+          git(url: 'https://gitee.com/PeppaPigskin/mall.git', credentialsId: 'gitee-id',
+            branch: 'master', changelog: true, poll: false)
+          sh 'echo 正在构建 $PROJECT_NAME 版本号：$PROJECT_VERSION 将会提交给 $REGISTRY 镜像仓库'
+          /* 编译代码,并指定使用测仓库配置 */
+          container ('maven') {
+            sh "mvn clean install -Dmaven.test.skip=true -gs `pwd`/mvn-settings.xml"
+          }
+        }
+      }
+
+      /* 第二步：代码质量分析 */
+      stage('sonar代码质量分析') {
+        steps {
+          container ('maven') {
+            /* 根据凭证获取参数 */
+            withCredentials([string(credentialsId: "$SONAR_CREDENTIAL_ID", variable: 'SONAR_TOKEN')]) {
+              withSonarQubeEnv('sonar') {
+                /* 输出当前目录 */
+                sh "echo 当前目录 `pwd`"
+                /* 进行代码质量分析 */
+                sh "mvn sonar:sonar -gs `pwd`/mvn-settings.xml -Dsonar.branch=$BRANCH_NAME -Dsonar.login=$SONAR_TOKEN"
+              }
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+
+      /* 第三步：构建/推送快照镜像 */
+      stage ('构建镜像 & 推送快照镜像') {
+        steps {
+          container ('maven') {
+            /* 项目打包 */
+            sh 'mvn -o -Dmaven.test.skip=true -gs `pwd`/mvn-settings.xml clean package'
+            /* 进入被构建的项目 并 构建项目（-f：根据指定配置文件，打包成docker镜像；-t：对打包的镜像指定标签） */
+            sh 'cd $PROJECT_NAME && docker build -f Dockerfile -t $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
+            /* 按照指定的账号密码，登陆到自己的docker仓库 */
+            withCredentials([usernamePassword(passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_USERNAME' ,credentialsId : "$DOCKER_CREDENTIAL_ID" ,)]) {
+              /* 进行登陆 */
+              sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
+              /* 进行快照镜像推送 */
+              sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER'
+            }
+          }
+        }
+      }
+      /* 第四步：推送最新镜像 */
+      stage('推送最新镜像'){
+        /* 判断当前是否为master分支 */
+        when{
+          branch 'master'
+        }
+        steps{
+          container ('maven') {
+            /* 给之前构建的镜像打一个新标签 */
+            sh 'docker tag  $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:latest '
+            /* 再推送上去 */
+            sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:latest '
+          }
+        }
+      }
+
+      /* 第五步：部署到K8S集群 */
+      stage('部署到K8S集群') {
+        when{
+          branch 'master'
+        }
+        steps {
+          input(id: 'deploy-to-dev-$PROJECT_NAME', message: '是否将 $PROJECT_NAME 部署到集群中?')
+          /* 调用K8S集群部署方法（configs：指定部署使用的配置文件所在目录） */
+          kubernetesDeploy(configs: '$PROJECT_NAME/deploy/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
+        }
+      }
+
+      /* 第六步：推送发布版 */
+      stage('发布版本'){
+        when{
+          /* 判断项目版本是否符合发布板 */
+          expression{
+            return params.PROJECT_VERSION =~ /v.*/
+          }
+        }
+        steps {
+          container ('maven') {
+            /* 询问是否发布 */
+            input(id: 'release-image-with-tag', message: '是否发布当前版本镜像?')
+              /* 加载码云账户信息 */
+              withCredentials([usernamePassword(credentialsId: "$GITEE_CREDENTIAL_ID", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                /* 设置码云账户密码信息 */
+                sh 'git config --global user.email "PeppaPigskin@qq.com" '
+                sh 'git config --global user.name "PeppaPigskin" '
+                /* 给当前分支打标签 */
+                sh 'git tag -a $PROJECT_VERSION -m "$PROJECT_VERSION" '
+                /* 给码云推送项目版本信息 */
+                sh 'git push http://$GIT_USERNAME:$GIT_PASSWORD@github.com/$GITEE_ACCOUNT/mall.git --tags --ipv4'
+              }
+
+            sh 'docker tag  $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:$PROJECT_VERSION '
+            sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:$PROJECT_VERSION '
+          }
+        }
+      }
+
+      /* 第七步：部署到生产环境 */
+    //     stage('deploy to production') {
+    //       when{
+    //         expression{
+    //           return params.TAG_NAME =~ /v.*/
+    //         }
+    //       }
+    //       steps {
+    //         input(id: 'deploy-to-production', message: 'deploy to production?')
+    //         kubernetesDeploy(configs: 'deploy/prod-ol/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
+    //       }
+    //     }
+    }
+
+    /* 定义环境变量 */
+    environment {
+      /* Dockerhub凭证ID(根据DockerHub创建的凭证决定) */
+      DOCKER_CREDENTIAL_ID = 'dockerhub-id'
+      /* 码云账户凭证ID(根据码云创建的凭证决定) */
+      GITEE_CREDENTIAL_ID = 'gitee-id'
+      /* K8S账户凭证ID(根据K8S创建的流水线项目决定) */
+      KUBECONFIG_CREDENTIAL_ID = 'kubeconfig-id'
+      /* 镜像仓库地址 */
+      REGISTRY = 'docker.io'
+      /* dockerhub名称空间 */
+      DOCKERHUB_NAMESPACE = 'pigskin'
+      /* 码云账户名 */
+      GITEE_ACCOUNT = 'PeppaPigskin'
+      /* 代码质量分析凭证ID */
+      SONAR_CREDENTIAL_ID= 'sonar-qube'
+      /* 分支名称 */
+      RANCH_NAME = 'master'
+    }
+
+    /* 定义参数 */
+    parameters {
+      /* 项目名称 */
+      string(name:'PROJECT_NAME',defaultValue: '',description:'')
+      /* 项目版本 */
+      string(name:'PROJECT_VERSION',defaultValue: 'v0.0Beta',description:'')
+    }
+	}
+
+-- 移植数据库(部署)
+	0、先设置K8S部署的MySql数据库服务集群外网可访问(参照————生产环境配置抽取(部署))
+	1、导出需要移植数据库的相关数据脚本
+	2、使用数据库可视化工具连接任意一个K8S集群节点的IP加上第一步暴露的集群外可访问的端口,连接到部署的MySql数据库集群
+	3、执行导出的数据库相关脚本
+	4、移除MySql数据库暴露的对外服务
+
+-- 项目流水线部署(以商城项目为例)————后端
+	1、部署流程图示,如下图所示:
+```
+
+<img src="image/img2_1_38_15_3.png" style="zoom:50%;">
+
+```markdown
+	2、K8S的DevOps工程创建流水线工程
+		1)基本信息————完成后下一步
+			名称————pigskinmall-jenkinsfile-cicd
+			描述信息————商城项目自动微服务部署,参数化构建
+			代码仓库————git/仓库url——对应项目所在的码云仓库地址/证书——对应创建的码云凭证(gitee-id)
+		2)高级设置————完成后创建
+			路径————Jenkinsfile
+			保留分支天数————7
+			保留分支最大个数————7
+			定时触发————取消勾选
+	3、第一次运行停掉,重新运行
+		1)输入参数————代码文件中设置的需要提供的参数
+		2)每一个部署文件修改端口号为(30000-32767)之间
+	4、服务包部署启动时不断重启————因为Dockerfile中使用java命令启动服务包时的内存大小超出K8S部署文件中限制的服务启动分配内存的大小
+		1)每一个Dockerfile文件设置启动服务内存限制大小,如下所示:
+			# 设置启动命令，并限制使用内存大小（初始分配内存大小以及最大分配内存大小）以及采用的配置为prod
+			ENTRYPOINT ["java","-jar","/app.jar","-Xms128m","-Xmx300m","--spring.profiles.active=prod"]
+	5、通过K8S中进行流水线部署发布
+		1)在集群中就能看到对应服务
+		2)在dockerhub中存在对应的镜像
+		3)在代码标签中存在对应标签
+	6、K8S中部署Nginx
+		1)修改nginx配置文件————设置上游服务器为任意一个K8S中的节点(端口号为网关服务的部署文件配置节点端口)
+			upstream mall {
+          server 192.168.56.100:31003;
+          server 192.168.56.101:31003;
+          server 192.168.56.102:31003;
+      }
+		2)将我们的nginx打包成镜像,并推送到镜像仓库
+			详见————2、Java开发之后端技术篇-1-17-1、构建将镜像到本地仓库
+		3)K8S部署Nginx—————详见————2、Java开发之后端技术篇-1-3-2、K8S无状态服务部署之Nginx环境搭建
+	7、Jenkins修改采用阿里云镜像仓库
+		/* 定义环境变量 */
+    environment {
+      /* Dockerhub凭证ID(根据K8S流水线中创建的凭证决定) */
+      DOCKER_CREDENTIAL_ID = 'aliyunhub-id'
+      /* 阿里云镜像仓库地址 */
+      REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
+      /* 仓库名称空间 */
+      DOCKERHUB_NAMESPACE = 'pigskin'
+      ...
+    }
+	8、创建新的流水线
+		1)基本信息————完成后下一步
+			名称————pigskinmall-jenkinsfile-aliyun-cicd
+			描述信息————商城项目自动微服务部署,参数化构建,采用阿里云镜像仓库
+			代码仓库————git/仓库url——对应项目所在的码云仓库地址/证书——对应创建的码云凭证(gitee-id)
+		2)高级设置————完成后创建
+			路径————Jenkinsfile
+			保留分支天数————7
+			保留分支最大个数————7
+			定时触发————取消勾选
+	9、停止上边的运行,重新运行,从而实现参数化构建
+		1)输入参数信息
+		2)点击确定进行构建
+	10、部署每一个微服务(默认私有,如果想要被拉取,就设置为公开)
+
+-- K8S服务所在主机设置可访问主机地址
+	1、SwitchHosts中配置域名访问方案
+		192.168.56.101 mall.com
+		192.168.56.101 search.mall.com
+		192.168.56.101 item.mall.com
+		192.168.56.101 auth.mall.com
+		192.168.56.101 cart.mall.com
+		192.168.56.101 order.mall.com
+		192.168.56.101 member.mall.com
+		192.168.56.101 seckill.mall.com
+		# 后台管理系统的域名映射规则
+		192.168.56.101 admin.mall.com
+
+-- 项目流水线部署(以商城项目为例)————网关与应用路由(创建Ingress路由规则)
+	0、使用随意一个具有管理员权限的用户登陆K8S
+	1、开启网关路由功能————创建负载均衡方式的网关
+    1)进入指定项目
+    2)项目设置——高级设置
+    3)外网访问——设置网关
+    4)访问方式选择————LoadBalancer
+    5)删除所有注解————保存
+	2、创建应用路由(每一个都创建一个规则,都交给nginx来处理)
+		1)进入指定项目
+		2)应用负载————创建应用路由
+			1-名称————mall-com
+		3)添加路由规则
+			1-指定域名————mall.com
+			2-协议————http
+			3-路径————/-选择服务(网关代理服务mall-nginx)-端口(80)
+	3、测试
+		通过域名访问静态资源,如果可以访问到,就证明可以使用
+
+-- 访问过程
+	1、SwitchHosts根据配置的域名访问方案————请求转给K8S集群的某个节点
+	2、K8S根据配置的Ingress路由规则————将请求转给K8S中的动静分离的nginx服务
+	3、Ngxin根据配置的上游服务器规则————将请求转给项目中的网关服务(gateway服务)
+	4、网关服务根据配置的路由规则————将请求转发给指定的服务
+
+-- 部署Vue后台管理项目————手动部署方式//也可以使用K8S流水线部署方式
+	0、打包前修改配置————将index-xxx.js的配置文件中api接口请求地址全部改为某个K8S节点中的gateway服务
+	1、使用如下命令进行项目构建————npm run build
+	2、会在项目根目录下生成dist目录
+	3、将dist进行压缩成dist.tar.gz的压缩文件
+	4、创建Dockerfile文件————内容如下所示:
+		# 从官方镜像拉取一个
+    FROM nginx
+    MAINTAINER pigkin
+    # 将自己的需要放入的文件爱添加到内部(会自动解压)
+    ADD dist.tar.gz /usr/share/nginx/html
+    # 暴露80端口
+    EXPOSE 80
+    ENTRYPOINT nginx -g "daemon off;"
+	5、服务器中创建一个目录(admin-vue-app)————将压缩包和创建的Dockerfile上传到此目录下
+	6、进入创建的目录使用命令进行构建docker镜像————docker build -t admin-vue-app:[版本号] -f Dockerfile .
+	7、对构建的镜像进行打标签————docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/pigskin/admin-vue-app:[镜像版本号]
+	8、推送给阿里云————docker push registry.cn-hangzhou.aliyuncs.com/pigskin/admin-vue-app:[镜像版本号]
+	9、K8S可以使用阿里云中的镜像进行部署
+```
+
+
 
 ## 39、DevOps——开发运营一体化
 
