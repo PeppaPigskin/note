@@ -446,6 +446,17 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 	brew install microsoft-remote-desktop
 ```
 
+12、在线绘图工具
+
+```markdown
+# 说明
+	它是一款在线画图工具，功能非常强大， 它里面支持流程图、思维导图、原型图、UML、网络拓扑、组织结构等多种类型，非常丰富，唯一的缺点就是只能免费保存9张图，想要保存更多的，需要进行付费升级。
+
+# 使用
+-- 进入如下地址,直接开始绘图
+	https://excalidraw.com/
+```
+
 
 
 # 4、Java——开发环境搭建
@@ -784,7 +795,7 @@ brew install VisualVM
 
 # 配置
 -- 1、使用如下命令创建一个SVN的代码仓库（目录改成你想要创建的目录）
-		svnadmin create /Users/pigskin/Desktop/CTJ/Code/SVN
+		svnadmin create /Users/pigskin/Desktop/CTJ/SZNK/SVN
 
 -- 2、打开conf文件夹,备份[authz、password、svnserve.conf]三个文件
 
@@ -794,10 +805,10 @@ brew install VisualVM
 	3、passwd-db = passwd————代表密码数据库是passwd文件
 	4、authz-db = authz————代表授权数据库为authz文件
 
--- 4、passwd文件的配置————[users]下添加用户名和密码,格式如下
+-- 4、passwd文件的配置(根据个人SVN账户决定)————[users]下添加用户名和密码,格式如下
 	username = password
 
--- 5、authz文件的配置————[groups]下创建组,[路径]指定路径下的访问用户或组
+-- 5、authz文件的配置(根据个人SVN账户决定)————[groups]下创建组,[路径]指定路径下的访问用户或组
   [groups]
   admin = wangwu # 将wangwu用户添加到admin组中
   test = zhangsan,lisi # 将zhangsan,lisi用户添加到test组中
@@ -807,7 +818,7 @@ brew install VisualVM
   maliu = rw # 给maliu用户添加read、write权限,单个用户前不用添加@
 
 # 开启服务
-	svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/Code/SVN]
+	svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/SZNK/SVN]
 
 # 关闭服务
 	打开[活动监视器]————>搜索[svnserve]————>选中对应服务————>删除
@@ -828,9 +839,20 @@ brew install VisualVM
 -- 版本回退————svn checkout -r [version] svn://localhost /Users/wanna/Desktop/test
 
 # 可视化工具安装与配置
--- 1、执行安装命令————brew install smartsvn
+-- SmartSVN
+	1、安装————执行安装命令————brew install smartsvn
 
--- 
+-- IDEA插件
+	1、安装插件————Subversion
+	2、配置
+		1)在idea菜单栏中进⾏以下操作————Preferences>Version Control>Subversion
+		2)在第⼀栏填⼊svn路径(根据个人具体情况而定)————/usr/local/Cellar/subversion/1.14.1_4/bin/svn
+
+# 问题及解决方式
+-- E230001
+	1、打开终端,执行以下命令————svn ls [svn地址]
+	2、显示(R)eject, accept (t)emporarily or accept (p)ermanently?————输p
+	3、然后根据提⽰输⼊svn账户名UserName和密码Password
 ```
 
 ## 14、Go语言开发环境搭建
@@ -1387,20 +1409,18 @@ brew install VisualVM
 # 可进行备份工作
 	备份[系统快照]————>生成/恢复备份
 
-# 网卡启用网络连接方式说明
--- 网络地址转换(NAT)————使用同样一个IP使用端口转换
+# Vmware提供四种网络连接方式
+-- 桥接(Bridged)网络————直接将虚拟网卡桥接到一个物理网卡上面,和inux下一个网卡绑定两个不同地址类似,实际上是将网卡设置为混杂模式从而达到侦听多个IP的能力
+	用这种方式虚拟系统的IP可设置成与本机系统在同一网段,虚拟系统相当于网络内的一台独立的机器,与本机共同插在一个Hub上,网络内其他机器可访问虚拟系统,虚拟系统也可访问网络内其他机器,当然与本机系统的双向访问也不成问题.
 
--- NAT网络————使用不同的IP
+-- 网络地址转换(NAT)————使用同样一个IP使用端口转换
+	这种方式也可以实现本机系统与虚拟系统的双向访问但网络内其他机器不能访问虚拟系统,虚拟系统可通过本机系统用NAT协议访问网络内其他机器.NAT方式的IP地址配置方法(虚拟系统先用DHCP自动获得IP地址,本系统里的Vmware services会为虚拟系统分配一个IP,之后如果想每次启动都用固定IP的话,在虚拟系统里直接设定这个IP即可)
 
 -- 仅主机(Host-Only)网络————便于宿主机连接虚拟机
+	顾名思义这种方式只能进行虚拟机和主机之间的网络通信,既网络内其他机器不能访问虚拟系统,虚拟系统也不能访问其他机器
 
--- 桥接网络————
-
--- 内部网络————
-
--- 通用驱动————
-
--- Cloud Network[EXPERIMENTAL]————
+-- Not Use方式————既不使用网络,虚拟系统为一个单机
+	一般来说, Bridged方式最方便好用,但如果本机系统是win2000而网线没插(或者根本没有网卡),网络很可能不可用(大部分用PC网卡的机器都如此),此时就只能用NAT方式或host-only
 ```
 
 ## 2、Vagrant
@@ -1883,9 +1903,9 @@ brew install VisualVM
 9、设置开机自启动
 	sudo docker update nginx --restart=always
 10、反向代理配置
-	
+	参照————https://jingyan.baidu.com/article/19192ad8171600e53f570774.html
 11、负载均衡配置
-	
+	参照————https://jingyan.baidu.com/article/a3a3f811f11957cca3eb8a3e.html
 ```
 
 ## 9、Docker中安装RabbitMQ
