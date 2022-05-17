@@ -2367,13 +2367,15 @@ brew install VisualVM
 	docker run -d --name tomcat8.5 -p 8080:8080 tomcat:8.5
 
 # 配置
--- 由于 docker 的 tomcat8.5 的镜像的 webapp 目录中没有文件，可以采取以下方式纠正，第一换版本，第二，将存放在 webapps.dist 文件夹中的内容复制出来，下面我们通过复制文件出来的方式解决这个问题:
-	1、进入 tomcat 容器中,并进入tomcat目录
-		docker exec -it 容器id /bin/bash
-		cd /usr/local/tomcat
-	2、tomcat 目录下执行如下命令
-		mv webapps webapps2
-		mv webapps.dist webapps
+-- 由于 docker 的 tomcat8.5 的镜像的 webapp 目录中没有文件，可以采取以下方式纠正
+	1、第一——————换版本;
+	2、第二————将存放在 webapps.dist 文件夹中的内容复制出来，下面我们通过复制文件出来的方式解决这个问题:
+		1)进入 tomcat 容器中,并进入tomcat目录
+			docker exec -it 容器id /bin/bash
+			cd /usr/local/tomcat
+		2)tomcat 目录下执行如下命令
+			mv webapps webapps2
+			mv webapps.dist webapps
 
 # 浏览器访问
 	Ip:8080
