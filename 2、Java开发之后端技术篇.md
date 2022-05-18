@@ -466,14 +466,14 @@ return interceptor;
 # 一般复杂查询使用QueryWrapper对象,结构图如下:
 ```
 
-<img src="image/img2_1_1_6_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_1_6_1.png" style="zoom:50%;" />
 
 ```markdown
 # 包含的常见操作,如图所示:
 	select                                     指定查询的列                                    
 ```
 
-<img src="image/img2_1_1_6_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_1_6_2.png" style="zoom:50%;" />
 
 ```markdown
 # 代码实现步骤
@@ -795,13 +795,13 @@ return interceptor;
 	3、图示:
 ```
 
-<img src="image/img2_1_3_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # Nginx配置文件说明-- 如图所示:
 ```
 
-<img src="image/img2_1_3_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 设置本地域名配置,配置本地hosts文件
@@ -845,7 +845,7 @@ return interceptor;
       }
 ```
 
-<img src="image/img2_1_3_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_3.png" style="zoom:50%;" />
 
 ```markdown
 		4)重启nginx
@@ -866,19 +866,19 @@ return interceptor;
   	1)配置server,如下图所示
 ```
 
-<img src="image/img2_1_3_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_4.png" style="zoom:50%;" />
 
 ```markdown
 		2)配置http,如下图所示
 ```
 
-<img src="image/img2_1_3_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_5.png" style="zoom:50%;" />
 
 ```markdown
 		3)网关配置(放到配置最后),如下图所示
 ```
 
-<img src="image/img2_1_3_1_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_6.png" style="zoom:50%;" />
 
 ```markdown
 		4)解决nginx代理给网关时,会丢失请求的host信息————nginx.conf配置文件中添加如下配置
@@ -889,7 +889,7 @@ return interceptor;
 	1、说明————将java代码和普通页面分开进行部署，每个请求分开访问————如图所示
 ```
 
-<img src="image/img2_1_3_1_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_3_1_7.png" style="zoom:50%;" />
 
 ```markdown
 	2、使用示例
@@ -1252,7 +1252,7 @@ return interceptor;
 # 图示————如下图所示
 ```
 
-<img src="image/img2_1_6_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_6_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # SpringBoot整合SpringCache简化缓存开发
@@ -1435,14 +1435,14 @@ return interceptor;
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_6_3_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_6_3_1.png" style="zoom:50%;" />
 
 ```markdown
 # 代码整合
 -- 1、创建对应模块————权限管理模块目录结构,如下图所示:
 ```
 
-<img src="image/img2_1_6_3_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_6_3_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 2、引入依赖
@@ -2089,7 +2089,7 @@ return interceptor;
 # 微服务架构图,如下图所示:
 ```
 
-<img src="image/img2_1_7_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_7_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 说明
@@ -2205,7 +2205,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	Feign-->Hystrix-->Ribbon-->Http Client(apache http components/Okhttp),详细过程如图:
 ```
 
-<img src="image/img2_1_8_0_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_0_1.png" style="zoom:50%;" />
 
 ```markdown
 # 小版本划分说明
@@ -2241,7 +2241,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	对比图示,如下图所示:
 ```
 
-<img src="image/img2_1_8_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # SpringCloudAlibaba使用Nacos作为注册中心
@@ -2269,7 +2269,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 简要图示,如下图所示:
 ```
 
-<img src="image/img2_1_8_1_2.png" style="zoom:50%;"/>
+<img src="image/img02/img2_1_8_1_2.png" style="zoom:50%;"/>
 
 ```markdown
 -- 角色说明
@@ -2280,7 +2280,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 详细图示,如下图所示:
 ```
 
-<img src="image/img2_1_8_1_3.png" style="zoom:50%;"/>
+<img src="image/img02/img2_1_8_1_3.png" style="zoom:50%;"/>
 
 ```markdown
 # Eureka Server————注册中心环境搭建
@@ -3001,7 +3001,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 官方架构原理图,如下图所示:
 ```
 
-<img src="image/img2_1_8_1_4.png" style="zoom:50%;"/>
+<img src="image/img02/img2_1_8_1_4.png" style="zoom:50%;"/>
 
 ```markdown
 -- 说明
@@ -3015,7 +3015,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 翻译后的架构原理图,如下图所示:
 ```
 
-<img src="image/img2_1_8_1_5.png" style="zoom:50%;"/>
+<img src="image/img02/img2_1_8_1_5.png" style="zoom:50%;"/>
 
 ```markdown
 # CAP原则
@@ -3292,7 +3292,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 # Gateway图示,如下:
 ```
 
-<img src="image/img2_1_8_5_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_5_1.png" style="zoom:50%;" />
 
 ```markdown
 # 核心概念
@@ -3304,7 +3304,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	Spring cloud Gateway发出请求。然后再由Gateway Handler Mapping中找到与请求相匹配的路由，将其发送到Gateway web handler。Handler再通过指定的过滤器链将请求发送到我们实际的服务执行业务逻辑，然后返回。如下图所示:
 ```
 
-<img src="image/img2_1_8_5_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_5_2.png" style="zoom:50%;" />
 
 ```markdown
 # 代码实现
@@ -3398,7 +3398,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	如下图所示,默认不需要额外配置，只要多个服务名字一样，Gateway自动实现负载均衡
 ```
 
-<img src="image/img2_1_8_5_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_5_3.png" style="zoom:50%;" />
 
 ```markdown
 # 相关工具类
@@ -3638,19 +3638,19 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	1、如果服务调用顺序如下:
 ```
 
-<img src="image/img2_1_8_6_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_6_1.png" style="zoom:50%;" />
 
 ```markdown
 	2、概念完整表示如下:
 ```
 
-<img src="image/img2_1_8_6_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_6_2.png" style="zoom:50%;" />
 
 ```markdown
 	3、Span之间的父子关系如下:
 ```
 
-<img src="image/img2_1_8_6_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_6_3.png" style="zoom:50%;" />
 
 ```markdown
 # SpringBoot整合Sleuth
@@ -3685,7 +3685,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 原理图,如下图所示
 ```
 
-<img src="image/img2_1_8_6_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_6_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 安装
@@ -3800,7 +3800,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_8_7_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_7_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 进程内负载均衡(客户端负载均衡)
@@ -3808,7 +3808,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_8_7_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_8_7_2.png" style="zoom:50%;" />
 
 ```markdown
 	Ribbon属于后者,它只是一个类库,集成与consumer进程,consumer通过它来获取provider的地址
@@ -4623,7 +4623,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 -- 工作流程,如下图所示:
 ```
 
-<img src="image/img2_1_9_4_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_9_4_1.png" style="zoom:50%;" />
 
 ```markdown
 # 整体机制————两阶段提交协议的演变：
@@ -4756,7 +4756,7 @@ https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.30
 	如下所示:
 ```
 
-<img src="image/img2_1_10_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_10_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 下载安装
@@ -4838,7 +4838,7 @@ docker run --env MODE=standalone --name nacos \
 # 配置如下信息,指定数据库账号和密码,nacos相关信息就会进入数据库
 ```
 
-<img src="image/img2_1_10_2_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_10_2_1.png" style="zoom:50%;">
 
 
 
@@ -5030,7 +5030,7 @@ docker run --env MODE=standalone --name nacos \
 		1)图示
 ```
 
-<img src="image/img2_1_11_2_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_1.png" style="zoom:50%;">
 
 ```markdown
 		2)说明
@@ -5043,7 +5043,7 @@ docker run --env MODE=standalone --name nacos \
 		1)图示
 ```
 
-<img src="image/img2_1_11_2_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_2.png" style="zoom:50%;">
 
 ```markdown
 		2)说明
@@ -5063,26 +5063,26 @@ docker run --env MODE=standalone --name nacos \
 		2)原理图
 ```
 
-<img src="image/img2_1_11_2_3.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_3.png" style="zoom:50%;">
 
 ```markdown
 		3)哨兵原理————Redis哨兵的三个定时任务,Redis哨兵判断一个Redis节点故障不可达主要就是通过三个定时任务来完成的:
 			1-每隔10秒,每个哨兵节点会向主节点和从节点发送“info replication”命令来获取罪行的拓扑结构,如下图所示:
 ```
 
-<img src="image/img2_1_11_2_4.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_4.png" style="zoom:50%;">
 
 ```markdown
 			2-每隔2秒,每个哨兵节点会向Redis节点的_sentinel_:hello频道发送自己对主节点是否故障的判断以及自身的节点信息,并且其他的哨兵节点也会订阅这个频道来了解其他哨兵节点的信息以及对主节点的判断,如下图所示:
 ```
 
-<img src="image/img2_1_11_2_5.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_5.png" style="zoom:50%;">
 
 ```markdown
 			3-每隔1秒,每个哨兵会向主节点、从节点、其他哨兵节点发送一个“ping”命令来做心跳检测,如果在定时Job3检测不到节点的心跳,会判断为“主观下线”。如下图所示:
 ```
 
-<img src="image/img2_1_11_2_6.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_6.png" style="zoom:50%;">
 
 ```markdown
 			客观下线————如果该节点还是主节点那么还会通知到其他的哨兵对该主节点进行心跳检测,这时主观下线的票数超过了<quorum>数时,那么这个主节点确实就可能是故障不可达了,这时就由原来的主观下线变为了“客观下线".
@@ -5096,7 +5096,7 @@ docker run --env MODE=standalone --name nacos \
 			1-图示,如下图所示:
 ```
 
-<img src="image/img2_1_11_2_7.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_7.png" style="zoom:50%;">
 
 ```markdown
 			2-说明————Redis集群的功能限制(Redis集群相对单机在功能上存在一些限制,需要提前了解,在使用时做好规避)
@@ -5109,7 +5109,7 @@ docker run --env MODE=standalone --name nacos \
 				-- 命令大多会重定向,耗时多,图示如下图所示:
 ```
 
-<img src="image/img2_1_11_2_8.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_8.png" style="zoom:50%;">
 
 ```markdown
 		4)一致性hash
@@ -5117,7 +5117,7 @@ docker run --env MODE=standalone --name nacos \
 				一致性哈希可以很好的解决稳定性问题,可以将所有的存储节点排列在首尾相接的Hash环上,每个key在计算Hash后会顺时针找到临接的存储节点存放。而当有节点加入或退出时,仅影响该节点在Hash环上顺时针相邻的后续节点。如下图所示:
 ```
 
-<img src="image/img2_1_11_2_9.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_9.png" style="zoom:50%;">
 
 ```markdown
 			2-一致性Hash解决了Hash倾斜问题
@@ -5128,7 +5128,7 @@ docker run --env MODE=standalone --name nacos \
 
 ```
 
-<img src="image/img2_1_11_2_10.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_10.png" style="zoom:50%;">
 
 ```markdown
 -- 部署步骤
@@ -5163,7 +5163,7 @@ docker run --env MODE=standalone --name nacos \
   		redis-cli --cluster create 192.168.56.xxx:7001 192.168.56.xxx:7002 192.168.56.xxx:7003 192.168.56.xxx:7004 192.168.56.xxx:7005 192.168.56.xxx:7006 --cluster-replicas 1
 ```
 
-<img src="image/img2_1_11_2_11.png" style="zoom:50%;">
+<img src="image/img02/img2_1_11_2_11.png" style="zoom:50%;">
 
 ```markdown
   	3)参数说明:
@@ -5412,7 +5412,7 @@ docker run --env MODE=standalone --name nacos \
 # 图示
 ```
 
-<img src="image/img2_1_13_1_1.png" style="zoom:30%;" />
+<img src="image/img02/img2_1_13_1_1.png" style="zoom:30%;" />
 
 ```markdown
 # 主要解决问题
@@ -5424,7 +5424,7 @@ docker run --env MODE=standalone --name nacos \
 			实现过程————如下图所示
 ```
 
-<img src="image/img2_1_13_1_2.png" style="zoom:30%;" />——
+<img src="image/img02/img2_1_13_1_2.png" style="zoom:30%;" />——
 
 ```markdown
 		2-方式二：通用开发者key（万能钥匙）
@@ -5432,7 +5432,7 @@ docker run --env MODE=standalone --name nacos \
 			实现过程————如下图所示,客户应用和受保护的资源双方约定好了，使用key能够打开双方
 ```
 
-<img src="image/img2_1_13_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_13_1_3.png" style="zoom:50%;" />
 
 ```markdown
 		3-方式三：办法令牌（特殊令牌）
@@ -5440,7 +5440,7 @@ docker run --env MODE=standalone --name nacos \
 			实现过程————如下图所示,访问者使用受保护资源颁发的令牌（字符串），就能够访问
 ```
 
-<img src="image/img2_1_13_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_13_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式访问问题（即单点登录）
@@ -6460,7 +6460,7 @@ docker run --env MODE=standalone --name nacos \
 # 单点登陆流程图如下:
 ```
 
-<img src="image/img2_1_19_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_19_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # 单点登录框架&原理演示
@@ -6540,7 +6540,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_21_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_21_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 倒排索引机制
@@ -6552,7 +6552,7 @@ docker run --env MODE=standalone --name nacos \
 --图示,如下图所示:
 ```
 
-<img src="image/img2_1_21_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_21_1_2.png" style="zoom:50%;" />
 
 ```markdown
 #	安装
@@ -7058,9 +7058,9 @@ docker run --env MODE=standalone --name nacos \
 		3)详细,如下图所示:
 ```
 
-<img src="image/img2_1_21_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_21_1_3.png" style="zoom:50%;" />
 
-<img src="image/img2_1_21_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_21_1_4.png" style="zoom:50%;" />
 
 ```markdown
 	2、映射————用来定义一个文档,以及它包含的属性是如何存储和索引的
@@ -7091,7 +7091,7 @@ docker run --env MODE=standalone --name nacos \
 		4)修改mapping信息,如下图所示:
 ```
 
-<img src="image/img2_1_21_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_21_1_5.png" style="zoom:50%;" />
 
 ```markdown
 -- 新版本改变
@@ -7806,7 +7806,7 @@ docker run --env MODE=standalone --name nacos \
 		当前我们的集群是正常运行的,但是在硬件故障时有丢失数据的风险。
 ```
 
-<img src="image/img2_1_21_2_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_1.png" style="zoom:50%;">
 
 ```markdown
 -- 新增节点
@@ -7815,7 +7815,7 @@ docker run --env MODE=standalone --name nacos \
 		此时 cluster-health 现在展示的状态为 green,这表示所有6个分片(包括3个主分片和3个副本分片)都在正常运行。我们的集群现在不仅仅是正常运行的,并且还处于始终可用的状态。
 ```
 
-<img src="image/img2_1_21_2_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_2.png" style="zoom:50%;">
 
 ```markdown
 -- 水平扩容————启动第三个节点
@@ -7823,7 +7823,7 @@ docker run --env MODE=standalone --name nacos \
 		Node1 和 Node2上各有一个分片被迁移到了新的 Node3 节点,现在每个节点上都拥有2个分片,而不是之前的三个.这表示每个节点的硬件资源(CPU、RAM、I/O)将被更少的分片所共享,每个分片的性能将会得到提升
 ```
 
-<img src="image/img2_1_21_2_3.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_3.png" style="zoom:50%;">
 
 ```markdown
 	2、在运行中的集群上是可以动态调整副本分片数目的,可以按需伸缩集群.将副本数量从默认的1增加到2,blogs索引现在拥有9个分片(3个主分片和6个副本分片).这意味着我们可以将集群扩容到9个节点,每个节点上一个分片.相比原来3个节点时,集群搜索性能可以提升3倍.如下所示:
@@ -7833,14 +7833,14 @@ docker run --env MODE=standalone --name nacos \
 		}
 ```
 
-<img src="image/img2_1_21_2_4.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_4.png" style="zoom:50%;">
 
 ```markdown
 -- 应对故障
 	1、关闭了一个节点后的集群,如下图所示
 ```
 
-<img src="image/img2_1_21_2_5.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_5.png" style="zoom:50%;">
 
 ```markdown
 	2、应对故障说明
@@ -7891,7 +7891,7 @@ docker run --env MODE=standalone --name nacos \
 	3、图示结构
 ```
 
-<img src="image/img2_1_21_2_6.png" style="zoom:50%;">
+<img src="image/img02/img2_1_21_2_6.png" style="zoom:50%;">
 
 ```markdown
 # 集群搭建
@@ -8273,7 +8273,7 @@ docker run --env MODE=standalone --name nacos \
 -- 读模式缓存使用流程,如下图所示:
 ```
 
-<img src="image/img2_1_23_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 缓存说明
@@ -8330,7 +8330,7 @@ docker run --env MODE=standalone --name nacos \
 -- 缓存穿透————如下图
 ```
 
-<img src="image/img2_1_23_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_2.png" style="zoom:50%;" />
 
 ```markdown
 	1、说明————指查询一个一定不存在的数据,由于缓存是不命中,将去查询数据库,但是数据库也无此记录,我们没有将此次查询的null写入缓存,这将导致这个不存在的数据每次请求都要去存储层去查询,失去了缓存的意义
@@ -8340,7 +8340,7 @@ docker run --env MODE=standalone --name nacos \
 -- 缓存雪崩————如下图
 ```
 
-<img src="image/img2_1_23_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_3.png" style="zoom:50%;" />
 
 ```markdown
 	1、说明————指我们设置缓存时key采用了相同的过期时间,导致缓存在某一时刻同时失效,请求全部转发到DB,DB瞬间压力过重雪崩
@@ -8349,7 +8349,7 @@ docker run --env MODE=standalone --name nacos \
 -- 缓存击穿————如下图
 ```
 
-<img src="image/img2_1_23_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_4.png" style="zoom:50%;" />
 
 ```markdown
 	1、说明————对于一些设置了过期时间的key,如果这些key可能在某些时间点被超高并发的访问,是一种非常“热点”的数据,如果这个key在大量请求同时进来前正好失效,那么所有对这个key的数据查询都落到DB
@@ -8383,25 +8383,25 @@ docker run --env MODE=standalone --name nacos \
 -- 双写模式————修改数据库数据,同时修改缓存,还是会产生脏数据,如图:
 ```
 
-<img src="image/img2_1_23_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_5.png" style="zoom:50%;" />
 
 ```markdown
 -- 失效模式————修改数据库后,删除对应缓存,让下一次查询再重新缓存,还是会产生脏数据,如图:
 ```
 
-<img src="image/img2_1_23_1_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_6.png" style="zoom:50%;" />
 
 ```markdown
 -- 解决方案————都会产生暂时性脏数据问题,可以加上读写锁,如图:
 ```
 
-<img src="image/img2_1_23_1_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_7.png" style="zoom:50%;" />
 
 ```markdown
 -- 解决-Canal————canal订阅binlog方式,进行数据的同步,如图:
 ```
 
-<img src="image/img2_1_23_1_8.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_1_8.png" style="zoom:50%;" />
 
 ```markdown
 # SpringCache————解决分布式缓存不一致性问题
@@ -8425,31 +8425,31 @@ docker run --env MODE=standalone --name nacos \
 -- 分布式锁演进——阶段一
 ```
 
-<img src="image/img2_1_23_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_2_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式锁演进——阶段二
 ```
 
-<img src="image/img2_1_23_2_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_2_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式锁演进——阶段三
 ```
 
-<img src="image/img2_1_23_2_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_2_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式锁演进——阶段四
 ```
 
-<img src="image/img2_1_23_2_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_2_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 分布式锁演进——最终形态
 ```
 
-<img src="image/img2_1_23_2_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_23_2_5.png" style="zoom:50%;" />
 
 ```markdown
 # redis分布式锁(自旋锁)使用
@@ -9623,7 +9623,7 @@ docker run --env MODE=standalone --name nacos \
 # Session原理
 ```
 
-<img src="image/img2_1_26_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 存在问题
@@ -9634,32 +9634,32 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示
 ```
 
-<img src="image/img2_1_26_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 分布式session解决方案原理
 -- Session复制,如图所示:
 ```
 
-<img src="image/img2_1_26_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 客户端存储,如图所示:
 ```
 
-<img src="image/img2_1_26_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- hash一致性,如图所示:
 ```
 
-<img src="image/img2_1_26_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_5.png" style="zoom:50%;" />
 
 ```markdown
 -- 统一存储,如图所示:
 ```
 
-<img src="image/img2_1_26_1_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_6.png" style="zoom:50%;" />
 
 ```markdown
 -- 不同服务,子域session共享
@@ -9674,7 +9674,7 @@ docker run --env MODE=standalone --name nacos \
 	3、图示,如图所示:
 ```
 
-<img src="image/img2_1_26_1_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_26_1_7.png" style="zoom:50%;" />
 
 ```markdown
 # SpringSession——————解决分布式系统Session不一致问题
@@ -9706,19 +9706,19 @@ docker run --env MODE=standalone --name nacos \
 -- 异步处理
 ```
 
-<img src="image/img2_1_28_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 应用解耦
 ```
 
-<img src="image/img2_1_28_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_1_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 流量控制
 ```
 
-<img src="image/img2_1_28_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_1_3.png" style="zoom:50%;" />
 
 ```markdown
 # 消息中间件概述
@@ -9736,7 +9736,7 @@ docker run --env MODE=standalone --name nacos \
 	3、JMS与AMQP对比,如图所示:
 ```
 
-<img src="image/img2_1_28_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- Spring支持
@@ -9817,7 +9817,7 @@ docker run --env MODE=standalone --name nacos \
 # 图示————如下图所示
 ```
 
-<img src="image/img2_1_28_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_2_1.png" style="zoom:50%;" />
 
 ```markdown
 # 核心概念
@@ -9858,7 +9858,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示
 ```
 
-<img src="image/img2_1_28_2_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_2_2.png" style="zoom:50%;" />
 
 ```markdown
 # Docker安装RabbitMQ
@@ -9877,26 +9877,26 @@ docker run --env MODE=standalone --name nacos \
 
 
 
-<img src="image/img2_1_28_3_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_3_1.png" style="zoom:50%;" />
 
 ```markdown
 # Exchange类型————分发消息时根据类型的不同分发策略有所区别
 -- 1、direct——直接(点对点)————只能最终到达一个队列(精确匹配),如下图所示
 ```
 
-<img src="image/img2_1_28_3_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_3_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 2、fanout——扇出(发布订阅)————将消息分配到绑定的队列上(广播模式)——不区分路由键,如下图所示
 ```
 
-<img src="image/img2_1_28_3_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_3_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 3、topic——主题(发布订阅)————将消息发送给部分队列(主题发布订阅模式)——根据路由键匹配,如下图所示
 ```
 
-<img src="image/img2_1_28_3_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_3_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 4、headers——(点对点)————匹配AMQP消息的header而不是路由键,并且和direct完全一致,但是性能差很多
@@ -10274,7 +10274,7 @@ docker run --env MODE=standalone --name nacos \
 # 可靠性抵达————图示,如下图所示
 ```
 
-<img src="image/img2_1_28_6_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_6_1.png" style="zoom:50%;" />
 
 ```markdown
 # 说明————保证消息不丢失,可靠到达,可以使用事物消息,性能下降250倍,为此引入确认机制
@@ -10569,14 +10569,14 @@ docker run --env MODE=standalone --name nacos \
 	定时任务每30分钟查一次,当一个订单在第一个次定时任务查询后立即产生,那么就会导致此次的任务在第三次的定时任务才能被查到,产生时效性问题.如下图所示:
 ```
 
-<img src="image/img2_1_28_7_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_1.png" style="zoom:50%;" />
 
 ```markdown
 # RabbitMQ延时队列实现定时任务
 	通过MQ暂缓存消息,不占用系统任何资源,实现事务最终一致性,并有效解决了定时任务产生的时效性问题,如下图所示
 ```
 
-<img src="image/img2_1_28_7_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_2.png" style="zoom:50%;" />
 
 ```markdown
 # 消息的存活时间--TTL————Time To Live
@@ -10598,7 +10598,7 @@ docker run --env MODE=standalone --name nacos \
 -- 实现一个延时队列————我们既可以控制消息在一段时间后变成死信,又可以控制变成死信的消息被路由到某一指定的交换机,结合二者,其实就可以实现一个延时队列,如下图所示:
 ```
 
-<img src="image/img2_1_28_7_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 手动ack&异常消息统一放在一个队列处理建议的两种方式
@@ -10609,26 +10609,26 @@ docker run --env MODE=standalone --name nacos \
 -- 方式一————设置队列过期时间实现延时队列————推荐使用
 ```
 
-<img src="image/img2_1_28_7_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 方式二————设置消息过期时间实现延时队列————使用的是懒检查(消息队列中的消息逐个检查,不会根据设置过期时间的长短优先处理)
 ```
 
-<img src="image/img2_1_28_7_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_5.png" style="zoom:50%;" />
 
 ```markdown
 # 代码整合————延时队列定时订单关单模拟
 -- 业务流程基本图示,如下图所示
 ```
 
-<img src="image/img2_1_28_7_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_6.png" style="zoom:50%;" />
 
 ```markdown
 -- 业务流程升级图示,如下图所示
 ```
 
-<img src="image/img2_1_28_7_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_28_7_7.png" style="zoom:50%;" />
 
 ```markdown
 -- 说明
@@ -11003,7 +11003,7 @@ docker run --env MODE=standalone --name nacos \
 -- 节点加入集群————(此时还是普通集群)操作完成,结果如下图所示:
 ```
 
-<img src="image/img2_1_28_9_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_28_9_1.png" style="zoom:50%;">
 
 ```markdown
 	1、第一个节点操作
@@ -11099,7 +11099,7 @@ docker run --env MODE=standalone --name nacos \
 -- 模型图如下
 ```
 
-<img src="image/img2_1_29_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 说明
@@ -11117,7 +11117,7 @@ docker run --env MODE=standalone --name nacos \
 -- 运行时数据区详细说明图如下
 ```
 
-<img src="image/img2_1_29_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 堆
@@ -11133,7 +11133,7 @@ docker run --env MODE=standalone --name nacos \
 	1、JDK1.8JVM图示
 ```
 
-<img src="image/img2_1_29_1_10.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_10.png" style="zoom:50%;" />
 
 ```markdown
 
@@ -11169,7 +11169,7 @@ docker run --env MODE=standalone --name nacos \
 	2、图示
 ```
 
-<img src="image/img2_1_29_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_3.png" style="zoom:50%;" />
 
 ```markdown
 	3、垃圾判断算法
@@ -11177,7 +11177,7 @@ docker run --env MODE=standalone --name nacos \
 			[0]图示
 ```
 
-<img src="image/img2_1_29_1_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_6.png" style="zoom:50%;" />
 
 ```markdown
 			[1]说明————它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。 这样使得每次都是对其中的一块进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。
@@ -11188,7 +11188,7 @@ docker run --env MODE=standalone --name nacos \
 			[0]图示
 ```
 
-<img src="image/img2_1_29_1_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_7.png" style="zoom:50%;" />
 
 ```markdown
 			[1]说明————算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。之所以说它是最基础的收集算法，是因为后续的收集算法都是基于这种思路并对其缺点进行改进而得到的。
@@ -11199,7 +11199,7 @@ docker run --env MODE=standalone --name nacos \
 			[1]图示
 ```
 
-<img src="image/img2_1_29_1_8.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_8.png" style="zoom:50%;" />
 
 ```markdown
 			[2]说明————标记整理算法主要是在标记清除算法上做了优化，标记存活对象->清除垃圾->整理存活对象。标记出所有能存活的对象，然后这些存活的对象向内存的某一端移动。
@@ -11214,7 +11214,7 @@ docker run --env MODE=standalone --name nacos \
        -- 图示
 ```
 
-<img src="image/img2_1_29_1_9.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_9.png" style="zoom:50%;" />
 
 ```markdown
       -- 说明
@@ -11230,7 +11230,7 @@ docker run --env MODE=standalone --name nacos \
 	1、如下图所示
 ```
 
-<img src="image/img2_1_29_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_4.png" style="zoom:50%;" />
 
 ```markdown
 	2、详细说明
@@ -11253,7 +11253,7 @@ docker run --env MODE=standalone --name nacos \
 	1、图示
 ```
 
-<img src="image/img2_1_29_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_29_1_5.png" style="zoom:50%;" />
 
 ```markdown
 	2、类加载完成后,接着会在Java堆中划分一块内存分配给对象。内存分配根据Java堆是否规整,有两种方式:
@@ -11508,7 +11508,7 @@ docker run --env MODE=standalone --name nacos \
 	0、官方图示,如下图所示:
 ```
 
-<img src="image/img2_1_32_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_32_2_1.png" style="zoom:50%;" />
 
 ```markdown
 
@@ -11575,7 +11575,7 @@ docker run --env MODE=standalone --name nacos \
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_32_2_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_32_2_2.png" style="zoom:50%;" />
 
 ```markdown
 	3、注意
@@ -11593,7 +11593,7 @@ docker run --env MODE=standalone --name nacos \
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_32_2_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_32_2_3.png" style="zoom:50%;" />
 
 ```markdown
 	3、注意
@@ -11624,7 +11624,7 @@ docker run --env MODE=standalone --name nacos \
 # 案例————以下订单并锁定及解锁库存的过程为例————图示说明,如下图所示
 ```
 
-<img src="image/img2_1_33_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_33_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 案例————以下订单并锁定及解锁库存的过程为例————库存锁定及解锁业务实现核心代码
@@ -12486,7 +12486,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示传送流程————如下图所示
 ```
 
-<img src="image/img2_1_34_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_34_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 常见算法
@@ -12506,7 +12506,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示传送流程————如下图所示
 ```
 
-<img src="image/img2_1_34_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_34_1_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 常见算法
@@ -12732,7 +12732,7 @@ docker run --env MODE=standalone --name nacos \
 		1)图示
 ```
 
-<img src="image/img2_1_36_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_36_1_1.png" style="zoom:50%;" />
 
 ```markdown
 		2)解决方式
@@ -12777,7 +12777,7 @@ docker run --env MODE=standalone --name nacos \
 # 部署方式的进化,如下图所示:
 ```
 
-<img src="image/img2_1_38_1_1.svg" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_1_1.svg" style="zoom:50%;" />
 
 ```markdown
 -- 1、传统部署时代(Traditional Deplovment)
@@ -12821,7 +12821,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_1_2.png" style="zoom:50%;" />
 
 ### 2、Kubernetes核心功能
 
@@ -12853,7 +12853,7 @@ docker run --env MODE=standalone --name nacos \
 	1、节点架构图示
 ```
 
-<img src="image/img2_1_38_3_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_3_1.png" style="zoom:50%;" />
 
 ```markdown
 	2、Master节点相关组件说明
@@ -12883,7 +12883,7 @@ docker run --env MODE=standalone --name nacos \
 	1、节点架构图,如下图所示:
 ```
 
-<img src="image/img2_1_38_3_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_3_2.png" style="zoom:50%;" />
 
 ```markdown
 	2、Node节点相关组件说明
@@ -12906,7 +12906,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_3_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_3_3.png" style="zoom:50%;" />
 
 ### 4、Kubernetes概念
 
@@ -12915,13 +12915,13 @@ docker run --env MODE=standalone --name nacos \
 -- 整体概念图1,如下图所示:
 ```
 
-<img src="image/img2_1_38_4_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 整体概念图2,如下图所示:
 ```
 
-<img src="image/img2_1_38_4_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_2.png" style="zoom:50%;" />
 
 ```markdown
 # 相关概念
@@ -12935,7 +12935,7 @@ docker run --env MODE=standalone --name nacos \
 -- Volume————如下图所示
 ```
 
-<img src="image/img2_1_38_4_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_3.png" style="zoom:50%;" />
 
 ```markdown
 	1、声明在Pod容器中可访问的文件目录
@@ -12954,7 +12954,7 @@ docker run --env MODE=standalone --name nacos \
 	0、图示,如下图所示
 ```
 
-<img src="image/img2_1_38_4_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_5.png" style="zoom:50%;" />
 
 ```markdown
 	1、定义一组Pod的副本数目、版本等
@@ -12965,7 +12965,7 @@ docker run --env MODE=standalone --name nacos \
 	1、图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_4_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_5.png" style="zoom:50%;" />
 
 ```markdown
 	2、Pod的负载均衡,提供一个或者多个Pod的稳定访问地址
@@ -12979,7 +12979,7 @@ docker run --env MODE=standalone --name nacos \
 	1、定义一些key-value标签,类似html标签选择器
 ```
 
-<img src="image/img2_1_38_4_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_6.png" style="zoom:50%;" />
 
 ```markdown
 -- Selectors
@@ -12993,7 +12993,7 @@ docker run --env MODE=standalone --name nacos \
 -- API————如下图所示
 ```
 
-<img src="image/img2_1_38_4_7.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_4_7.png" style="zoom:50%;" />
 
 ```markdown
 	1、我们通过kubernetes的API来操作整个集群
@@ -13035,7 +13035,7 @@ docker run --env MODE=standalone --name nacos \
 # 流程图示,如下图所示
 ```
 
-<img src="image/img2_1_38_6_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_6_1.png" style="zoom:50%;" />
 
 ```markdown
 # 流程文字叙述
@@ -13088,7 +13088,7 @@ docker run --env MODE=standalone --name nacos \
 # 部署步骤————组件图示,如下图所示
 ```
 
-<img src="image/img2_1_38_7_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_7_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 1、在所有节点上安装Docker和kubeadm
@@ -13336,7 +13336,7 @@ docker run --env MODE=standalone --name nacos \
 -- yaml模板,图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_9_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_9_1.png" style="zoom:50%;" />
 
 ```markdown
 	1、apiVersion————定义版本信息
@@ -13378,7 +13378,7 @@ docker run --env MODE=standalone --name nacos \
 	2、图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_10_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_10_1.png" style="zoom:50%;" />
 
 ```markdown
 		步骤说明:
@@ -13419,7 +13419,7 @@ docker run --env MODE=standalone --name nacos \
 -- 修改配置文件————新增 type: NodePort 和 nodePort: 30001,以便能实现非本机访问,如图所示:
 ```
 
-<img src="image/img2_1_38_11_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_11_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 想查看更多信息，可以 describe 这个失败的 Pod
@@ -13658,13 +13658,13 @@ docker run --env MODE=standalone --name nacos \
 	目前，平台的资源一共有三个层级，包括 集群 (Cluster)、 企业空间 (Workspace)、 项目 (Project) 和 DevOps Project (DevOps 工程)，层级关系如下图所示，即一个集群中可以创建多个企业空间，而每个企业空间，可以创建多个项目和 DevOps工程，而集群、企业空间、项目和 DevOps工程中，默认有多个不同的内置角色。
 ```
 
-<img src="image/img2_1_38_12_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_12_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 用户系统架构图————图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_12_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_1_38_12_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 基于用户系统架构图,建立多租户系统步骤
@@ -13696,7 +13696,7 @@ docker run --env MODE=standalone --name nacos \
 	WordPress 是使用 PHP 开发的博客平台，用户可以在支持 PHP 和 MySQL 数据库的环境中架设属于自己的网站。本文以创建一个 Wordpress 应用 为例，以创建 KubeSphere 应用的形式将 Wordpress 的组件（MySQL 和 Wordpress）创建后发布至 Kubernetes 中，并在集群外访问 Wordpress 服务.一个完整的 Wordpress 应用会包括以下 Kubernetes 对象，其中 MySQL 作为后端数据库，Wordpress 本身作为前端提供浏览器访问。图示如下:　
 ```
 
-<img src="image/img2_1_38_13_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_38_13_1.png" style="zoom:50%;">
 
 ```markdown
 # 创建步骤
@@ -13738,7 +13738,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_14_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_38_14_1.png" style="zoom:50%;">
 
 ```markdown
 -- 流程说明:
@@ -13878,7 +13878,7 @@ docker run --env MODE=standalone --name nacos \
 -- 部署流程,图示如下:
 ```
 
-<img src="image/img2_1_38_15_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_38_15_1.png" style="zoom:50%;">
 
 ```markdown
 -- 整体详细步骤说明
@@ -14019,7 +14019,7 @@ docker run --env MODE=standalone --name nacos \
     3)targetPort、port、nodePort说明,如下图所示:
 ```
 
-<img src="image/img2_1_38_15_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_38_15_2.png" style="zoom:50%;">
 
 ```markdown
 -- 项目根目录定义流水线文档示例
@@ -14196,7 +14196,7 @@ docker run --env MODE=standalone --name nacos \
 	1、部署流程图示,如下图所示:
 ```
 
-<img src="image/img2_1_38_15_3.png" style="zoom:50%;">
+<img src="image/img02/img2_1_38_15_3.png" style="zoom:50%;">
 
 ```markdown
 	2、K8S的DevOps工程创建流水线工程
@@ -14346,7 +14346,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_39_1_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_39_1_1.png" style="zoom:50%;">
 
 ```markdown
 -- 说明
@@ -14360,7 +14360,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_39_1_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_39_1_2.png" style="zoom:50%;">
 
 ```markdown
 -- 持续集成(Continuous Integration)
@@ -14383,7 +14383,7 @@ docker run --env MODE=standalone --name nacos \
 	3、持续交付工具链图,如下图所示:
 ```
 
-<img src="image/img2_1_39_1_3.png" style="zoom:50%;">
+<img src="image/img02/img2_1_39_1_3.png" style="zoom:50%;">
 
 ```markdown
 -- 持续部署(Continuous Development)
@@ -14411,13 +14411,13 @@ docker run --env MODE=standalone --name nacos \
 # 集群基础形式
 ```
 
-<img src="image/img2_1_40_1_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_40_1_1.png" style="zoom:50%;">
 
 ```markdown
 # 集群高可用部署形式
 ```
 
-<img src="image/img2_1_40_1_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_40_1_2.png" style="zoom:50%;">
 
 ```markdown
 # 集群部署示例
@@ -14463,7 +14463,7 @@ docker run --env MODE=standalone --name nacos \
 	2、原理图,如下图所示:
 ```
 
-<img src="image/img2_1_41_3_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_41_3_1.png" style="zoom:50%;">
 
 ```markdown
 -- MySQL-MMM(Master-Master Replication Manager for MySQL)————MySQL主主复制管理器
@@ -14472,7 +14472,7 @@ docker run --env MODE=standalone --name nacos \
 	2、原理图,如下图所示:
 ```
 
-<img src="image/img2_1_41_3_2.png" style="zoom:50%;">
+<img src="image/img02/img2_1_41_3_2.png" style="zoom:50%;">
 
 ```markdown
 -- MHA(Master High Availability)
@@ -14485,7 +14485,7 @@ docker run --env MODE=standalone --name nacos \
 	2、原理图,如下图所示:
 ```
 
-<img src="image/img2_1_41_3_3.png" style="zoom:50%;">
+<img src="image/img02/img2_1_41_3_3.png" style="zoom:50%;">
 
 ```markdown
 # Docker安装模拟MySQL主从复制集群
@@ -14636,7 +14636,7 @@ docker run --env MODE=standalone --name nacos \
 # 原理图如下
 ```
 
-<img src="image/img2_1_41_4_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_41_4_1.png" style="zoom:50%;">
 
 ```markdown
 # 说明————可以使用kubesphere,快速搭建MySQL环境
@@ -14843,7 +14843,7 @@ docker run --env MODE=standalone --name nacos \
 -- 图示,如下图所示:
 ```
 
-<img src="image/img2_1_42_1_1.png" style="zoom:50%;">
+<img src="image/img02/img2_1_42_1_1.png" style="zoom:50%;">
 
 ```markdown
 -- 使用步骤————https://shardingsphere.apache.org/document/legacy/4.x/document/cn/quick-start/sharding-proxy-quick-start/
@@ -15637,7 +15637,7 @@ https://open.weixin.qq.com/
 -- 如图所示:
 ```
 
-<img src="image/img2_2_6_2_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_6_2_1.png" style="zoom:50%;" />
 
 ### 3、后端功能实现
 
@@ -16494,7 +16494,7 @@ error => {   
 # 微博社交登陆功能实现流程图
 ```
 
-<img src="image/img2_2_9_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_9_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 代码实现
@@ -16704,7 +16704,7 @@ error => {   
 -- 流程图示————如下图所示
 ```
 
-<img src="image/img2_2_10_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_10_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 流程说明
@@ -17298,7 +17298,7 @@ error => {   
 	9、内网穿透联调图示如下
 ```
 
-<img src="image/img2_2_10_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_10_1_2.png" style="zoom:50%;" />
 
 ```markdown
 	10、收单操作相关问题及解决方式
@@ -17455,13 +17455,13 @@ error => {   
 -- 场景一————注册公共域名
 ```
 
-<img src="image/img2_2_11_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_11_1_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 场景二————借助内网穿透服务商
 ```
 
-<img src="image/img2_2_11_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_2_11_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 使用场景
@@ -17948,7 +17948,7 @@ error => {   
 		1)实现方式————添加响应头,可配置内容如图所示:
 ```
 
-<img src="image/img2_3_0_5_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_0_5_1.png" style="zoom:50%;" />
 
 ```markdown
 # 微服务跨域解决方案
@@ -18036,7 +18036,7 @@ error => {   
 	项目中我们并没有严格遵循这种传递关系，但这种和业务层次的关联对我们理解各实体类的作用是有帮助的。（我们没有接触到PO的原因，我理解为ORM对PO进行了封装）如下图:
 ```
 
-<img src="image/img2_3_0_8_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_0_8_1.png" style="zoom:50%;" />
 
 ```markdown
 -- 模型
@@ -19148,7 +19148,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # 图示
 ```
 
-<img src="image/img2_3_18_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_18_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 问题说明
@@ -19174,7 +19174,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- 3、默认生成的请求RequestTemplate对象没有请求头,此时远端服务没有获取到请求头,认为未登录.如下图所示:
 ```
 
-<img src="image/img2_3_18_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_18_1_2.png" style="zoom:50%;" />
 
 ```markdown
 # 问题解决
@@ -19238,7 +19238,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # 图示
 ```
 
-<img src="image/img2_3_19_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_19_1_1.png" style="zoom:50%;" />
 
 ```markdown
 # 问题说明
@@ -19385,7 +19385,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	1、业务流程示例,如下图:
 ```
 
-<img src="image/img2_3_20_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_20_1_1.png" style="zoom:50%;" />
 
 ```markdown
 	2、引入相关依赖
@@ -19766,7 +19766,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	1)流程图,如下所示:
 ```
 
-<img src="image/img2_3_24_1_1.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_1.png" style="zoom:50%;" />
 
 ```markdown
 	2)业务实现代码如下:
@@ -20112,7 +20112,7 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	2、缺点————流量会级联映射到其他系统
 ```
 
-<img src="image/img2_3_24_1_2.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_2.png" style="zoom:50%;" />
 
 ```markdown
 -- 秒杀流程图二————独立服务,处理秒杀业务——————应对超高并发流量使用
@@ -20120,13 +20120,13 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 	2、缺点————抢购成功后,订单服务出现异常的情况下,消息队列的消息一直未被消费,然后订单数据一直准备不好,就会一直无法支付
 ```
 
-<img src="image/img2_3_24_1_3.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_3.png" style="zoom:50%;" />
 
 ```markdown
 -- 秒杀消息队列流程图,如下所示
 ```
 
-<img src="image/img2_3_24_1_4.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_4.png" style="zoom:50%;" />
 
 ```markdown
 -- 秒杀服务业务代码实现————基于-秒杀流程图二
@@ -20330,9 +20330,9 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 # 秒杀(高并发)系统关注的问题
 ```
 
-<img src="image/img2_3_24_1_5.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_5.png" style="zoom:50%;" />
 
-<img src="image/img2_3_24_1_6.png" style="zoom:50%;" />
+<img src="image/img02/img2_3_24_1_6.png" style="zoom:50%;" />
 
 ```markdown
 # 限流
