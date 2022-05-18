@@ -29,6 +29,10 @@
 
 
 
+[6、软考笔记之软件设计师](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md)————文档————软件设计师考点整理
+
+
+
 [attachments](https://gitee.com/PeppaPigskin/note/blob/master/attachments)————目录————用于存放整理文件中提及的相关附件文件
 
 
@@ -112,6 +116,8 @@
   - [18、Docker中安装Zipkin](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#18docker中安装zipkin)
   - [19、Docker中Oracle环境搭建](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#19docker中oracle环境搭建)
   - [20、Docker中Tomcat环境搭建](https://gitee.com/PeppaPigskin/note/blob/master/1、Java开发之工具环境篇.md#20docker中tomcat环境搭建)
+
+
 
 ##### 2、Java开发之后端技术篇——————Java开发相关主流技术说明
 
@@ -380,6 +386,20 @@
 ##### 5、Java面试题题库—————————相关Java面试题及答案依据知识点进行整理
 
 
+
+
+
+##### 6、软考笔记之软件设计师——————用于存放整理文件中显示的图片资源
+
+- [0、软件考试介绍](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#0软件考试介绍)
+- - [1、考试大纲要求](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#1考试大纲要求)
+  - [2、考试形式](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#2考试形式)
+  - [3、历年考试情况](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#3历年考试情况)
+- [1、计算机组成与体系结构(6分)](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#1计算机组成与体系结构6分)
+- - [1、数据的表示](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#1数据的表示)
+  - - [1、进制的转换](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#1进制的转换)
+    - [2、原码补码反码移码](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#2原码补码反码移码)
+    - [3、浮点数运算](https://gitee.com/PeppaPigskin/note/blob/master/6、软考笔记之软件设计师.md#3浮点数运算)
 
 
 
