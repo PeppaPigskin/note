@@ -362,7 +362,7 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 ## 9、设置VPN
 
 ```markdown
-# MacOS Monterey 12 客户端配置方法
+# MacOS客户端配置方法
 -- 1.系统偏好设置————>网络————>选择“+”添加
 	接口设置为————VPN
 	VPN类型选择————L2TP/IPSec
