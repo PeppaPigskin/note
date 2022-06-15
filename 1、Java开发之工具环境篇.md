@@ -849,10 +849,25 @@ brew install VisualVM
 		2)在第⼀栏填⼊svn路径(根据个人具体情况而定)————/usr/local/Cellar/subversion/1.14.1_4/bin/svn
 
 # 问题及解决方式
--- E230001
+-- E230001————由于SVNssl证书验证失败导致
 	1、打开终端,执行以下命令————svn ls [svn地址]
 	2、显示(R)eject, accept (t)emporarily or accept (p)ermanently?————输p
-	3、然后根据提⽰输⼊svn账户名UserName和密码Password
+	3、根据提⽰输⼊svn账户名UserName和密码Password
+	4、再重新拉取代码问题解决
+
+-- svn账号清理
+	1、IDEA账号清理
+		1)打开IDEA的setting或Preferences
+		2)搜索subversion
+		3)点击subversion
+		4)点击Clear Auth Cache按钮即可
+	2、svn账号清理——mac
+		1)终端运行命令————rm ~/.subversion/auth/svn.simple/*
+	3、svn账号清理——windows
+		1)SVN客户端中(以TortoiseSvn为例),右键->tortoisesvn->setting
+		2)在弹出的“settings”窗口右侧，点击“Saved Data”
+		3)点击左侧的“Authentication”后方的“clear”按钮即可
+		4)另外一种方式————找到C:\Documents and Settings\administrator\Application Data\Subversion\auth目录，删除svn.simple目录下的所有文件即可
 ```
 
 ## 14、Go语言开发环境搭建
