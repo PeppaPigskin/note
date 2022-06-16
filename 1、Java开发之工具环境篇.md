@@ -983,6 +983,12 @@ brew install VisualVM
 -- 安装插件
 	1、lombok————简化JavaBean的开发
 	2、mybatisx————从一个mapper的方法快速定位到其对应xml文件
+
+# 问题解决
+-- 各种环境配置都没问题,但是拉取不到远程仓库的东西
+	1、由于idea的Maven采用脱机工作(意思就是不读取远程仓库，只读取本地已有的仓库)选项导致解决办法如下:
+		依次打开Maven设置项————Idea——>Preferences——>Build...——>Build Tools——>Maven,去掉勾选项「Work offline」,应用即可.
+
 ```
 
 
