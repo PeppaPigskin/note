@@ -810,7 +810,7 @@ brew install VisualVM
   maliu = rw # 给maliu用户添加read、write权限,单个用户前不用添加@
 
 # 开启服务
-    svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/SZNK/SVN]
+    svnserve -d -r [创建的路径:/Users/pigskin/Desktop/CTJ/SVN]
 
 # 关闭服务
     打开[活动监视器]————>搜索[svnserve]————>选中对应服务————>删除
