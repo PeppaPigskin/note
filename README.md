@@ -802,9 +802,47 @@
 
 ##### 4、面试
 
-`2021最新面经-京东.pdf`——链接: https://pan.baidu.com/s/1V35qwzbKETqU9H8U1as2wg?pwd=os8g 提取码: os8g
+`2021最新面经-京东`——链接: https://pan.baidu.com/s/1gFZRPb4cWQ1YHoACXsxU5w 提取码: j4po
 
- `2021最新面经-美团.pdf`——链接: https://pan.baidu.com/s/1LwrKyx9uynVpHasXAmS9Yg?pwd=lv5c 提取码: lv5c
+`2021最新面经-美团`——链接: https://pan.baidu.com/s/1jV9NCZ7aZcyr_pmxkAXeDA 提取码: 266v
+
+`阿里钉钉、字节抖音 Android面经`——链接: https://pan.baidu.com/s/1ls10sBeF50_itP0Xeyp_Ng 提取码: 0d1o
+
+`阿里面试感想`——链接: https://pan.baidu.com/s/1Df1Lgd4OZn3GTRxgvDFK_w 提取码: m3wb
+
+`阿里云面试总结及面试题详解`——链接: https://pan.baidu.com/s/14b-DPNfyh-3LQgneqJYJvw 提取码: f2sj
+
+`阿里P7面试`——链接: https://pan.baidu.com/s/1rNCEo76kj61NH2dh5bFhtA 提取码: g56k
+
+`华为校招面经`——链接: https://pan.baidu.com/s/15v0UJGVbkH6Lpva83Jp_ag 提取码: hglu
+
+`技术人做到哪些才能进阿里`——链接: https://pan.baidu.com/s/1xCxtkzBySPBE1yKlA7za6g 提取码: eo9c
+
+`两周拿到字节offer`——链接: https://pan.baidu.com/s/15ir2E8RZWXT7JiVu03ruLA 提取码: 372d
+
+`蚂蚁金服面试分享`——链接: https://pan.baidu.com/s/1W_Em1kOJzXfJwyDuFu65Gg 提取码: n2ch
+
+`美团和蚂蚁金服面试笔记`——链接: https://pan.baidu.com/s/14QAcvxQvluqk7n91yUinoQ 提取码: m1ke
+
+`美团Java开发面经`——链接: https://pan.baidu.com/s/1TU6eDOMmz6ej52TnyotYvA 提取码: 9bta
+
+`陌陌、 猎豹移动、 映客和作业帮`——链接: https://pan.baidu.com/s/15SGRiYpHbry_5khJYCxM4g 提取码: 0kdv
+
+`算法面经`——链接: https://pan.baidu.com/s/1-7T7a3SM5aVAA3LInS-yyA 提取码: eu8p
+
+`腾讯&阿里&携程面经`——链接: https://pan.baidu.com/s/1QmLjBC3zES7Zfhnei-QnWQ 提取码: tie7
+
+`腾讯校招面经`——链接: https://pan.baidu.com/s/1WBG07R2bRxvB9kL8Lx92yg 提取码: n610
+
+`腾讯一面-题目`——链接: https://pan.baidu.com/s/16_5NjTVKakE5DfzAh0AQYQ 提取码: amfv
+
+`微软面经`——链接: https://pan.baidu.com/s/1xLSizvXKXuQ8iRsY3GIQlQ 提取码: 2c76
+
+`字节跳动面经`——链接: https://pan.baidu.com/s/17DdGlXWp8CR0DJ7KlKU7sA 提取码: 6jwt
+
+`字节data-基础架构-大数据面经`——链接: https://pan.baidu.com/s/1U5jURS_dY8PFJ3CMSlbZ7Q 提取码: vfjg
+
+
 
 ##### 5、其他
 
