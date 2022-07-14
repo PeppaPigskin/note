@@ -972,7 +972,25 @@
 
 ##### 5、算法/数据结构/设计模式
 
-``——
+`「代码随想录」动态规划专题精讲（v1.2）`——链接: https://pan.baidu.com/s/1rZINBS9e9yalGQFDAXiPwQ 提取码: 3d40
+
+`「代码随想录」二叉树专题精讲（v1.1）`——链接: https://pan.baidu.com/s/1gx-9PB5wDwAuY-Bmu-hpfg 提取码: dspg
+
+`「代码随想录」回溯算法精讲（v1.1）`——链接: https://pan.baidu.com/s/15y9dmEb81faUOjEcSPRPzg 提取码: njp4
+
+`「代码随想录」贪心算法专题精讲（v1.0）`——链接: https://pan.baidu.com/s/1nucC0hnq5qk7R0iUryc5CA 提取码: 1qpf
+
+`2021最新版数据结构与算法面试题手册 1`——链接: https://pan.baidu.com/s/1DxhfXziVxPjOrDRz7t8aiQ 提取码: 5lg6
+
+`数据结构和算法4.5`——链接: https://pan.baidu.com/s/1pTwKRunFmqDPoXx5GqaGMg 提取码: 3ave
+
+`算法小抄官方完整版`——链接: https://pan.baidu.com/s/1WAB2-MXuMs-r0CY4r4uDTQ 提取码: s3h8
+
+`最新版数据结构与算法面试题手册V1_1`——链接: https://pan.baidu.com/s/1781vH6xBthe-htjVHbm8Xg 提取码: nn9k
+
+`java23种设计模式-解释版`——链接: https://pan.baidu.com/s/1dBoF3AFqLWcsN4vj6L_N4g 提取码: d7p4
+
+`java23种设计模式`——链接: https://pan.baidu.com/s/1l-mcrizE3k3BQcrGu9ljfA 提取码: g7qq
 
 ##### 6、Docker
 
