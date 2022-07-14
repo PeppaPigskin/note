@@ -672,6 +672,8 @@
 
 ##### 5、Java面试题题库
 
+    
+
 ##### 6、软考笔记之软件设计师
 
     [0、软件考试介绍](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#0%E8%BD%AF%E4%BB%B6%E8%80%83%E8%AF%95%E4%BB%8B%E7%BB%8D)
@@ -780,17 +782,7 @@
 
 #### 四、Java资料专栏(仅供学习,如有侵权请留言联系删除)
 
-##### 1、基础
-
-```
-
-```
-
-##### 2、进阶
-
-##### 3、高级
-
-##### 4、面试
+##### 0、面试
 
 ###### 1、面试题
 
@@ -811,6 +803,8 @@
 `ElasticSearch面试题 30道`——链接: https://pan.baidu.com/s/1G6uaN2nni_vKK3kAMxY7qQ 提取码: jvp5
 
 `Git常用命令面试题 60道`——链接: https://pan.baidu.com/s/1l-YzbCOfwsiCl3wGIyHbJA 提取码: 7n87
+
+`Go面试题`——链接: https://pan.baidu.com/s/1iLVFI3x__4L5nBHHRRb_ZA 提取码: 2qch
 
 `Java并发编程最全面试题 123道`——链接: https://pan.baidu.com/s/1bBNq79CM1Wkcgwat9xDUNg 提取码: 1b3i
 
@@ -920,4 +914,74 @@
 
 `字节data-基础架构-大数据面经`——链接: https://pan.baidu.com/s/1U5jURS_dY8PFJ3CMSlbZ7Q 提取码: vfjg
 
-##### 5、其他
+##### 1、Java
+
+`深入理解Java虚拟机：JVM高级特性与最佳实践（第3版)- 周志明`——链接: https://pan.baidu.com/s/1EoXUgcpTk_fwLBs92ExKQQ 提取码: ak1t
+
+`Java工程师成神之路（基础篇）`——链接: https://pan.baidu.com/s/1AaaCWmgEjCgs4caH4B9wWw 提取码: ke46
+
+`JAVA核心知识点整理`——链接: https://pan.baidu.com/s/1efhnyQyc10XRIBZogB7rJA 提取码: qnqd
+
+`Java开发手册（黄山版）`——链接: https://pan.baidu.com/s/175e5HwRMGk2Lwj_EcKegXg 提取码: mjpn
+
+`Java开发手册（嵩山版）灵魂17问`——链接: https://pan.baidu.com/s/1XTZibuHCpFu1PhsQznIy7w 提取码: rfsk
+
+`Java中高级核心知识全面解析`——链接: https://pan.baidu.com/s/195gsNQXU56ZpQV7SOEeTKw 提取码: i7cg
+
+##### 2、Database
+
+###### 1、Mysql
+
+`最新MySQL笔记`——链接: https://pan.baidu.com/s/1UPlzOvflAMfzZlUeFWXq8g 提取码: 4k30
+
+###### 2、Redis
+
+`Redis核心数据结构高性能原理与优化实战`——链接: https://pan.baidu.com/s/1SUgmWTXa51GITV4KxJ4MbA 提取码: lmwr
+
+`Redis开发与运维(付磊)`——链接: https://pan.baidu.com/s/1Zdsohyp8_pRJyPBPe-_0_g 提取码: j7aa
+
+`Redis设计与实现`——链接: https://pan.baidu.com/s/1Bjrw34ex1uCHlSxZLhA1gw 提取码: s1b7
+
+##### 3、Spring/SpringBoot/SpringCloud/SpringCloudAlibaba
+
+`Spring Boot+Spring Cloud微服务开发`——链接: https://pan.baidu.com/s/1Wwb55d1ttwTuHlcdxdXWJw 提取码: ql19
+
+`Spring Boot实战 ,丁雪丰 (译者) `——链接: https://pan.baidu.com/s/1G7eeIF2ePk625iMS6HWYSQ 提取码: icu8
+
+`Spring Cloud Alibaba笔记`——链接: https://pan.baidu.com/s/1wrfNqRbiMj95iE791tYAlQ 提取码: b8vm
+
+`Spring源码深度解析（第2版）`——链接: https://pan.baidu.com/s/1FzGThJtokSFfK5k9HoWpdw 提取码: 5phs
+
+`SpringBoot 从入门到进阶系列官方小册`——链接: https://pan.baidu.com/s/1WNr9XOeh1XHFQEQifuj-fw 提取码: mcok
+
+`SpringBoot 学习笔记完整教程`——链接: https://pan.baidu.com/s/1MGApKAOyR6a0NAVP4s0X5A 提取码: ekpl
+
+##### 4、多线程
+
+`慕课JUC中级笔记-上`——链接: https://pan.baidu.com/s/1xpccr1mp7oM-NyySfC9-1A 提取码: 6vcs
+
+`慕课JUC中级笔记-中`——链接: https://pan.baidu.com/s/1A2s2MNzG7vhGU-EoI23pOQ 提取码: bv0d
+
+`慕课JUC中级笔记-下`——链接: https://pan.baidu.com/s/19JNchxycclFxTZ5vnjfQ-Q 提取码: 7dh5
+
+`线程八大核心+ java并发底层原理`——链接: https://pan.baidu.com/s/1abv7kuTVaea9cDy0TichQA 提取码: 6roh
+
+`Java并发编程图册`——链接: https://pan.baidu.com/s/1k1bzQdaSxfAw4f5saD0vBA 提取码: 3re5
+
+`Java并发编程之美_翟陆续等`——链接: https://pan.baidu.com/s/1jnkZLBz_B6XD-XR87HpNqQ 提取码: phiv
+
+##### 5、算法/数据结构/设计模式
+
+``——
+
+##### 6、Docker
+
+`Docker从入门到实践`——链接: https://pan.baidu.com/s/1Zh2w8vTtX9mH4DhWm6bC7A 提取码: f739
+
+`Docker实战`——链接: https://pan.baidu.com/s/1a5ccV6rBasuaYFh_5rOkaA 提取码: i73b
+
+`docker思维导图`——链接: https://pan.baidu.com/s/1Xi2rNhD9nYz_MKcytSYtbw 提取码: dn4a
+
+`Spring Cloud与Docker微服务架构实战`——链接: https://pan.baidu.com/s/1LRINrFE9MEnpqpb_1UziHw 提取码: 45ab
+
+##### 7、其他
