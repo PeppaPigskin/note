@@ -1003,3 +1003,87 @@
 `Spring Cloud与Docker微服务架构实战`——链接: https://pan.baidu.com/s/1LRINrFE9MEnpqpb_1UziHw 提取码: 45ab
 
 ##### 7、其他
+
+###### 1、互联网高薪必读书单
+
+`00-亿级流量网站架构核心技术`——链接: https://pan.baidu.com/s/1Vc5un3egtGihj6Ui2Jm0ig 提取码: 4q3g
+
+`00-Java面试核心知识点整理-图灵学院`——链接: https://pan.baidu.com/s/1ek5mUVuT4mHTrTadiTgI-A 提取码: aueu
+
+`01-大话数据结构`——链接: https://pan.baidu.com/s/1hj4X-CqdBc8Mfcw9PpBSTQ 提取码: u570
+
+`01-Mysql军规-图灵学院`——链接: https://pan.baidu.com/s/11lYcLOD3Bm7F6GsKzTRxgw 提取码: fkvc
+
+`02-淘宝技术这十年-图灵学院`——链接: https://pan.baidu.com/s/1O_pt7x-b9x0GQkCH2vEhyg 提取码: g5ob
+
+`02-研磨设计模式`——链接: https://pan.baidu.com/s/1L3Ps4h37gYu2W7tLfzBA4A 提取码: tjei
+
+`03-码出高效：Java开发手册`——链接: https://pan.baidu.com/s/1Wquev32ZmSC95veqjaonRA 提取码: vt3l
+
+`04-码农翻身：用故事给技术加点料`——链接: https://pan.baidu.com/s/1jP6NsRmkexweYYi5z5YgnA 提取码: 0k8o
+
+`04-JVM调优工具命令详解-图灵学院`——链接: https://pan.baidu.com/s/1nZ87Yqt5CbdpjsxBR-LYgQ 提取码: aj4k
+
+`05-大话设计模式(带目录完整版)`——链接: https://pan.baidu.com/s/1IL_wooQ7ZEox8WJzbXQicw 提取码: am1b
+
+`06-阿里巴巴手册-泰山版`——链接: https://pan.baidu.com/s/104kAWa02GeGyf0orvJk5vw 提取码: wg5s
+
+`07-分布式服务架构`——链接: https://pan.baidu.com/s/15S8aENfiy2DJhYi7J_Rj7Q 提取码: q2b3
+
+`08-JAVA并发编程实战`——链接: https://pan.baidu.com/s/1eAsqQLJyZFp-ZluFZbbSKA 提取码: ausk
+
+`09-Java并发编程的艺术`——链接: https://pan.baidu.com/s/1bgLkk3w5ltqC0eugTI4bEQ 提取码: r8j5
+
+`10-彻底理解Java中的各种锁-图灵学院`——链接: https://pan.baidu.com/s/1hqAluaoUNtxYyIzATE6lXg 提取码: 1uug
+
+`10-Java面试核心知识点整理-图灵学院`——链接: https://pan.baidu.com/s/1HHfHKtUVYKZnXGzfpWvxIg 提取码: 3wsn
+
+`11-JRockit权威指南 深入理解JVM`——链接: https://pan.baidu.com/s/18jCUFIsPOCGsomplKHaqEA 提取码: 33bo
+
+`12-Kafka技术内幕：图文详解Kafka源码设计与实现`——链接: https://pan.baidu.com/s/1Rkq4GsQRnQT-aCvnU_FMzA 提取码: oqsv
+
+`13-Mysql军规-图灵学院`——链接: https://pan.baidu.com/s/1IBnhgomhuSxK5YenGHhX1g 提取码: 61w3
+
+`14-Netty实战`——链接: https://pan.baidu.com/s/1tEwUBusuk-63a3pmv_C3sQ 提取码: 9ko8
+
+`15-Redis命令参考手册完整版-图灵学院`——链接: https://pan.baidu.com/s/1hm-lwDMNn8Y-G_moWrTtVg 提取码: l07d
+
+`16-Spring源码深度解析（第2版）`——链接: https://pan.baidu.com/s/1RU7881GxYFAk_suwpRmkwg 提取码: lq8e
+
+`17-分布式服务架构：原理、设计与实战`——链接: https://pan.baidu.com/s/1OrUAkkNARvXMA0OM-cgw_A 提取码: b2g1
+
+`17-高性能MySQL.3rd`——链接: https://pan.baidu.com/s/1dHD4Tm1DYY9OEatsm4lpzA 提取码: 0qqt
+
+`18-美团和蚂蚁金服面试笔记`——链接: https://pan.baidu.com/s/12oYOMloZ0gB9zMQpxaiRcA 提取码: 7ni7
+
+`19-深入理解Java虚拟机：JVM高级特性与最佳实践`——链接: https://pan.baidu.com/s/1cqxaBnDGprEDi0Sg5mhL9Q 提取码: 41d9
+
+`并发内存模型与线程规范-图灵学院`——链接: https://pan.baidu.com/s/1c1_Tg71tf7mwPuhJ1paNJA 提取码: d3p0
+
+`彻底理解Java中的各种锁-图灵学院`——链接: https://pan.baidu.com/s/1uzhIZH63nfFiiTdRwuDhHA 提取码: 0fw0
+
+`鸟哥的linux私房菜_基础学习篇（第三版）`——链接: https://pan.baidu.com/s/1NZ46L2Qqgvs90A5ghu9GOg 提取码: veqt
+
+`深入分析Java  Web技术内幕`——链接: https://pan.baidu.com/s/1zU_G7CNQXJZOJmiLxnXnSA 提取码: qa3e
+
+`实战Java高并发程序设计`——链接: https://pan.baidu.com/s/1QGjH9iuN43YVHyDZwIReww 提取码: 7p59
+
+`循环依赖解决过程`——链接: https://pan.baidu.com/s/1IoTxETaB1MBjp_vJT_j6Lg 提取码: ublu
+
+`ASM4使用指南`——链接: https://pan.baidu.com/s/1To8q00-_ZJsQvMsXFeDpug 提取码: ek8b
+
+`class文件的字节码结构`——链接: https://pan.baidu.com/s/13gvuCcJViSCYIH3B7StOvg 提取码: tbub
+
+`Docker中文手册`——链接: https://pan.baidu.com/s/1z-jdNf5CxBVSUZ5pxHaeaw 提取码: cv3e
+
+`jls8-图灵学院`——链接: https://pan.baidu.com/s/1_GseYaO-79CR2UdNqf-GmA 提取码: 6q6h
+
+`JVM调优工具命令详解-图灵学院`——链接: https://pan.baidu.com/s/1W-RjSeG6zRDiM4nxIWTVzg 提取码: b4c4
+
+`JVM指令手册`——链接: https://pan.baidu.com/s/10DBPeLnd0Ww9Ik69FVnGFw 提取码: fsh0
+
+`jvms8-图灵学院`——链接: https://pan.baidu.com/s/17QpmR3zVosXKebXtK9DHAQ 提取码: 2u8k
+
+`jvms11-图灵学院`——链接: https://pan.baidu.com/s/1tT0ycECdRcQBpQcazOWQsQ 提取码: 3u6l
+
+`Kafka权威指南.[美]Neha Narkhede(详细书签)`——链接: https://pan.baidu.com/s/1iFPgaa9Ybg-AzFOlEstUmA 提取码: q34q
