@@ -774,4 +774,152 @@ public class EasyPoiController {
 }
 ```
 
-# 
+
+
+# 1、Java知识点整理
+
+## 1、JavaSE基础
+
+### `jdk和jre的区别`
+
+——jdk是java的开发工具包，提供了java的开发环境和运行环境
+
+——jre是java的运行环境，为java的运行提供了环境
+
+
+
+### `==和equals的区别`
+
+——==对于基本类型比较的是值是否相同，对于引用类型比较的是引用地址是否相同
+
+——equals本质上就是==，只是String和Integer等重写了equals方法，把它变成了值比较
+
+
+
+### `final在java中的作用`
+
+——修饰的类为最终类，不能被继承
+
+——修饰的方法不能被重写
+
+——修饰的变量叫做常量，常量必须初始化，初始化后值就不能被修改
+
+
+
+### `String属于基础类型吗`
+
+——不属于基础类型，而是属于引用类型。基础类型有：byte、boolean、char、short、int、float、long、double
+
+
+
+### `操作字符串的类`
+
+——String:声明的是不可变的对象，每次操作都会生成新的String对象，然后将指针指向新的String对象
+
+——StringBuffer:可以在原对象的基础上进行操作，线程安全，性能相对StringBuilder低，建议多线程使用
+
+——StringBuilder:可以在原对象的基础上进行操作，非线程安全，性能相对StringBuffer高，建议单线程使用
+
+
+
+### `如何实现字符串反转`
+
+——使用StringBuffer或StringBuilder的reverse方法
+
+
+
+### `String常见方法`
+
+——indexOf:返回指定字符的索引
+
+——charAt:返回指定索引处的字符
+
+——replace:字符串替换
+
+——trim：去除字符串两端空白
+
+——split:分个字符串，返回一个分割后的字符串数组
+
+——getBytes：返回字符串的byte类型数组
+
+——length：返回字符串长度
+
+——toLowerCase:将字符串转换为小写形式
+
+——toUpperCase:将字符串转换为大写形式
+
+——substring：截取字符串
+
+——equals:字符串比较
+
+
+
+### `普通类和抽象类的区别`
+
+——普通类:不能包含抽象方法，可以直接实例化
+
+——抽象类:不能直接实例化，可以包含抽象方法（不是必须的），不能被final修饰，因为抽象类就是需要被其他类继承的
+
+
+
+### `接口和抽象类的区别`
+
+——实现:抽象类的子类需要使用extends来继承，接口使用implements来实现接口
+
+——构造方法:抽象类可以有，而接口不能有
+
+——main方法:抽象类可有且可运行，接口不能有
+
+——访问修饰符:抽象类中的方法可以是任意修饰符，接口中的方法默认为public
+
+
+
+### `BIO、NIO、AIO的区别`
+
+——BIO(Block IO):同步阻塞式IO,平常使用的传统IO(模式简单、使用方便、并发处理能力低)
+
+——NIO(New IO):同步非阻塞IO，传统IO的升级(客户端和服务器端通过channel(通道)通讯，实现了多路复用)
+
+——AIO(Asynchronous IO):异步非阻塞IO，NIO的升级(异步IO的操作基于事件和回调机制)
+
+
+
+### `Files的常用方法有哪些`
+
+——exists:检测文件路径是否存在
+
+——createFile:创建文件
+
+——createDrectory:创建文件夹
+
+——delete:删除一个文件或目录
+
+——copy:复制文件
+
+——move:移动文件
+
+——size:查看文件个数
+
+——read:读取文件
+
+——write:写入文件
+
+
+
+### `建立数组的方式`
+
+——int[] arr = new int[6];
+
+——int[] arr = {...};
+
+——int[] arr = new int[]{...};
+
+
+
+## 2、MySQL
+
+## 3、Spring
+
+## 4、SpringBoot
+
+## 5、SpringCloud
