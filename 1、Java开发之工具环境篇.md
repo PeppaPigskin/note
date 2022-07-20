@@ -527,6 +527,7 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 -- 2、搜索————Serialization issues
 -- 3、勾选————Serializable class without 'serialVersionUID'
 -- 4、点击应用即可
+-- 5、实体类实现序列化接口(Serializable)之后,使用「Alt+Enter/Option+Enter」快捷键可以自动生成序列化ID
 
 # 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
 
