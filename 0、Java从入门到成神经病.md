@@ -916,7 +916,93 @@ public class EasyPoiController {
 
 
 
-## 2、MySQL
+## 2、数据库
+
+### 1、MySQL
+
+#### `mysql分页查询`
+
+——方式一
+
+```sql
+-- 该语句的意思为，查询m+n条记录，去掉前m条，返回后n条记录。无疑该查询能够实现分页功能，
+-- 但是如果m的值越大，查询的性能会越低（越后面的页数，查询性能越低），
+-- 因为MySQL同样需要扫描过m+n条记录。
+
+select * from table order by id limit m, n;
+```
+
+——方式二
+
+```sql
+-- 该方式每次会返回n条记录，却无需像方式1扫描过m条记录，在大数据量的分页情况下，
+-- 性能可以明显好于方式1，但该分页查询必须要每次查询时拿到上一次查询（上一页）
+-- 的一个最大id（或最小id）。该查询的问题就在于，我们有时没有办法拿到上一次查
+-- 询（上一页）的最大id（或最小id），比如当前在第3 页，需要查询第5页的数据，
+-- 该查询方法便爱莫能助了
+
+select * from table where id > #max_id# order by id limit n;
+```
+
+——方式三
+
+```sql
+-- 为了避免能够实现方式2不能实现的查询，就同样需要使用到limit m, n子句，
+-- 为了性能，就需要将m的值尽力的小，比如当前在第3页，需要查询第5页，
+-- 每页10条数据，当前第3页的最大id为#max_id#：
+-- 其实该查询方式是部分解决了方式2的问题，但如果当前在第2页，需要查询第100页或1000页，
+-- 性能仍然会较差。
+
+select * from table where id > #max_id# order by id limit 20, 10;
+```
+
+#### `MySQL数据库优化`
+
+——
+
+——
+
+——
+
+——
+
+
+
+### 2、Oracle
+
+`oracle分页查询`
+
+——方式一
+
+```sql
+-- 根据ROWID来分  取500到10000
+select * from t_student where rowid in(
+        select rid from(
+                  select rownum rn,rid from(
+                   select rowid rid,cid from t_student)
+             where rownum<10000)
+            where rn>500)
+       order by cid desc;
+```
+
+——方式二
+
+```sql
+-- 按ROWNUM来分  取500到10000
+select * from(
+                     select t.*,rownum rn from(
+                                        select * from t_student) t
+                           where rownum<10000)
+where rn>500
+```
+
+
+
+### 3、数据库查询记录大于n条的记录
+
+```sql
+select 字段1,字段2,字段3 from 表名 group by 字段1,字段2,字段3 having count(*)>n
+```
 
 ## 3、Spring
 
