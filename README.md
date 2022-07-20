@@ -2,6 +2,10 @@
 
       `本人主要从事Java后端开发工作,本站内容主要针对个人开发生涯中使用的一些相关技术栈进行系统性梳理.内容仅供学习交流使用,如若存在侵权,请联系本人删除!`
 
+      `码云地址`——[note: 个人学习工作中相关知识点整理笔记](https://gitee.com/PeppaPigskin/note)
+
+      `GitHub地址`——[GitHub - PeppaPigskin/note: 个人学习工作中相关知识点整理笔记](https://github.com/PeppaPigskin/note)
+
 #### 二、文件目录结构
 
     [0、Java从入门到成神经病](https://gitee.com/PeppaPigskin/note/blob/master/0、Java从入门到成神经病.md)——文档———Java基础知识体系
