@@ -446,8 +446,6 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
     AppStore安装
 ```
 
-
-
 ## 11、windows远程桌面工具
 
 ```markdown
@@ -523,6 +521,12 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
         -- 石墨文档————https://shimo.im/docs/XvW3WpHgHdRHVXgV/read
         -- 文档获取————https://docs.qq.com/doc/DTVh3bkxWSEpvVm5N
         -- 网址激活————http://www.lookdiv.com/————输入[7788]获取激活码
+
+# IDEA设置快捷键自动生成序列化ID
+-- 1、依次打开:IntelliJ IDEA——>Preferences——>Editor——>Inspections
+-- 2、搜索————Serialization issues
+-- 3、勾选————Serializable class without 'serialVersionUID'
+-- 4、点击应用即可
 
 # 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
 
