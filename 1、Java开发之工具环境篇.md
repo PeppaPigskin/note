@@ -273,9 +273,88 @@ Exit
         3)~/Library/Application Support/
         4)~/Library/Logs/
     3、同理，如果想要初始化配置啥的，也可以删除对应的目录，重启即可
-```
 
-## 3、Mac OS 环境搭建
+
+# Homebrew更换国内镜像源（中科大、阿里、清华)
+-- 查看本地镜像源地址
+    1、查看 brew.git 当前源
+        cd "$(brew --repo)" && git remote -v
+    2、查看 homebrew-core.git 当前源
+        cd "$(brew --repo homebrew/core)" && git remote -v
+
+
+-- 切换 Homebrew 镜像源为中科大镜像源
+    1、替换brew.git
+        cd "$(brew --repo)" && git remote set-url origin https://mirrors.ustc.edu.cn/brew.git
+    2、替换homebrew-core.git
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core" && git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git
+    3、替换homebrew-cask.git
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask" && git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-cask.git
+    4、zsh 替换homebrew-bottles镜像，Mac OS在10.15系统开始，默认的shell都换成了zsh
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.zshrc
+    5、修改使其立即生效
+        source ~/.zshrc
+    6、bash 替换homebrew-bottles镜像
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.bash_profile
+    7、修改使其立即生效
+        source ~/.bash_profile
+    8、刷新源
+        brew update
+
+-- 切换 Homebrew 镜像源为阿里镜像源
+    1、替换brew.git
+        cd "$(brew --repo)" && git remote set-url origin https://mirrors.aliyun.com/homebrew/brew.git
+    2、替换homebrew-core.git
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core" && git remote set-url origin https://mirrors.aliyun.com/homebrew/homebrew-core.git
+    3、zsh 替换homebrew-bottles镜像，Mac OS在10.15系统开始，默认的shell都换成了zsh
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles' >> ~/.zshrc
+    4、修改使其立即生效
+        source ~/.zshrc
+    5、bash 替换homebrew-bottles镜像
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.aliyun.com/homebrew/homebrew-bottles' >> ~/.bash_profile
+    6、修改使其立即生效
+        source ~/.bash_profile
+    7、刷新源
+        brew update
+
+-- 切换 Homebrew 镜像源为清华镜像
+    1、替换brew.git
+        cd "$(brew --repo)" && git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
+    2、替换homebrew-core.git
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core" && git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
+    3、替换homebrew-cask.git
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask" && git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask.git
+    4、zsh 替换homebrew-bottles镜像，Mac OS在10.15系统开始，默认的shell都换成了zsh
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles' >> ~/.zshrc
+    5、修改使其立即生效
+        source ~/.zshrc
+    6、bash 替换homebrew-bottles镜像
+        echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles' >> ~/.bash_profile
+    7、修改使其立即生效
+        source ~/.bash_profile
+    8、刷新源
+        brew update
+
+-- 切换 Homebrew 镜像源为官方镜像
+    1、重置 brew.git 为官方源
+        cd "$(brew --repo)" && git remote set-url origin https://github.com/Homebrew/brew.git
+    2、重置 homebrew-core.git 为官方源
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core" && git remote set-url origin https://github.com/Homebrew/homebrew-core.git
+    3、重置 homebrew-cask.git 为官方源
+        cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask" && git remote set-url origin https://github.com/Homebrew/homebrew-cask
+    4、zsh 注释掉 HOMEBREW_BOTTLE_DOMAIN 配置，前面加#符号就行
+        vi ~/.zshrc
+        # export HOMEBREW_BOTTLE_DOMAIN=xxxxxxxxx
+    5、修改使其立即生效
+        source ~/.zshrc
+    6、bash 注释掉 HOMEBREW_BOTTLE_DOMAIN 配置,前面加#就行
+        vi ~/.bash_profile
+        # export HOMEBREW_BOTTLE_DOMAIN=xxxxxxxxx
+    7、修改使其立即生效
+        source ~/.bash_profile
+    8、刷新源
+        brew update
+```
 
 ```bash
 # 解决brew安装软件检测不安全

@@ -18918,9 +18918,18 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- Thymeleaf格式转换
     1、数字转换为日期类型对象————${new java.util.Date(item.seckillInfoVo.startTime)}
     2、格式化日期类型对象————${#dates.format(new java.util.Date(item.seckillInfoVo.startTime),"yyyy-YY-dd HH:mm:ss")}
+
+
 ```
 
-## 14、新建的SpringBoot模块启动异常
+```markdown
+# 数据 Oracle数据库存Date类型数据,Java代码
+-- Java使用————new Timestamp(System.currentTimeMillis())
+```
+
+
+
+# ## 14、新建的SpringBoot模块启动异常
 
 ```markdown
 # 原因————因为没有配置数据库相关配置
