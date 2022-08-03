@@ -843,7 +843,7 @@ brew install VisualVM
     brew install nvm 
 2、配置nvm
     export NVM_DIR="$HOME/.nvm"
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  #  This loads nvm
+    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh" #  This loads nvm
     [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  #      This loads nvm bash_completion
 3、查看所有node版本
     nvm ls-remote
@@ -863,6 +863,18 @@ brew install VisualVM
     2)添加配置
         export NODE_HOME="node安装路径(bin路径的父级路径)" 
         export PATH=$PATH:$NODE_HOME/bin
+6、卸载
+    1)在终端依次输入以下命令
+        sudo npm uninstall npm -g
+        sudo rm -rf /usr/local/lib/node /usr/local/lib/node_modules /var/db/receipts/org.nodejs.*
+        sudo rm -rf /usr/local/include/node /Users/$USER/.npm
+        sudo rm /usr/local/bin/node
+        sudo rm /usr/local/share/man/man1/node.1
+        sudo rm /usr/local/lib/dtrace/node.d
+    2)验证是否成功
+        node -v  //not found
+        npm -v //not found
+
 ```
 
 ## 12、Apifox安装与配置
