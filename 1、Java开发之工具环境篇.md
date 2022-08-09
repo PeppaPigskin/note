@@ -2,11 +2,13 @@
 
 ## 1、mac常用命令
 
-```bash
+```markdown
 # 查看IP
     ipconfig
+
 # 终端连接虚拟机
      ssh [账户名]@[服务地址]
+
 # Mac显示“您没有权限来打开应用 eclipse”的问题
     codesign -f -s - --deep <拖动软件app到终端>
 ```
@@ -25,8 +27,11 @@
 
 # 数据传输
 -- 上传本地文件到服务器指定目录————scp [本地文件所在路径]/[文件名]  [账户名]@[服务地址]:[服务端指定目录]
+
 -- 从服务器下载到本地目录————scp [账户名]@[服务地址]:[服务端文件所在路径]/[文件名]  [本地目录]
+
 -- 从服务器下载整个目录————scp -r [账户名]@[服务地址]:[远程目录]  [本地目录]
+
 -- 上传整个目录到服务器————scp -r   [本地目录]  [账户名]@[服务地址]:/[远程目录]
 
 # 过滤查看所有进程
@@ -76,11 +81,13 @@
 
 ## 1、Win10 企业版密钥
 
-```bash
+```markdown
 # 密钥 1:
 NG4HW-VH26C-733KW-K6F98-J8CK4
+
 # 密钥 2:
 XKY4K-2NRWR-8F6P2-448RF-CRYQH
+
 # 密钥 3:
 NTVHT-YF2M4-J9FJG-BJD66-YG667
 ```
@@ -137,7 +144,12 @@ NTVHT-YF2M4-J9FJG-BJD66-YG667
 
 ```bash
 @echo off
-:: 该行代码的意思是将位于【源文件路径：C:\Downloads\SourceFolder】下的内容复制到【目标文件路径：D:\TargetFolder】中，其中：【/e：拷贝所有子目录，包括空子目录】、【/I： 如果目标文件或目录不存在且拷贝的文件数多于一，则假设目标为目录】、【/d：只拷贝文件日期与在目标文件后的文件（即修改过的源文件）】、【/h：同时拷贝隐藏文件和系统文件】、【/r：拷贝并覆盖只读文件】、【/y： 复制文件审核设置（不显示已有文件覆盖确认）】
+:: 该行代码的意思是将位于【源文件路径：C:\Downloads\SourceFolder】下的内容复制到
+::【目标文件路径：D:\TargetFolder】中，其中：【/e：拷贝所有子目录，包括空子目录】、
+::【/I： 如果目标文件或目录不存在且拷贝的文件数多于一，则假设目标为目录】、
+::【/d：只拷贝文件日期与在目标文件后的文件（即修改过的源文件）】、
+::【/h：同时拷贝隐藏文件和系统文件】、【/r：拷贝并覆盖只读文件】、
+::【/y： 复制文件审核设置（不显示已有文件覆盖确认）】
 xcopy "C:\Downloads\SourceFolder" "D:\TargetFolder" /e/I/d/h/r/y
 Exit
 ```
@@ -178,20 +190,22 @@ Exit
 
 ## 1、iTerm2 + Oh My Zsh 终端
 
-```bash
-1、zsh安装
+```markdown
+# zsh安装
     1)zsh安装命令
         brew install zsh
     2)查看是否已安装
         zsh --version
     3)设置为默认
         chsh -s /usr/local/bin/zsh
-2、iterm2安装
+
+# iterm2安装
     1)iterm2安装命令
         brew install iterm2
     2)设置其为默认
         iTerm2 -> Make ITerm2 Default Term
-3、oh-my-zsh安装/卸载
+
+# oh-my-zsh安装/卸载
     1)安装方式一
         sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     2)安装方式二
@@ -199,16 +213,19 @@ Exit
     3)卸载方式
         uninstall_oh_my_zsh
     4)出现[oh-my-zsh] 提示检测到不安全的完成相关目录，解决方式
-4、配置主题【https://github.com/ohmyzsh/ohmyzsh/wiki/Themes】
+
+# 配置主题【https://github.com/ohmyzsh/ohmyzsh/wiki/Themes】
     ZSH_THEME="agnoster" # 以agnoster为例，编辑【~/.zshrc】文件，修改【ZSH_THEME】配置
-5、设置字体
+
+# 设置字体
     1)大部分主题用到的字体【Meslo for Powerline】
     【字体文件,详见————[附件——Meslo LG S Regular for Powerline.ttf]】
     2)agnoster还需要额外安装字体【Powerline Fonts】
     【https://github.com/powerline/fonts】  
     3)选择字体
     【iTerm -> Preferences -> Profiles -> Text -> Change Font】
-6、命令自动补全功能【zsh-autosuggestions】
+
+# 命令自动补全功能【zsh-autosuggestions】
     1)克隆代码到$ZSH_CUSTOM/plugins（默认位于~/.oh-my-zsh/custom/plugins）
         git clone https://gitee.com/imirror/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     2)下载该插件到.oh-my-zsh/plugins目录
@@ -219,7 +236,8 @@ Exit
     5)如果有看不到补全到问题，确保以下两个颜色不是相近的：
         iTerm > Preferences > Profiles > Colors > ANSI Colors > Bright > Black
         iTerm > Preferences > Profiles > Colors > Basic Colors > Background
-7、语法高亮【zsh-syntax-highlighting】
+
+# 语法高亮【zsh-syntax-highlighting】
     1)克隆代码到$ZSH_CUSTOM/plugins（默认位于~/.oh-my-zsh/custom/plugins）
         git clone https://gitee.com/imirror/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     2)在Oh My Zsh配置启用插件，打开【~/.zshrc】，找到plugins，追加zsh-autosuggestions
@@ -386,28 +404,34 @@ ZF71R-DMX85-08DQY-8YMNC-PPHV8
 
 ## 5、远程控制工具sunloginclient
 
-```bash
-1、说明
-    向日葵是一款阳光的远程控制软件。您可在任何可连入互联网的地方，轻松访问和控制安装了向日葵客户端的设备，且目前支持电脑、手机等多种控制端的方式进行远控。
-2、安装
+```markdown
+# 说明
+    向日葵是一款阳光的远程控制软件。您可在任何可连入互联网的地方，轻松访问和控制安装
+了向日葵客户端的设备，且目前支持电脑、手机等多种控制端的方式进行远控。
+
+# 安装
     brew install sunloginclient
-3、问题处理
-    # mac授权问题————
-        -- 进入终端su账户
-            sudo su
-        -- 执行命令
-            tccutil reset Accessibility
-        -- 重启电脑
-        -- 进行授权
-            系统偏好设置——>安全性与隐私——>隐私——>进行相应权限的授权
-            授权说明——https://service.oray.com/question/10558.html
+
+# 问题处理
+-- mac授权问题————
+  1、进入终端su账户
+     sudo su
+  2、执行命令
+     tccutil reset Accessibility
+  3、重启电脑
+     进行授权
+  4、系统偏好设置——>安全性与隐私——>隐私——>进行相应权限的授权
+     授权说明——https://service.oray.com/question/10558.html
 ```
 
 ## 6、终端工具Tabby
 
 ```markdown
-1、说明
-2、安装
+# 说明
+    Tabby（原名 Terminus）是一个高度可配置的终端模拟器、SSH 和串行客户端，适
+用于 Windows、macOS 和 Linux。
+
+# 安装
     brew install tabby
 ```
 
@@ -667,10 +691,11 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 
 ​        开发环境结合Nginx实现对域名访问环境的搭建.通过将浏览器发送的请求域名全部转发到指定nginx的对应虚拟机IP地址.生产环境就需要`购买指定域名————>进行注册使用`,开发环境配置如下:
 
-```bash
-1、下载安装修改hosts文件的软件
+```markdown
+# 下载安装修改hosts文件的软件
     brew install switchhosts
-2、通过该软件修改hosts文件
+
+# 通过该软件修改hosts文件
     1)配置格式如下
         虚拟机IP地址 请求域名
     1)默认规则
@@ -702,16 +727,19 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
     127.0.0.1 ssoserver.com
     127.0.0.1 client1.com
     127.0.0.1 client2.com
-3、测试,请求就会跳转到指定的IP地址
+
+# 测试,请求就会跳转到指定的IP地址
      http://pigskinmall.com:5601/ ————就会成功跳转到虚拟机中的指定端口
 ```
 
 ## 4、性能测试工具
 
-```bash
-1、下载
-brew install VisualVM
-2、使用
+```markdown
+# 下载
+    brew install VisualVM
+
+# 使用
+    //TODO:
 ```
 
 ## 5、压力测试工具
@@ -737,6 +765,7 @@ brew install VisualVM
     brew install git
 # 进入git控制台,配置用户名和邮箱
 -- 配置用户名————git config --global user.name "PeppaPigskin"
+
 -- 配置邮箱————git config --global user.email "178xxxx932@qq.com"
 
 # 配置ssh免密登录————https://gitee.com/help/articles/4181#article-header0
@@ -775,81 +804,98 @@ brew install VisualVM
 
 ### 1、安装mysql@5.7
 
-```bash
-1、安装mysql@5.7
+```markdown
+# 安装mysql@5.7
     brew install mysql@5.7
-2、配置使用【vim ~/.bash_profile】打开，添加以下内容，使用【source ~/.bash_profile】保存
+
+# 配置使用【vim ~/.bash_profile】打开，添加以下内容，使用【source ~/.bash_profile】保存
     export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-3、修改密码，使用命令【mysql -uroot -p】
+
+# 修改密码，使用命令【mysql -uroot -p】
     brew services start mysql@5.7 # 启动 mysql
     set password for 'root'@'localhost'=PASSWORD('root123'); # 修改密码
-4、刷新修改结果
+
+# 刷新修改结果
     FLUSH PRIVILEGES;
 ```
 
 ### 2、安装mysql 8.0.26
 
-```bash
-1、安装mysql 8.0.26
+```markdown
+# 安装mysql 8.0.26
     brew install mysql
-2、配置使用【vim ~/.bash_profile】打开，添加以下内容，使用【source ~/.bash_profile】保存
+
+# 配置使用【vim ~/.bash_profile】打开，添加以下内容，使用【source ~/.bash_profile】保存
     export PATH="/usr/local/opt/mysql@8.0/bin:$PATH"
-3、修改密码，使用命令【mysql -uroot -p】
+
+# 修改密码，使用命令【mysql -uroot -p】
     brew services start mysql # 启动 mysql
     ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123';
-4、刷新修改结果
+
+# 刷新修改结果
     FLUSH PRIVILEGES;
 ```
 
 ## 9、Nacos环境搭建
 
-```bash
-1、下载
+```markdown
+# 下载
     https://github.com/alibaba/nacos/releases
-2、启动:进入bin目录,执行以下命令
+
+# 启动:进入bin目录,执行以下命令
     sh startup.sh -m standalone
-3、网页登陆
+
+# 网页登陆
     http://127.0.0.1:8848/nacos/# /login
-4、终端测试是否启动成功
+
+# 终端测试是否启动成功
     curl http://127.0.0.1:8848/nacos
-5、关闭：进入bin目录，执行以下命令
+
+# 关闭：进入bin目录，执行以下命令
     sh shutdown.sh
-6、命令关闭不了的情况下，使用杀死进程方式
-    1)查看端口占用进程
-        lsof -i:8848
-    2)终止制定进程
-        kill -9 xxx 
+
+# 命令关闭不了的情况下，使用杀死进程方式
+-- 1)查看端口占用进程
+   lsof -i:8848
+
+-- 2)终止制定进程
+   kill -9 xxx 
 ```
 
 ## 10、Webpack安装
 
-```bash
-1、安装
-    npm install webpack@4.16.5 -g
-    npm i webpack -D
-    npm i webpack-cli -D
-    npm install  webpack-cli@3.1.0 -g 
-2、打包css需安装插件
-    npm install --save-dev style-loader@0.19.1 css-loader@0.28.3
-3、卸载
-    npm uninstall -g webpack webpack-cli
-    npm uninstall webpack webpack-cli --save-dev
+```markdown
+# 安装
+  npm install webpack@4.16.5 -g
+  npm i webpack -D
+  npm i webpack-cli -D
+  npm install  webpack-cli@3.1.0 -g 
+
+# 打包css需安装插件
+  npm install --save-dev style-loader@0.19.1 css-loader@0.28.3
+
+# 卸载
+  npm uninstall -g webpack webpack-cli
+  npm uninstall webpack webpack-cli --save-dev
 ```
 
 ## 11、Node环境搭建(npm同时也会安装好)
 
-```bash
-1、安装nvm
-    brew install nvm 
-2、配置nvm
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh" #  This loads nvm
-    [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  #      This loads nvm bash_completion
-3、查看所有node版本
-    nvm ls-remote
-4、下载安装指定版本node
-    nvm install v10.14.2
-    # 安装完提示信息
+```markdown
+# 安装nvm
+  brew install nvm 
+
+# 配置nvm
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh" #  This loads nvm
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  #      This loads nvm bash_completion
+
+# 查看所有node版本
+  nvm ls-remote
+
+# 下载安装指定版本node
+  nvm install v10.14.2
+  # 安装完提示信息
   node@14 is keg-only, which means it was not symlinked into /usr/local,
   because this is an alternate version of another formula.
   If you need to have node@14 first in your PATH, run:
@@ -857,33 +903,37 @@ brew install VisualVM
   For compilers to find node@14 you may need to set:
     export LDFLAGS="-L/usr/local/opt/node@14/lib"
     export CPPFLAGS="-I/usr/local/opt/node@14/include"
-5、环境配置(nvm安装的不用配置)
-    1)进入配置目录
-        cd /etc/profile
-    2)添加配置
-        export NODE_HOME="node安装路径(bin路径的父级路径)" 
-        export PATH=$PATH:$NODE_HOME/bin
-6、卸载
-    1)在终端依次输入以下命令
-        sudo npm uninstall npm -g
-        sudo rm -rf /usr/local/lib/node /usr/local/lib/node_modules /var/db/receipts/org.nodejs.*
-        sudo rm -rf /usr/local/include/node /Users/$USER/.npm
-        sudo rm /usr/local/bin/node
-        sudo rm /usr/local/share/man/man1/node.1
-        sudo rm /usr/local/lib/dtrace/node.d
-    2)验证是否成功
-        node -v  //not found
-        npm -v //not found
 
+# 环境配置(nvm安装的不用配置)
+-- 1)进入配置目录
+   cd /etc/profile
+
+-- 2)添加配置
+   export NODE_HOME="node安装路径(bin路径的父级路径)" 
+   export PATH=$PATH:$NODE_HOME/bin
+
+# 卸载
+-- 1)在终端依次输入以下命令
+   sudo npm uninstall npm -g
+   sudo rm -rf /usr/local/lib/node /usr/local/lib/node_modules /var/db/receipts/org.nodejs.*
+   sudo rm -rf /usr/local/include/node /Users/$USER/.npm
+   sudo rm /usr/local/bin/node
+   sudo rm /usr/local/share/man/man1/node.1
+   sudo rm /usr/local/lib/dtrace/node.d
+
+-- 2)验证是否成功
+   node -v  //not found
+   npm -v //not found
 ```
 
 ## 12、Apifox安装与配置
 
-```bash
-1、说明
-    Apifox是 API 文档、API 调试、API Mock、API 自动化测试一体化协作平台，定位 Postman + Swagger + Mock + JMeter。通过一套系统、一份数据，解决多个系统之间的数据同步问题。只要定义好 API 文档，API 调试、API 数据 Mock、API 自动化测试就可以直接使用，无需再次定义；API 文档和 API 开发调试使用同一个工具，API 调试完成后即可保证和 API 文档定义完全一致。高效、及时、准确！
-2、使用文档
-    https://www.apifox.cn/help/
+```markdown
+S# 说明
+  Apifox是 API 文档、API 调试、API Mock、API 自动化测试一体化协作平台，定位 Postman + Swagger + Mock + JMeter。通过一套系统、一份数据，解决多个系统之间的数据同步问题。只要定义好 API 文档，API 调试、API 数据 Mock、API 自动化测试就可以直接使用，无需再次定义；API 文档和 API 开发调试使用同一个工具，API 调试完成后即可保证和 API 文档定义完全一致。高效、及时、准确！
+
+# 使用文档
+  https://www.apifox.cn/help/
 ```
 
 ## 13、SVN环境搭建
@@ -974,36 +1024,41 @@ brew install VisualVM
 
 ## 14、Go语言开发环境搭建
 
-```bash
-1、安装Golang的SDK
-    # SDK安装包方式
-        0)安装包下载地址:https://golang.org/dl/
-        1)双击 .tar 文件，就会自动解压成名字为“go”的文件夹;拖拽到你的用户名下,记住路径;
+```markdown
+# 安装Golang的SDK
+-- SDK安装包方式
+     0)安装包下载地址:https://golang.org/dl/
+     1)双击 .tar 文件，就会自动解压成名字为“go”的文件夹;拖拽到你的用户名下,记住路径;
 我的路径为:/Users/pigskin/go
-        2)双击pkg包，顺着指引，即可安装成功。
-        3)在命令行输入 go version,验证SDK安装成功,获取到go的version，则代表安装成功。
-    # 使用brew
-        安装————brew install go
-2、配置环境变量
-    # 打开终端输入以下命令进入用户主目录————cd ~
-    # 输入以下命令查看是否存在.bash_profile————ls -all
-    # 存在即使用以下命令打开文件————vim .bash_profile
-    # 键入以下字符进入编辑模式,并添加如下内容————i
-        注意：= 前后没有空格。否则报错误(not a valid identifier)
-        1)SDK安装包方式
-            # 设置日常开发的根目录
-            export GOPATH=/Users/pigskin/go
-            # 设置GOPATH下的bin目录
-            export GOBIN=$GOPATH/bin
-            # 设置Path变量
-            export PATH=$PATH:$GOBIN
-        2)使用brew安装方式
-            # 设置日常开发的根目录
-            export GOPATH=/usr/local/Cellar/go/1.17.5
-            # 设置GOPATH下的bin目录
-            export GOBIN=$GOPATH/bin
-            # 设置Path变量
-            export PATH=$PATH:$GOBIN
+     2)双击pkg包，顺着指引，即可安装成功。
+     3)在命令行输入 go version,验证SDK安装成功,获取到go的version，则代表安装成功。
+
+-- 使用brew
+     安装————brew install go
+
+# 配置环境变量
+-- 打开终端输入以下命令进入用户主目录————cd ~
+
+-- 输入以下命令查看是否存在.bash_profile————ls -all
+
+--存在即使用以下命令打开文件————vim .bash_profile
+
+-- 键入以下字符进入编辑模式,并添加如下内容————i
+   注意：= 前后没有空格。否则报错误(not a valid identifier)
+   1)SDK安装包方式
+     # 设置日常开发的根目录
+     export GOPATH=/Users/pigskin/go
+     # 设置GOPATH下的bin目录
+     export GOBIN=$GOPATH/bin
+     # 设置Path变量
+     export PATH=$PATH:$GOBIN
+   2)使用brew安装方式
+     # 设置日常开发的根目录
+     export GOPATH=/usr/local/Cellar/go/1.17.5
+     # 设置GOPATH下的bin目录
+     export GOBIN=$GOPATH/bin
+     # 设置Path变量
+     export PATH=$PATH:$GOBIN
     # 点击ESC，并输入以下命令保存并退出编辑————:wq
   # 可输入以下命令查看是否保存成功————vim .bash_profile
   # 输入以下命令完成对golang环境变量的配置，配置成功没有提示————source ~/.bash_profile 
@@ -1090,6 +1145,13 @@ brew install VisualVM
 -- 各种环境配置都没问题,但是拉取不到远程仓库的东西
     1、由于idea的Maven采用脱机工作(意思就是不读取远程仓库，只读取本地已有的仓库)选项导致解决办法如下:
         依次打开Maven设置项————Idea——>Preferences——>Build...——>Build Tools——>Maven,去掉勾选项「Work offline」,应用即可.
+
+# jar包导入本地maven的方法
+-- 终端执行命令
+    mvn install:install-file "-Dfile=jar包以及所在路径" "-DgroupId=对应groupId" "-DartifactId=对应artifactId" "-Dversion=版本号" "-Dpackaging=jar"
+
+-- 使用示例
+    mvn install:install-file -DgroupId=com.aliyun -DartifactId=aliyun-sdk-vod-upload -Dversion=1.4.11 -Dpackaging=jar -Dfile=aliyun-java-vod-upload-1.4.11.jar
 ```
 
 ## 16、Seata环境搭建
@@ -1480,7 +1542,8 @@ brew install VisualVM
 
 # 配置镜像加速
 -- 配置
-    Perferences... ->Docker Engine。在配置列表中填写加速器地址即可。修改完成之后，点击 Apply&Restart 按钮，Docker 就会重启并应用配置的镜像地址了。
+    Perferences... ->Docker Engine。在配置列表中填写加速器地址即可。修改完成之
+后，点击 Apply&Restart 按钮，Docker 就会重启并应用配置的镜像地址了。
 
 -- 镜像地址
     1、网易的镜像地址————"registry-mirrors": ["http://hub-mirror.c.163.com"]
@@ -1497,7 +1560,46 @@ brew install VisualVM
     https://gitee.com/docmirror/dev-sidecar
 
 # 说明
-    开发者边车，命名取自service-mesh的service-sidecar，意为为开发者打辅助的边车工具（以下简称ds).通过本地代理的方式将https请求代理到一些国内的加速通道上
+    开发者边车，命名取自service-mesh的service-sidecar，意为为开发者打辅助的边车
+工具（以下简称ds).通过本地代理的方式将https请求代理到一些国内的加速通道上
+```
+
+## 23、KingBaseES——人大金仓国产数据库
+
+```markdown
+# 说明
+    KingbaseES是一款面向事务处理应用，兼顾简单分析应用的企业级关系型数据库，
+产品融合了金仓在数据库领域多年的产品研发经验和企业级应用经验，可满足各行业用户
+多种场景的数据处理需求。
+
+# 官方地址
+    https://www.kingbase.com.cn/rjcxxz/index.htm
+
+# 本地maven仓库导入驱动
+-- 终端进入jar包所在位置,执行如下命令:
+    mvn install:install-file -DgroupId=kingbase -DartifactId=kingbase8 -Dversion=8.2.0 -Dpackaging=jar -Dfile=kingbase-8.2.0.jar
+
+-- 项目pom文件引入依赖
+    <!--人大金仓jdbc驱动包-->
+    <!-- https://mvnrepository.com/artifact/kingbase/kingbase8 -->
+    <dependency>
+        <groupId>kingbase</groupId>
+        <artifactId>kingbase8</artifactId>
+        <version>8.2.0</version>
+    </dependency>
+
+# 数据库安装
+    https://www.kingbase.com.cn/azysj/index.htm
+
+# 数据迁移
+    详见————3、Java开发之数据库篇-3-2、数据迁移
+
+# 开发注意事项
+-- 1、已发现的有使用数据库中的函数返回字段名的问题，如count(1) 不能直接返回，应该
+对该字段定义别名如count。
+
+-- 2、还需要注意在转换过程中是否有字段类型、表结构、表数据转换失败的（查看迁移报告
+里面会有原因）。
 ```
 
 # 5、Java——虚拟机环境搭建
