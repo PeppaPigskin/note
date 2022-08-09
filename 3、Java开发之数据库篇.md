@@ -2,7 +2,7 @@
 
 ## 1、常用基础命令
 
-​		
+​        
 
 ## 2、相关知识点
 
@@ -24,7 +24,6 @@
 -- 最————最左原则的意思，在复合索引中，索引列的顺序非常重要，如果不是按照索引列最左列开始进行查找，则无法使用索引。
 
 -- 快————全表扫描更快的意思，如果数据库预计使用全表扫描比使用索引更快，那就不会使用索引。
-
 ```
 
 ## 3、利用mysqldump导出表结构或者表数据
@@ -33,30 +32,28 @@
 # 说明————加-d参数代表只导表结构，不加此参数则代表导出结构以及表数据，> 代表录入某一文件，若为>>则表示将内容追加到某文件末尾
 -- 导出数据库为dbname的表结构
 mysqldump -uuser -pdbpasswd -d dbname >db.sql; 
- 
+
 -- 导出数据库为dbname某张表结构
 mysqldump -uuser -pdbpasswd -d dbname table_name>db.sql;
- 
+
 -- 导出数据库为dbname所有表结构及表数据
 mysqldump -uuser -pdbpasswd  dbname >db.sql;
- 
+
 -- 导出数据库为dbname某张表结构及表数据
 mysqldump -uuser -pdbpasswd dbname table_name>db.sql;
- 
+
 -- 批量导出dbname数据库中多张表结构及表数据
 mysqldump -uuser -pdbpasswd dbname table_name1 table_name2 table_name3>db.sql;
- 
+
 -- 批量导出dbname数据库中多张表结构
 mysqldump -uuser -pdbpasswd -d dbname table_name1 table_name2 table_name3>db.sql;
 ```
-
-
 
 # 二、Oracle
 
 ## 1、常用基础命令
 
-### 	1、用户
+### 1、用户
 
 ```sql
 # 创建用户
@@ -92,9 +89,7 @@ shutdown immediate;
 startup;
 ```
 
-
-
-### 	2、表空间
+### 2、表空间
 
 ```sql
 # 创建表空间
@@ -140,9 +135,7 @@ ALTER DATABASE DATAFILE [表空间文件：'D:\ORACLE\PRODUCT\ORADATA\TEST\USERS
 ALTER TABLESPACE [表控件名：grp] ADD DATAFILE [新加的表控件数据文件：'D:\oracle\product\10.2.0\oradata\GRP2.ora']  SZIE 800M AUTOEXTEND ON NEXT 50m MAXSIZE 500m; 
 ```
 
-
-
-### 	3、数据表
+### 3、数据表
 
 ```sql
 # 创建表（可指定表空间）
@@ -184,9 +177,7 @@ SELECT * FROM USER_COL_COMMENTS A WHERE A.TABLE_NAME LIKE ['模糊表名%'];
 select * from user_tables  where nvl(num_rows,0) = 0;
 ```
 
-
-
-### 	4、视图
+### 4、视图
 
 ```sql
 # 创建视图（可给访问权限）
@@ -198,9 +189,7 @@ DROP VIEW [视图名];
 CREATE MATERIALIZED VIEW [物化视图名] REFRESH FORCE ON DEMAND START WITH SYSDATE NEXT TO_DATE(CONCAT(TO_CHAR(SYSDATE+1,'dd-mm-yyyy'),'00:00:00'),'dd-mm-yyyy hh24:mi:ss') AS [创建物化视图的SQL];
 ```
 
-
-
-### 	5、数据处理
+### 5、数据处理
 
 ```sql
 # 数据导入
@@ -218,9 +207,7 @@ exp username/password@SID file=F:\xx.dmp statistics=none (owner=username)/(table
 expdp blog/123456@orcl directory=DATA_PUMP_DIR dumpfile=blog.dmp logfile=blog.log + schemas=blog或者remap_schema=eamprd(用户?):eamprduat(密码?)                                             
 ```
 
-
-
-### 	6、DBLink
+### 6、DBLink
 
 ```sql
 # 创建DBLink
@@ -229,41 +216,100 @@ CREATE  DATABASE LINK [DBLink名]  CONNECT TO [链接的用户名：ZHB20180521]
 DROP DATABASE LINK [DBLink名];
 ```
 
-
-
-### 	7、触发器
+### 7、触发器
 
 ```sql
-#	启用/停用触发器
+#    启用/停用触发器
 ALTER TRIGGER [触发器名] DISABLE/ENABLE;
-#	启用/停用指定表中所有触发器
+#    启用/停用指定表中所有触发器
 ALTER TABLE [表名：table_name] DISABLE/ENABLE ALL TRIGGERS;
 ```
 
-
-
-### 	8、其他
+### 8、其他
 
 ```sql
-#	断开会话
+#    断开会话
 ALTER SYSTEM KILL SESSION ['sid,serial'];
 
 
 # 查看是否有被锁的表
 SELECT b.owner, b.object_name, a.session_id, a.locked_mode
-	FROM v$locked_object a, dba_objects b
+    FROM v$locked_object a, dba_objects b
   WHERE b.object_id = a.object_id
 
 # 查看是哪个进程锁的
 select b.username,b.sid,b.serial#,logon_time
-	from v$locked_object a,v$session b
-	where a.session_id = b.sid order by b.logon_time
+    from v$locked_object a,v$session b
+    where a.session_id = b.sid order by b.logon_time
 
 # 杀掉进程 sid,serial#
-	alter system kill session '284,38112';
+    alter system kill session '284,38112';
 ```
 
+# 三、KingBase
 
+## 1、用户
 
+### 1、基础命令
 
+```sql
+-- 查看用户信息
+select * from sys_user;
 
+-- 创建新的用户
+create user username with password '******';
+
+-- 修改名username的用户登陆口令
+alter user username with password '******';
+
+-- 删除用户
+drop user username;
+
+-- 一个对象可以通过该对象类型重新分配所有者
+alter table table_name onwer to username;
+
+-- 使用GRANT命令分配权限。
+grant update on table_name to username;
+
+-- 撤销表的权限
+revoke all on table_name from public;
+```
+
+### 2、密码错误解决————设置免密登陆后进行修改密码
+
+```sql
+-- (1) 打开数据库目录，到进入data数据目录
+
+-- (2) 编辑打开sys_hba.conf文件
+
+-- (3) 找到# IPv4 local connections: 下方的host all all 127.0.0.1/32 scram-sha-256
+
+-- (4) 将 scram-sha-256 改为 trust
+
+-- (5) 重启服务————「KingBase安装目录」\Server\bin>sys_ctl -D 「KingBase安装目录」\data restart
+
+-- (6) 然后免密登陆进入 执行 alter user system password ‘123456’; 修改密码
+
+-- (7) 密码修改完成后 将sys_hba.conf文件trust改为原来scram-sha-256
+
+-- (8) 重启服务即可——「KingBase安装目录」\Server\bin>sys_ctl -D 「KingBase安装目录」\data restart
+```
+
+## 2、数据迁移
+
+```sql
+-- oracle——>kingbase
+0、在目的数据库 KingbaseES 上创建与源数据库 Oracle 同名的用户、数据库
+1、点击电脑左下角开始按钮，在KingbaseES V8文件夹下找到《数据迁移工具》打开
+2、创建源数据库连接(oracle)————填写数据源信息，包括:“连接名称”、“数据 库类型”、“数据库版本”、“服务器地址”、“端口”、“用户名”、“密码”、“数据库”、“驱 动”、“URL”、“连接参数”
+3、创建目标数据库连接(kingbase)————填写数据源信息，包括:“连接名称”、“数据 库类型”、“数据库版本”、“服务器地址”、“端口”、“用户名”、“密码”、“数据库”、“驱 动”、“URL”、“连接参数”
+4、新建迁移任务
+    1)输入迁移任务的名称、选择上面步骤新建的源数据库和目标数据库
+    2)点击下一步选择要转换的数据库
+    3)继续点击下一步选择要转换的表、视图等
+    4)继续点击下一步填写迁移配置（一般默认原始数据）
+    5)继续点击下一步、点击完成后可以在迁移任务中看见我们新建的迁移任务
+5、开始迁移
+    1)双击新建的迁移任务可以看到所需迁移的具体明细，然后点击左上角绿色按钮开始迁移，等待完成即可
+    2)迁移完成后会有具体的迁移报告查看
+```
