@@ -2114,6 +2114,203 @@ return interceptor;
 https://blog.csdn.net/weixin_30827565/article/details/101144394?spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-8.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-8.pc_relevant_paycolumn_v3&utm_relevant_index=12
 ```
 
+### 3、编写自定义starter
+
+```java
+# 说明
+    一个starter其实就是对一个功能的集成封装,然后对外提供一个依赖,让业务去使用.
+为了区分官方的starter和个人的starter,通常在命名上会有一个规范(第三方在建立自
+己的starter时命名规则统一使用xxx-spring-boot-starter,而官方提供的starter
+统一命名方式为spring-boot-starter-xxx)
+
+# 自定义starter编写流程
+-- 1、首先在pom中添加一个自动装配的依赖
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+      <version>2.7.1</version>
+    </dependency>
+
+
+-- 2、编写属性类————接受属性值的类
+    package com.pigskin.hash.starter.config;
+
+    import org.springframework.boot.context.properties.ConfigurationProperties;
+
+    /**
+     * 属性类————接受属性值的类
+     *
+     * @author WuChen
+     * @version 1.0
+     * @date 2022/8/11 13:49
+     */
+    @ConfigurationProperties(prefix = "myself.hash")
+    public class MyHashProperties {
+        private String hashPre;
+
+        public String getHashPre() {
+            return hashPre;
+        }
+
+        public void setHashPre(String hashPre) {
+            this.hashPre = hashPre;
+        }
+    }
+
+-- 3、编写业务实现类————实际业务需要注入的类，用来对入参进行 MD5 摘要，然后返回一个
+拼接了前缀的字符串给业务。这个前缀是通过 application.properties 中配
+置 ziyou.hash.hashPre=JavaGeekTech 配置后传递过来的。
+    package com.pigskin.hash.starter.service;
+
+    import javax.xml.bind.DatatypeConverter;
+    import java.security.MessageDigest;
+    import java.security.NoSuchAlgorithmException;
+
+    /**
+     * 实际业务需要注入的类————用来对入参进行 MD5 摘要，然后返回一个拼接了前缀的字符串给业务
+     *
+     * @author WuChen
+     * @version 1.0
+     * @date 2022/8/11 09:58
+     */
+    public class MyHashTemplate {
+
+        /**
+         * 这个前缀是通过 application.properties 中配置 ziyou.hash.hashPre=JavaGeekTech 配置后传递过来的
+         */
+        private String prefix;
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        /**
+         * 用来对入参进行 MD5 摘要，然后返回一个拼接了前缀的字符串给业务
+         *
+         * @param origin 入参
+         * @return java.lang.String 一个拼接了前缀的字符串
+         * @author WuChen
+         * @date 2022/8/11 10:02
+         */
+        public String myHash(String origin) {
+            if (null == origin || origin.length() == 0) {
+                return null;
+            }
+            try {
+                final MessageDigest md5 = MessageDigest.getInstance("MD5");
+                md5.update(origin.getBytes());
+                return this.prefix + ":" + DatatypeConverter.printHexBinary(md5.digest()).toUpperCase();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+-- 4、编写装配类————自动装配类，这个类会根据条件进行 MyHashTemplate  Bean 的
+初始化，并将前缀进行赋值。
+    package com.pigskin.hash.starter.config;
+
+    import com.pigskin.hash.starter.service.MyHashTemplate;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+    import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+    import org.springframework.boot.context.properties.EnableConfigurationProperties;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+
+    /**
+     * 自动装配类————这个类会根据条件进行 MyHashTemplate Bean 的初始化，并将前缀进行赋值
+     *
+     * @author WuChen
+     * @version 1.0
+     * @date 2022/8/11 09:52
+     */
+    @Configuration
+    @ConditionalOnClass({MyHashTemplate.class})
+    @EnableConfigurationProperties(MyHashProperties.class)
+    public class MyHashAutoConfiguration {
+
+        @Autowired
+        MyHashProperties myHashProperties;
+
+        @Bean
+        @ConditionalOnMissingBean(MyHashTemplate.class)
+        public MyHashTemplate myJsonService() {
+            final MyHashTemplate myHashTemplate = new MyHashTemplate();
+            myHashTemplate.setPrefix(myHashProperties.getHashPre());
+            return myHashTemplate;
+
+        }
+    }
+
+-- 5、增加配置文件————需要在 resource 文件中编写一个 META-INF/spring.factories 文
+件，内容如下(前面的 Key 是固定写法，后面的 value 就是配置类的全路径引用地址)
+    org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.pigskin.hash.starter.config.MyHashAutoConfiguration
+
+-- 6、进行打包
+    mvn clean package
+
+# 项目中使用自定义编写的starter
+-- 0、将打包的jar导入到需要使用该starter项目的maven仓库
+    mvn install:install-file -DgroupId=com.peppapigskin -DartifactId=pigskin-spring-boot-starter -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar -Dfile=pigskin-spring-boot-starter-0.0.1-SNAPSHOT.jar
+
+-- 1、在项目的pom中添加需要使用该starter的依赖
+	<dependency>
+		<groupId>com.peppapigskin</groupId>
+		<artifactId>pigskin-spring-boot-starter</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+
+-- 2、在需要使用的地方进行对象注入
+1)业务层
+    package com.example.demo.service;
+
+    import com.example.hash.starter.service.MyHashTemplate;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+
+    @Service
+    public class HelloService {
+      @Autowired
+      private MyHashTemplate myHashTemplate;
+
+      public String sayHello(String name) {
+        return myHashTemplate.myHash(name);
+      }
+    }
+2)控制器层
+    package com.example.demo.controller;
+
+    import com.example.demo.service.HelloService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestParam;
+    import org.springframework.web.bind.annotation.RestController;
+
+    @RestController
+    public class HelloController {
+
+      @Autowired
+      private HelloService helloService;
+
+      @GetMapping(value = "/hello")
+      public String hello(@RequestParam("name") String name) {
+        return helloService.sayHello(name);
+      }
+    }
+
+-- 3、在application配置文件中增加配置信息
+    # 配置前缀
+    myself:
+      hash:
+        hashPre: JavaGeekTech
+
+-- 4、此时一个简单的自定义starter就可以使用了
+    启动项目，我们访问地址 http://127.0.0.1:8080/hello?name=ziyou 可以
+看到效果如下
+    JavaGeekTech:1DB9B61F2AF0655AE28ABF723E73DBAB
+```
+
 ## 8、SpringCloud
 
 ### 0、SpringCloud简介
@@ -18918,16 +19115,12 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
 -- Thymeleaf格式转换
     1、数字转换为日期类型对象————${new java.util.Date(item.seckillInfoVo.startTime)}
     2、格式化日期类型对象————${#dates.format(new java.util.Date(item.seckillInfoVo.startTime),"yyyy-YY-dd HH:mm:ss")}
-
-
 ```
 
 ```markdown
 # 数据 Oracle数据库存Date类型数据,Java代码
 -- Java使用————new Timestamp(System.currentTimeMillis())
 ```
-
-
 
 # ## 14、新建的SpringBoot模块启动异常
 
