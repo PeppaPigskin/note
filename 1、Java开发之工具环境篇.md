@@ -606,7 +606,12 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 
 ```markdown
 # 说明
-    IDEA 全称 IntelliJ IDEA，是java编程语言开发的集成环境。IntelliJ在业界被公认为最好的java开发工具，尤其在智能代码助手、代码自动提示、重构、JavaEE支持、各类版本工具(git、svn等)、JUnit、CVS整合、代码分析、 创新的GUI设计等方面的功能可以说是超常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以严谨著称的东欧程序员为主。它的旗舰版本还支持HTML，CSS，PHP，MySQL，Python等。免费版只支持Java,Kotlin等少数语言。
+    IDEA 全称 IntelliJ IDEA，是java编程语言开发的集成环境。IntelliJ在业界被公认
+为最好的java开发工具，尤其在智能代码助手、代码自动提示、重构、JavaEE支持、各类版本
+工具(git、svn等)、JUnit、CVS整合、代码分析、 创新的GUI设计等方面的功能可以说是超
+常的。IDEA是JetBrains公司的产品，这家公司总部位于捷克共和国的首都布拉格，开发人员以
+严谨著称的东欧程序员为主。它的旗舰版本还支持HTML，CSS，PHP，MySQL，Python等。免费
+版只支持Java,Kotlin等少数语言。
 
 # 安装
     brew install intellij-idea
@@ -630,20 +635,24 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 -- 2、搜索————Serialization issues
 -- 3、勾选————Serializable class without 'serialVersionUID'
 -- 4、点击应用即可
--- 5、实体类实现序列化接口(Serializable)之后,使用「Alt+Enter/Option+Enter」快捷键可以自动生成序列化ID
+-- 5、实体类实现序列化接口(Serializable)之后,使用「Alt+Enter/Option+Enter」快
+捷键可以自动生成序列化ID
 
 # 常用设置————https://blog.csdn.net/qq_38586496/article/details/109382560
 
 # IDEA风格配置导出文件详见————[附件——settings.zip]
 
 # 常用插件
--- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及链式调用方法，总之就是为了简化实体类而生的插件
+-- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及
+链式调用方法，总之就是为了简化实体类而生的插件
 
--- Free Mybatis Plugin————一个提高mybatis编码的插件。实现了dao层跳转到xml层的跳转功能
+-- Free Mybatis Plugin————一个提高mybatis编码的插件。实现了dao层跳转到xml层
+的跳转功能
 
 -- Mybatis-log-plugin————根据mybatis输出的sql日志，转换为拼接好参数的sql
 
--- Jrebel————一款比较好用的热部署插件，省去了一直重启的麻烦，尤其适合项目比较大的，能够节省不少时间
+-- Jrebel————一款比较好用的热部署插件，省去了一直重启的麻烦，尤其适合项目比较大的，
+能够节省不少时间
     1、详情参考1————https://blog.csdn.net/top_explore/article/details/107321541
     1、详情参考2————https://blog.csdn.net/seanxwq/article/details/89892614
 
@@ -652,31 +661,89 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
     2、提供了一个 Services tree 的显示窗口;
     3、一个简单的 http 请求工具;
     4、在请求方法上添加了有用功能: 复制生成 URL;,复制方法参数...
-    5、其他功能: java 类上添加 Convert to JSON 功能，格式化 json 数据 ( Windows: Ctrl + Enter; Mac: Command + Enter )
+    5、其他功能: java 类上添加 Convert to JSON 功能，格式化 json 数
+据 ( Windows: Ctrl + Enter; Mac: Command + Enter )
 
 -- redis————redis客户端工具，不需要再去安装第三方客户端，相对方便许多
 
 -- Vuesion Theme————一款皮肤插件.非常适中的UI颜色,漂亮的代码高亮主题
 
--- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或是鼠标中键滚屏时有点卡顿
+-- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或
+是鼠标中键滚屏时有点卡顿
 
--- File Expander————能在Idea里直接打开Jar包,并且反编译代码查看.甚至于能打开tar.gz,zip等压缩格式
+-- File Expander————能在Idea里直接打开Jar包,并且反编译代码查看.甚至于能
+打开tar.gz,zip等压缩格式
 
--- GitToolBox————能在项目上提示你还有多少文件没提交,远程还有多少文件没更新下来,还能在每一行代码上提示上次提交的时间,查版本提交问题的时候尤其方便
+-- GitToolBox————能在项目上提示你还有多少文件没提交,远程还有多少文件没更新下
+来,还能在每一行代码上提示上次提交的时间,查版本提交问题的时候尤其方便
 
--- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
+-- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪
+个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
 
--- GsonFormat————超级实用的一个插件，对接第三方接口，通常需要将对方的json字符串转实体类，搞的很是头疼。使用GsonFormat我们只需要创建一个类，然后把要转换的json字符串复制进去，点击OK它就会给我们生成相应的实体对象。
+-- GsonFormat————超级实用的一个插件，对接第三方接口，通常需要将对方的json字
+符串转实体类，搞的很是头疼。使用GsonFormat我们只需要创建一个类，然后把要转换
+的json字符串复制进去，点击OK它就会给我们生成相应的实体对象。
 
--- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文时理解的更加透彻。
+-- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个
+插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻
+译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文
+时理解的更加透彻。
 
--- arthas idea————阿里开源的一款强大的java在线诊断工具.有了arthas这种神器可以线上输出日志，但是watch语法还是不够简单，因此Idea arthas 插件就此横空出世，插件安装成功后，只需要将光标放置在具体的类、字段、方法上面 右键选择需要执行的命令，部分会有窗口弹出、根据界面操作获取命令；部分直接获取命令复制到了剪切板 ，自己启动arthas 后粘贴即可执行。
+-- arthas idea————阿里开源的一款强大的java在线诊断工具.有了arthas这种神器可
+以线上输出日志，但是watch语法还是不够简单，因此Idea arthas 插件就此横空出世，插
+件安装成功后，只需要将光标放置在具体的类、字段、方法上面 右键选择需要执行的命令，部
+分会有窗口弹出、根据界面操作获取命令；部分直接获取命令复制到了剪切板 ，自己启
+动arthas 后粘贴即可执行。
 
--- Search In Repository————平时我们如果要依赖一个第三方jar包，但是不知道它的maven/gradle的坐标。搓点的做法基本上就是baidu了，稍微高级点的就是到中央仓库去查下，最新版本的坐标是什么。然后复制下来，贴到pom里去。这款插件，无需你来回跳转，直接把中央仓库的查找集成到了Idea里面。你只需要打开这款插件，输入jar包的名字或者gav关键字，就能查到到这个jar包所有的版本，然后可以直接复制gav坐标。方便又快捷，干净又卫生！
+-- Search In Repository————平时我们如果要依赖一个第三方jar包，但是不知道
+它的maven/gradle的坐标。搓点的做法基本上就是baidu了，稍微高级点的就是到中央
+仓库去查下，最新版本的坐标是什么。然后复制下来，贴到pom里去。这款插件，无需你来回
+跳转，直接把中央仓库的查找集成到了Idea里面。你只需要打开这款插件，输入jar包的名
+字或者gav关键字，就能查到到这个jar包所有的版本，然后可以直接复制gav坐标。方便又
+快捷，干净又卫生！
 
--- VisualGC————Idea堆栈的可视化工具，和Idea深度集成。直接显示所有进程，双击即可打开JVM的堆栈可视化界面。堆栈和垃圾收集情况一目了然！
+-- VisualGC————Idea堆栈的可视化工具，和Idea深度集成。直接显示所有进程，双击即
+可打开JVM的堆栈可视化界面。堆栈和垃圾收集情况一目了然！
 
--- Zoolytic————一款zookeeper节点的查看分析插件。其实第三方也有一些zk的节点信息查看工具，但是我都觉得不够方便，直到我发现了这款插件。
+-- Zoolytic————一款zookeeper节点的查看分析插件。其实第三方也有一些zk的节点信
+息查看工具，但是我都觉得不够方便，直到我发现了这款插件。
+
+-- Codota————代码智能提示插件,只要打出首字母就能联想出一整条语句，这也太智能
+了，还显示了每条语句使用频率。原因是它学习了我的项目代码，总结出了我的代码偏好。
+
+-- Key Promoter X————捷键提示插件,每次都会在右下角弹窗提示，帮助我们快速熟悉快捷键。
+
+-- CodeGlance————显示代码缩略图插件,当代码很多的时候，方便查看，很有用。
+
+-- Alibaba Java Coding Guidelines————阿里巴巴代码规范检查插件,会按照阿里Java开发
+手册上规范帮我们检查代码，然后对代码做不同颜色展示，鼠标放上去，会看到提示内容，帮助
+我们写出更规范的代码。
+
+-- CamelCase————驼峰命名和下划线命名转换,命名方式用快捷
+键 ⇧ + ⌥ + U / Shift + Alt + U 可以进行快速转换，当我们需要修改大量变量名称的
+时候很方便
+
+-- MybatisX————高效操作Mybatis插件
+1、映射器和xm可以来回跳转
+2、mybatis.xml,mapper.xm1提示
+3、映射器和XML支持自动提示,例如jpa(参考MybatisCodeHelperPro)
+4、集成 mybatis生成器Gui(从免费的mybatis插件复制)
+
+-- SonarLint————代码质量检查插件,提示我不要用System.out输出，要用logger输出，诸
+如此类，帮助我们提升代码质量
+
+-- Save Actions————格式化代码插件,可以帮忙我们优化包导入，自动给没有修改的变量添
+加final修饰符，调用方法的时候自动添加this关键字等，使我们的代码更规范统一
+
+-- Grep Console————自定义控制台输出格式插件
+
+-- MetricsReloaded————代码复杂度检查插件
+
+-- Statistic————代码统计插件
+
+-- Rainbow Brackets————彩虹括号插件,成对儿的括号显示相同的颜色，有了这个插
+件，我的近视都好了。
+
 ```
 
 [附件——settings.zip](attachments/IDEA/settings.zip)
