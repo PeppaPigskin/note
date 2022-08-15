@@ -792,6 +792,8 @@
 
 `Java面试题合集最新版2022(485页)`——链接: https://pan.baidu.com/s/1rrVz7clc67xo56FPqI8beA 提取码: n7fk
 
+`Java最新2022版面试题及解答-阿里内部资料(266页)`——链接: https://pan.baidu.com/s/1MME7WkluDHvg3GzKyc7lAQ 提取码: igfq
+
 `2021 Java 面试真题`——链接: https://pan.baidu.com/s/1mr_YQQPGHVDMvRnXdhMk_Q 提取码: d0lu
 
 `2020年Java最常见的200面试题汇总`——链接: https://pan.baidu.com/s/1L8XvNFjmSRTCjXeJnZDqbQ 提取码: 9qt8
