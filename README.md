@@ -790,6 +790,8 @@
 
 ###### 1、面试题
 
+`Java面试题合集最新版2022(485页)`——链接: https://pan.baidu.com/s/1rrVz7clc67xo56FPqI8beA 提取码: n7fk
+
 `2021 Java 面试真题`——链接: https://pan.baidu.com/s/1mr_YQQPGHVDMvRnXdhMk_Q 提取码: d0lu
 
 `2020年Java最常见的200面试题汇总`——链接: https://pan.baidu.com/s/1L8XvNFjmSRTCjXeJnZDqbQ 提取码: 9qt8
@@ -921,6 +923,8 @@
 `字节data-基础架构-大数据面经`——链接: https://pan.baidu.com/s/1U5jURS_dY8PFJ3CMSlbZ7Q 提取码: vfjg
 
 ##### 1、Java
+
+`JAVA面试核心知识点整理(283页)`——链接: https://pan.baidu.com/s/1GUxKOYmbopOTYSshugVo5g 提取码: ltna
 
 `深入理解Java虚拟机：JVM高级特性与最佳实践（第3版)- 周志明`——链接: https://pan.baidu.com/s/1EoXUgcpTk_fwLBs92ExKQQ 提取码: ak1t
 
