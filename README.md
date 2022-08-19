@@ -378,7 +378,6 @@
 - - [1、鉴权方法](https://gitee.com/PeppaPigskin/note/blob/master/2%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF%E7%AF%87.md#1%E9%89%B4%E6%9D%83%E6%96%B9%E6%B3%95 "1、鉴权方法")
   - - [1、基本概念](https://gitee.com/PeppaPigskin/note/blob/master/2%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF%E7%AF%87.md#1%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5 "1、基本概念")
     - [2、十种鉴权方案](https://gitee.com/PeppaPigskin/note/blob/master/2%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF%E7%AF%87.md#2%E5%8D%81%E7%A7%8D%E9%89%B4%E6%9D%83%E6%96%B9%E6%A1%88 "2、十种鉴权方案")
-  - [2、Java23种设计模式](https://gitee.com/PeppaPigskin/note/blob/master/2%E3%80%81Java%E5%BC%80%E5%8F%91%E4%B9%8B%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF%E7%AF%87.md#2java23%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F "2、Java23种设计模式")
 
 ##### 3、Java开发之数据库篇
 
@@ -431,8 +430,6 @@
 - [1、基础题库](https://gitee.com/PeppaPigskin/note/blob/master/5%E3%80%81Java%E9%9D%A2%E8%AF%95%E9%A2%98%E9%A2%98%E5%BA%93.md#1%E5%9F%BA%E7%A1%80%E9%A2%98%E5%BA%93 "1、基础题库")
 
 ##### 6、软考笔记之软件设计师
-
-
 
 - [0、软件考试介绍](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#0%E8%BD%AF%E4%BB%B6%E8%80%83%E8%AF%95%E4%BB%8B%E7%BB%8D "0、软件考试介绍")
 - - [1、考试大纲要求](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#1%E8%80%83%E8%AF%95%E5%A4%A7%E7%BA%B2%E8%A6%81%E6%B1%82 "1、考试大纲要求")
@@ -487,8 +484,6 @@
     - [2、位示图](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#2%E4%BD%8D%E7%A4%BA%E5%9B%BE "2、位示图")
   - [5、微内核操作系统](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#5%E5%BE%AE%E5%86%85%E6%A0%B8%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F "5、微内核操作系统")
   - - [1、虚设备与SPOOLING技术](https://gitee.com/PeppaPigskin/note/blob/master/6%E3%80%81%E8%BD%AF%E8%80%83%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E5%B8%88.md#1%E8%99%9A%E8%AE%BE%E5%A4%87%E4%B8%8Espooling%E6%8A%80%E6%9C%AF "1、虚设备与SPOOLING技术")
-
-
 
 #### 四、Java资料专栏(仅供学习,如有侵权请留言联系删除)
 
