@@ -643,18 +643,91 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 # IDEA风格配置导出文件详见————[附件——settings.zip]
 
 # 常用插件
--- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及
-链式调用方法，总之就是为了简化实体类而生的插件
+-- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或
+是鼠标中键滚屏时有点卡顿
+
+-- Alibaba Java Coding Guidelines————阿里巴巴代码规范检查插件,会按照阿里Java开发
+手册上规范帮我们检查代码，然后对代码做不同颜色展示，鼠标放上去，会看到提示内容，帮助
+我们写出更规范的代码。
+
+-- Arthas idea————阿里开源的一款强大的java在线诊断工具.有了arthas这种神器可
+以线上输出日志，但是watch语法还是不够简单，因此Idea arthas 插件就此横空出世，插
+件安装成功后，只需要将光标放置在具体的类、字段、方法上面 右键选择需要执行的命令，部
+分会有窗口弹出、根据界面操作获取命令；部分直接获取命令复制到了剪切板 ，自己启
+动arthas 后粘贴即可执行。
+
+-- AiXcoder Code Completer————代码提示补全插件。使用 AI 去自动提示和补全代码，
+比 IDEA 自带的代码补全更加智能化。
+
+-- CodeGlance————显示代码缩略图插件,当代码很多的时候，方便查看，很有用。
+
+-- CamelCase————驼峰命名和下划线命名转换,命名方式用快捷
+键 ⇧ + ⌥ + U / Shift + Alt + U 可以进行快速转换，当我们需要修改大量变量名称的
+时候很方便
+
+-- Codota————代码智能提示插件,只要打出首字母就能联想出一整条语句，这也太智能
+了，还显示了每条语句使用频率。原因是它学习了我的项目代码，总结出了我的代码偏好。
 
 -- Free Mybatis Plugin————一个提高mybatis编码的插件。实现了dao层跳转到xml层
 的跳转功能
 
--- Mybatis-log-plugin————根据mybatis输出的sql日志，转换为拼接好参数的sql
+-- File Expander————能在Idea里直接打开Jar包,并且反编译代码查看.甚至于能
+打开tar.gz,zip等压缩格式
+
+-- GitToolBox————能在项目上提示你还有多少文件没提交,远程还有多少文件没更新下
+来,还能在每一行代码上提示上次提交的时间,查版本提交问题的时候尤其方便
+
+-- GsonFormat————超级实用的一个插件，对接第三方接口，通常需要将对方的json字
+符串转实体类，搞的很是头疼。使用GsonFormat我们只需要创建一个类，然后把要转换
+的json字符串复制进去，点击OK它就会给我们生成相应的实体对象。
+
+-- Grep Console————自定义控制台输出格式插件
+
+-- Git Commit Template————提供了很好的 Git 格式化模版，你可以按照实际情况格式化
+你的提交信息。
+
+-- GenerateSerialVersionUID————代码生成插件。一键为实现 Serializable 接口的类
+生成 SerialVersionUID。
+
+-- IDEA Mind Map————画思维导图
 
 -- Jrebel————一款比较好用的热部署插件，省去了一直重启的麻烦，尤其适合项目比较大的，
 能够节省不少时间
     1、详情参考1————https://blog.csdn.net/top_explore/article/details/107321541
     1、详情参考2————https://blog.csdn.net/seanxwq/article/details/89892614
+
+-- JavaDoc————快速生成 java 注释.通过快捷 就可以生成注释。mac 的快捷键需要自己去
+设置,windows 快捷键如下:
+    1、要为活动元素生成 javadocs，请按 shift + alt + G。
+    2、要为当前 java 文件中的所有元素生成 javadocs,请按 shift + ctrl + alt + G。
+    3、删除当前/选定元素上的 javadocs 请按 shift + alt + Z。
+    4、删除当前类所有元素上的 javadocs：请按 shift + ctrl + alt + Z。
+
+-- Json Parser————JSON解析器是一个用于验证和格式化JSON字符串的轻量级插件。
+
+-- Key Promoter X————捷键提示插件,每次都会在右下角弹窗提示，帮助我们快速熟悉快捷键。
+
+-- Kubernetes————K8s工具
+
+-- Lombok————简化你的实体类不再写get/set方法，还能快速的实现builder模式，以及
+链式调用方法，总之就是为了简化实体类而生的插件
+
+-- Mybatis-log-plugin————根据mybatis输出的sql日志，转换为拼接好参数的sql.方便在
+开发中从日志中跟踪调试 sql语句。
+
+-- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪
+个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
+
+-- MybatisX————高效操作Mybatis插件,为 Mybatis 开发的插件，提供了 Mapper 接口
+和 XML之间的跳转和自动生成模版的功能。
+    1、映射器和xm可以来回跳转
+    2、mybatis.xml,mapper.xm1提示
+    3、映射器和XML支持自动提示,例如jpa(参考MybatisCodeHelperPro)
+    4、集成 mybatis生成器Gui(从免费的mybatis插件复制)
+
+-- MetricsReloaded————代码复杂度检查插件
+
+-- Material Theme UI————可将原始外观更改为Material Design外观。
 
 -- RestfulToolkit
     1、根据 URL 直接跳转到对应的方法定义 ( Ctrl \ or Ctrl Alt N );
@@ -664,36 +737,20 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
     5、其他功能: java 类上添加 Convert to JSON 功能，格式化 json 数
 据 ( Windows: Ctrl + Enter; Mac: Command + Enter )
 
--- redis————redis客户端工具，不需要再去安装第三方客户端，相对方便许多
+-- Redis————redis客户端工具，不需要再去安装第三方客户端，相对方便许多
 
--- Vuesion Theme————一款皮肤插件.非常适中的UI颜色,漂亮的代码高亮主题
+-- Rainbow Brackets————彩虹括号插件,成对儿的括号显示相同的颜色，有了这个插
+件，我的近视都好了。
 
--- Atom Material ICons————一款ICON插件.解决了idea在macOs下,感觉在拖动滚动条或
-是鼠标中键滚屏时有点卡顿
+-- SonarLint————代码质量检查插件,提示我不要用System.out输出，要用logger输出，诸
+如此类，帮助我们提升代码质量
 
--- File Expander————能在Idea里直接打开Jar包,并且反编译代码查看.甚至于能
-打开tar.gz,zip等压缩格式
+-- Save Actions————格式化代码插件,可以帮忙我们优化包导入，自动给没有修改的变量添
+加final修饰符，调用方法的时候自动添加this关键字等，使我们的代码更规范统一
 
--- GitToolBox————能在项目上提示你还有多少文件没提交,远程还有多少文件没更新下
-来,还能在每一行代码上提示上次提交的时间,查版本提交问题的时候尤其方便
+-- Statistic————代码统计插件
 
--- Maven Helper————可视化依赖书,可以清晰的知道,哪个Jar包传递依赖了什么,哪
-个jar包什么版本和什么版本冲突了.排查Jar包依赖等问题用这个简直是神器
-
--- GsonFormat————超级实用的一个插件，对接第三方接口，通常需要将对方的json字
-符串转实体类，搞的很是头疼。使用GsonFormat我们只需要创建一个类，然后把要转换
-的json字符串复制进去，点击OK它就会给我们生成相应的实体对象。
-
--- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个
-插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻
-译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文
-时理解的更加透彻。
-
--- arthas idea————阿里开源的一款强大的java在线诊断工具.有了arthas这种神器可
-以线上输出日志，但是watch语法还是不够简单，因此Idea arthas 插件就此横空出世，插
-件安装成功后，只需要将光标放置在具体的类、字段、方法上面 右键选择需要执行的命令，部
-分会有窗口弹出、根据界面操作获取命令；部分直接获取命令复制到了剪切板 ，自己启
-动arthas 后粘贴即可执行。
+-- SequenceDiagram————时序图绘制插件
 
 -- Search In Repository————平时我们如果要依赖一个第三方jar包，但是不知道
 它的maven/gradle的坐标。搓点的做法基本上就是baidu了，稍微高级点的就是到中央
@@ -702,47 +759,18 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 字或者gav关键字，就能查到到这个jar包所有的版本，然后可以直接复制gav坐标。方便又
 快捷，干净又卫生！
 
+-- Translation————不需要你切换窗口,直接一个快捷键就可以翻译整段文本了.这个
+插件的翻译引擎可以与多个翻译接口集成对接，支持google翻译，有道翻译，百度翻
+译，阿里翻译。实时进行精准快速的翻译，自动识别语言。帮助你在阅读源码里的英文
+时理解的更加透彻。
+
+-- Vuesion Theme————一款皮肤插件.非常适中的UI颜色,漂亮的代码高亮主题
+
 -- VisualGC————Idea堆栈的可视化工具，和Idea深度集成。直接显示所有进程，双击即
 可打开JVM的堆栈可视化界面。堆栈和垃圾收集情况一目了然！
 
 -- Zoolytic————一款zookeeper节点的查看分析插件。其实第三方也有一些zk的节点信
 息查看工具，但是我都觉得不够方便，直到我发现了这款插件。
-
--- Codota————代码智能提示插件,只要打出首字母就能联想出一整条语句，这也太智能
-了，还显示了每条语句使用频率。原因是它学习了我的项目代码，总结出了我的代码偏好。
-
--- Key Promoter X————捷键提示插件,每次都会在右下角弹窗提示，帮助我们快速熟悉快捷键。
-
--- CodeGlance————显示代码缩略图插件,当代码很多的时候，方便查看，很有用。
-
--- Alibaba Java Coding Guidelines————阿里巴巴代码规范检查插件,会按照阿里Java开发
-手册上规范帮我们检查代码，然后对代码做不同颜色展示，鼠标放上去，会看到提示内容，帮助
-我们写出更规范的代码。
-
--- CamelCase————驼峰命名和下划线命名转换,命名方式用快捷
-键 ⇧ + ⌥ + U / Shift + Alt + U 可以进行快速转换，当我们需要修改大量变量名称的
-时候很方便
-
--- MybatisX————高效操作Mybatis插件
-1、映射器和xm可以来回跳转
-2、mybatis.xml,mapper.xm1提示
-3、映射器和XML支持自动提示,例如jpa(参考MybatisCodeHelperPro)
-4、集成 mybatis生成器Gui(从免费的mybatis插件复制)
-
--- SonarLint————代码质量检查插件,提示我不要用System.out输出，要用logger输出，诸
-如此类，帮助我们提升代码质量
-
--- Save Actions————格式化代码插件,可以帮忙我们优化包导入，自动给没有修改的变量添
-加final修饰符，调用方法的时候自动添加this关键字等，使我们的代码更规范统一
-
--- Grep Console————自定义控制台输出格式插件
-
--- MetricsReloaded————代码复杂度检查插件
-
--- Statistic————代码统计插件
-
--- Rainbow Brackets————彩虹括号插件,成对儿的括号显示相同的颜色，有了这个插
-件，我的近视都好了。
 
 ```
 
