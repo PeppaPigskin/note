@@ -711,13 +711,20 @@ Omi录屏专家 for mac让你快速记录自己的工作步骤。无论是整个
 -- Json Parser————JSON解析器是一个用于验证和格式化JSON字符串的轻量级插件。
 
 -- JRebel and XRebel————Java代码修改后不用重启系统，立即生效
-    安装完成之后，这里会有两个绿色的按钮，并且在右边多了一个选项Select Rebel Agents：
-    其中一个绿色的按钮，表示热部署启动项目，另外一个表示用debug默认热部署启动项目。
-    Select Rebel Agents选项中包含三个值：
-        JRebel：修改完代码，不重启服务，期望代码直接生效。
-        XRebel：请求过程中，各个部分代码性能监控。例如：方法执行时间，出现的异常，
+    1、安装完成之后，这里会有两个绿色的按钮，并且在右边多了一个选项Select Rebel Agents：
+    2、其中一个绿色的按钮，表示热部署启动项目，另外一个表示用debug默认热部署启动项目。
+    3、Select Rebel Agents选项中包含三个值：
+        1)JRebel：修改完代码，不重启服务，期望代码直接生效。
+        2)XRebel：请求过程中，各个部分代码性能监控。例如：方法执行时间，出现的异常，
     SQL执行时间，输出的Log，MQ执行时间等。
-        JRebel+XRebel：修改完代码，不重启服务，并且监控代码。
+        3)JRebel+XRebel：修改完代码，不重启服务，并且监控代码。
+    4、激活
+        1)使用 jrebel.qekang.com网址
+        2)通过该网址生成 UUID  https://www.guidgen.com/  
+        3)jrebel.qekang.com网址 拼上 UUID
+            https://jrebel.qekang.com/7b42efd0-6ecf-48be-809b-291774eeb84b
+        4)输入一个邮箱
+        5)进行激活
 
 -- Key Promoter X————捷键提示插件,每次都会在右下角弹窗提示，帮助我们快速熟悉快捷键。
 
