@@ -20520,6 +20520,35 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
         调整键盘为英文输入状态，刷新一下页面，鼠标点击当前页面任意位置，然后依次按键 thisisunsafe 按完上面的按键，页面会自动刷新，然后就可以正常访问了。
 ```
 
+## 28、Maven打包同时引入本地jar包
+
+```xml
+实现步骤如下:
+1、将需要手动引入的包放在项目/src/main/resources目录下,如/src/main/resources/lib目录下
+2、修改pom文件，引入依赖并且将scope设置为system,如下:
+ <dependency>
+     <groupId>com.hand.hdsp</groupId>
+     <artifactId>fine-core</artifactId>
+     <version>10.0</version>
+     <scope>system</scope>
+     <systemPath>${project.basedir}/src/main/resources/lib/fine-core-core-10.0.jar</systemPath>
+ </dependency>
+3、配置maven打包插件,如下:
+ <plugins>
+    <plugin>
+        <groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-maven-plugin</artifactId>
+    	<version>${spring-boot.version}</version>
+		<!--JAR包打包需要将resources\lib\下的jar包复制到WEB-INF/lib-->
+		<configuration>
+			<includeSystemScope>true</includeSystemScope>
+		</configuration>
+	</plugin>
+ <plugins>							
+```
+
+
+
 # 四、相关注解说明
 
 ## 1、基本注解
