@@ -9099,488 +9099,112 @@ docker run --env MODE=standalone --name nacos \
 ### 3、CompletableFuture异步编排
 
 ```markdown
-# 创建异步对象(CompletableFuture提供了四个静态方法来创建一个异步操作)
--- 无返回结果的，可自定义线程池
-    1、相关方法
-    1)不可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable)
-       2)可以定义线程池————public static CompletableFuture<Void> runAsync (Runnable runnable, Executor executor)
-    2、代码示例：       
-    CompletableFuture.runAsync(() -> {    
-      System.out.println("当前线程：" + Thread.currentThread().getId());   
-      int i = 10 / 2;         
-      System.out.println("运行结果：" + i);      
-    }, service); //service为自定义线程池,不指定采用默认
-    3、结果：
-    //        main方法开始。。。。。
-    //        main方法结束。。。。。
-    //        当前线程：11
-    //        运行结果：5
+# 一、创建异步对象（异步带后缀Async，自定义线程池添加taskExecutor）
+/*1、创建异步对象，无返回结果的*/
+final CompletableFuture<Void> runAsync1 = CompletableFuture.runAsync(() -> System.out.println("runAsync1 线程ID:【" + Thread.currentThread().getId() + "】"), taskExecutor);
+final CompletableFuture<Void> runAsync2 = CompletableFuture.runAsync(() -> System.out.println("runAsync2 线程ID:【" + Thread.currentThread().getId() + "】"), taskExecutor);
 
--- 有返回结果的，可自定义线程池
-    1、相关方法
-    1)不可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier)
-    2)可自定义线程池————public static <U > CompletableFuture < U > supplyAsync(Supplier < U > supplier,
-          Executor executor)
-    2、代码示例 
-    CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {      
-      System.out.println("当前线程：" + Thread.currentThread().getId());      
-      int i = 10 / 2;         
-      System.out.println("运行结果：" + i);   
-      return i;   
-    }, service);   
-    System.out.println("main方法结束。。。。。" + supplyAsync.get());
-    3、结果
-    //        main方法开始。。。。。
-    //        当前线程：11
-    //        运行结果：5
-    //        main方法结束。。。。。5
+/*2、创建异步对象，有返回结果的*/
+final CompletableFuture<String> supplyAsync1 = CompletableFuture.supplyAsync(() -> {
+    try {
+        Thread.sleep(10000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    System.out.println("supplyAsync1 线程ID:【" + Thread.currentThread().getId() + "】");
+    return Thread.currentThread().getId() + "";
+}, taskExecutor);
+final CompletableFuture<String> supplyAsync2 = CompletableFuture.supplyAsync(() -> {
+    System.out.println("supplyAsync2 线程ID:【" + Thread.currentThread().getId() + "】");
+    return Thread.currentThread().getId() + "";
+}, taskExecutor);
 
-# 计算完成时回调方法(方法完成之后的感知)
--- 相关方法————处理正常和异常的计算结果
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-      public CompletableFuture<T> whenComplete (BiConsumer < ? super T, ?super Throwable > action)  
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, ?super Throwable > action)   
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public CompletableFuture<T> whenCompleteAsync (BiConsumer < ? super T, 
-            ?super Throwable > action, Executor executor)       
-    4、处理异常结果
-      public CompletableFuture<T> exceptionally (Function < Throwable, ? extends T > fn)
+# 二、完成时回调方法（异步带后缀Async，自定义线程池添加taskExecutor）
+/*1、方法完成之后的感知————处理正常和异常计算结果，但是没法修改返回数据*/
+supplyAsync1.whenCompleteAsync((result, exception) -> {
+    /*虽然能得到异常信息，但是没法修改返回数据*/
+    if (result != null && exception == null) {
+        System.out.println("whenCompleteAsync 感知到 supplyAsync 的结果为：【" + result + "】" + "但不可以返回新的结果【不能return】");
+    }
+    System.out.println("whenCompleteAsync 感知到 supplyAsync 出异常/不符合预期结果了");
+});
+/*2、方法完成之后的处理————处理正常和异常计算结果，并返回新的结果*/
+supplyAsync1.handleAsync((result, exception) -> {
+    if (result != null && exception == null) {
+        //返回有结果，并且异常为空，则继续执行并返回执行后的新结果
+        return "handleAsync 感知到 supplyAsync 的结果为：【" + result + "】" + "并可以返回新的结果【return" + result + "】";
+    }
+    /*否则证明有异常或者返回结果为空*/
+    return "handleAsync 感知到 supplyAsync 出异常/不符合预期结果了";
+});
+/*3、处理异常结果*/
+supplyAsync1.exceptionally(throwable -> {
+    /*可以感知异常，同时返回默认值*/
+    return "exceptionally 感知到 supplyAsync 出异常了";
+});
 
--- 代码示例    
-    CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {       
-    System.out.println("当前线程：" + Thread.currentThread().getId());     
-    int i = 10 / 0;          
-    System.out.println("运行结果：" + i);     
-    return i;     
-    }, service).whenComplete((result, exception) -> {    
-        /*虽然能得到异常信息，但是没法修改返回数据*/       
-         System.out.println("异步任务成功完成了。。。,结果是：" + result + "；异常是：" + exception);    
-    }).exceptionally(throwable -> {   
-      /*可以感知异常，同时返回默认值*/      
-      return 10;      
-    });
+# 三、线程串行化方法（异步带后缀Async，自定义线程池添加taskExecutor）
+/*1、不能获取到上一步的执行结果，继续执行无返回值*/
+final CompletableFuture<Void> thenRunAsync = runAsync1.thenRunAsync(() -> {
+    System.out.println("thenRunAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("thenRunAsync 不获取到上一步,且不可以返回新的结果【不能return】");
+}, taskExecutor);
+/*2、能接收到上一步的执行结果，继续执行无返回值*/
+final CompletableFuture<Void> thenAcceptAsync = supplyAsync1.thenAcceptAsync((x) -> {
+    System.out.println("thenAcceptAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("thenAcceptAsync 获取到上一步结果：【" + x + "】" + "但不可以返回新的结果【不能return】");
+}, taskExecutor);
+/*3、能接收到上一步的执行结果,继续执行有返回值*/
+final CompletableFuture<String> thenApplyAsync = supplyAsync1.thenApplyAsync((x) -> {
+    System.out.println("thenApplyAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    return "thenApplyAsync 获取到上一步结果：【" + x + "】" + "并可以返回新的结果【return_" + x + "】";
+});
 
--- 结果
-    //        main方法开始。。。。。
-    //        当前线程：11
-    //        异步任务成功完成了。。。,结果是：null；异常是：java.util.concurrent.CompletionException: 
-    // java.lang.ArithmeticException: / by zero
-    //        main方法结束。。。。。10
+# 四、两个任务组合（异步带后缀Async，自定义线程池添加taskExecutor）
+/*1、两个任务都完成后操————不能获取到任务一和任务二的执行结果，继续执行无返回结果*/
+final CompletableFuture<Void> runAfterBothAsync = runAsync1.runAfterBothAsync(runAsync2, () -> {
+    System.out.println("runAfterBothAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("runAfterBothAsync 不获取到上一步,且不可以返回新的结果【不能return】");
+}, taskExecutor);
+/*2、两个任务都完成后操————能获取到任务一和任务二的执行结果，继续执行无返回结果*/
+final CompletableFuture<Void> thenAcceptBothAsync = supplyAsync1.thenAcceptBothAsync(supplyAsync2, (f1, f2) -> {
+    System.out.println("thenAcceptBothAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("thenAcceptBothAsync 获取到上一步 supplyAsync1 结果：【" + f1 + "】" + "supplyAsync2 结果：【" + f2 + "】" + "但不可以返回新的结果【不能return】");
+}, taskExecutor);
+/*3、两个任务都完成后操————能获取到任务一和任务二的执行结果，继续执行有返回结果*/
+final CompletableFuture<String> thenCombineAsync = supplyAsync1.thenCombineAsync(supplyAsync2, (f1, f2) -> {
+    System.out.println("thenCombineAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    return "thenCombineAsync 获取到上一步 supplyAsync1 结果：【" + f1 + "】" + " supplyAsync2 结果：【" + f2 + "】" + "并可以返回新的结果【return_" + f1 + ":" + f2 + "】";
+}, taskExecutor);
+/*4、两个任务只要有一个任务完成————不能获取到任务一或任务二的执行结果，继续执行无返回结果*/
+final CompletableFuture<Void> runAfterEitherAsync = runAsync1.runAfterEitherAsync(runAsync2, () -> {
+    System.out.println("runAfterBothAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("runAfterBothAsync 不获取到上一步,且不可以返回新的结果【不能return】");
+}, taskExecutor);
+/*5、两个任务只要有一个任务完成————能获取到任务一或任务二的执行结果，继续执行无返回结果*/
+final CompletableFuture<Void> acceptEitherAsync = supplyAsync1.acceptEitherAsync(supplyAsync2, (result) -> {
+    System.out.println("acceptEitherAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    System.out.println("acceptEitherAsync 获取到上一步 supplyAsync1 或 supplyAsync2 结果：【" + result + "】" + "但不可以返回新的结果【不能return】");
 
-# handle方法(方法完成之后的处理)
--- 相关方法————处理正常和异常的计算结果，并返回新的结果
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-      public <U > CompletableFuture < U > handle(BiFunction < ? super T, Throwable, ? extends U > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, ? extends U > fn)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-        public <U > CompletableFuture < U > handleAsync(BiFunction < ? super T, Throwable, 
-          ? extends U > fn, Executor executor)
+}, taskExecutor);
+/*6、两个任务只要有一个任务完成————能获取到任务一或任务二的执行结果，继续执行有返回结果*/
+final CompletableFuture<String> applyToEitherAsync = supplyAsync1.applyToEitherAsync(supplyAsync2, (result) -> {
+    System.out.println("applyToEitherAsync 线程ID:【" + Thread.currentThread().getId() + "】");
+    return "applyToEitherAsync 获取到上一步 supplyAsync1 或 supplyAsync2 结果：【" + result + "】" + "并可以返回新的结果【return_" + result + "】";
+});
 
--- 代码示例
-    CompletableFuture<Integer> handle = CompletableFuture.supplyAsync(() -> {     
-        System.out.println("当前线程：" + Thread.currentThread().getId());       
-        int i = 10 / 4;         
-        System.out.println("运行结果：" + i);   
-        return i;    
-    }, service).handle((result, exception) -> {    
-        if (result != null && exception == null) {
-            //返回有结果，并且异常为空，则继续执行并返回执行后的新结果    
-            return result * 2;       
-        }          
-        /*否则证明有异常或者返回结果为空*/   
-        return 0;   
-    });
-
--- 结果
-    // main方法开始。。。。。    
-    // 当前线程：11       
-    // main方法结束。。。。。
-    // 0
-
-# 线程串行化方法
--- 相关方法————不能获取到上一步的执行结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-        public CompletableFuture<Void> thenRun(Runnable action)      
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    public CompletableFuture<Void> thenRunAsync (Runnable action)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public CompletableFuture<Void> thenRunAsync (Runnable action, Executor executor)
-    4、代码示例  
-    CompletableFuture.supplyAsync(() -> {         
-      System.out.println("当前线程：" + Thread.currentThread().getId());   
-      int i = 10 / 4;        
-      System.out.println("运行结果：" + i);      
-      return i;      
-    }, service).thenRunAsync(() -> {   
-      System.out.println("任务二启动了。。。");   
-    }, service);
-    5、运行结果
-        //        当前线程：11
-        //        运行结果：2
-        //        main方法结束。。。。。
-        //        任务二启动了。。。
-
--- 相关方法————能接收到上一步的执行结果,但是不能改变返回值，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-       public CompletableFuture<Void> thenAccept(Consumer<? super T> action)    
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-       public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action)    
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-       public CompletableFuture<Void> thenAcceptAsync (Consumer < ? super T > action, Executor executor)
-    4、代码示例 
-        CompletableFuture.supplyAsync(() -> {     
-      System.out.println("当前线程：" + Thread.currentThread().getId());    
-      int i = 10 / 4;         
-      System.out.println("运行结果：" + i);  
-      return i;     
-    }, service).thenAcceptAsync((result) -> {  
-         System.out.println("任务二启动了。。。上一次结果为：" + result);     
-    }, service);
-    5、运行结果
-    //        当前线程：11
-    //        运行结果：2
-    //        main方法结束。。。。。
-    //        任务二启动了。。。上一次结果为：2
-
--- 相关方法————能接收到上一步的执行结果,并且能改变返回值，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-      public <U > CompletableFuture < U > thenApply(Function < ? super T, ? extends U > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-    public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, ? extends U > fn)       
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是由其他线程继续执行
-      public <U > CompletableFuture < U > thenApplyAsync(Function < ? super T, 
-            ? extends U > fn, Executor executor)
-    4、代码示例
-    CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {  
-      System.out.println("当前线程：" + Thread.currentThread().getId());      
-      int i = 10 / 4;          
-      System.out.println("运行结果：" + i);        
-      return i;      
-    }, service).thenApplyAsync((result) -> {   
-      System.out.println("任务二启动了。。。上一次结果为：" + result);  
-      return "我是返回结果" + result;  
-    }, service);    
-    System.out.println("main方法结束。。。。。最终返回结果：" + future.get());
-    5、执行结果
-    //        当前线程：11
-    //        运行结果：2
-    //        任务二启动了。。。上一次结果为：2
-    //        main方法结束。。。。。最终返回结果：我是返回结果2
-
-# 两个任务组合——都要完成(两个任务都完成后触发)
--- 相关方法————不能获取到任务一和任务二的执行结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-        public CompletableFuture<Void> runAfterBoth (CompletionStage < ? > other, Runnable action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-        public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action)        
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-        public CompletableFuture<Void> runAfterBothAsync (CompletionStage < ? > other, Runnable action, Executor executor)
-    4、代码示例：       
-    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> { 
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());      
-      int i = 10 / 4;     
-      System.out.println("任务一线程结束：" + i);  
-      return i;      
-    }, service);  
-    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {        
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
-      System.out.println("任务二线程结束：");     
-      return "Hello";     
-    }, s    ervice);    
-    future01.runAfterBothAsync(future02, () -> {   
-        System.out.println("任务三开始。。。");      
-    }, service);     
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        main方法结束。。。。。最终返回结果：
-    //        任务三开始。。。
-
--- 相关方法————能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-      public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,BiConsumer < ? super T, ?super U > action)       
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-      public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action, Executor executor)
-    4、代码示例：      
-    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {   
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
-      int i = 10 / 4;        
-      System.out.println("任务一线程结束：" + i);     
-      return i;    
-    }, service);    
-    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {    
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
-      System.out.println("任务二线程结束：");     
-      return "Hello";
-    }, service);     
-    future01.thenAcceptBothAsync(future02, (f1, f2) -> {         
-        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);   
-    }, service);
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        main方法结束。。。。。最终返回结果：
-    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
-
--- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-    public <U, V > CompletableFuture < V > thenCombine(CompletionStage < ? extends U > other,BiFunction < ? super T,? super U,? extends V > fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other, BiFunction < ? super T,?super U,? extends V > fn)        
-    3、自定义线程池（将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-        public <U, V > CompletableFuture < V > thenCombineAsync(CompletionStage < ? extends U > other,BiFunction < ? super T,?super U,? extends V > fn, Executor executor)
-    4、代码示例：
-    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
-      int i = 10 / 4;         
-      System.out.println("任务一线程结束：" + i);   
-        return i;     
-    }, service);  
-    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {   
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());  
-      System.out.println("任务二线程结束：");      
-      return "Hello";    
-    }, service);  
-    CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {   
-      System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);      
-      return "任务三返回结果：" + "任务一的结果：" + f1 + ";任务二的结果：" + f2;    
-    }, service);
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
-    //        main方法结束。。。。。最终返回结果：任务三返回结果：任务一的结果：2;任务二的结果：Hello
-
-# 两个任务组合——一个完成
--- 相关方法————不能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-      public CompletableFuture<Void> runAfterEither (CompletionStage < ? > other, Runnable action) 
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action)  
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行    
-    public CompletableFuture<Void> runAfterEitherAsync (CompletionStage < ? > other, Runnable action, Executor executor)
-    4、代码示例
-    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {  
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());         
-      int i = 10 / 4;       
-      System.out.println("任务一线程结束：" + i);    
-      return i;     
-    }, service);      
-    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {     
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());          
-      try {              
-        Thread.sleep(3000);     
-        System.out.println("任务二线程结束：任务二的线程睡了三秒");    
-      } catch (InterruptedException e) {      
-          e.printStackTrace();          
-      }         
-      return "Hello";     
-    }, service);  
-    future01.runAfterEitherAsync(future02, () -> {         
-        System.out.println("任务三开始执行。。。");      
-    }, service);
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务三开始执行。。。
-    //        任务二线程结束：任务二的线程睡了三秒
-
--- 相关方法————能获取到任务一或任务二的执行结果，任务三无返回结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-    public CompletableFuture<Void> acceptEither (CompletionStage < ? extends T > other, Consumer < ? super T > action)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-       public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,Consumer < ? super T > action)        
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    public CompletableFuture<Void> acceptEitherAsync (CompletionStage < ? extends T > other,Consumer < ? super T > action, Executor executor)
-    4、代码示例：
-    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {       
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());  
-      int i = 10 / 4;       
-      System.out.println("任务一线程结束：" + i);    
-      return i;      
-    }, service);   
-    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());   
-      System.out.println("任务二线程结束：");      
-      try {               
-        Thread.sleep(3000);    
-        System.out.println("任务二线程结束：任务二的线程睡了三秒");   
-      } catch (InterruptedException e) {            
-          e.printStackTrace();          
-      }          
-      return "Hello";    
-    }, service);     
-    future01.acceptEitherAsync(future02, (result) -> {   
-      System.out.println("任务三开始执行。。。任务一或任务二的结果为：" + result);   
-    }, service);
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        任务三开始执行。。。任务一或任务二的结果为：2
-    //        任务二线程结束：任务二的线程睡了三秒
-
--- 相关方法————能获取到任务一和任务二的执行结果，任务三有返回结果，继续执行
-    1、执行当前任务的线程继续执行任务————相同的线程执行
-         public <U> CompletableFuture <U> applyToEither(CompletionStage <? extends T> other, Function <? super T,U> fn)       
-    2、将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, Function < ? super T, U > fn)      
-    3、自定义线程池————将接下来的任务交给线程池来进行执行————可能是有其他线程继续执行
-    public <U > CompletableFuture < U > applyToEitherAsync(CompletionStage < ? extends T > other, Function < ? super T, U > fn, Executor executor)
-    4、代码示例：    
-    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {         
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());        
-      int i = 10 / 4;        
-      System.out.println("任务一线程结束：" + i);     
-      return i;     
-    }, service); 
-    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {  
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());      
-      try {            
-        Thread.sleep(3000);      
-        System.out.println("任务二线程结束：");    
-      } catch (InterruptedException e) {   
-          e.printStackTrace();        
-      }          
-      return "Hello";    
-    }, service);     
-    CompletableFuture<String> stringCompletableFuture = future01.applyToEitherAsync(future02, (result) -> {  
-      System.out.println("任务三开始执行。。。");    
-      return "任务三执行完成，任务一或任务二的结果为：result:" + result;       
-    }, service);     
-    System.out.println("main方法结束。。。。。最终返回结果：" + stringCompletableFuture.get());
-    5、运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        任务三开始执行。。。
-    //        main方法结束。。。。。最终返回结果：任务三执行完成，任务一或任务二的结果为：result:2
-
-# 多任务组合
--- 相关方法 
-    1、等待所有任务完成
-      public static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs)     
-    2、只要有一个任务完成
-       public static CompletableFuture<Object> anyOf(CompletableFuture<?>... cfs)
-    3、代码示例：     
-    CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {  
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());   
-      int i = 10 / 4;        
-      System.out.println("任务一线程结束：" + i);     
-      return i;     
-    }, service);   
-    CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {     
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId());    
-      try {           
-        Thread.sleep(3000);     
-        System.out.println("任务二线程结束：");       
-      } catch (InterruptedException e) {            
-          e.printStackTrace();      
-      }          
-      return "Hello";    
-    }, service);     
-    CompletableFuture<Object> future03 = CompletableFuture.supplyAsync(() -> {   
-      System.out.println("任务三线程启动：" + Thread.currentThread().getId());  
-      try {          
-        Thread.sleep(5000);    
-        System.out.println("任务三线程结束：");   
-      } catch (InterruptedException e) { 
-          e.printStackTrace();         
-      }           
-      return "Hello";      
-    }, service);      
-    CompletableFuture<Object> future04 = CompletableFuture.supplyAsync(() -> {     
-      System.out.println("任务四线程启动：" + Thread.currentThread().getId());    
-      try {             
-        Thread.sleep(6000);  
-        System.out.println("任务四线程结束：");   
-      } catch (InterruptedException e) {       
-          e.printStackTrace();           
-      }           
-      return "Hello";     
-    }, service);   
-    //等待所有结果完成
-    CompletableFuture.allOf(future01, future02, future03, future04).get();
-    System.out.println("main...end..." + future01.get() + "=>" + future02.get() + "=>" + future03.get() + "=>" + future04.get());
-        //只要其中一个执行完成
-      CompletableFuture<Object> f = CompletableFuture.anyOf(future01, future02, future03, future04);      
-      System.out.println("main...end..." + f.get());
-    4、等待所有结果完成————运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务三线程启动：13
-    //        任务四线程启动：14
-    //        任务二线程结束：
-    //        任务三线程结束：
-    //        任务四线程结束：
-    //        main...end...2=>Hello=>Hello=>Hello       
-    5、只要其中一个执行完成————运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务三线程启动：13
-    //        任务四线程启动：14
-    //        main...end...2
-    //        任务二线程结束：
-    //        任务三线程结束：
-    //        任务四线程结束：
-
-# 业务场景示例
--- 场景————假如商品详情页的每个查询,需要入校标注的时间才能完成,那么用户5.5s才能看到结果.但是使用多线程,1.5s就能看到
--- 说明
-    1、方法说明：  
-    /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行（执行当前任务的线程继续执行任务——相同的线程执行）*/
-    public <U > CompletableFuture < Void > thenAcceptBoth(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action)     
-    /*能获取到任务一和任务二的执行结果,任务三无返回结果,继续执行（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
-    public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other,BiConsumer < ? super T, ?super U > action)    
-    /*能获取到任务一和任务二的执行结果，任务三无返回结果，继续执行，自定义线程池（将接下来的任务交给线程池来进行执行——可能是有其他线程继续执行）*/
-    public <U > CompletableFuture < Void > thenAcceptBothAsync(CompletionStage < ? extends U > other, BiConsumer < ? super T, ?super U > action, Executor executor)
-    2、代码示例：    
-    CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {       
-      System.out.println("任务一线程启动：" + Thread.currentThread().getId());     
-      int i = 10 / 4;         
-      System.out.println("任务一线程结束：" + i);    
-      return i;      
-    }, service);    
-    CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> { 
-      System.out.println("任务二线程启动：" + Thread.currentThread().getId()); 
-      System.out.println("任务二线程结束：");       
-      return "Hello";      
-    }, service);  
-    future01.thenAcceptBothAsync(future02, (f1, f2) -> {    
-        System.out.println("任务三开始。。。之前任务一的结果：" + f1 + ";任务二的结果：" + f2);        
-    }, service);
-    3、结果展示
-    //      运行结果：
-    //        main方法开始。。。。。
-    //        任务一线程启动：11
-    //        任务一线程结束：2
-    //        任务二线程启动：12
-    //        任务二线程结束：
-    //        main方法结束。。。。。最终返回结果：
-    //        任务三开始。。。之前任务一的结果：2;任务二的结果：Hello
+# 五、多任务组合
+try {
+    /*1、只要有一个任务完成*/
+    final CompletableFuture<Object> anyOf = CompletableFuture.anyOf(runAsync1, runAsync2, supplyAsync1, supplyAsync2);
+    System.out.println("只要其中一个执行完成【" + anyOf.get() + "】");
+    /*2、等待所有任务完成*/
+    final CompletableFuture<Void> allOf = CompletableFuture.allOf(runAsync1, runAsync2, supplyAsync1, supplyAsync2);
+    System.out.println("等待所有结果完成【" + allOf.get() + "】");
+    System.out.println("runAsync1, runAsync2, supplyAsync1, supplyAsync2 任务都已结束...");
+} catch (InterruptedException | ExecutionException e) {
+    e.printStackTrace();
+}
 ```
 
 ### 4、CompletableFuture异步编排使用步骤
@@ -20537,17 +20161,15 @@ DENIEDRedisisrunninginprotectedmodebecauseprotectedmodeisenabled】
  <plugins>
     <plugin>
         <groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-maven-plugin</artifactId>
-    	<version>${spring-boot.version}</version>
-		<!--JAR包打包需要将resources\lib\下的jar包复制到WEB-INF/lib-->
-		<configuration>
-			<includeSystemScope>true</includeSystemScope>
-		</configuration>
-	</plugin>
- <plugins>							
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
+        <!--JAR包打包需要将resources\lib\下的jar包复制到WEB-INF/lib-->
+        <configuration>
+            <includeSystemScope>true</includeSystemScope>
+        </configuration>
+    </plugin>
+ <plugins>                            
 ```
-
-
 
 # 四、相关注解说明
 
